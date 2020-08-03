@@ -1,4 +1,4 @@
-IMPORTANT: YOU MUST OWN A LEGEL COPY OF THE RMMV SOFTWARE TO USE THIS PROJECT
+IMPORTANT: YOU MUST OWN A LEGEL COPY OF THE RMMZ SOFTWARE TO USE ANY OF MY RMMZ PLUGINS
 
 Plugin Users:
 You're welcome to make bug reports, compatibility problem reports and feature requests as raising issues
