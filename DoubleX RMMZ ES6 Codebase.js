@@ -28,7 +28,7 @@
  *----------------------------------------------------------------------------
  *    # Links
  *      This Plugin:
- *      1. https://pastebin.com/qjqn9sE0
+ *      1. https://github.com/Double-X/DoubleX-RMMZ/blob/master/DoubleX%20RMMZ%20ES6%20Codebase.js
  *      Posts:
  *      1. 
  *      2. 
@@ -40,11 +40,7 @@
  *      8. 
  *----------------------------------------------------------------------------
  *    # Instructions
- *      1. The default plugin parameters file name is
- *         DoubleX RMMZ ES6 Codebase
- *         If you want to change that, you must edit the value of
- *         DoubleX_RMMZ.ES6_Codebase_File, which must be done via opening this
- *         plugin js file directly
+ *      1. THIS PLUGIN MUST BE PLACED ABOVE ALL THE OTHER PLUGINS
  *----------------------------------------------------------------------------
  *    # Contributors
  *      Authors:
@@ -59,11 +55,16 @@
  *      - None So Far
  *----------------------------------------------------------------------------
  *    # Changelog
- *      v0.00a(GMT 1400 3-Aug-2020):
+ *      v0.00a(GMT 1400 4-Aug-2020):
  *      1. Rewritten the core parts into the ES6 standard
+ *----------------------------------------------------------------------------
+ *    # Todo
+ *      1. Adds Array.prototype.filterReduce
+ *      2. Adds Array.prototype.filterMapReduce
+ *      3. Adds Array.prototype.mapFilterReduce
  *============================================================================*/
 /*:
- * @plugindesc (v1.00a)Helps plugin developers write their plugins into ES6
+ * @plugindesc (v0.00a)Helps plugin developers write their plugins into ES6
  * standards, but such plugins will need this plugin to work
  * @author DoubleX
  *
@@ -71,29 +72,67 @@
  *============================================================================
  *    ## Plugin Developers Info
  *----------------------------------------------------------------------------
- *    Do these 2 additional things when using ES6 class inheritance aliasing
- *    without directly typing prototypes:
- *    1. Adds the following code right below a new class inheriting another
- *       one:
- *       - ES6ExtendedClassAlias.inherit(Klass);
- *       Where Klass is the new class inheriting another one
- *    2. Adds the following code right below extending an existing class as a
- *       way to alias its methods:
- *       - ES6ExtendedClassAlias.update(Klass);
- *       Where Klass is the existing class being extended as a way to alias
- *       its methods
- *    Right now it doesn't work well with inheriting static functions in
- *    classes, so those in children classes should use
- *    ParentClass.staticFunc.call(this) instead of super.staticFunc()
+ *    # Aliasing functions/methods without prototyping on your side
+ *      Please note that it doesn't work with built-in JavaScript prototypes
+ *      like Array and String
+ *      Do these 2 additional things when using ES6 class inheritance aliasing
+ *      without directly typing prototypes:
+ *      1. Adds the following code right below a new class inheriting another
+ *         one:
+ *         - ES6ExtendedClassAlias.inherit(Klass);
+ *         Where Klass is the new class inheriting another one
+ *      2. Adds the following code right below extending an existing class as
+ *         a way to alias its methods:
+ *         - ES6ExtendedClassAlias.update(Klass);
+ *         Where Klass is the existing class being extended as a way to alias
+ *         its methods
+ *      Right now it doesn't work well with inheriting static functions in
+ *      classes, so those in children classes should use
+ *      ParentClass.staticFunc.call(this) instead of super.staticFunc()
+ *   # New public APIs
+ *     Input
+ *     1. isJustReleased(keyName)
+ *        Returns if the specified key's just released right on this frame
+ *     Array.prototype
+ *     1. fastMap(mapCallback, mapThis_)
+ *        The same as map but is tested to be noticeably faster
+ *     2. fastMerge(arr)
+ *        The same as concat except that fastMerge alters the original array
+ *        instead of returning a new one
+ *     3. filterMap(filterCallback, mapCallback, filterThis_, mapThis_)
+ *        The same as chaining filter with map except that the new array
+ *        returned by filter will be mapped in place
+ *     4. mapFilter(mapCallback, filterCallback, mapThis_, filterThis_)
+ *        The same as chaining map with filter except that the new array
+ *        returned by map will be filtered in place
+ *     5. mapReduce(mapCallback, reduceCallback, initVal_, mapThis_, reduceThis_)
+ *        The same as chaining map with reduce but is tested to be noticeably
+ *        faster
+ *     6. isProperSubsetOf(arr)
+ *        Returns if this array's a proper subset of the specified array
+ *     7. isProperSupersetOf(arr)
+ *        Returns if this array's a proper superset of the specified array
+ *     8. isSupersetOf(arr)
+ *        Returns if this array's a superset of the specified array
+ *     9. isSubsetOf(arr)
+ *        Returns if this array's a subset of the specified array
+ *     10. isEmpty()
+ *        Returns if this array's empty
+ *     11. symmetricDifference(arr)
+ *        Returns the symmetric difference of this and the specified array
+ *     12. union(arr)
+ *        Returns the union of this and the specified array
+ *     13. difference(arr)
+ *        Returns the difference of this and the specified array
+ *     14. intersection(arr)
+ *        Returns the intersection of this and the specified array
+ *     15. excludes(elem)
+ *        Returns if this array excludes the specified element
  *============================================================================
  */
 
 var DoubleX_RMMZ = DoubleX_RMMZ || {};
 DoubleX_RMMZ["ES6 Codebase"] = "v0.00a";
-
-// The plugin file name must be the same as DoubleX_RMMZ.ES6_Codebase_File
-DoubleX_RMMZ.ES6_Codebase_File = "DoubleX RMMZ ES6 Codebase";
-//
 
 /*============================================================================
  *    ## Plugin Implementations
@@ -111,6 +150,11 @@ DoubleX_RMMZ.ES6_Codebase_File = "DoubleX RMMZ ES6 Codebase";
  *      2. Parameter/Return value of type * means it might be of any type
  *      3. Function signature with (**) means it might take any number of
  *         parameters of any type
+ *      4. Supposedly nullable variables are marked with the _ suffix in their
+ *         names(but they can be sure to be non null in some cases)
+ *      5. Functions supposedly returning nullable values are marked with the
+ *         _ suffix in their names(but their return values can be sure to be
+ *         non null in some cases)
  *----------------------------------------------------------------------------*/
 
 /*----------------------------------------------------------------------------
@@ -1719,7 +1763,7 @@ class Input {
      * @author DoubleX @interface @since v0.00a @version v0.00a
      * @memberof JsExtensions
      * @param {Array} arr - The array to be checked against
-     * @returns {boolean} If the specified array's a proper subset of this
+     * @returns {boolean} If this's a proper subset of the specified array
      */
     $.isProperSubsetOf = function(arr) {
         return this.isSubsetOf(arr) && !arr.isSubsetOf(this);
@@ -1730,7 +1774,7 @@ class Input {
      * @author DoubleX @interface @since v0.00a @version v0.00a
      * @memberof JsExtensions
      * @param {Array} arr - The array to be checked against
-     * @returns {boolean} If the specified array's a proper superset of this
+     * @returns {boolean} If this's a proper superset of the specified array
      */
     $.isProperSupersetOf = function(arr) {
         return this.isSupersetOf(arr) && !arr.isSupersetOf(this);
@@ -1741,7 +1785,7 @@ class Input {
      * @author DoubleX @interface @since v0.00a @version v0.00a
      * @memberof JsExtensions
      * @param {Array} arr - The array to be checked against
-     * @returns {boolean} If the specified array's a superset of this
+     * @returns {boolean} If this's a superset of the specified array
      */
     $.isSupersetOf = function(arr) { return arr.isSubsetOf(this); };
 
@@ -1750,7 +1794,7 @@ class Input {
      * @author DoubleX @interface @since v0.00a @version v0.00a
      * @memberof JsExtensions
      * @param {Array} arr - The array to be checked against
-     * @returns {boolean} If the specified array's a subset of this
+     * @returns {boolean} If this's a subset of the specified array
      */
     $.isSubsetOf = function(arr) { return this.difference(arr).isEmpty(); };
 
@@ -1767,7 +1811,7 @@ class Input {
      * @author DoubleX @interface @since v0.00a @version v0.00a
      * @memberof JsExtensions
      * @param {Array} arr - The array to have symmetric difference with
-     * @returns {Array} The symmetric difference of the specified and this array
+     * @returns {Array} The symmetric difference of this and the specified array
      */
     $.symmetricDifference = function(arr) {
         return this.difference(arr).union(arr.difference(this));
@@ -1778,7 +1822,7 @@ class Input {
      * @author DoubleX @interface @since v0.00a @version v0.00a
      * @memberof JsExtensions
      * @param {Array} arr - The array to have union with this array
-     * @returns {Array} The union of the specified and this array
+     * @returns {Array} The union of this and the specified array
      */
     $.union = function(arr) { return this.concat(arr.difference(this)); };
 
@@ -1787,7 +1831,7 @@ class Input {
      * @author DoubleX @interface @since v0.00a @version v0.00a
      * @memberof JsExtensions
      * @param {Array} arr - The array to have difference with this array
-     * @returns {Array} The difference of the specified and this array
+     * @returns {Array} The difference of this and the specified array
      */
     $.difference = function(arr) { return this.filter(this.excludes, arr); };
 
@@ -1796,7 +1840,7 @@ class Input {
      * @author DoubleX @interface @since v0.00a @version v0.00a
      * @memberof JsExtensions
      * @param {Array} arr - The array to have intersection with this array
-     * @returns {Array} The intersection of the specified and this array
+     * @returns {Array} The intersection of this and the specified array
      */
     $.intersection = function(arr) {
         // The 2nd argument of includes doesn't match with that of filter
