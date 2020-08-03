@@ -429,11 +429,9 @@ class Graphics {
      * @type number
      * @name Graphics.width
      */
-    static set width(value) {
-        // Edited to dry up codes essentially being the identical knowledge
-        this._updateDimen("_width", value);
-        //
-    } // width
+    // Edited to dry up codes essentially being the identical knowledge
+    static set width(value) { this._updateDimen("_width", value); }
+    //
 
     /**
      * The height of the game screen.
@@ -449,11 +447,9 @@ class Graphics {
      * @type number
      * @name Graphics.height
      */
-    static set height(value) {
-        // Edited to dry up codes essentially being the identical knowledge
-        this._updateDimen("_height", value);
-        //
-    } // height
+    // Edited to dry up codes essentially being the identical knowledge
+    static set height(value) { this._updateDimen("_height", value); }
+    //
 
     /**
      * The default zoom scale of the game screen.
@@ -550,12 +546,10 @@ class Graphics {
         //
         document.body.appendChild(this._canvas);
     } // _createCanvas
-
-    static _updateCanvas() {
-        // Edited to help plugins update the existing canvas in better ways
-        if (this._canvas) this._updateExistingCanvas();
-        //
-    } // _updateCanvas
+    
+    // Edited to help plugins update the existing canvas in better ways
+    static _updateCanvas() { if (this._canvas) this._updateExistingCanvas(); }
+    //
 
     static _updateVideo() {
         const w = this._width * this._realScale;
@@ -863,9 +857,7 @@ class Graphics {
      * Idempotent
      * @author DoubleX @since v0.00a @version v0.00a
      */
-    static _updateDefaultRealScale() {
-        this._realScale = this._defaultScale;
-    } // _updateDefaultRealScale
+    static _updateDefaultRealScale() { this._realScale = this._defaultScale; }
 
     /**
      * Creates a new document with a specified id as well as returning the html
@@ -875,7 +867,7 @@ class Graphics {
      */
     static _errorHTML(id, html) {
         const div = document.createElement("div");
-        [div.id. div.innerHTML] = [id, Utils.escapeHtml(html || "")];
+        [div.id, div.innerHTML] = [id, Utils.escapeHtml(html || "")];
         return div.outerHTML;
     } // _errorHTML
 
@@ -1012,9 +1004,7 @@ class Graphics {
      * @author DoubleX @since v0.00a @version v0.00a
      * @returns {boolean} If the effekseer context can be created
      */
-    static _isCreateEffekseerContext() {
-        return this._app && window.effekseer;
-    } // _isCreateEffekseerContext
+    static _isCreateEffekseerContext() { return this._app && window.effekseer; }
 
     /**
      * Removes the pixi application if it fails to create an effekseer context
@@ -1054,14 +1044,11 @@ class Graphics {
 Graphics.FPSCounter = class {
 
     constructor() {
-          this._tickCount = 0;
-          this._frameTime = 100;
-          this._frameStart = 0;
-          this._lastLoop = performance.now() - 100;
-          this._showFps = true;
-          this.fps = this.duration = 0;
-          this._createElements();
-          this._update();
+        [this._tickCount, this._frameTime, this._frameStart] = [0, 100, 0];
+        [this._lastLoop, this._showFps] = [performance.now() - 100, true];
+        this.fps = this.duration = 0;
+        this._createElements();
+        this._update();
     } // constructor
 
     startTick() { this._frameStart = performance.now(); }
@@ -1119,8 +1106,7 @@ Graphics.FPSCounter = class {
      * @author DoubleX @since v0.00a @version v0.00a
      */
     _switchToFPS() {
-        this._boxDiv.style.display = "block";
-        this._showFps = true;
+        [this._boxDiv.style.display, this._showFps] = ["block", true];
     } // _switchToFPS
 
     /**
@@ -1147,8 +1133,7 @@ Graphics.FPSCounter = class {
      */
     _newBoxDiv(labelDiv, numberDiv) {
         const boxDiv = document.createElement("div");
-        boxDiv.id = "fpsCounterBox";
-        boxDiv.style.display = "none";
+        [boxDiv.id, boxDiv.style.display] = ["fpsCounterBox", "none"];
         boxDiv.appendChild(labelDiv);
         boxDiv.appendChild(numberDiv);
         return boxDiv;
@@ -1271,12 +1256,9 @@ class Input {
      */
     static clear() {
         [this._currentState, this._previousState] = [{}, {}];
-        this._gamepadStates = [];
-        this._latestButton = null;
+        [this._gamepadStates, this._latestButton] = [[], null];
         this._pressedTime = this._dir4 = this._dir8 = 0;
-        this._preferredAxis = "";
-        this._date = 0;
-        this._virtualButton = null;
+        [this._preferredAxis, this._date, this._virtualButton] = ["", 0, null];
         // Added to support the isJustReleased static function
         this._isJustReleased = {};
         //
@@ -1296,8 +1278,7 @@ class Input {
         if (this._virtualButton) {
             /** @todo Extracts these codes into a well-named static function */
             this._latestButton = this._virtualButton;
-            this._pressedTime = 0;
-            this._virtualButton = null;
+            [this._pressedTime, this._virtualButton] = [0, null];
             //
         }
         this._updateDirection();
@@ -1476,18 +1457,14 @@ class Input {
         } else if (y !== 0) this._preferredAxis = "x";
         this._dir4 = this._makeNumpadDirection(x, y);
     } // _updateDirection
+    
+    // Edited to dry up codes essentially being the identical knowledge
+    static _signX() { return this._sign("right") - this._sign("left"); }
+    //
 
-    static _signX() {
-        // Edited to dry up codes essentially being the identical knowledge
-        return this._sign("right") - this._sign("left");
-        //
-    } // _signX
-
-    static _signY() {
-        // Edited to dry up codes essentially being the identical knowledge
-        return this._sign("down") - this._sign("up");
-        //
-    } // _signY
+    // Edited to dry up codes essentially being the identical knowledge
+    static _signY() {  return this._sign("down") - this._sign("up"); }
+    //
 
     static _makeNumpadDirection(x, y) {
         return x === 0 && y === 0 ? 0 : 5 - y * 3 + x;
@@ -1531,10 +1508,8 @@ class Input {
      * @enum @param {string} keyName - The mapped name of the key
      */
     static _onStartPress(keyName) {
-        this._latestButton = keyName;
-        this._pressedTime = 0;
-        this._date = Date.now();
-        this._isJustReleased[keyName] = false; // It's just to play safe
+        [this._latestButton, this._pressedTime] = [keyName, 0];
+        [this._date, this._isJustReleased[keyName]] = [Date.now(), false];
     } // _onStartPress
 
     /**
@@ -1888,9 +1863,7 @@ class JsonEx {
      * @param {object} object - The object to be converted.
      * @returns {string} The JSON string.
      */
-    static stringify(object) {
-        return JSON.stringify(this._encode(object, 0));
-    }
+    static stringify(object) { return JSON.stringify(this._encode(object, 0)); }
 
     /**
      * Parses a JSON string and reconstructs the corresponding object.
@@ -1898,9 +1871,7 @@ class JsonEx {
      * @param {string} json - The JSON string.
      * @returns {object} The reconstructed object.
      */
-    static parse(json) {
-        return this._decode(JSON.parse(json));
-    }
+    static parse(json) { return this._decode(JSON.parse(json)); }
 
     /**
      * Makes a deep copy of the specified object.
@@ -1908,25 +1879,27 @@ class JsonEx {
      * @param {object} object - The object to be copied.
      * @returns {object} The copied object.
      */
-    static makeDeepCopy(object) {
-        return this.parse(this.stringify(object));
-    }
+    static makeDeepCopy(object) { return this.parse(this.stringify(object)); }
 
     static _encode(value, depth) {
         // [Note] The handling code for circular references in certain versions of
         //   MV has been removed because it was too complicated and expensive.
         if (depth >= this.maxDepth) throw new Error("Object too deep");
+        // Edited to help plugins alter encode behaviors in better ways
         if (this._isValObj(value)) return this._encodeValObj(value, depth);
+        //
         return value;
-    }
+    } // _encode
 
     static _decode(value) {
+        // Edited to help plugins alter decode behaviors in better ways
         return this._isValObj(value) ? this._decodeValObj(value) : value;
-    }
+        //
+    } // _decode
 
     /**
      * Pure function
-     * @author DoubleX @interface @since v0.00a @version v0.00a
+     * @author DoubleX @since v0.00a @version v0.00a
      * @param {*} val - The value object to be encoded
      * @param {number} depth - The current depth of the encoded value object
      * @returns {*} The fully encoded value object
@@ -1940,22 +1913,22 @@ class JsonEx {
             val[k] = this._encode(v, depth + 1);
         });
         return val;
-    }
+    } // _encodeValObj
 
     /**
      * Pure function
-     * @author DoubleX @interface @since v0.00a @version v0.00a
+     * @author DoubleX @since v0.00a @version v0.00a
      * @param {*} val - The value to be encoded or decoded
      * @returns {boolean} If the value's indeed a value object
      */
     static _isValObj(val) {
         const type = Object.prototype.toString.call(val);
         return type === "[object Object]" || type === "[object Array]";
-    }
+    } // _isValObj
 
     /**
      * Pure function
-     * @author DoubleX @interface @since v0.00a @version v0.00a
+     * @author DoubleX @since v0.00a @version v0.00a
      * @param {*} val - The value object to be decoded
      * @returns {*} The fully decoded value object
      */
@@ -1963,12 +1936,851 @@ class JsonEx {
         const constructorName = val["@"];
         if (constructorName) {
             const constructor = window[constructorName];
-            if (constructor) {
-                Object.setPrototypeOf(val, constructor.prototype);
-            }
+            if (constructor) Object.setPrototypeOf(val, constructor.prototype);
         }
         Object.entries(val).forEach(([k, v]) => val[k] = this._decode(v));
         return val;
+    } // _decodeValObj
+
+} // JsonEx
+
+/*----------------------------------------------------------------------------
+ *    # Rewritten class: TouchInput
+ *      - Rewrites it into the ES6 standard
+ *----------------------------------------------------------------------------*/
+
+//-----------------------------------------------------------------------------
+/**
+ * The static class that handles input data from the mouse and touchscreen.
+ *
+ * @namespace
+ */
+class TouchInput {
+
+    constructor() { throw new Error("This is a static class"); }
+
+    /**
+     * Initializes the touch system.
+     */
+    static initialize() {
+        this.clear();
+        this._setupEventHandlers();
+    } // initialize
+
+    /**
+     * The wait time of the pseudo key repeat in frames.
+     *
+     * @type number
+     */
+    static keyRepeatWait = 24;
+
+    /**
+     * The interval of the pseudo key repeat in frames.
+     *
+     * @type number
+     */
+    static keyRepeatInterval = 6;
+
+    /**
+     * The threshold number of pixels to treat as moved.
+     *
+     * @type number
+     */
+    static moveThreshold = 10;
+
+    static clear() {
+        this._mousePressed = this._screenPressed = false;
+        [this._pressedTime, this._clicked] = [0, false];
+        this._newState = this._createNewState();
+        this._currentState = this._createNewState();
+        this._x = this._y = this._triggerX = this._triggerY = 0;
+        [this._moved, this._date] = [false, 0];
+    } // clear
+
+    static update() {
+        this._currentState = this._newState;
+        this._newState = this._createNewState();
+        this._clicked = this._currentState.released && !this._moved;
+        if (this.isPressed()) this._pressedTime++;
+    } // update
+
+    /**
+     * Checks whether the mouse button or touchscreen has been pressed and
+     * released at the same position.
+     *
+     * @returns {boolean} True if the mouse button or touchscreen is clicked.
+     */
+    static isClicked() { return this._clicked; }
+
+    /**
+     * Checks whether the mouse button or touchscreen is currently pressed down.
+     *
+     * @returns {boolean} True if the mouse button or touchscreen is pressed.
+     */
+    static isPressed() { return this._mousePressed || this._screenPressed; }
+    
+    /**
+     * Checks whether the left mouse button or touchscreen is just pressed.
+     *
+     * @returns {boolean} True if the mouse button or touchscreen is triggered.
+     */
+    static isTriggered() { return this._currentState.triggered; }
+
+    /**
+     * Checks whether the left mouse button or touchscreen is just pressed
+     * or a pseudo key repeat occurred.
+     *
+     * @returns {boolean} True if the mouse button or touchscreen is repeated.
+     */
+    static isRepeated() {
+        if (!this.isPressed()) return false;
+        if (this._currentState.triggered) return true;
+        if (this._pressedTime < this.keyRepeatWait) return false;
+        return this._pressedTime % this.keyRepeatInterval === 0;
+    } // isRepeated
+
+    /**
+     * Checks whether the left mouse button or touchscreen is kept depressed.
+     *
+     * @returns {boolean} True if the left mouse button or touchscreen is long-pressed.
+     */
+    static isLongPressed() {
+        return this.isPressed() && this._pressedTime >= this.keyRepeatWait;
+    } // isLongPressed
+
+    /**
+     * Checks whether the right mouse button is just pressed.
+     *
+     * @returns {boolean} True if the right mouse button is just pressed.
+     */
+    static isCancelled() { return this._currentState.cancelled; }
+
+    /**
+     * Checks whether the mouse or a finger on the touchscreen is moved.
+     *
+     * @returns {boolean} True if the mouse or a finger on the touchscreen is moved.
+     */
+    static isMoved() { return this._currentState.moved; }
+
+    /**
+     * Checks whether the mouse is moved without pressing a button.
+     *
+     * @returns {boolean} True if the mouse is hovered.
+     */
+    static isHovered() { return this._currentState.hovered; }
+
+    /**
+     * Checks whether the left mouse button or touchscreen is released.
+     *
+     * @returns {boolean} True if the mouse button or touchscreen is released.
+     */
+    static isReleased() { return this._currentState.released; }
+
+    /**
+     * The horizontal scroll amount.
+     *
+     * @readonly
+     * @type number
+     * @name TouchInput.wheelX
+     */
+    static get wheelX() { return this._currentState.wheelX; }
+
+    /**
+     * The vertical scroll amount.
+     *
+     * @readonly
+     * @type number
+     * @name TouchInput.wheelY
+     */
+    static get wheelY() { return this._currentState.wheelY; }
+
+    /**
+     * The x coordinate on the canvas area of the latest touch event.
+     *
+     * @readonly
+     * @type number
+     * @name TouchInput.x
+     */
+    static get x() { return this._x; }
+
+    /**
+     * The y coordinate on the canvas area of the latest touch event.
+     *
+     * @readonly
+     * @type number
+     * @name TouchInput.y
+     */
+    static get y() { return this._y; }
+
+    /**
+     * The time of the last input in milliseconds.
+     *
+     * @readonly
+     * @type number
+     * @name TouchInput.date
+     */
+    static get date() { return this._date; }
+
+    static _createNewState() {
+        return {
+            triggered: false,
+            cancelled: false,
+            moved: false,
+            hovered: false,
+            released: false,
+            wheelX: 0,
+            wheelY: 0
+        };
+    } // _createNewState
+
+    static _setupEventHandlers() {
+        const pf = { passive: false };
+        document.addEventListener("mousedown", this._onMouseDown.bind(this));
+        document.addEventListener("mousemove", this._onMouseMove.bind(this));
+        document.addEventListener("mouseup", this._onMouseUp.bind(this));
+        document.addEventListener("wheel", this._onWheel.bind(this), pf);
+        document.addEventListener("touchstart", this._onTouchStart.bind(this), pf);
+        document.addEventListener("touchmove", this._onTouchMove.bind(this), pf);
+        document.addEventListener("touchend", this._onTouchEnd.bind(this));
+        document.addEventListener("touchcancel", this._onTouchCancel.bind(this));
+        window.addEventListener("blur", this._onLostFocus.bind(this));
+    } // _setupEventHandlers
+
+    static _onMouseDown(event) {
+        switch (event.button) {
+            case 0: return this._onLeftButtonDown(event);
+            case 1: return this._onMiddleButtonDown(event);
+            case 2: this._onRightButtonDown(event);
+        }
+    } // _onMouseDown
+
+    static _onLeftButtonDown(event) {
+        // Edited to dry up codes essentially being the identical knowledge
+        const xy = this._pageToCanvasXY(event);
+        if (!Graphics.isInsideCanvas(...xy)) return;
+        //
+        // Edited to help plugins alter left button down behaviors in better way
+        this._onLeftButtonDownInsideCanvas(...xy);
+        //
+    } // _onLeftButtonDown
+
+    static _onMiddleButtonDown(/*event*/) {}
+
+    static _onRightButtonDown(event) {
+        // Edited to dry up codes essentially being the identical knowledge
+        const xy = this._pageToCanvasXY(event);
+        if (Graphics.isInsideCanvas(...xy)) this._onCancel(...xy);
+        //
+    } // _onRightButtonDown
+
+    static _onMouseMove(event) {
+        // Edited to dry up codes essentially being the identical knowledge
+        const xy = this._pageToCanvasXY(event);
+        if (this._mousePressed) return this._onMove(...xy);
+        if (Graphics.isInsideCanvas(...xy)) this._onHover(...xy);
+        //
+    } // _onMouseMove
+
+    static _onMouseUp(event) {
+        // Edited to help plugins alter left button up behaviors in better ways
+        if (event.button === 0) this._onLeftButtonUp(event);
+        //
+    } // _onMouseUp
+
+    static _onWheel(event) {
+        this._newState.wheelX += event.deltaX;
+        this._newState.wheelY += event.deltaY;
+        event.preventDefault();
+    } // _onWheel
+
+    static _onTouchStart(event) {
+        const { changedTouches, touches } = event;
+        changedTouches.forEach(touch => {
+            // Edited to help plugins alter touches inside canvas in better ways
+            const xy = this._pageToCanvasXY(touch);
+            if (!Graphics.isInsideCanvas(...xy)) return;
+            this._onTouchStartInsideCanvas(touches, ...xy);
+            //
+        });
+        /** @todo Extracts this conditional into a well-named static function */
+        if (!window.cordova && !window.navigator.standalone) return;
+        //
+        event.preventDefault();
+    } // _onTouchStart
+
+    static _onTouchMove(event) {
+        event.changedTouches.forEach(this._onMoveTouch, this);
+    } // _onTouchMove
+
+    static _onTouchEnd(event) {
+        event.changedTouches.forEach(this._onReleaseTouch, this);
+    } // _onTouchEnd
+
+    static _onTouchCancelfunction(/*event*/) { this._screenPressed = false; }
+
+    static _onLostFocus() { this.clear(); }
+
+    static _onTrigger(x, y) {
+        this._newState.triggered = true;
+        [this._x, this._y, this._triggerX, this._triggerY] = [x, y, x, y];
+        [this._moved, this._date] = [false, Date.now()];
+    } // _onTrigger
+    
+    // Edited to dry up codes essentially being the identical knowledge
+    static _onCancel(x, y) { this._onUpdateNewState("cancelled", x, y); }        
+    //
+
+    static _onMove(x, y) {
+        // Edited to help plugins alter the on move event in better ways
+        if (this._isMoved(x, y)) this._moved = true;
+        if (this._moved) this._onUpdateNewState("_moved", x, y);
+        //
+    } // _onMove
+    
+    // Edited to dry up codes essentially being the identical knowledge
+    static _onHover(x, y) { this._onUpdateNewState("hovered", x, y); }
+    //
+
+    // Edited to dry up codes essentially being the identical knowledge
+    static _onRelease(x, y) { this._onUpdateNewState("released", x, y); }
+    //
+
+    /**
+     * Triggers the left button down event inside the canvas x and y positions
+     * Idempotent
+     * @author DoubleX @since v0.00a @version v0.00a
+     * @param {number} x - The page x position of the touch event
+     * @param {number} y - The page y position of the touch event
+     */
+    static _onLeftButtonDownInsideCanvas(x, y) {
+        [this._mousePressed, this._pressedTime] = [true, 0];
+        this._onTrigger(x, y);
+    } // _onLeftButtonDownInsideCanvas
+
+    /**
+     * Triggers the specified the left button up event
+     * Idempotent
+     * @author DoubleX @since v0.00a @version v0.00a
+     * @param {Event} event - The specified left button up event
+     */
+    static _onLeftButtonUp(event) {
+        this._mousePressed = false;
+        this._onRelease(...this._pageToCanvasXY(event));
+    } // _onLeftButtonUp
+
+    /**
+     * Triggers the touch start event inside canvas for the specified touches
+     * Idempotent
+     * @author DoubleX @since v0.00a @version v0.00a
+     * @param {[Touch]} touches - The specified touches from the specified event
+     * @param {number} x - The page x position of the touch event
+     * @param {number} y - The page y position of the touch event
+     */
+    static _onTouchStartInsideCanvas(touches, x, y) {
+        [this._screenPressed, this._pressedTime] = [true, 0];
+        touches.length >= 2 ? this._onCancel(x, y) : this._onTrigger(x, y);
+        event.preventDefault();
+    } // _onTouchStartInsideCanvas
+
+    /**
+     * Triggers the touch move event for the specified touch
+     * Idempotent
+     * @author DoubleX @since v0.00a @version v0.00a
+     * @param {Touch} touch - The specified touch from the specified event
+     */
+    static _onMoveTouch(touch) { this._onMove(...this._pageToCanvasXY(touch)); }
+
+    /**
+     * Triggers the touch release event for the specified touch
+     * Idempotent
+     * @author DoubleX @since v0.00a @version v0.00a
+     * @param {Touch} touch - The specified touch from the specified event
+     */
+    static _onReleaseTouch(touch) {
+        this._screenPressed = false;
+        this._onRelease(...this._pageToCanvasXY(touch));
+    } // _onReleaseTouch
+
+    /**
+     * Nullipotent
+     * @author DoubleX @since v0.00a @version v0.00a
+     * @param {Event|Touch} eventTouch - The specified event or its touch
+     * @returns {[number]} The converted x and y canvas positions
+     */
+    static _pageToCanvasXY(eventTouch) {
+        return [
+            Graphics.pageToCanvasX(eventTouch.pageX),
+            Graphics.pageToCanvasY(eventTouch.pageY)
+        ];
+    } // _pageToCanvasXY
+
+    /**
+     * Nullipotent
+     * @author DoubleX @since v0.00a @version v0.00a
+     * @param {number} x - The page x position of the touch event
+     * @param {number} y - The page y position of the touch event
+     * @returns {boolean} If the detected touch event's indeed a movement
+     */
+    static _isMoved(x, y) {
+        const dx = Math.abs(x - this._triggerX);
+        const dy = Math.abs(y - this._triggerY);
+        return dx > this.moveThreshold || dy > this.moveThreshold;
+    } // _isMoved
+
+    /**
+     * Updates the specified new states as well as the current x and y positions
+     * Idempotent
+     * @author DoubleX @since v0.00a @version v0.00a
+     * @enum @param {string} state - The name of the new state to be updated
+     * @param {number} x - The page x position of the touch event
+     * @param {number} y - The page y position of the touch event
+     */
+    static _onUpdateNewState(state, x, y) {
+        [this._newState[state], this._x, this._y] = [true, x, y];
+    } // _onUpdateNewState
+
+} // TouchInput
+
+/*----------------------------------------------------------------------------
+ *    # Rewritten class: Utils
+ *      - Rewrites it into the ES6 standard
+ *----------------------------------------------------------------------------*/
+
+//-----------------------------------------------------------------------------
+/**
+ * The static class that defines utility methods.
+ *
+ * @namespace
+ */
+class Utils {
+
+    constructor() { throw new Error("This is a static class"); }
+
+    /**
+     * The name of the RPG Maker. "MZ" in the current version.
+     *
+     * @type string
+     * @constant
+     */
+    static RPGMAKER_NAME = "MZ";
+
+    /**
+     * The version of the RPG Maker.
+     *
+     * @type string
+     * @constant
+     */
+    static RPGMAKER_VERSION = "0.9.5";
+
+    /**
+     * Checks whether the current RPG Maker version is greater than or equal to
+     * the given version.
+     *
+     * @param {string} version - The "x.x.x" format string to compare.
+     * @returns {boolean} True if the current version is greater than or equal
+     *                    to the given version.
+     */
+    static checkRMVersion(version) {
+        const array1 = this.RPGMAKER_VERSION.split("."), l = array1.length;
+        const array2 = String(version).split(".");
+        for (let i = 0; i < l; i++) {
+            const [v1, v2] = [+array1[i], +array2[i]];
+            if (v1 > v2) return true;
+            if (v1 < v2) return false;
+        }
+        return true;
     }
 
-}
+    /**
+     * Checks whether the option is in the query string.
+     *
+     * @param {string} name - The option name.
+     * @returns {boolean} True if the option is in the query string.
+     */
+    static isOptionValid(name) {
+        const args = location.search.slice(1);
+        if (args.split("&").includes(name)) return true;
+        if (!this.isNwjs() || nw.App.argv.length <= 0) return false;
+        return nw.App.argv[0].split("&").includes(name);
+    }
+
+    /**
+     * Checks whether the platform is NW.js.
+     *
+     * @returns {boolean} True if the platform is NW.js.
+     */
+    static isNwjs() {
+        return typeof require === "function" && typeof process === "object";
+    }
+
+    /**
+     * Checks whether the platform is RPG Atsumaru.
+     *
+     * @returns {boolean} True if the platform is RPG Atsumaru.
+     */
+    static isAtsumaru() { return typeof RPGAtsumaru === "object"; }
+
+    /**
+     * Checks whether the platform is a mobile device.
+     *
+     * @returns {boolean} True if the platform is a mobile device.
+     */
+    static isMobileDevice() {
+        const r = /Android|webOS|iPhone|iPad|iPod|BlackBerry|Opera Mini/i;
+        return !!navigator.userAgent.match(r);
+    }
+
+    /**
+     * Checks whether the browser is Mobile Safari.
+     *
+     * @returns {boolean} True if the browser is Mobile Safari.
+     */
+    static isMobileSafari() {
+        const agent = navigator.userAgent;
+        if (!agent.match(/iPhone|iPad|iPod/)) return false;
+        return !!agent.match(/AppleWebKit/) && !agent.match("CriOS");
+    }
+
+    /**
+     * Checks whether the browser is Android Chrome.
+     *
+     * @returns {boolean} True if the browser is Android Chrome.
+     */
+    static isAndroidChrome() {
+        const agent = navigator.userAgent;
+        return !!(agent.match(/Android/) && agent.match(/Chrome/));
+    }
+
+    /**
+     * Checks whether the browser is accessing local files.
+     *
+     * @returns {boolean} True if the browser is accessing local files.
+     */
+    static isLocal() { return window.location.href.startsWith("file:"); }
+
+    /**
+     * Checks whether the browser supports WebGL.
+     *
+     * @returns {boolean} True if the browser supports WebGL.
+     */
+    static canUseWebGL() {
+        try {
+            return !!document.createElement("canvas").getContext("webgl");
+        } catch (e) { return false; }
+    }
+
+    /**
+     * Checks whether the browser supports Web Audio API.
+     *
+     * @returns {boolean} True if the browser supports Web Audio API.
+     */
+    static canUseWebAudioAPI() {
+        return !!(window.AudioContext || window.webkitAudioContext);
+    }
+
+    /**
+     * Checks whether the browser supports CSS Font Loading.
+     *
+     * @returns {boolean} True if the browser supports CSS Font Loading.
+     */
+    static canUseCssFontLoadingfunction() {
+        return !!(document.fonts && document.fonts.ready);
+    }
+
+    /**
+     * Checks whether the browser supports IndexedDB.
+     *
+     * @returns {boolean} True if the browser supports IndexedDB.
+     */
+    static canUseIndexedDB() {
+        if (!window.indexedDB) return;
+        return !!(window.mozIndexedDB || window.webkitIndexedDB);
+    }
+
+    /**
+     * Checks whether the browser can play ogg files.
+     *
+     * @returns {boolean} True if the browser can play ogg files.
+     */
+    static canPlayOgg() {
+        if (!Utils._audioElement) {
+            Utils._audioElement = document.createElement("audio");
+        }
+        if (!Utils._audioElement) return false;
+        return !!Utils._audioElement.canPlayType('audio/ogg; codecs="vorbis"');
+    }
+
+    /**
+     * Checks whether the browser can play webm files.
+     *
+     * @returns {boolean} True if the browser can play webm files.
+     */
+    static canPlayWebm() {
+        if (!Utils._videoElement) {
+            Utils._videoElement = document.createElement("video");
+        }
+        if (!Utils._videoElement) return false;
+        return !!Utils._videoElement.canPlayType('video/webm; codecs="vp8, vorbis"');
+    }
+
+    /**
+     * Encodes a URI component without escaping slash characters.
+     *
+     * @param {string} str - The input string.
+     * @returns {string} Encoded string.
+     */
+    static encodeURI(str) {
+        return encodeURIComponent(str).replace(/%2F/g, "/");
+    }
+
+    /**
+     * Escapes special characters for HTML.
+     *
+     * @param {string} str - The input string.
+     * @returns {string} Escaped string.
+     */
+    static escapeHtml(str) {
+        const entityMap = {
+            "&": "&amp;",
+            "<": "&lt;",
+            ">": "&gt;",
+            '"': "&quot;",
+            "'": "&#39;",
+            "/": "&#x2F;"
+        };
+        /** @todo Figures out why String(str) is needed here */
+        return String(str).replace(/[&<>"'/]/g, s => entityMap[s]);
+        //
+    }
+
+    /**
+     * Checks whether the string contains any Arabic characters.
+     *
+     * @returns {boolean} True if the string contains any Arabic characters.
+     */
+    static containsArabic(str) {
+        const regExp = /[\u0600-\u06FF\u0750-\u077F\u08A0-\u08FF]/;
+        return regExp.test(str);
+    }
+
+    /**
+     * Sets information related to encryption.
+     *
+     * @param {boolean} hasImages - Whether the image files are encrypted.
+     * @param {boolean} hasAudio - Whether the audio files are encrypted.
+     * @param {string} key - The encryption key.
+     */
+    static setEncryptionInfo(hasImages, hasAudio, key) {
+        // [Note] This function is implemented for module independence.
+        this._hasEncryptedImages = hasImages;
+        this._hasEncryptedAudio = hasAudio;
+        this._encryptionKey = key;
+    }
+
+    /**
+     * Checks whether the image files in the game are encrypted.
+     *
+     * @returns {boolean} True if the image files are encrypted.
+     */
+    static hasEncryptedImages() { return this._hasEncryptedImages; }
+
+    /**
+     * Checks whether the audio files in the game are encrypted.
+     *
+     * @returns {boolean} True if the audio files are encrypted.
+     */
+    static hasEncryptedAudio() { return this._hasEncryptedAudio; }
+
+    /**
+     * Decrypts encrypted data.
+     *
+     * @param {ArrayBuffer} source - The data to be decrypted.
+     * @returns {ArrayBuffer} The decrypted data.
+     */
+    static decryptArrayBuffer(source) {
+        const header = new Uint8Array(source, 0, 16);
+        const headerHex = Array.from(header, x => x.toString(16)).join(",");
+        if (headerHex !== "52,50,47,4d,56,0,0,0,0,3,1,0,0,0,0,0") {
+            throw new Error("Decryption error");
+        }
+        const [body, view] = [source.slice(16), new DataView(body)];
+        const key = this._encryptionKey.match(/.{2}/g);
+        for (let i = 0; i < 16; i++) {
+            view.setUint8(i, view.getUint8(i) ^ parseInt(key[i], 16));
+        }
+        return body;
+    }
+
+} // Utils
+
+/*----------------------------------------------------------------------------
+ *    # Rewritten class: Video
+ *      - Rewrites it into the ES6 standard
+ *----------------------------------------------------------------------------*/
+
+//-----------------------------------------------------------------------------
+/**
+ * The static class that handles video playback.
+ *
+ * @namespace
+ */
+class Video {
+
+    constructor() { throw new Error("This is a static class"); }
+
+    /**
+     * Initializes the video system.
+     *
+     * @param {number} width - The width of the video.
+     * @param {number} height - The height of the video.
+     */
+    static initialize(width, height) {
+        [this._element, this._loading, this._volume] = [null, false, 1];
+        this._createElement();
+        this._setupEventHandlers();
+        this.resize(width, height);
+    }
+
+    /**
+     * Changes the display size of the video.
+     *
+     * @param {number} width - The width of the video.
+     * @param {number} height - The height of the video.
+     */
+    static resize(width, height) {
+        // Edited to help plugins alter element resize behaviors in better ways
+        if (this._element) this._resizeElem(width, height);
+        //
+    }
+
+    /**
+     * Starts playback of a video.
+     *
+     * @param {string} src.
+     */
+    static play(src) {
+        this._element.src = src;
+        this._element.onloadeddata = this._onLoad.bind(this);
+        this._element.onerror = this._onError.bind(this);
+        this._element.onended = this._onEnd.bind(this);
+        this._element.load();
+        this._loading = true;
+    }
+
+    /**
+     * Checks whether the video is playing.
+     *
+     * @returns {boolean} True if the video is playing.
+     */
+    static isPlaying() { return this._loading || this._isVisible(); }
+
+    /**
+     * Sets the volume for videos.
+     *
+     * @param {number} volume - The volume for videos (0 to 1).
+     */
+    static setVolume(volume) {
+        this._volume = volume;
+        // Edited to help plugins alter element volume behaviors in better ways
+        if (this._element) this._setElemVolume();
+        //
+    }
+
+    static _createElement() {
+        // Edited to help plugins create video element behaviors in better ways
+        this._element = this._createdElem();
+        //
+        document.body.appendChild(this._element);
+    }
+
+    static _onLoad() {
+        this._element.volume = this._volume;
+        this._element.play();
+        this._updateVisibility(true);
+        this._loading = false;
+    }
+
+    static _onError() {
+        this._updateVisibility(false);
+        throw ["LoadError", this._element.src, () => this._element.load()];
+    }
+
+    static _onEnd() { this._updateVisibility(false); }
+
+    static _updateVisibility(videoVisible) {
+        if (videoVisible) return this._updateWhenVisible();
+        this._updateWhenInvisible();
+    }
+
+    static _isVisible() { return this._element.style.opacity > 0; }
+
+    static _setupEventHandlers() {
+        const onUserGesture = this._onUserGesture.bind(this);
+        document.addEventListener("keydown", onUserGesture);
+        document.addEventListener("mousedown", onUserGesture);
+        document.addEventListener("touchend", onUserGesture);
+    }
+
+    static _onUserGesture() {
+        /** @todo Extracts this conditional into a well-named static function */
+        if (this._element.src || !this._element.paused) return;
+        //
+        this._element.play().catch(() => 0);
+    }
+
+    /**
+     * Resizes the video element
+     * Idempotent
+     * @author DoubleX @since v0.00a @version v0.00a
+     */
+    static _resizeElem(w, h) {
+        const { style } = this._element;
+        [style.width, style.height] = [w + "px", h + "px"];
+    } // _resizeElem
+
+    /**
+     * Sets the volume of the video element
+     * Idempotent
+     * @author DoubleX @since v0.00a @version v0.00a
+     */
+    static _setElemVolume() { this._element.volume = this._volume; }
+
+    /**
+     * Creates a new document with id gameVideo as the video element
+     * Nullipotent
+     * @author DoubleX @since v0.00a @version v0.00a
+     * @returns {DOM} The video element document
+     */
+    static _createdElem() {
+        const elem = document.createElement("video");
+        elem.id = "gameVideo";
+        const { style } = elem;
+        [style.position, style.margin] = ["absolute", "auto"];
+        style.top = style.left = style.right = style.bottom = style.opacity = 0;
+        style.zIndex = 2;
+        elem.setAttribute("playsinline", "");
+        elem.oncontextmenu = () => false;
+        return elem;
+    } // _createdElem
+
+    /**
+     * Updates this video when it should become visible
+     * Idempotent
+     * @author DoubleX @since v0.00a @version v0.00a
+     */
+    static _updateWhenVisible() {
+        Graphics.hideScreen();
+        this._element.style.opacity = 1;
+    } // _updateWhenVisible
+
+    /**
+     * Updates this video when it should become invisible
+     * Idempotent
+     * @author DoubleX @since v0.00a @version v0.00a
+     */
+    static _updateWhenInvisible() {
+        Graphics.showScreen();
+        this._element.style.opacity = 0;
+    } // _updateWhenInvisible
+
+} // Video
