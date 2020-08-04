@@ -7,6 +7,7 @@ You'll be in the contributor list for raising accetped issues if you want(you ca
 Fellow Plugin Developers:
 You're welcome to submit pull requests for this project
 You'll be in the contributor list for submitting accepted pull requests if you want(you can also tell me how you want me to credit you)
+Pull requests breaking plugins not written with this plugin in mind won't be even considered
 
 Using Older Versions:
 Download the older version from the old versions folder
