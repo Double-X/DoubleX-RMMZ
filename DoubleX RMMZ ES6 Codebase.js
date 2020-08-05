@@ -44,14 +44,10 @@
  *      This Plugin:
  *      1. https://github.com/Double-X/DoubleX-RMMZ/blob/master/DoubleX%20RMMZ%20ES6%20Codebase.js
  *      Posts:
- *      1.
- *      2.
- *      3.
- *      4.
- *      5.
- *      6.
- *      7.
- *      8.
+ *      1. https://forums.rpgmakerweb.com/index.php?threads/is-a-plugin-rewriting-rmmz-codebase-into-es6-standard-a-good-idea.124928/
+ *      2. https://www.rpgmakercentral.com/topic/42504-is-a-plugin-rewriting-rmmz-codebase-into-es6-standard-a-good-idea/
+ *      3. https://rpgmaker.net/forums/topics/25326/?post=909885#post909885
+ *      4. https://xyphien.com/forums/threads/is-a-plugin-rewriting-rmmz-codebase-into-es6-standard-a-good-idea.9529/
  *----------------------------------------------------------------------------
  *    # Instructions
  *      1. THIS PLUGIN MUST BE PLACED ABOVE ALL THE OTHER PLUGINS
