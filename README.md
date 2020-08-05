@@ -7,7 +7,6 @@ Plugin Users:
 Fellow Plugin Developers:
 1. You're welcome to submit pull requests for this project
 2. You'll be in the contributor list for submitting accepted pull requests if you want(you can also tell me how you want me to credit you)
-3. Pull requests breaking plugins not written with this plugin in mind won't be even considered
 
 Using Older Versions:
 1. Download the older version from the old versions folder
