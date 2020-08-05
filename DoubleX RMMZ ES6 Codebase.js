@@ -54,6 +54,16 @@
  *      2. The version number of this plugin's supposed to be the same as that
  *         of the default RMMZ codebase, so this plugin must be outdated if
  *         those version numbers are indeed different
+ *      3. (Plugin developers only)The version number of this plugin is
+ *         DoubleX_RMMZ["ES6 Codebase"], which should be "0.9.5"
+ *         If it's falsy, it means this plugin's not loaded at the moment of
+ *         querying its version number
+ *      4. (Plugin developers only)If you don't want your plugin to use this
+ *         plugin but still want to alias functions/methods without direct
+ *         prototyping on your side, you can copy the ES6ExtendedClassAlias
+ *         class from this plugin without having to give me credit or ask your
+ *         plugin users to do so(as long as you've just copied that class and
+ *         nothing more)
  *----------------------------------------------------------------------------
  *    # Contributors
  *      Authors:
