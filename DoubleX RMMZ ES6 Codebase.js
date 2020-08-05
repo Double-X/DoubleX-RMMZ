@@ -5445,12 +5445,10 @@ class TilingSprite extends PIXI.TilingSprite {
         this.texture.baseTexture = this._bitmap.baseTexture;
         this._refresh();
     } // _onBitmapLoad
-
-    _refresh() {
-        // Edited to help plugins alter texture refresh behaviors in better ways
-        if (this.texture) this._refreshWithTexture();
-        //
-    } // _refresh
+    
+    // Edited to help plugins alter texture refresh behaviors in better ways
+    _refresh() { if (this.texture) this._refreshWithTexture(); }
+    //
 
     /**
      * Initializes the new static empty base texture of the Sprite class
@@ -5517,10 +5515,12 @@ class TilingSprite extends PIXI.TilingSprite {
      */
     _refreshedTextureFrame() {
         const frame = this._frame.clone();
+        /** @todo Extracts these codes into well-named functions */
         if (frame.width === 0 && frame.height === 0 && this._bitmap) {
             frame.width = this._bitmap.width;
             frame.height = this._bitmap.height;
         }
+        //
         return frame;
     } // _refreshedTextureFrame
 
@@ -5970,8 +5970,7 @@ class WebAudio {
         // Edited to help plugins alter fade out with gain node in better ways
         if (this._gainNode) this._fadeOutWithGainNode(duration);
         //
-        this._isPlaying = false;
-        this._loadListeners = [];
+        [this._isPlaying, this._loadListeners] = [false, []];
     } // fadeOut
 
     /**
@@ -6109,8 +6108,7 @@ class WebAudio {
             this._loopStartTime = this._loopStart / this._sampleRate;
             this._loopLengthTime = this._loopLength / this._sampleRate;
         } else {
-            this._loopStartTime = 0;
-            this._loopLengthTime = this._totalTime;
+            [this._loopStartTime, this._loopLengthTime] = [0, this._totalTime];
         }
         //
         if (this._sourceNode) this._refreshSourceNode();
