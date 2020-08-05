@@ -30,8 +30,11 @@
  *         anymore if you've violated any of the above.
  *----------------------------------------------------------------------------
  *    # Prerequisites
- *      Abilities:
- *      1. Some RMMZ plugin development proficiency to fully utilize this
+ *      Abilities(Plugin Users):
+ *      1. Nothing special
+ *      Abilities(Plugin Developers):
+ *      1. Basic knowledge on what the default RMMZ codebase does in general
+ *      2. Some RMMZ plugin development proficiency to fully utilize this
  *         plugin in intended ways
  *         (Basic knowledge on what RMMZ plugin development does in general
  *         with several easy, simple and small plugins written without
@@ -104,7 +107,7 @@
  *============================================================================*/
 /*:
  * @plugindesc (0.9.5)Helps plugin developers write their plugins into ES6
- * standards, but such plugins will need this plugin to work
+ * standards in better ways, but such plugins will need this plugin to work
  * @author DoubleX
  *
  * @help
@@ -203,6 +206,7 @@ DoubleX_RMMZ["ES6 Codebase"] = "0.9.5";
  *      - Lets plugin developers alias ES6 classes without direct prototyping
  *----------------------------------------------------------------------------*/
 
+// THIS CLASS ITSELF SHOULD NEVER EVER HAVE ANY CHILD CLASS
 class ES6ExtendedClassAlias {
 
     static _inheritances = new Map();
@@ -296,6 +300,7 @@ class ES6ExtendedClassAlias {
     } // _updateStaticFuncs
 
 } // ES6ExtendedClassAlias
+//
 
 /*----------------------------------------------------------------------------
  *    # Rewritten class: Graphics
@@ -2228,15 +2233,10 @@ class TouchInput {
     } // _createNewState
 
     static _setupEventHandlers() {
-        const pf = { passive: false };
-        document.addEventListener("mousedown", this._onMouseDown.bind(this));
-        document.addEventListener("mousemove", this._onMouseMove.bind(this));
-        document.addEventListener("mouseup", this._onMouseUp.bind(this));
-        document.addEventListener("wheel", this._onWheel.bind(this), pf);
-        document.addEventListener("touchstart", this._onTouchStart.bind(this), pf);
-        document.addEventListener("touchmove", this._onTouchMove.bind(this), pf);
-        document.addEventListener("touchend", this._onTouchEnd.bind(this));
-        document.addEventListener("touchcancel", this._onTouchCancel.bind(this));
+        // Edited to help plugins alter event handlers in better ways
+        this._setupMouseEventHandlers();
+        this._setupTouchEventHandlers();
+        //
         window.addEventListener("blur", this._onLostFocus.bind(this));
     } // _setupEventHandlers
 
@@ -2338,6 +2338,33 @@ class TouchInput {
     // Edited to dry up codes essentially being the identical knowledge
     static _onRelease(x, y) { this._onUpdateNewState("released", x, y); }
     //
+
+    /**
+     * Setups all mouse event handlers of this touch input static class
+     * Idempotent
+     * @author DoubleX @since 0.9.5 @version 0.9.5
+     */
+    static _setupMouseEventHandlers() {
+      document.addEventListener("mousedown", this._onMouseDown.bind(this));
+      document.addEventListener("mousemove", this._onMouseMove.bind(this));
+      document.addEventListener("mouseup", this._onMouseUp.bind(this));
+      document.addEventListener("wheel", this._onWheel.bind(this), {
+          passive: false
+      });
+    } // _setupMouseEventHandlers
+
+    /**
+     * Setups all touch event handlers of this touch input static class
+     * Idempotent
+     * @author DoubleX @since 0.9.5 @version 0.9.5
+     */
+    static _setupTouchEventHandlers() {
+        const pf = { passive: false };
+        document.addEventListener("touchstart", this._onTouchStart.bind(this), pf);
+        document.addEventListener("touchmove", this._onTouchMove.bind(this), pf);
+        document.addEventListener("touchend", this._onTouchEnd.bind(this));
+        document.addEventListener("touchcancel", this._onTouchCancel.bind(this));
+    } // _setupTouchEventHandlers
 
     /**
      * Triggers the left button down event inside the canvas x and y positions
@@ -3762,6 +3789,9 @@ class ColorFilter extends PIXI.Filter {
     } // _initUniforms
 
 } // ColorFilter
+// It's just to play safe in case of any plugin extending PIXI.Filter in ES6 way
+ES6ExtendedClassAlias.inherit(ColorFilter);
+//
 
 /*----------------------------------------------------------------------------
  *    # Rewritten class: Point
@@ -3778,6 +3808,9 @@ class ColorFilter extends PIXI.Filter {
  * @param {number} y - The y coordinate.
  */
 class Point extends PIXI.Point {}
+// It's just to play safe in case of any plugin extending PIXI.Point in ES6 way
+ES6ExtendedClassAlias.inherit(Point);
+//
 
 /*----------------------------------------------------------------------------
  *    # Rewritten class: Rectangle
@@ -3796,6 +3829,9 @@ class Point extends PIXI.Point {}
  * @param {number} height - The height of the rectangle.
  */
 class Rectangle extends PIXI.Rectangle {}
+// It's just to play safe in case of any plugin extending PIXI.Rectangle in ES6
+ES6ExtendedClassAlias.inherit(Rectangle);
+//
 
 /*----------------------------------------------------------------------------
  *    # Rewritten class: ScreenSprite
@@ -3892,6 +3928,9 @@ class ScreenSprite extends PIXI.Container {
     } // _setNewColor
 
 } // ScreenSprite
+// It's just to play safe in case of any plugin extending PIXI.Container in ES6
+ES6ExtendedClassAlias.inherit(ScreenSprite);
+//
 
 /*----------------------------------------------------------------------------
  *    # Rewritten class: Sprite
@@ -4261,6 +4300,9 @@ class Sprite extends PIXI.Sprite {
     } // _refreshWithBaseTexture
 
 } // Sprite
+// It's just to play safe in case of any plugin extending PIXI.Sprite in ES6 way
+ES6ExtendedClassAlias.inherit(Sprite);
+//
 
 /*----------------------------------------------------------------------------
  *    # Rewritten class: Stage
@@ -4279,6 +4321,9 @@ class Stage extends PIXI.Container {
     destroy() { super.destroy({ children: true, texture: true }); }
 
 } // Stage
+// It's just to play safe in case of any plugin extending PIXI.Container in ES6
+ES6ExtendedClassAlias.inherit(Stage);
+//
 
 /*----------------------------------------------------------------------------
  *    # Rewritten class: Tilemap
@@ -4886,6 +4931,9 @@ class Tilemap extends PIXI.Container {
     } // _addTileA2TableEdge
 
 } // Tilemap
+// It's just to play safe in case of any plugin extending PIXI.Container in ES6
+ES6ExtendedClassAlias.inherit(Tilemap);
+//
 
 /*----------------------------------------------------------------------------
  *    # Rewritten class: Tilemap.Layer
@@ -5096,6 +5144,9 @@ Tilemap.Layer = class extends PIXI.Container {
     } // _newVao
 
 }; // Tilemap.Layer
+// It's just to play safe in case of any plugin extending PIXI.Container in ES6
+ES6ExtendedClassAlias.inherit(Tilemap.Layer);
+//
 
 /*----------------------------------------------------------------------------
  *    # Rewritten class: Tilemap.Renderer
@@ -5129,42 +5180,10 @@ Tilemap.Renderer = class extends PIXI.ObjectRenderer {
     } // contextChange
 
     _createShader() {
-        const vertexSrc = `attribute float aTextureId;
-                           attribute vec4 aFrame;
-                           attribute vec2 aSource;
-                           attribute vec2 aDest;
-                           uniform mat3 uProjectionMatrix;
-                           varying vec4 vFrame;
-                           varying vec2 vTextureCoord;
-                           varying float vTextureId;
-                           void main(void) {
-                             vec3 position = uProjectionMatrix * vec3(aDest, 1.0);
-                             gl_Position = vec4(position, 1.0);
-                             vFrame = aFrame;
-                             vTextureCoord = aSource;
-                             vTextureId = aTextureId;
-                           }`;
-        const fragmentSrc = `varying vec4 vFrame;
-                             varying vec2 vTextureCoord;
-                             varying float vTextureId;
-                             uniform sampler2D uSampler0;
-                             uniform sampler2D uSampler1;
-                             uniform sampler2D uSampler2;
-                             void main(void) {
-                               vec2 textureCoord = clamp(vTextureCoord, vFrame.xy, vFrame.zw);
-                               int textureId = int(vTextureId);
-                               vec4 color;
-                               if (textureId < 0) {
-                                 color = vec4(0.0, 0.0, 0.0, 0.5);
-                               } else if (textureId == 0) {
-                                 color = texture2D(uSampler0, textureCoord / 2048.0);
-                               } else if (textureId == 1) {
-                                 color = texture2D(uSampler1, textureCoord / 2048.0);
-                               } else if (textureId == 2) {
-                                 color = texture2D(uSampler2, textureCoord / 2048.0);
-                               }
-                               gl_FragColor = color;
-                             }`;
+        // Edited to help plugins alter the create shader glsl in better ways
+        const vertexSrc = this._shaderVertexSrc();
+        const fragmentSrc = this._shaderFragmentSrc();
+        //
         return new PIXI.Shader(PIXI.Program.from(vertexSrc, fragmentSrc), {
             uSampler0: 0,
             uSampler1: 1,
@@ -5220,6 +5239,58 @@ Tilemap.Renderer = class extends PIXI.ObjectRenderer {
     /**
      * Nullipotent
      * @author DoubleX @since 0.9.5 @version 0.9.5
+     * @returns {string} The shader vertex glsl source codes
+     */
+    _shaderVertexSrc() {
+        return `attribute float aTextureId;
+                attribute vec4 aFrame;
+                attribute vec2 aSource;
+                attribute vec2 aDest;
+                uniform mat3 uProjectionMatrix;
+                varying vec4 vFrame;
+                varying vec2 vTextureCoord;
+                varying float vTextureId;
+                void main(void) {
+                  vec3 position = uProjectionMatrix * vec3(aDest, 1.0);
+                  gl_Position = vec4(position, 1.0);
+                  vFrame = aFrame;
+                  vTextureCoord = aSource;
+                  vTextureId = aTextureId;
+                }`;
+    } // _shaderVertexSrc
+
+    /**
+     * Nullipotent
+     * @author DoubleX @since 0.9.5 @version 0.9.5
+     * @returns {string} The shader fragment glsl source codes
+     */
+    _shaderFragmentSrc() {
+        return `varying vec4 vFrame;
+                varying vec2 vTextureCoord;
+                varying float vTextureId;
+                uniform sampler2D uSampler0;
+                uniform sampler2D uSampler1;
+                uniform sampler2D uSampler2;
+                void main(void) {
+                  vec2 textureCoord = clamp(vTextureCoord, vFrame.xy, vFrame.zw);
+                  int textureId = int(vTextureId);
+                  vec4 color;
+                  if (textureId < 0) {
+                    color = vec4(0.0, 0.0, 0.0, 0.5);
+                  } else if (textureId == 0) {
+                    color = texture2D(uSampler0, textureCoord / 2048.0);
+                  } else if (textureId == 1) {
+                    color = texture2D(uSampler1, textureCoord / 2048.0);
+                  } else if (textureId == 2) {
+                    color = texture2D(uSampler2, textureCoord / 2048.0);
+                  }
+                  gl_FragColor = color;
+                }`;
+    } // _shaderFragmentSrc
+
+    /**
+     * Nullipotent
+     * @author DoubleX @since 0.9.5 @version 0.9.5
      * @returns {PIXI.BaseRenderTexture} The internal base texture in the list
      */
     _internalBaseTexture() {
@@ -5253,6 +5324,9 @@ Tilemap.Renderer = class extends PIXI.ObjectRenderer {
 
 }; // Tilemap.Renderer
 PIXI.Renderer.registerPlugin("rpgtilemap", Tilemap.Renderer);
+// It's just to play safe in case of any plugin extending PIXI.ObjectRenderer
+ES6ExtendedClassAlias.inherit(Tilemap.Renderer);
+//
 
 /*----------------------------------------------------------------------------
  *    # Rewritten class: TilingSprite
@@ -5445,6 +5519,9 @@ class TilingSprite extends PIXI.TilingSprite {
     } // _refreshedTextureFrame
 
 } // TilingSprite
+// It's just to play safe in case of any plugin extending PIXI.TilingSprite
+ES6ExtendedClassAlias.inherit(TilingSprite);
+//
 
 /*----------------------------------------------------------------------------
  *    # Rewritten class: Weather
@@ -5629,6 +5706,9 @@ class Weather extends PIXI.Container {
     } // _updateWeatherSprite
 
 } // Weather
+// It's just to play safe in case of any plugin extending PIXI.Container in ES6
+ES6ExtendedClassAlias.inherit(Weather);
+//
 
 /*----------------------------------------------------------------------------
  *    # Rewritten class: WebAudio
@@ -7194,6 +7274,9 @@ class Window extends PIXI.Container {
     } // _updatePauseSignAlpha
 
 } // Window
+// It's just to play safe in case of any plugin extending PIXI.Container in ES6
+ES6ExtendedClassAlias.inherit(Window);
+//
 
 /*----------------------------------------------------------------------------
  *    # Rewritten class: WindowLayer
@@ -7271,3 +7354,6 @@ class WindowLayer extends PIXI.Container {
     } // _renderChild
 
 } // WindowLayer
+// It's just to play safe in case of any plugin extending PIXI.Container in ES6
+ES6ExtendedClassAlias.inherit(WindowLayer);
+//
