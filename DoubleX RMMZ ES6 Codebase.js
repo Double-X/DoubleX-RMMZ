@@ -69,7 +69,7 @@
  *      - None So Far
  *----------------------------------------------------------------------------
  *    # Changelog
- *      0.9.5(GMT 1400 4-Aug-2020):
+ *      0.9.5(GMT 1000 5-Aug-2020):
  *      1. Rewritten the core parts into the ES6 standard
  *----------------------------------------------------------------------------
  *    # Todo
@@ -501,13 +501,6 @@ class Graphics {
      * @name Graphics.width
      */
     static get width() { return this._width; }
-
-    /**
-     * The width of the game screen.
-     *
-     * @type number
-     * @name Graphics.width
-     */
     // Edited to dry up codes essentially being the identical knowledge
     static set width(value) { this._updateDimen("_width", value); }
     //
@@ -519,13 +512,6 @@ class Graphics {
      * @name Graphics.height
      */
     static get height() { return this._height; }
-
-    /**
-     * The height of the game screen.
-     *
-     * @type number
-     * @name Graphics.height
-     */
     // Edited to dry up codes essentially being the identical knowledge
     static set height(value) { this._updateDimen("_height", value); }
     //
@@ -537,13 +523,6 @@ class Graphics {
      * @name Graphics.defaultScale
      */
     static get defaultScale() { return this._defaultScale; }
-
-    /**
-     * The default zoom scale of the game screen.
-     *
-     * @type number
-     * @name Graphics.defaultScale
-     */
     static set defaultScale(value) {
         // Edited to dry up codes essentially being the identical knowledge
         this._updateDimen("_defaultScale", value);
@@ -966,13 +945,13 @@ class Graphics {
     } // _newErrorPrinter
 
     /**
-     * Updates the existing error printer document
+     * This function shouldn't be called without an existing error printer
      * Idempotent
      * @author DoubleX @since 0.9.5 @version 0.9.5
      */
     static _updateExistingErrorPrinter() {
         const { style } = this._errorPrinter;
-        /** @todo Figures out where 640 and 100 come from respectively */
+        /** @todo Figures out where do 640 and 100 come from respectively */
         style.width = `${640 * this._realScale}px`;
         style.height = `${100 * this._realScale}px`;
         //
@@ -1138,13 +1117,13 @@ Graphics.FPSCounter = class {
 
     endTick() {
         const time = performance.now(), thisFrameTime = time - this._lastLoop;
-        /** @todo Figures out where 12 comes from */
+        /** @todo Figures out where does 12 come from */
         this._frameTime += (thisFrameTime - this._frameTime) / 12;
         //
         this.fps = 1000 / this._frameTime;
         this.duration = Math.max(0, time - this._frameStart);
         this._lastLoop = time;
-        /** @todo Figures out where 15 comes from */
+        /** @todo Figures out where does 15 come from */
         if (this._tickCount++ % 15 === 0) this._update();
         //
     } // endTick
@@ -3071,13 +3050,6 @@ class Bitmap {
      * @name Bitmap#smooth
      */
     get smooth() { return this._smooth; }
-
-    /**
-     * Whether the smooth scaling is applied.
-     *
-     * @type boolean
-     * @name Bitmap#smooth
-     */
     set smooth(value) {
         if (this._smooth === value) return;
         this._smooth = value;
@@ -3091,13 +3063,6 @@ class Bitmap {
      * @name Bitmap#paintOpacity
      */
     get paintOpacity() { return this._paintOpacity; }
-
-    /**
-     * The opacity of the drawing object in the range (0, 255).
-     *
-     * @type number
-     * @name Bitmap#paintOpacity
-     */
     set paintOpacity(value) {
         if (this._paintOpacity === value) return;
         this._paintOpacity = value;
@@ -3120,8 +3085,10 @@ class Bitmap {
      * @param {number} width - The new width of the bitmap.
      * @param {number} height - The new height of the bitmap.
      */
-    resize(width, height) {
-        const [w, h] = [Math.max(width || 0, 1), Math.max(height || 0, 1)];
+    resize(width = 0, height = 0) {
+        // They shouldn't be "", false, null, NaN or other defined falsy values
+        const [w, h] = [Math.max(width, 1), Math.max(height, 1)];
+        //
         [this.canvas.width, this.canvas.height] = [w, h];
         [this.baseTexture.width, this.baseTexture.height] = [w, h];
     } // resize
@@ -3401,7 +3368,7 @@ class Bitmap {
     } // _startLoading
 
     // Edited to help pluggins alter the xhr behaviors in better ways
-    _startDecrypting() { this._newXhr().send(); }
+    _startDecrypting() { this._newDecryptingXhr().send(); }
     //
 
     _onXhrLoad(xhr) {
@@ -3524,7 +3491,9 @@ class Bitmap {
      * @param {number} [dh=sh] The height to draw the image in the destination
      */
     _bltWithoutRescue(source, sx, sy, sw, sh, dx, dy, dw, dh) {
+        // Default parameters can't be used as it's possible for them to be 0
         [dw, dh] = [dw || sw, dh || sh];
+        //
         const image = source._canvas || source._image;
         this.context.globalCompositeOperation = "source-over";
         this.context.drawImage(image, sx, sy, sw, sh, dx, dy, dw, dh);
@@ -3556,7 +3525,7 @@ class Bitmap {
     } // _drawnTextY
 
     /**
-     * This shouldn't be called without an existing image
+     * This method shouldn't be called without an existing image
      * Idempotent
      * @author DoubleX @since 0.9.5 @version 0.9.5
      */
@@ -3566,7 +3535,7 @@ class Bitmap {
     } // _ensureCanvasWithImage
 
     /**
-     * Cleanups the existing canvas of this bitmap before erasing it
+     * This method shouldn't be called without an existing canvas
      * Idempotent
      * @author DoubleX @since 0.9.5 @version 0.9.5
      */
@@ -3588,7 +3557,7 @@ class Bitmap {
     } // _newBaseTexture
 
     /**
-     * Updates the scale mode of the existing base texture
+     * This method shouldn't be called without an existing base texture
      * Idempotent
      * @author DoubleX @since 0.9.5 @version 0.9.5
      */
@@ -3615,14 +3584,14 @@ class Bitmap {
      * @author DoubleX @since 0.9.5 @version 0.9.5
      * @returns {XMLHttpRequest} The GET XMLHttpRequest receiving array buffers
      */
-    _newXhr() {
+    _newDecryptingXhr() {
         const xhr = new XMLHttpRequest();
         xhr.open("GET", `${this._url}_`);
         xhr.responseType = "arraybuffer";
-        xhr.onload = () => this._onXhrLoad(xhr);
+        xhr.onload = this._onXhrLoad.bind(this, xhr);
         xhr.onerror = this._onError.bind(this);
         return xhr;
-    } // _newXhr
+    } // _newDecryptingXhr
 
     /**
      * Sets the image source by the XMLHttpRequeset response
@@ -3858,13 +3827,6 @@ class ScreenSprite extends PIXI.Container {
      * @name ScreenSprite#opacity
      */
     get opacity() { return this.alpha * 255; }
-
-    /**
-     * The opacity of the sprite (0 to 255).
-     *
-     * @type number
-     * @name ScreenSprite#opacity
-     */
     set opacity(value) { this.alpha = value.clamp(0, 255) / 255; }
 
     /**
@@ -3915,10 +3877,12 @@ class ScreenSprite extends PIXI.Container {
      * @param {number} g - The green value in the range (0, 255)
      * @param {number} b - The blue value in the range (0, 255)
      */
-    _setNewColor(r, g, b) {
+    _setNewColor(r = 0, g = 0, b = 0) {
+        // They shouldn't be "", false, null, NaN or other defined falsy values
         [this._red, this._green, this._blue] = [r, g, b].map(component => {
-            return Math.round(component || 0).clamp(0, 255);
+            return Math.round(component).clamp(0, 255);
         });
+        //
         const graphics = this._graphics;
         graphics.clear();
         graphics.beginFill((this._red << 16) | (this._green << 8) | this._blue, 1);
@@ -3946,7 +3910,7 @@ class Sprite extends PIXI.Sprite {
 
     constructor(bitmap) {
         // Edited to help plugins setups the empty base texture in better ways
-        this._initEmptyBaseTexture();
+        Sprite._initEmptyBaseTexture();
         //
         const frame = new Rectangle();
         const texture = new PIXI.Texture(Sprite._emptyBaseTexture, frame);
@@ -3969,13 +3933,6 @@ class Sprite extends PIXI.Sprite {
      * @name Sprite#bitmap
      */
     get bitmap() { return this._bitmap; }
-
-    /**
-     * The image for the sprite.
-     *
-     * @type Bitmap
-     * @name Sprite#bitmap
-     */
     set bitmap(value) {
         if (this._bitmap === value) return;
         this._bitmap = value;
@@ -3989,13 +3946,6 @@ class Sprite extends PIXI.Sprite {
      * @name Sprite#width
      */
     get width() { return this._frame.width; }
-
-    /**
-     * The width of the sprite without the scale.
-     *
-     * @type number
-     * @name Sprite#width
-     */
     set width(value) {
         /** @todo Checks if these should be called if the width's unchanged */
         this._frame.width = value;
@@ -4010,13 +3960,6 @@ class Sprite extends PIXI.Sprite {
      * @name Sprite#height
      */
     get height() { return this._frame.height; }
-
-    /**
-     * The height of the sprite without the scale.
-     *
-     * @type number
-     * @name Sprite#height
-     */
     set height(value) {
         /** @todo Checks if these should be called if the height's unchanged */
         this._frame.height = value;
@@ -4031,13 +3974,6 @@ class Sprite extends PIXI.Sprite {
      * @name Sprite#opacity
      */
     get opacity() { return this.alpha * 255; }
-
-    /**
-     * The opacity of the sprite (0 to 255).
-     *
-     * @type number
-     * @name Sprite#opacity
-     */
     set opacity(value) { this.alpha = value.clamp(0, 255) / 255; }
 
     /**
@@ -4050,13 +3986,6 @@ class Sprite extends PIXI.Sprite {
         if (this._colorFilter) return this._colorFilter.blendMode;
         return this._blendMode;
     } // blendMode
-
-    /**
-     * The blend mode to be applied to the sprite.
-     *
-     * @type number
-     * @name Sprite#blendMode
-     */
     set blendMode(value) {
         this._blendMode = value;
         if (this._colorFilter) this._colorFilter.blendMode = value;
@@ -4258,7 +4187,7 @@ class Sprite extends PIXI.Sprite {
     } // _setNewFrame
 
     /**
-     * Triggers the events upon changing this existing sprite bitmap
+     * This method shouldn't be called without an existing bitmap
      * Idempotent
      * @author DoubleX @since 0.9.5 @version 0.9.5
      */
@@ -4382,13 +4311,6 @@ class Tilemap extends PIXI.Container {
      * @name Tilemap#width
      */
     get width() { return this._width; }
-
-    /**
-     * The width of the tilemap.
-     *
-     * @type number
-     * @name Tilemap#width
-     */
     set width(value) { this._width = value; }
 
     /**
@@ -4398,13 +4320,6 @@ class Tilemap extends PIXI.Container {
      * @name Tilemap#height
      */
     get height() { return this._height; }
-
-    /**
-     * The height of the tilemap.
-     *
-     * @type number
-     * @name Tilemap#height
-     */
     set height(value) { this._height = value; }
 
     /**
@@ -4471,7 +4386,7 @@ class Tilemap extends PIXI.Container {
     /**
      * Updates the transform on all children of this container for rendering.
      */
-    updateTransform = function() {
+    updateTransform() {
         const [ox, oy] = [Math.ceil(this.origin.x), Math.ceil(this.origin.y)];
         const startX = Math.floor((ox - this._margin) / this._tileWidth);
         const startY = Math.floor((oy - this._margin) / this._tileHeight);
@@ -4514,7 +4429,7 @@ class Tilemap extends PIXI.Container {
         this._needsRepaint = true;
     } // _createLayers
 
-    _updateBitmaps = function() {
+    _updateBitmaps() {
         /** @todo Extracts these codes into well-named functions */
         if (!this._needsBitmapsUpdate || !this.isReady()) return;
         this._lowerLayer.setBitmaps(this._bitmaps);
@@ -4523,9 +4438,10 @@ class Tilemap extends PIXI.Container {
         //
     }
 
-    _addAllSpots = function(startX, startY) {
+    _addAllSpots(startX, startY) {
         this._lowerLayer.clear();
         this._upperLayer.clear();
+        /** @todo Extracts these codes into a well-named function */
         const widthWithMatgin = this.width + this._margin * 2;
         const heightWithMatgin = this.height + this._margin * 2;
         const tileCols = Math.ceil(widthWithMatgin / this._tileWidth) + 1;
@@ -4535,6 +4451,7 @@ class Tilemap extends PIXI.Container {
                 this._addSpot(startX, startY, x, y);
             }
         }
+        //
     } // _addAllSpots
 
     _addSpot(startX, startY, x, y) {
@@ -4654,7 +4571,7 @@ class Tilemap extends PIXI.Container {
     } // _addTableEdge
 
     _addShadow(layer, shadowBits, dx, dy) {
-        /** @todo Figures out where 0x0f comes from */
+        /** @todo Figures out where does 0x0f come from */
         if (!(shadowBits & 0x0f)) return;
         //
         const [w1, h1] = [this._tileWidth / 2, this._tileHeight / 2];
@@ -4677,7 +4594,7 @@ class Tilemap extends PIXI.Container {
     _isHigherTile(tileId) { return this.flags[tileId] & 0x10; }
 
     _isTableTile(tileId) {
-        /** @todo Figures out where 0x80 comes from */
+        /** @todo Figures out where does 0x80 come from */
         return this.isTileA2(tileId) && this.flags[tileId] & 0x80;
         //
     } // _isTableTile
@@ -4970,6 +4887,11 @@ class Tilemap extends PIXI.Container {
 
 } // Tilemap
 
+/*----------------------------------------------------------------------------
+ *    # Rewritten class: Tilemap.Layer
+ *      - Rewrites it into the ES6 standard
+ *----------------------------------------------------------------------------*/
+
 //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 // Internal classes
 Tilemap.Layer = class extends PIXI.Container {
@@ -5110,7 +5032,7 @@ Tilemap.Layer = class extends PIXI.Container {
     } // _initPrivateVars
 
     /**
-     * Destroys this tilemap layer with the existing vao
+     * This method shouldn't be called without an existing vao
      * Idempotent
      * @author DoubleX @since 0.9.5 @version 0.9.5
      */
@@ -5150,6 +5072,7 @@ Tilemap.Layer = class extends PIXI.Container {
      * @author DoubleX @since 0.9.5 @version 0.9.5
      * @param {PIXI.Renderer} renderer - The pixi renderer
      * @param {WebGLRenderingContext} gl - The pixi WebGL rendering context
+     * @param {number} numElements - The number of rectangle elements
      */
     _renderWithElems(renderer, gl, numElements) {
         renderer.state.set(this._state);
@@ -5179,11 +5102,15 @@ Tilemap.Layer = class extends PIXI.Container {
  *      - Rewrites it into the ES6 standard
  *----------------------------------------------------------------------------*/
 
+//:::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+// Internal classes
 Tilemap.Renderer = class extends PIXI.ObjectRenderer {
 
     constructor(renderer) {
         super(renderer);
+        // Edited to help plugins initialize private variables in better ways
         this._initPrivateVars();
+        //
         this.contextChange();
     } // constructor
 
@@ -5248,11 +5175,11 @@ Tilemap.Renderer = class extends PIXI.ObjectRenderer {
 
     _createInternalTextures() {
         this._destroyInternalTextures();
-        for (let i = 0; i < Tilemap.Layer.MAX_GL_TEXTURES; i++) {
-            const baseTexture = new PIXI.BaseRenderTexture();
-            baseTexture.resize(2048, 2048);
-            baseTexture.scaleMode = PIXI.SCALE_MODES.NEAREST;
-            this._internalTextures.push(baseTexture);
+        const maxGLTextures = Tilemap.Layer.MAX_GL_TEXTURES;
+        for (let i = 0; i < maxGLTextures; i++) {
+            // Edited to help plugins alter internal base textures in better way
+            this._internalTextures.push(this._internalBaseTexture());
+            //
         }
     } // _createInternalTextures
 
@@ -5265,21 +5192,15 @@ Tilemap.Renderer = class extends PIXI.ObjectRenderer {
 
     updateTextures(renderer, images) {
         images.forEach((image, i) => {
-            renderer.texture.bind(this._internalTextures[i >> 2], 0);
-            const gl = renderer.gl;
-            const [x, y] = [1024 * (i % 2), 1024 * ((i >> 1) % 2)];
-            const [format, type] = [gl.RGBA, gl.UNSIGNED_BYTE];
-            gl.pixelStorei(gl.UNPACK_PREMULTIPLY_ALPHA_WEBGL, 0);
-            // prettier-ignore
-            gl.texSubImage2D(gl.TEXTURE_2D, 0, x, y, 1024, 1024, format, type,
-                    this._clearBuffer);
-            gl.pixelStorei(gl.UNPACK_PREMULTIPLY_ALPHA_WEBGL, 1);
-            gl.texSubImage2D(gl.TEXTURE_2D, 0, x, y, format, type, image);
+            // Edited to help plugins alter texture updates in better ways
+            this._updateTextureImage(renderer, image, i);
+            //
         });
     } // updateTextures
 
     bindTextures(renderer) {
-        for (let ti = 0; ti < Tilemap.Layer.MAX_GL_TEXTURES; ti++) {
+        const maxGLTextures = Tilemap.Layer.MAX_GL_TEXTURES;
+        for (let ti = 0; ti < maxGLTextures; ti++) {
             renderer.texture.bind(this._internalTextures[ti], ti);
         }
     } // bindTextures
@@ -5291,8 +5212,2062 @@ Tilemap.Renderer = class extends PIXI.ObjectRenderer {
      */
     _initPrivateVars() {
         [this._shader, this._images, this._internalTextures] = [null, [], []];
+        /** @todo Figures out where does 4 come from */
         this._clearBuffer = new Uint8Array(1024 * 1024 * 4);
+        //
     } // _initPrivateVars
+
+    /**
+     * Nullipotent
+     * @author DoubleX @since 0.9.5 @version 0.9.5
+     * @returns {PIXI.BaseRenderTexture} The internal base texture in the list
+     */
+    _internalBaseTexture() {
+        const baseTexture = new PIXI.BaseRenderTexture();
+        /** @todo Figures out where does 2048 come from */
+        baseTexture.resize(2048, 2048);
+        //
+        baseTexture.scaleMode = PIXI.SCALE_MODES.NEAREST;
+        return baseTexture;
+    } // _internalBaseTexture
+
+    /**
+     * Updates the specified texture image with the specified renderer
+     * Hotspot/Idempotent
+     * @author DoubleX @since 0.9.5 @version 0.9.5
+     * @param {PIXI.Renderer} renderer - The pixi renderer
+     * @param {HTMLImageElement|HTMLCanvasElement} image - The texture image
+     * @param {index} i - The index of the texture image in the image list
+     */
+    _updateTextureImage(renderer, image, i) {
+        renderer.texture.bind(this._internalTextures[i >> 2], 0);
+        const [gl, x, y] = [renderer.gl, 1024 * (i % 2), 1024 * ((i >> 1) % 2)];
+        const [format, type] = [gl.RGBA, gl.UNSIGNED_BYTE];
+        gl.pixelStorei(gl.UNPACK_PREMULTIPLY_ALPHA_WEBGL, 0);
+        // prettier-ignore
+        gl.texSubImage2D(gl.TEXTURE_2D, 0, x, y, 1024, 1024, format, type,
+                this._clearBuffer);
+        gl.pixelStorei(gl.UNPACK_PREMULTIPLY_ALPHA_WEBGL, 1);
+        gl.texSubImage2D(gl.TEXTURE_2D, 0, x, y, format, type, image);
+    } // _updateTextureImage
 
 }; // Tilemap.Renderer
 PIXI.Renderer.registerPlugin("rpgtilemap", Tilemap.Renderer);
+
+/*----------------------------------------------------------------------------
+ *    # Rewritten class: TilingSprite
+ *      - Rewrites it into the ES6 standard
+ *----------------------------------------------------------------------------*/
+
+//-----------------------------------------------------------------------------
+/**
+ * The sprite object for a tiling image.
+ *
+ * @class
+ * @extends PIXI.TilingSprite
+ * @param {Bitmap} bitmap - The image for the tiling sprite.
+ */
+class TilingSprite extends PIXI.TilingSprite {
+
+    constructor(bitmap) {
+        TilingSprite._initEmptyBaseTexture();
+        const frame = new Rectangle();
+        const texture = new PIXI.Texture(TilingSprite._emptyBaseTexture, frame);
+        PIXI.TilingSprite.call(this, texture);
+        this._bitmap = bitmap;
+        this._width = this._height = 0;
+        this._frame = frame;
+        this._initPublicVars();
+        this._onBitmapChange();
+    } // constructor
+
+    static _emptyBaseTexture = null;
+
+    /**
+     * The image for the tiling sprite.
+     *
+     * @type Bitmap
+     * @name TilingSprite#bitmap
+     */
+    get bitmap() { return this._bitmap; }
+    set bitmap(value) {
+        if (this._bitmap === value) return;
+        this._bitmap = value;
+        this._onBitmapChange();
+    } // bitmap
+
+    /**
+     * The opacity of the tiling sprite (0 to 255).
+     *
+     * @type number
+     * @name TilingSprite#opacity
+     */
+    get opacity() { return this.alpha * 255; }
+    set opacity(value) { this.alpha = value.clamp(0, 255) / 255; }
+
+    /**
+     * Destroys the tiling sprite.
+     */
+    destroy() { super.destroy({ children: true, texture: true }); }
+
+    /**
+     * Updates the tiling sprite for each frame.
+     */
+    update() {
+        /** @todo Checks if an invisible sprite needs to be updated */
+        this.children.forEach(child => { if (child.update) child.update(); });
+        //
+    } // update
+
+    /**
+     * Sets the x, y, width, and height all at once.
+     *
+     * @param {number} x - The x coordinate of the tiling sprite.
+     * @param {number} y - The y coordinate of the tiling sprite.
+     * @param {number} width - The width of the tiling sprite.
+     * @param {number} height - The height of the tiling sprite.
+     */
+    move(x = 0, y = 0, width = 0, height = 0) {
+        // They shouldn't be "", false, null, NaN or other defined falsy values
+        [this.x, this.y, this._width, this._height] = [x, y, width, height];
+        //
+    } // move
+
+    /**
+     * Specifies the region of the image that the tiling sprite will use.
+     *
+     * @param {number} x - The x coordinate of the frame.
+     * @param {number} y - The y coordinate of the frame.
+     * @param {number} width - The width of the frame.
+     * @param {number} height - The height of the frame.
+     */
+    setFrame(x, y, width, height) {
+        [this._frame.x, this._frame.y] = [x, y];
+        [this._frame.width, this._frame.height] = [width, height];
+        this._refresh();
+    } // setFrame
+
+    /**
+     * Updates the transform on all children of this container for rendering.
+     */
+    updateTransform() {
+        this.tilePosition.x = Math.round(-this.origin.x);
+        this.tilePosition.y = Math.round(-this.origin.y);
+        super.updateTransform();
+    } // updateTransform
+
+    _onBitmapChange() {
+        if (!this._bitmap) return this.texture.frame = new Rectangle();
+        this._bitmap.addLoadListener(this._onBitmapLoad.bind(this));
+    } // _onBitmapChange
+
+    _onBitmapLoad() {
+        this.texture.baseTexture = this._bitmap.baseTexture;
+        this._refresh();
+    } // _onBitmapLoad
+
+    _refresh() {
+        // Edited to help plugins alter texture refresh behaviors in better ways
+        if (this.texture) this._refreshWithTexture();
+        //
+    } // _refresh
+
+    /**
+     * Initializes the new static empty base texture of the Sprite class
+     * Idempotent
+     * @author DoubleX @since 0.9.5 @version 0.9.5
+     */
+    static _initEmptyBaseTexture() {
+        if (this._emptyBaseTexture) return;
+        this._emptyBaseTexture = this._newEmptyBaseTexture();
+    } // _initEmptyBaseTexture
+
+    /**
+     * Nullipotent
+     * @author DoubleX @since 0.9.5 @version 0.9.5
+     * @returns {PIXI.BaseTexture} The new static empty base texture of Sprite
+     */
+    static _newEmptyBaseTexture() {
+        const emptyBaseTexture = new PIXI.BaseTexture();
+        emptyBaseTexture.setSize(1, 1);
+        return emptyBaseTexture;
+    } // _newEmptyBaseTexture
+
+    /**
+     * Initializes all public variables of this tiling sprite
+     * Idempotent
+     * @author DoubleX @since 0.9.5 @version 0.9.5
+     */
+    _initPublicVars() {
+        /**
+         * The origin point of the tiling sprite for scrolling.
+         *
+         * @type Point
+         */
+        this.origin = new Point();
+    } // _initPublicVars
+
+    /**
+     * This method shouldn't be called without an existing texture
+     * Idempotent
+     * @author DoubleX @since 0.9.5 @version 0.9.5
+     */
+    _refreshWithTexture() {
+        if (this.texture.baseTexture) this._refreshWithBaseTexture();
+        this.texture._updateID++;
+    } // _refreshWithTexture
+
+    /**
+     * This method shouldn't be called without an existing base texture
+     * Idempotent
+     * @author DoubleX @since 0.9.5 @version 0.9.5
+     */
+    _refreshWithBaseTexture() {
+        /** @todo Thinks of if at least logging the catch will be better */
+        try {
+            this.texture.frame = this._refreshedTextureFrame();
+        } catch (e) { this.texture.frame = new Rectangle(); }
+        //
+    } // _refreshWithBaseTexture
+
+    /**
+     * Nullipotent
+     * @author DoubleX @since 0.9.5 @version 0.9.5
+     * @returns {Rectangle} The new frame for the refreshed texture
+     */
+    _refreshedTextureFrame() {
+        const frame = this._frame.clone();
+        if (frame.width === 0 && frame.height === 0 && this._bitmap) {
+            frame.width = this._bitmap.width;
+            frame.height = this._bitmap.height;
+        }
+        return frame;
+    } // _refreshedTextureFrame
+
+} // TilingSprite
+
+/*----------------------------------------------------------------------------
+ *    # Rewritten class: Weather
+ *      - Rewrites it into the ES6 standard
+ *----------------------------------------------------------------------------*/
+
+//-----------------------------------------------------------------------------
+/**
+ * The weather effect which displays rain, storm, or snow.
+ *
+ * @class
+ * @extends PIXI.Container
+ */
+class Weather extends PIXI.Container {
+
+    constructor() {
+        super();
+        // Edited to help plugins initialize private variables in better ways
+        this._initPrivateVars();
+        //
+        this._createBitmaps();
+        this._createDimmer();
+        // Edited to help plugins initialize public variables in better ways
+        this._initPublicVars();
+        //
+    } // constructor
+
+    /**
+     * Destroys the weather.
+     */
+    destroy() {
+        super.destroy({ children: true, texture: true });
+        this._rainBitmap.destroy();
+        this._stormBitmap.destroy();
+        this._snowBitmap.destroy();
+    } // destroy
+
+    /**
+     * Updates the weather for each frame.
+     */
+    update() {
+        this._updateDimmer();
+        this._updateAllSprites();
+    } // update
+
+    _createBitmaps() {
+        this._rainBitmap = new Bitmap(1, 60);
+        this._rainBitmap.fillAll("white");
+        this._stormBitmap = new Bitmap(2, 100);
+        this._stormBitmap.fillAll("white");
+        this._snowBitmap = new Bitmap(9, 9);
+        this._snowBitmap.drawCircle(4, 4, 4, "white");
+    } // _createBitmaps
+
+    _createDimmer() {
+        this._dimmerSprite = new ScreenSprite();
+        this._dimmerSprite.setColor(80, 80, 80);
+        this.addChild(this._dimmerSprite);
+    } // _createDimmer
+
+    _updateDimmer() {
+        this._dimmerSprite.opacity = Math.floor(this.power * 6);
+    } // _updateDimmer
+
+    _updateAllSprites() {
+        const maxSprites = Math.floor(this.power * 10);
+        while (this._sprites.length < maxSprites) this._addSprite();
+        while (this._sprites.length > maxSprites) this._removeSprite();
+        this._sprites.forEach(sprite => {
+            this._updateSprite(sprite);
+            sprite.x = sprite.ax - this.origin.x;
+            sprite.y = sprite.ay - this.origin.y;
+        });
+    } // _updateAllSprites
+
+    _addSprite() {
+        // Edited to help plugins alter sprite add behaviors in better ways
+        const sprite = this._newSprite();
+        //
+        this._sprites.push(sprite);
+        this.addChild(sprite);
+    } // _addSprite
+
+    _removeSprite() { this.removeChild(this._sprites.pop()); }
+
+    _updateSprite(sprite) {
+        switch (this.type) {
+            case "rain":
+                this._updateRainSprite(sprite);
+                break;
+            case "storm":
+                this._updateStormSprite(sprite);
+                break;
+            case "snow":
+                this._updateSnowSprite(sprite);
+                break;
+        }
+        /** @todo Figures out where does 40 come from */
+        if (sprite.opacity < 40) this._rebornSprite(sprite);
+        //
+    } // _updateSprite
+
+    _updateRainSprite(sprite) {
+        // Edited to dry up codes essentially being the identical knowledge
+        this._updateWeatherSprite(sprite, this._rainBitmap, Math.PI / 16, 6);
+        //
+    } // _updateRainSprite
+
+    _updateStormSprite(sprite) {
+        // Edited to dry up codes essentially being the identical knowledge
+        this._updateWeatherSprite(sprite, this._stormBitmap, Math.PI / 8, 8);
+        //
+    } // _updateStormSprite
+
+    _updateSnowSprite(sprite) {
+        // Edited to dry up codes essentially being the identical knowledge
+        this._updateWeatherSprite(sprite, this._snowBitmap, Math.PI / 16, 3);
+        //
+    } // _updateSnowSprite
+
+    /**
+     * Initializes all private variables of this weather
+     * Idempotent
+     * @author DoubleX @since 0.9.5 @version 0.9.5
+     */
+    _initPrivateVars() {
+        [this._width, this._height] = [Graphics.width, Graphics.height];
+        this._sprites = [];
+    } // _initPrivateVars
+
+    /**
+     * Initializes all public variables of this weather
+     * Idempotent
+     * @author DoubleX @since 0.9.5 @version 0.9.5
+     */
+    _initPublicVars() {
+        /**
+         * The type of the weather in ["none", "rain", "storm", "snow"].
+         *
+         * @type string
+         */
+        this.type = "none";
+        /**
+         * The power of the weather in the range (0, 9).
+         *
+         * @type number
+         */
+        this.power = 0;
+        /**
+         * The origin point of the tiling sprite for scrolling.
+         *
+         * @type Point
+         */
+        this.origin = new Point();
+    } // _initPublicVars
+
+    /**
+     * Nullipotent
+     * @author DoubleX @since 0.9.5 @version 0.9.5
+     * @returns {Sprite} The new weather sprite to be added in the list
+     */
+    _newSprite() {
+        const sprite = new Sprite(this.viewport);
+        sprite.opacity = 0;
+        return sprite;
+    } // _newSprite
+
+    /**
+     * Updates the sprite with the specified weather, radian and opacity change
+     * Idempotent
+     * @author DoubleX @since 0.9.5 @version 0.9.5
+     * @param {Sprite} sprite - The weather sprite to be updated
+     * @param {Bitmap} bitmap - The new bitmap of the weather sprite
+     * @param {number} radian - The new rotation of the weather sprite
+     * @param {number} opacityDecrement - The weather sprite opacity decrement
+     */
+    _updateWeatherSprite(sprite, bitmap, radian, opacityDecrement) {
+        [sprite.bitmap, sprite.rotation] = [bitmap, radian];
+        sprite.ax -= opacityDecrement * Math.sin(sprite.rotation);
+        sprite.ay += opacityDecrement * Math.cos(sprite.rotation);
+        sprite.opacity -= opacityDecrement;
+    } // _updateWeatherSprite
+
+} // Weather
+
+/*----------------------------------------------------------------------------
+ *    # Rewritten class: WebAudio
+ *      - Rewrites it into the ES6 standard
+ *----------------------------------------------------------------------------*/
+
+//-----------------------------------------------------------------------------
+/**
+ * The audio object of Web Audio API.
+ *
+ * @class
+ * @param {string} url - The url of the audio file.
+ */
+class WebAudio {
+
+    constructor(url) {
+        this.clear();
+        this._url = url;
+        this._startLoading();
+    } // constructor
+
+    /**
+     * Initializes the audio system.
+     *
+     * @returns {boolean} True if the audio system is available.
+     */
+    static initialize() {
+        this._context = this._masterGainNode = null;
+        this._masterVolume = 1;
+        this._createContext();
+        this._createMasterGainNode();
+        this._setupEventHandlers();
+        return !!this._context;
+    } // initialize
+
+    /**
+     * Sets the master volume for all audio.
+     *
+     * @param {number} value - The master volume (0 to 1).
+     */
+    static setMasterVolume(value) {
+        this._masterVolume = value;
+        this._resetVolume();
+    } // setMasterVolume
+
+    static _createContext() {
+        try {
+            const AudioContext = window.AudioContext || window.webkitAudioContext;
+            this._context = new AudioContext();
+        } catch (e) { this._context = null; }
+    } // _createContext
+
+    static _currentTime() {
+        return this._context ? this._context.currentTime : 0;
+    } // _currentTime
+
+    static _createMasterGainNode() {
+        // Edited to help plugins create master gain node in better ways
+        if (this._context) this._createMasterGainNodeWithContext();
+        //
+    } // _createMasterGainNode
+
+    static _setupEventHandlers() {
+        const onUserGesture = this._onUserGesture.bind(this);
+        const onVisibilityChange = this._onVisibilityChange.bind(this);
+        document.addEventListener("keydown", onUserGesture);
+        document.addEventListener("mousedown", onUserGesture);
+        document.addEventListener("touchend", onUserGesture);
+        document.addEventListener("visibilitychange", onVisibilityChange);
+    } // _setupEventHandlers
+
+    static _onUserGesture() {
+        const context = this._context;
+        if (context && context.state === "suspended") context.resume();
+    } // _onUserGesture
+
+    static _onVisibilityChange() {
+        if (document.visibilityState === "hidden") return this._onHide();
+        this._onShow();
+    } // _onVisibilityChange
+
+    static _onHide() {
+        if (this._shouldMuteOnHide()) this._fadeOut(1);
+    } // _onHide
+
+    static _onShow() {
+        if (this._shouldMuteOnHide()) this._fadeIn(1);
+    } // _onShow
+
+    static _shouldMuteOnHide() {
+        return Utils.isMobileDevice() && !window.navigator.standalone;
+    } // _shouldMuteOnHide
+
+    static _resetVolume() {
+        // Edited to help plugins reset volume with gain node in better ways
+        if (this._masterGainNode) this._resetVolWithMasterGainNode();
+        //
+    } // _resetColume
+
+    static _fadeIn(duration) {
+        // Edited to help plugins fade in with master gain node in better ways
+        if (this._masterGainNode) this._fadeInWithMasterGainNode(duration);
+        //
+    } // _fadeIn
+
+    static _fadeOut(duration) {
+        // Edited to help plugins fade out with master gain node in better ways
+        if (this._masterGainNode) this._fadeOutWithMasterGainNode(duration);
+        //
+    } // _fadeOut
+
+    /**
+     * Clears the audio data.
+     */
+    clear() {
+        this.stop();
+        this._data = this._buffer = null;
+        this._sourceNode = this._gainNode = this._pannerNode = null;
+        this._totalTime = this._sampleRate = 0;
+        this._loop = this._loopStart = this._loopLength = 0;
+        this._loopStartTime = this._loopLengthTime = this._startTime = 0;
+        this._volume = this._pitch = 1;
+        [this._pan, this._endTimer] = [0, null];
+        [this._loadListeners, this._stopListeners] = [[], []];
+        this._lastUpdateTime = 0;
+        this._isLoaded = this._isError = this._isPlaying = false;
+        this._decoder = null;
+    } // clear
+
+    /**
+     * The url of the audio file.
+     *
+     * @readonly
+     * @type string
+     * @name WebAudio#url
+     */
+    get url() { return this._url; }
+
+    /**
+     * The volume of the audio.
+     *
+     * @type number
+     * @name WebAudio#volume
+     */
+    get volume() { return this._volume; }
+    set volume(value) {
+        this._volume = value;
+        if (!this._gainNode) return;
+        this._gainNode.gain.setValueAtTime(value, WebAudio._currentTime());
+    } // volume
+
+    /**
+     * The pitch of the audio.
+     *
+     * @type number
+     * @name WebAudio#pitch
+     */
+    get pitch() { return this._pitch; }
+    set pitch(value) {
+        if (this._pitch === value) return;
+        this._pitch = value;
+        if (this.isPlaying()) this.play(this._loop, 0);
+    } // pitch
+
+    /**
+     * The pan of the audio.
+     *
+     * @type number
+     * @name WebAudio#pan
+     */
+    get pan() { return this._pan; }
+    set pan(value) {
+        this._pan = value;
+        this._updatePanner();
+    } // pan
+
+    /**
+     * Checks whether the audio data is ready to play.
+     *
+     * @returns {boolean} True if the audio data is ready to play.
+     */
+    isReady() { return !!this._buffer; }
+
+    /**
+     * Checks whether a loading error has occurred.
+     *
+     * @returns {boolean} True if a loading error has occurred.
+     */
+    isError() { return this._isError; }
+
+    /**
+     * Checks whether the audio is playing.
+     *
+     * @returns {boolean} True if the audio is playing.
+     */
+    isPlaying() { return this._isPlaying; }
+
+    /**
+     * Plays the audio.
+     *
+     * @param {boolean} loop - Whether the audio data play in a loop.
+     * @param {number} offset - The start position to play in seconds.
+     */
+    play(loop, offset) {
+        this._loop = loop;
+        if (this.isReady()) {
+            this._startPlaying(offset || 0);
+        } else if (WebAudio._context) {
+            this.addLoadListener(this.play.bind(this, loop, offset));
+        }
+        this._isPlaying = true;
+    } // play
+
+    /**
+     * Stops the audio.
+     */
+    stop() {
+        this._isPlaying = false;
+        this._removeEndTimer();
+        this._removeNodes();
+        this._loadListeners = [];
+        // Edited to help plugins call stop listeners in better ways
+        if (this._stopListeners) this._callStopListeners();
+        //
+    } // stop
+
+    /**
+     * Destroys the audio.
+     */
+    destroy() {
+        this.stop();
+        this._destroyDecoder();
+    } // destroy
+
+    /**
+     * Performs the audio fade-in.
+     *
+     * @param {number} duration - Fade-in time in seconds.
+     */
+    fadeIn(duration) {
+        // Edited to help plugins alter fade in ready behaviors in better ways
+        if (this.isReady()) return this._fadeInWhenReady(duration);
+        //
+        this.addLoadListener(this.fadeIn.bind(this, duration));
+    } // fadeIn
+
+    /**
+     * Performs the audio fade-out.
+     *
+     * @param {number} duration - Fade-out time in seconds.
+     */
+    fadeOut(duration) {
+        // Edited to help plugins alter fade out with gain node in better ways
+        if (this._gainNode) this._fadeOutWithGainNode(duration);
+        //
+        this._isPlaying = false;
+        this._loadListeners = [];
+    } // fadeOut
+
+    /**
+     * Gets the seek position of the audio.
+     */
+    // Edited to help plugins alter seeking with context in better ways
+    seek() { return WebAudio._context ? this._seekWithContext() : 0; }
+    //
+
+    /**
+     * Adds a callback function that will be called when the audio data is loaded.
+     *
+     * @param {function} listner - The callback function.
+     */
+    addLoadListener(listner) { this._loadListeners.push(listner); }
+
+    /**
+     * Adds a callback function that will be called when the playback is stopped.
+     *
+     * @param {function} listner - The callback function.
+     */
+    addStopListener(listner) { this._stopListeners.push(listner); }
+
+    /**
+     * Tries to load the audio again.
+     */
+    retry() {
+        this._startLoading();
+        if (this._isPlaying) this.play(this._loop, 0);
+    } // retry
+
+    // Edited to help plugins alter start loading behaviors in better ways
+    _startLoading() { if (WebAudio._context) this._startLoadingWithContext(); }
+    //
+
+    _shouldUseDecoder() {
+        return !Utils.canPlayOgg() && typeof VorbisDecoder === "function";
+    } // _shouldUseDecoder
+
+    _createDecoder() {
+        this._decoder = new VorbisDecoder(
+            WebAudio._context,
+            this._onDecode.bind(this),
+            this._onError.bind(this)
+        );
+    } // _createDecoder
+
+    _destroyDecoder() {
+        if (!this._decoder) return;
+        this._decoder.destroy();
+        this._decoder = null;
+    } // _destroyDecoder
+
+    _realUrl() { return `${this._url}${Utils.hasEncryptedAudio() ? "_" : ""}`; }
+
+    // Edited to help plugins alter start loading xhr behaviors in better ways
+    _startXhrLoading(url) { this._newLoadingXhr(url).sned(); }
+    //
+
+    _startFetching(url) {
+        fetch(url).then(this._onFetch.bind(this)).catch(this._onError.bind(this));
+    } // _startFetching
+
+    _onXhrLoad(xhr) {
+        // Edited to help pluggins alter the xhr load behaviors in better ways
+        xhr.status < 400 ? this._onXhrLoadSuc(xhr) : this._onError();
+        //
+    } // _onXhrLoad
+
+    _onFetch(response) {
+        // Edited to help plugins alter on fetch ok behaviors in better ways
+        response.ok ? this._onFetchOk(response) : this._onError();
+        //
+    } // _onFetch
+
+    _onError() {
+        if (this._sourceNode) this._stopSourceNode();
+        [this._data, this._isError] = [null, true];
+    } // _onError
+
+    _onFetchProcess(value) {
+        const currentData = this._data;
+        const currentSize = currentData ? currentData.length : 0;
+        const newData = new Uint8Array(currentSize + value.length);
+        if (currentData) newData.set(currentData);
+        newData.set(value, currentSize);
+        this._data = newData;
+        this._updateBufferOnFetch();
+    } // _onFetchProcess
+
+    _updateBufferOnFetch() {
+        // [Note] Too frequent updates have a negative impact on sound quality.
+        //   In addition, decodeAudioData() may fail if the data is being fetched
+        //   and is too small.
+        const currentTime = performance.now();
+        const deltaTime = currentTime - this._lastUpdateTime;
+        /** @todo Extracts these codes into well-named functions */
+        if (deltaTime >= 500 && this._data.length >= 50000) {
+            this._updateBuffer();
+            this._lastUpdateTime = currentTime;
+        }
+        //
+    } // _updateBufferOnFetch
+
+    _updateBuffer() {
+        const arrayBuffer = this._readableBuffer();
+        this._readLoopComments(arrayBuffer);
+        this._decodeAudioData(arrayBuffer);
+    } // _updateBuffer
+
+    _readableBuffer() {
+        if (!Utils.hasEncryptedAudio()) return this._data.buffer;
+        return Utils.decryptArrayBuffer(this._data.buffer);
+    } // _readableBuffer
+
+    _decodeAudioData(arrayBuffer) {
+        if (this._shouldUseDecoder()) {
+            /** @todo Extracts these codes into a well-named function */
+            if (this._decoder) this._decoder.send(arrayBuffer, this._isLoaded);
+            //
+        } else {
+            // [Note] Make a temporary copy of arrayBuffer because
+            //   decodeAudioData() detaches it.
+            WebAudio._context
+                .decodeAudioData(arrayBuffer.slice())
+                .then(this._onDecode.bind(this))
+                .catch(this._onError.bind(this));
+        }
+    } // _decodeAudioData
+
+    _onDecode(buffer) {
+        [this._buffer, this._totalTime] = [buffer, buffer.duration];
+        /** @todo Extracts these codes into well-named functions */
+        if (this._loopLength > 0 && this._sampleRate > 0) {
+            this._loopStartTime = this._loopStart / this._sampleRate;
+            this._loopLengthTime = this._loopLength / this._sampleRate;
+        } else {
+            this._loopStartTime = 0;
+            this._loopLengthTime = this._totalTime;
+        }
+        //
+        if (this._sourceNode) this._refreshSourceNode();
+        this._onLoad();
+    } // _onDecode
+
+    _refreshSourceNode() {
+        this._stopSourceNode();
+        this._createSourceNode();
+        // Edited to help plugins alter refresh source node in better ways
+        if (this._isPlaying) this._refreshSourceNodeWhenPlaying();
+        //
+    } // _refreshSourceNode
+
+    _startPlaying(offset) {
+        // Edited to help plugins alter the start playing offset in better ways
+        const playingOffset = this._startPlayingOffset(offset);
+        //
+        this._removeEndTimer();
+        this._removeNodes();
+        this._createPannerNode();
+        this._createGainNode();
+        this._createSourceNode();
+        this._startSourceNode(0, playingOffset);
+        this._startTime = WebAudio._currentTime() - playingOffset / this._pitch;
+        this._createEndTimer();
+    } // _startPlaying
+
+    _startSourceNode(when, offset) {
+        if (offset >= this._buffer.duration) return;
+        this._sourceNode.start(when, offset);
+    } // _startSourceNode
+
+    // Ignore InvalidStateError
+    _stopSourceNode() { try { this._sourceNode.stop(); } catch (e) {} }
+
+    _createPannerNode() {
+        this._pannerNode = WebAudio._context.createPanner();
+        this._pannerNode.panningModel = "equalpower";
+        this._pannerNode.connect(WebAudio._masterGainNode);
+        this._updatePanner();
+    } // _createPannerNode
+
+    _createGainNode() {
+        const currentTime = WebAudio._currentTime();
+        this._gainNode = WebAudio._context.createGain();
+        this._gainNode.gain.setValueAtTime(this._volume, currentTime);
+        this._gainNode.connect(this._pannerNode);
+    } // _createGainNode
+
+    _createSourceNode() {
+        const currentTime = WebAudio._currentTime();
+        this._sourceNode = WebAudio._context.createBufferSource();
+        this._sourceNode.buffer = this._buffer;
+        this._sourceNode.loop = this._loop && this._isLoaded;
+        this._sourceNode.loopStart = this._loopStartTime;
+        this._sourceNode.loopEnd = this._loopStartTime + this._loopLengthTime;
+        this._sourceNode.playbackRate.setValueAtTime(this._pitch, currentTime);
+        this._sourceNode.connect(this._gainNode);
+    } // _createSourceNode
+
+    // Edited to help plugins alter the remove nodes behaviors in better way
+    _removeNodes() { if (this._sourceNode) this._removeNodesWithSourceNode(); }
+
+    _createEndTimer() {
+        /** @todo Extracts these codes into well-named functions */
+        if (this._sourceNode && !this._loop) {
+            const endTime = this._startTime + this._totalTime / this._pitch;
+            const delay = endTime - WebAudio._currentTime();
+            this._endTimer = setTimeout(this.stop.bind(this), delay * 1000);
+        }
+        //
+    } // _createEndTimer
+
+    _removeEndTimer() {
+        if (!this._endTimer) return;
+        clearTimeout(this._endTimer);
+        this._endTimer = null;
+    } // _removeEndTimer
+
+    _updatePanner() {
+         if (!this._pannerNode) return;
+         this._pannerNode.setPosition(this._pan, 0, 1 - Math.abs(this._pan));
+    } // _updatePanner
+
+    _onLoad() {
+        while (!this._loadListeners.isEmpty()) this._loadListeners.shift()();
+    } // _onLoad
+
+    _readLoopComments(arrayBuffer) {
+        const view = new DataView(arrayBuffer), maxI = view.byteLength - 30;
+        let index = 0;
+        while (index < maxI) {
+            if (this._readFourCharacters(view, index) !== "OggS") break;
+            index += 26;
+            const [numSegments, segments] = [view.getUint8(index++), []];
+            for (let i = 0; i < numSegments; i++) {
+                segments.push(view.getUint8(index++));
+            }
+            // Edited to help plugins alter loop comment packets in better ways
+            const packets = this._loopCommentPackets(segments);
+            //
+            let vorbisHeaderFound = false;
+            packets.forEach(size => {
+                if (this._readFourCharacters(view, index + 1) === "vorb") {
+                    // Edited to help plugins alter read packet in better ways
+                    this._readLoopCommentPacket(view, index, size);
+                    //
+                    vorbisHeaderFound = true;
+                }
+                index += size;
+            });
+            if (!vorbisHeaderFound) break;
+        }
+    } // _readLoopComments
+
+    _readMetaData(view, index, size) {
+        const maxI = index + size - 10;
+        for (let i = index; i < maxI; i++) {
+            if (this._readFourCharacters(view, i) !== "LOOP") continue;
+            let text = "";
+            while (view.getUint8(i) > 0) {
+                text += String.fromCharCode(view.getUint8(i++));
+            }
+            // Edited to help plugins alter loop start/length in better ways
+            this._readMetaLoopStartLength(text);
+            //
+            if (text === "LOOPSTART" || text === "LOOPLENGTH") {
+                let text2 = "";
+                i += 16;
+                while (view.getUint8(i) > 0) {
+                    text2 += String.fromCharCode(view.getUint8(i++));
+                }
+                if (text === "LOOPSTART") {
+                    this._loopStart = parseInt(text2);
+                } else this._loopLength = parseInt(text2);
+            }
+        }
+    } // _readMetaData
+
+    _readFourCharacters(view, index) {
+        let string = "";
+        if (index <= view.byteLength - 4) {
+            for (let i = 0; i < 4; i++) {
+                string += String.fromCharCode(view.getUint8(index + i));
+            }
+        }
+        return string;
+    } // _readFourCharacters
+
+    /**
+     * Creates the master gain node with the global web audio context
+     * Idempotent
+     * @author DoubleX @since 0.9.5 @version 0.9.5
+     */
+    static _createMasterGainNodeWithContext() {
+        this._masterGainNode = this._context.createGain();
+        this._resetVolume();
+        this._masterGainNode.connect(this._context.destination);
+    } // _createMasterGainNodeWithContext
+
+    /**
+     * Resets the master volume with its master gain node being present
+     * Idempotent
+     * @author DoubleX @since 0.9.5 @version 0.9.5
+     */
+    static _resetVolWithMasterGainNode() {
+        const [gain, volume] = [this._masterGainNode.gain, this._masterVolume];
+        const currentTime = this._currentTime();
+        gain.setValueAtTime(volume, currentTime);
+    } // _resetVolWithMasterGainNode
+
+    /**
+     * Fades in the global web audio with its master gain node being present
+     * Idempotent
+     * @author DoubleX @since 0.9.5 @version 0.9.5
+     * @param {number} duration - Fade-out time in seconds
+     */
+    static _fadeInWithMasterGainNode(duration) {
+        const [gain, volume] = [this._masterGainNode.gain, this._masterVolume];
+        const currentTime = this._currentTime();
+        /** @todo Dries up these codes representing identical knowledge */
+        gain.setValueAtTime(0, currentTime);
+        gain.linearRampToValueAtTime(volume, currentTime + duration);
+        //
+    } // _fadeInWithMasterGainNode
+
+    /**
+     * Fades out the global web audio with its master gain node being present
+     * Idempotent
+     * @author DoubleX @since 0.9.5 @version 0.9.5
+     * @param {number} duration - Fade-out time in seconds
+     */
+    static _fadeOutWithMasterGainNode(duration) {
+        const [gain, volume] = [this._masterGainNode.gain, this._masterVolume];
+        const currentTime = this._currentTime();
+        /** @todo Dries up these codes representing identical knowledge */
+        gain.setValueAtTime(volume, currentTime);
+        gain.linearRampToValueAtTime(0, currentTime + duration);
+        //
+    } // _fadeOutWithMasterGainNode
+
+    /**
+     * Calls all stop listeners when this web audio's just stopped
+     * Idempotent
+     * @author DoubleX @since 0.9.5 @version 0.9.5
+     * @param {number} duration - Fade-out time in seconds
+     */
+    _callStopListeners() {
+        while (!this._stopListeners.isEmpty()) this._stopListeners.shift()();
+    } // _callStopListeners
+
+    /**
+     * Fades in this web audio when it's ready
+     * Idempotent
+     * @author DoubleX @since 0.9.5 @version 0.9.5
+     * @param {number} duration - Fade-out time in seconds
+     */
+    _fadeInWhenReady(duration) {
+        if (this._gainNode) this._fadeInWhenReadyWithGainNode(duration);
+    } // _fadeInWhenReady
+
+    /**
+     * Fades in this web audio when it's ready with its gain node being present
+     * Idempotent
+     * @author DoubleX @since 0.9.5 @version 0.9.5
+     * @param {number} duration - Fade-out time in seconds
+     */
+    _fadeInWhenReadyWithGainNode(duration) {
+        const gain = this._gainNode.gain;
+        const currentTime = WebAudio._currentTime();
+        /** @todo Dries up these codes representing identical knowledge */
+        gain.setValueAtTime(0, currentTime);
+        gain.linearRampToValueAtTime(this._volume, currentTime + duration);
+        //
+    } // _fadeInWhenReadyWithGainNode
+
+    /**
+     * Fades out this web audio with its gain node being present
+     * Idempotent
+     * @author DoubleX @since 0.9.5 @version 0.9.5
+     * @param {number} duration - Fade-out time in seconds
+     */
+    _fadeOutWithGainNode(duration) {
+        const gain = this._gainNode.gain;
+        const currentTime = WebAudio._currentTime();
+        /** @todo Dries up these codes representing identical knowledge */
+        gain.setValueAtTime(this._volume, currentTime);
+        gain.linearRampToValueAtTime(0, currentTime + duration);
+        //
+    } // _fadeOutWithGainNode
+
+    /**
+     * Nullipotent
+     * @author DoubleX @since 0.9.5 @version 0.9.5
+     * @returns {number} The seek position of this web audio with global context
+     */
+    _seekWithContext() {
+        let pos = (WebAudio._currentTime() - this._startTime) * this._pitch;
+        if (this._loopLength > 0) {
+            const seekPos = this._loopStart + this._loopLength;
+            while (pos >= seekPos) pos -= this._loopLength;
+        }
+        return pos;
+    } // _seekWithContext
+
+    /**
+     * Starts loading this web audio data with the global web audio context
+     * Idempotent
+     * @author DoubleX @since 0.9.5 @version 0.9.5
+     */
+    _startLoadingWithContext() {
+        const url = this._realUrl();
+        Utils.isLocal() ? this._startXhrLoading(url) : this._startFetching(url);
+        this._lastUpdateTime = -10000;
+        this._isError = this._isLoaded = false;
+        this._destroyDecoder();
+        if (this._shouldUseDecoder()) this._createDecoder();
+    } // _startLoadingWithContext
+
+    /**
+     * Nullipotent
+     * @author DoubleX @since 0.9.5 @version 0.9.5
+     * @returns {XMLHttpRequest} The GET XMLHttpRequest receiving array buffers
+     */
+    _newLoadingXhr(url) {
+        const xhr = new XMLHttpRequest();
+        xhr.open("GET", url);
+        xhr.responseType = "arraybuffer";
+        xhr.onload = this._onXhrLoad.bind(this, xhr);
+        xhr.onerror = this._onError.bind(this);
+        return xhr;
+    } // _newLoadingXhr
+
+    /**
+     * Loads the data and updates the buffer of this local web audio
+     * Idempotent
+     * @author DoubleX @since 0.9.5 @version 0.9.5
+     * @param {XMLHttpRequest} xhr - The GET XMLHttpRequest with array buffers
+     */
+    _onXhrLoadSuc(xhr) {
+        [this._data, this._isLoaded] = [new Uint8Array(xhr.response), true];
+        this._updateBuffer();
+    } // _onXhrLoadSuc
+
+    /**
+     * Triggers the events when the non-local web audio fetches' okay
+     * Idempotent
+     * @author DoubleX @since 0.9.5 @version 0.9.5
+     * @param {Response} response - The non-local web audio fetch okay response
+     */
+    _onFetchOk(response) {
+        const reader = response.body.getReader();
+        /** @todo Extracts this into a method without obscuring the recursion */
+        const readChunk = ({ done, value }) => {
+            if (done) {
+                this._isLoaded = true;
+                this._updateBuffer();
+                return 0;
+            } else {
+                this._onFetchProcess(value);
+                return reader.read().then(readChunk);
+            }
+        };
+        //
+        reader.read().then(readChunk).catch(this._onError.bind(this));
+    } // _onFetchOk
+
+    /**
+     * Refreshes the source node of this web audio when it's playing
+     * Idempotent
+     * @author DoubleX @since 0.9.5 @version 0.9.5
+     */
+    _refreshSourceNodeWhenPlaying() {
+        const currentTime = WebAudio._currentTime();
+        this._startSourceNode(0, (currentTime - this._startTime) * this._pitch);
+        this._removeEndTimer();
+        this._createEndTimer();
+    } // _refreshSourceNodeWhenPlaying
+
+    /**
+     * Nullipotent
+     * @author DoubleX @since 0.9.5 @version 0.9.5
+     * @param {number} offset - The raw start playing offset of this web audio
+     * @returns {number} The corrected start playing offset of this web audio
+     */
+    _startPlayingOffset(offset) {
+        if (this._loopLengthTime <= 0) return offset;
+        const loopEnd = this._loopStartTime + this._loopLengthTime;
+        let playingOffset = offset;
+        while (playingOffset >= loopEnd) playingOffset -= this._loopLengthTime;
+        return playingOffset;
+    } // _startPlayingOffset
+
+    /**
+     * This method shouldn't be called without an existing source node
+     * Idempotent
+     * @author DoubleX @since 0.9.5 @version 0.9.5
+     */
+    _removeNodesWithSourceNode() {
+        this._stopSourceNode();
+        this._sourceNode = this._gainNode = this._pannerNode = null;
+    } // _removeNodesWithSourceNode
+
+    /**
+     * Reads the loop comment from a packet in the packet list of this web audio
+     * Idempotent
+     * @author DoubleX @since 0.9.5 @version 0.9.5
+     * @param {[uint8]} segments - The list of 8 bit integers in array buffer
+     * @returns {[number]} The list of the sizes of the loop comment packets
+     */
+    _loopCommentPackets(segments) {
+        const packets = [];
+        while (!segments.isEmpty()) {
+            let packetSize = 0;
+            while (segments[0] === 255) packetSize += segments.shift();
+            packetSize += segments.shift();
+            packets.push(packetSize);
+        }
+        return packets;
+    } // _loopCommentPackets
+
+    /**
+     * Reads the loop comment from a packet in the packet list of this web audio
+     * Idempotent
+     * @author DoubleX @since 0.9.5 @version 0.9.5
+     * @param {DataView} view - The data view of the loop comment array buffer
+     * @param {index} i - The index of the current byte in the data array buffer
+     * @param {number} size - The size of this packet to be read
+     */
+    _readLoopCommentPacket(view, i, size) {
+        const headerType = view.getUint8(i);
+        if (headerType === 1) {
+            this._sampleRate = view.getUint32(i + 12, true);
+        } else if (headerType === 3) this._readMetaData(view, i, size);
+    } // _readLoopCommentPacket
+
+    /**
+     * Reads the loop start and length meta data for this web audio
+     * Idempotent
+     * @author DoubleX @since 0.9.5 @version 0.9.5
+     * @param {string} text - The meta data text having the loop start/length
+     */
+    _readMetaLoopStartLength(text) {
+        if (text.match(/LOOPSTART=([0-9]+)/)) {
+            this._loopStart = parseInt(RegExp.$1);
+        }
+        if (!text.match(/LOOPLENGTH=([0-9]+)/)) return;
+        this._loopLength = parseInt(RegExp.$1);
+    } // _readMetaLoopStartLength
+
+} // WebAudio
+
+/*----------------------------------------------------------------------------
+ *    # Rewritten class: Window
+ *      - Rewrites it into the ES6 standard
+ *----------------------------------------------------------------------------*/
+
+//-----------------------------------------------------------------------------
+/**
+ * The window in the game.
+ *
+ * @class
+ * @extends PIXI.Container
+ */
+class Window extends PIXI.Container {
+
+    constructor() {
+        super();
+        this._initPrivateVars();
+        this._createAllParts();
+        this._initPublicVars();
+    } // constructor
+    /**
+     * The image used as a window skin.
+     *
+     * @type Bitmap
+     * @name Window#windowskin
+     */
+    get windowskin() { return this._windowskin; }
+    set windowskin(value) {
+        if (this._windowskin === value) return;
+        this._windowskin = value;
+        this._windowskin.addLoadListener(this._onWindowskinLoad.bind(this));
+    } // windowskin
+
+    /**
+     * The bitmap used for the window contents.
+     *
+     * @type Bitmap
+     * @name Window#contents
+     */
+    get contents() { return this._contentsSprite.bitmap; }
+    set contents(value) { this._contentsSprite.bitmap = value; }
+
+    /**
+     * The bitmap used for the window contents background.
+     *
+     * @type Bitmap
+     * @name Window#contentsBack
+     */
+     get contentsBack() { return this._contentsBackSprite.bitmap; }
+     set contentsBack(value) { this._contentsBackSprite.bitmap = value; }
+
+    /**
+     * The width of the window in pixels.
+     *
+     * @type number
+     * @name Window#width
+     */
+    get width() { return this._width; }
+    set width(value) {
+        /** @todo Checks whether refresh's needed if the width's unchanged */
+        this._width = value;
+        this._refreshAllParts();
+        //
+    } // width
+
+    /**
+     * The height of the window in pixels.
+     *
+     * @type number
+     * @name Window#height
+     */
+    get height() { return this._height; }
+    set height(value) {
+        /** @todo Checks whether refresh's needed if the height's unchanged */
+        this._height = value;
+        this._refreshAllParts();
+        //
+    } // height
+
+    /**
+     * The size of the padding between the frame and contents.
+     *
+     * @type number
+     * @name Window#padding
+     */
+    get padding() { return this._padding; }
+    set padding(value) {
+        /** @todo Checks whether refresh's needed if the padding's unchanged */
+        this._padding = value;
+        this._refreshAllParts();
+        //
+    } // padding
+
+    /**
+     * The size of the margin for the window background.
+     *
+     * @type number
+     * @name Window#margin
+     */
+    get margin() { return this._margin; }
+    set margin(value) {
+        /** @todo Checks whether refresh's needed if the margin's unchanged */
+        this._margin = value;
+        this._refreshAllParts();
+        //
+    } // margin
+
+    /**
+     * The opacity of the window without contents (0 to 255).
+     *
+     * @type number
+     * @name Window#opacity
+     */
+    get opacity() { return this._container.alpha * 255; }
+    set opacity(value) { this._container.alpha = value.clamp(0, 255) / 255; }
+
+    /**
+     * The opacity of the window background (0 to 255).
+     *
+     * @type number
+     * @name Window#backOpacity
+     */
+    get backOpacity() { return this._backSprite.alpha * 255; }
+    set backOpacity(value) {
+        this._backSprite.alpha = value.clamp(0, 255) / 255;
+    } // backOpacity
+
+    /**
+     * The opacity of the window contents (0 to 255).
+     *
+     * @type number
+     * @name Window#contentsOpacity
+     */
+    get contentsOpacity() { return this._contentsSprite.alpha * 255; }
+    set contentsOpacity(value) {
+        this._contentsSprite.alpha = value.clamp(0, 255) / 255;
+    } // contentsOpacity
+
+    /**
+     * The openness of the window (0 to 255).
+     *
+     * @type number
+     * @name Window#openness
+     */
+    get openness() { return this._openness; }
+    set openness(value) {
+        if (this._openness === value) return;
+        this._openness = value.clamp(0, 255);
+        this._container.scale.y = this._openness / 255;
+        this._container.y = (this.height / 2) * (1 - this._openness / 255);
+    } // openness
+
+    /**
+     * The width of the content area in pixels.
+     *
+     * @readonly
+     * @type number
+     * @name Window#innerWidth
+     */
+    get innerWidth() { return Math.max(0, this._width - this._padding * 2); }
+
+    /**
+     * The height of the content area in pixels.
+     *
+     * @readonly
+     * @type number
+     * @name Window#innerHeight
+     */
+    get innerHeight() { return Math.max(0, this._height - this._padding * 2); }
+
+    /**
+     * The rectangle of the content area.
+     *
+     * @readonly
+     * @type Rectangle
+     * @name Window#innerRect
+     */
+    get innerRect() {
+        return new Rectangle(
+            this._padding,
+            this._padding,
+            this.innerWidth,
+            this.innerHeight
+        );
+    } // innerRect
+
+    /**
+     * Destroys the window.
+     */
+    destroy() { super.destroy({ children: true, texture: true }); }
+
+    /**
+     * Updates the window for each frame.
+     */
+    update() {
+        if (this.active) this._animationCount++;
+        this.children.forEach(child => { if (child.update) child.update(); });
+    } // update
+
+    /**
+     * Sets the x, y, width, and height all at once.
+     *
+     * @param {number} x - The x coordinate of the window.
+     * @param {number} y - The y coordinate of the window.
+     * @param {number} width - The width of the window.
+     * @param {number} height - The height of the window.
+     */
+    move(x = 0, y = 0, width = 0, height = 0) {
+        // They shouldn't be "", false, null, NaN or other defined falsy values
+        [this.x, this.y] = [x, y];
+        if (this._width === width && this._height === height) return;
+        //
+        [this._width, this._height] = [width, height];
+        this._refreshAllParts();
+    } // move
+
+    /**
+     * Checks whether the window is completely open (openness == 255).
+     *
+     * @returns {boolean} True if the window is open.
+     */
+    isOpen() { return this._openness >= 255; }
+
+    /**
+     * Checks whether the window is completely closed (openness == 0).
+     *
+     * @returns {boolean} True if the window is closed.
+     */
+    isClosed() { return this._openness <= 0; }
+
+    /**
+     * Sets the position of the command cursor.
+     *
+     * @param {number} x - The x coordinate of the cursor.
+     * @param {number} y - The y coordinate of the cursor.
+     * @param {number} width - The width of the cursor.
+     * @param {number} height - The height of the cursor.
+     */
+    setCursorRect(x = 0, y = 0, width = 0, height = 0) {
+        // They shouldn't be "", false, null, NaN or other defined falsy values
+        const [cw, ch] = [Math.floor(width), Math.floor(height)];
+        this._cursorRect.x = Math.floor(x);
+        this._cursorRect.y = Math.floor(y);
+        //
+        if (this._cursorRect.width !== cw || this._cursorRect.height !== ch) {
+            // Edited to help plugins alter cursor width height in better ways
+            this._setNewCursorWH(cw, ch);
+            //
+        }
+    } // setCursorRect
+
+    /**
+     * Moves the cursor position by the given amount.
+     *
+     * @param {number} x - The amount of horizontal movement.
+     * @param {number} y - The amount of vertical movement.
+     */
+    moveCursorBy(x, y) { this._cursorRect.x += x, this._cursorRect.y += y; }
+
+    /**
+     * Moves the inner children by the given amount.
+     *
+     * @param {number} x - The amount of horizontal movement.
+     * @param {number} y - The amount of vertical movement.
+     */
+    moveInnerChildrenBy(x, y) {
+        this._innerChildren.forEach(child => { child.x += x, child.y += y; });
+    } // moveInnerChildrenBy
+
+    /**
+     * Changes the color of the background.
+     *
+     * @param {number} r - The red value in the range (-255, 255).
+     * @param {number} g - The green value in the range (-255, 255).
+     * @param {number} b - The blue value in the range (-255, 255).
+     */
+    setTone(r, g, b) {
+        const tone = this._colorTone;
+        if (r === tone[0] && g === tone[1] && b === tone[2]) return;
+        this._colorTone = [r, g, b, 0];
+        this._refreshBack();
+    } // setTone
+
+    /**
+     * Adds a child between the background and contents.
+     *
+     * @param {object} child - The child to add.
+     * @returns {object} The child that was added.
+     */
+    addChildToBack(child) {
+        const containerIndex = this.children.indexOf(this._container);
+        return this.addChildAt(child, containerIndex + 1);
+    } // addChildToBack
+
+    /**
+     * Adds a child to the client area.
+     *
+     * @param {object} child - The child to add.
+     * @returns {object} The child that was added.
+     */
+    addInnerChild(child) {
+        this._innerChildren.push(child);
+        return this._clientArea.addChild(child);
+    } // addInnerChild
+
+    /**
+     * Updates the transform on all children of this container for rendering.
+     */
+    updateTransform() {
+        this._updateClientArea();
+        this._updateFrame();
+        this._updateContentsBack();
+        this._updateCursor();
+        this._updateContents();
+        this._updateArrows();
+        this._updatePauseSign();
+        super.updateTransform();
+        this._updateFilterArea();
+    } // updateTransform
+
+    /**
+     * Draws the window shape into PIXI.Graphics object. Used by WindowLayer.
+     */
+    drawShape(graphics) {
+        // Edited to help plugins alter draw shape behaviors in better ways
+        if (graphics) this._drawShapeWithGraphics(graphics);
+        //
+    } // drawShape
+
+    _createAllParts() {
+        this._createContainer();
+        this._createBackSprite();
+        this._createFrameSprite();
+        this._createClientArea();
+        this._createContentsBackSprite();
+        this._createCursorSprite();
+        this._createContentsSprite();
+        this._createArrowSprites();
+        this._createPauseSignSprites();
+    } // _createAllParts
+
+    _createContainer() {
+        this._container = new PIXI.Container();
+        this.addChild(this._container);
+    } // _createContainer
+
+    _createBackSprite() {
+        this._backSprite = new Sprite();
+        this._backSprite.addChild(new TilingSprite());
+        this._container.addChild(this._backSprite);
+    } // _createBackSprite
+
+    _createFrameSprite() {
+        this._frameSprite = new Sprite();
+        for (let i = 0; i < 8; i++) {
+            this._frameSprite.addChild(new Sprite());
+        }
+        this._container.addChild(this._frameSprite);
+    } // _createFrameSprite
+
+    _createClientArea() {
+        // Edited to help plugins alter create client area in better ways
+        this._clientArea = this._newClientArea();
+        //
+        this.addChild(this._clientArea);
+    } // _createClientArea
+
+    _createContentsBackSprite() {
+        this._contentsBackSprite = new Sprite();
+        this._clientArea.addChild(this._contentsBackSprite);
+    } // _createContentsBackSprite
+
+    _createCursorSprite() {
+        this._cursorSprite = new Sprite();
+        for (let i = 0; i < 9; i++) {
+            this._cursorSprite.addChild(new Sprite());
+        }
+        this._clientArea.addChild(this._cursorSprite);
+    } // _createCursorSprite
+
+    _createContentsSprite() {
+        this._contentsSprite = new Sprite();
+        this._clientArea.addChild(this._contentsSprite);
+    } // _createContentsSprite
+
+    _createArrowSprites() {
+        this._downArrowSprite = new Sprite();
+        this.addChild(this._downArrowSprite);
+        this._upArrowSprite = new Sprite();
+        this.addChild(this._upArrowSprite);
+    } // _createArrowSprites
+
+    _createPauseSignSprites() {
+        this._pauseSignSprite = new Sprite();
+        this.addChild(this._pauseSignSprite);
+    } // _createPauseSignSprites
+
+    _onWindowskinLoad() { this._refreshAllParts(); }
+
+    _refreshAllParts() {
+        this._refreshBack();
+        this._refreshFrame();
+        this._refreshCursor();
+        this._refreshArrows();
+        this._refreshPauseSign();
+    } // _refreshAllParts
+
+    _refreshBack() {
+        const w = Math.max(0, this._width - this._margin * 2);
+        const h = Math.max(0, this._height - this._margin * 2);
+        // Edited to help plugins alter refresh back behaviors in better ways
+        this._refreshBackSprite(w, h);
+        this._refreshBackTilingSprite(w, h);
+        //
+    } // refreshBack
+
+    _refreshFrame() {
+        const drect = { x: 0, y: 0, width: this._width, height: this._height };
+        const srect = { x: 96, y: 0, width: 96, height: 96 };
+        this._frameSprite.children.forEach(child => {
+            child.bitmap = this._windowskin;
+        });
+        this._setRectPartsGeometry(this._frameSprite, srect, drect, 24);
+    } // _refreshFrame
+
+    _refreshCursor() {
+        const drect = this._cursorRect.clone();
+        const srect = { x: 96, y: 96, width: 48, height: 48 };
+        this._cursorSprite.children.forEach(child => {
+            child.bitmap = this._windowskin;
+        });
+        this._setRectPartsGeometry(this._cursorSprite, srect, drect, 4);
+    } // _refreshCursor
+
+    _setRectPartsGeometry(sprite, srect, drect, m) {
+        const [sx, sy, sw, sh] = [srect.x, srect.y, srect.width, srect.height];
+        const [dx, dy, dw, dh] = [drect.x, drect.y, drect.width, drect.height];
+        const [smw, smh] = [sw - m * 2, sh - m * 2];
+        const [dmw, dmh] = [dw - m * 2, dh - m * 2];
+        const children = sprite.children;
+        sprite.setFrame(0, 0, dw, dh);
+        sprite.move(dx, dy);
+        /** @todo Extracts these codes into a well-named function */
+        // corner
+        children[0].setFrame(sx, sy, m, m);
+        children[1].setFrame(sx + sw - m, sy, m, m);
+        children[2].setFrame(sx, sy + sw - m, m, m);
+        children[3].setFrame(sx + sw - m, sy + sw - m, m, m);
+        children[0].move(0, 0);
+        children[1].move(dw - m, 0);
+        children[2].move(0, dh - m);
+        children[3].move(dw - m, dh - m);
+        //
+        /** @todo Extracts these codes into a well-named function */
+        // edge
+        children[4].move(m, 0);
+        children[5].move(m, dh - m);
+        children[6].move(0, m);
+        children[7].move(dw - m, m);
+        children[4].setFrame(sx + m, sy, smw, m);
+        children[5].setFrame(sx + m, sy + sw - m, smw, m);
+        children[6].setFrame(sx, sy + m, m, smh);
+        children[7].setFrame(sx + sw - m, sy + m, m, smh);
+        const [scaleX, scaleY] = [dmw / smw, dmh / smh];
+        children[4].scale.x = children[5].scale.x = scaleX;
+        children[6].scale.y = children[7].scale.y = scaleY;
+        //
+        /** @todo Extracts these codes into a well-named function */
+        // center
+        if (children[8]) {
+            children[8].setFrame(sx + m, sy + m, smw, smh);
+            children[8].move(m, m);
+            [children[8].scale.x, children[8].scale.y] = [scaleX, scaleY];
+        }
+        //
+        children.forEach(child => child.visible = dw > 0 && dh > 0);
+    } // _setRectPartsGeometry
+
+    _refreshArrows() {
+        /** @todo Figures out the difference between 0 + p and p */
+        const p = 24, [q, sx, sy] = [p / 2, 96 + p, 0 + p];
+        //
+        // Edited to help plugins alter the arrow refresh in better ways
+        this._refreshDownArrow(p, q, sx, sy);
+        this._refreshUpArrow(p, q, sx, sy);
+        //
+    } // _refreshArrows
+
+    _refreshPauseSign() {
+        const [sx, sy, p] = [144, 96, 24];
+        this._pauseSignSprite.bitmap = this._windowskin;
+        this._pauseSignSprite.anchor.x = 0.5;
+        this._pauseSignSprite.anchor.y = 1;
+        this._pauseSignSprite.move(this._width / 2, this._height);
+        this._pauseSignSprite.setFrame(sx, sy, p, p);
+        this._pauseSignSprite.alpha = 0;
+    } // _refreshPauseSign
+
+    _updateClientArea() {
+        const pad = this._padding;
+        this._clientArea.move(pad, pad);
+        this._clientArea.x = pad - this.origin.x;
+        this._clientArea.y = pad - this.origin.y;
+        // Edited to help plugins alter client area visibility in better ways
+        this._clientArea.visible = this._isUpdatedClientAreaVisible();
+        //
+    } // _updateClientArea
+
+    _updateFrame() { this._frameSprite.visible = this.frameVisible; }
+
+    _updateContentsBack() {
+        const bitmap = this._contentsBackSprite.bitmap;
+        if (!bitmap) return;
+        this._contentsBackSprite.setFrame(0, 0, bitmap.width, bitmap.height);
+    } // _updateContentsBack
+
+    _updateCursor() {
+        this._cursorSprite.alpha = this._makeCursorAlpha();
+        this._cursorSprite.visible = this.isOpen() && this.cursorVisible;
+        this._cursorSprite.x = this._cursorRect.x;
+        this._cursorSprite.y = this._cursorRect.y;
+    } // _updateCursor
+
+    _makeCursorAlpha() {
+        const blinkCount = this._animationCount % 40;
+        const baseAlpha = this.contentsOpacity / 255;
+        if (!this.active) return baseAlpha;
+        if (blinkCount < 20) return baseAlpha - blinkCount / 32;
+        return baseAlpha - (40 - blinkCount) / 32;
+    } // _makeCursorAlpha
+
+    _updateContents() {
+        const bitmap = this._contentsSprite.bitmap;
+        if (!bitmap) return;
+        this._contentsSprite.setFrame(0, 0, bitmap.width, bitmap.height);
+    } // _updateContents
+
+    _updateArrows() {
+        this._downArrowSprite.visible = this.isOpen() && this.downArrowVisible;
+        this._upArrowSprite.visible = this.isOpen() && this.upArrowVisible;
+    } // _updateArrows
+
+    _updatePauseSign() {
+        const x = Math.floor(this._animationCount / 16) % 2;
+        const y = Math.floor(this._animationCount / 16 / 2) % 2;
+        const [sx, sy, p] = [144, 96, 24];
+        // Edited to help plugins update the pause sign alpha in better ways
+        this._updatePauseSignAlpha();
+        //
+        this._pauseSignSprite.setFrame(sx + x * p, sy + y * p, p, p);
+        this._pauseSignSprite.visible = this.isOpen();
+    } // _updatePauseSign
+
+    _updateFilterArea() {
+        const pos = this._clientArea.worldTransform.apply(new Point(0, 0));
+        const filterArea = this._clientArea.filterArea;
+        filterArea.x = pos.x + this.origin.x;
+        filterArea.y = pos.y + this.origin.y;
+        filterArea.width = this.innerWidth;
+        filterArea.height = this.innerHeight;
+    } // _updateFilterArea
+
+    /**
+     * Initializes all private variables of this window
+     * Idempotent
+     * @author DoubleX @since 0.9.5 @version 0.9.5
+     */
+    _initPrivateVars() {
+        [this._isWindow, this._windowskin] = [true, null];
+        this._width = this._height = 0;
+        this._cursorRect = new Rectangle();
+        [this._openness, this._animationCount] = [255, 0];
+        [this._padding, this._margin] = [12, 4];
+        [this._colorTone, this._innerChildren] = [[0, 0, 0, 0], []];
+        this._container = this._backSprite = this._frameSprite = null;
+        this._contentsBackSprite = this._cursorSprite = null;
+        this._contentsSprite = this._downArrowSprite = null;
+        this._upArrowSprite = this._pauseSignSprite = null;
+    } // _initPrivateVars
+
+    /**
+     * Initializes all public variables of this window
+     * Idempotent
+     * @author DoubleX @since 0.9.5 @version 0.9.5
+     */
+    _initPublicVars() {
+        /**
+         * The origin point of the window for scrolling.
+         *
+         * @type Point
+         */
+        this.origin = new Point();
+        /**
+         * The active state for the window.
+         *
+         * @type boolean
+         */
+        this.active = true;
+        /**
+         * The visibility of the frame.
+         *
+         * @type boolean
+         */
+        this.frameVisible = true;
+        /**
+         * The visibility of the cursor.
+         *
+         * @type boolean
+         */
+        this.cursorVisible = true;
+        /**
+         * The visibility of the down scroll arrow.
+         *
+         * @type boolean
+         */
+        this.downArrowVisible = false;
+        /**
+         * The visibility of the up scroll arrow.
+         *
+         * @type boolean
+         */
+        this.upArrowVisible = false;
+        /**
+         * The visibility of the pause sign.
+         *
+         * @type boolean
+         */
+        this.pause = false;
+    } // _initPublicVars
+
+    /**
+     * Sets the new cursor width and height followed by a cursor refresh
+     * Idempotent
+     * @author DoubleX @since 0.9.5 @version 0.9.5
+     * @param {int} cw - The truncated width of the cursor
+     * @param {int} ch - The truncated height of the cursor
+     */
+    _setNewCursorWH(cw, ch) {
+        [this._cursorRect.width, this._cursorRect.height] = [cw, ch];
+        this._refreshCursor();
+    } // _setNewCursorWH
+
+    /**
+     * Draws the window shape into PIXI.Graphics object used by WindowLayer
+     * Idempotent
+     * @author DoubleX @since 0.9.5 @version 0.9.5
+     * @param {PIXI.Graphics} graphics - The Pixi graphics drawing the shape
+     */
+    _drawShapeWithGraphics(graphics) {
+        const height = (this.height * this._openness) / 255;
+        const y = this.y + (this.height - height) / 2;
+        graphics.beginFill(0xffffff);
+        graphics.drawRoundedRect(this.x, y, this.width, height, 0);
+        graphics.endFill();
+    } // _drawShapeWithGraphics
+
+    /**
+     * Nullipotent
+     * @author DoubleX @since 0.9.5 @version 0.9.5
+     * @returns {Sprite} The new client area sprite of this window
+     */
+    _newClientArea() {
+        const clientArea = new Sprite();
+        clientArea.filters = [new PIXI.filters.AlphaFilter()];
+        clientArea.filterArea = new Rectangle();
+        clientArea.move(this._padding, this._padding);
+        return clientArea;
+    } // _newClientArea
+
+    /**
+     * Refreshes the back sprite of this window
+     * Idempotent
+     * @author DoubleX @since 0.9.5 @version 0.9.5
+     * @param {number} w - The width of this window excluding the margins
+     * @param {number} h - The height of this window excluding the margins
+     */
+    _refreshBackSprite(w, h) {
+        this._backSprite.bitmap = this._windowskin;
+        /** @todo Figures out where does 96 come from */
+        this._backSprite.setFrame(0, 0, 96, 96);
+        this._backSprite.move(this._margin, this._margin);
+        [this._backSprite.scale.x, this._backSprite.scale.y] = [w / 96, h / 96];
+        //
+        this._backSprite.setColorTone(this._colorTone);
+    } // _refreshBackSprite
+
+    /**
+     * Refreshes the back tiling sprite of this window
+     * Idempotent
+     * @author DoubleX @since 0.9.5 @version 0.9.5
+     * @param {number} w - The width of this window excluding the margins
+     * @param {number} h - The height of this window excluding the margins
+     */
+    _refreshBackTilingSprite(w, h) {
+        const tilingSprite = this._backSprite.children[0];
+        tilingSprite.bitmap = this._windowskin;
+        /** @todo Figures out where does 96 come from */
+        tilingSprite.setFrame(0, 96, 96, 96);
+        tilingSprite.move(0, 0, w, h);
+        [tilingSprite.scale.x, tilingSprite.scale.y] = [96 / w, 96 / h];
+        //
+    } // _refreshBackTilingSprite
+
+    /**
+     * Refreshes the down arrow sprite of this window
+     * Idempotent
+     * @author DoubleX @since 0.9.5 @version 0.9.5
+     * @param {number} p - The new width of the frame of the down arrow sprite
+     * @param {number} q - The new height of the frame of the down arrow sprite
+     * @param {number} sx - The source x position the down arrow sprite frame
+     * @param {number} sy - The source y position the down arrow sprite frame
+     */
+    _refreshDownArrow(p, q, sx, sy) {
+        this._downArrowSprite.bitmap = this._windowskin;
+        this._downArrowSprite.anchor.x = this._downArrowSprite.anchor.y = 0.5;
+        this._downArrowSprite.setFrame(sx + q, sy + q + p, p, q);
+        this._downArrowSprite.move(this._width / 2, this._height - q);
+    } // _refreshDownArrow
+
+    /**
+     * Refreshes the up arrow sprite of this window
+     * Idempotent
+     * @author DoubleX @since 0.9.5 @version 0.9.5
+     * @param {number} p - The new width of the frame of the up arrow sprite
+     * @param {number} q - The new height of the frame of the up arrow sprite
+     * @param {number} sx - The source x position the up arrow sprite frame
+     * @param {number} sy - The source y position the up arrow sprite frame
+     */
+    _refreshUpArrow(p, q, sx, sy) {
+        this._upArrowSprite.bitmap = this._windowskin;
+        this._upArrowSprite.anchor.x = this._upArrowSprite.anchor.y = 0.5;
+        this._upArrowSprite.setFrame(sx + q, sy, p, q);
+        this._upArrowSprite.move(this._width / 2, q);
+    } // _refreshUpArrow
+
+    /**
+     * Nullipotent
+     * @author DoubleX @since 0.9.5 @version 0.9.5
+     * @returns {boolean} If the updated client area should be visible
+     */
+    _isUpdatedClientAreaVisible() {
+        return this.innerWidth > 0 && this.innerHeight > 0 && this.isOpen();
+    } // _isUpdatedClientAreaVisible
+
+    /**
+     * Updates the alpha value of the pause sign sprite in this window
+     * Idempotent
+     * @author DoubleX @since 0.9.5 @version 0.9.5
+     */
+    _updatePauseSignAlpha() {
+        const sprite = this._pauseSignSprite;
+        if (!this.pause) return sprite.alpha = 0;
+        if (sprite.alpha < 1) sprite.alpha = Math.min(sprite.alpha + 0.1, 1);
+    } // _updatePauseSignAlpha
+
+} // Window
+
+/*----------------------------------------------------------------------------
+ *    # Rewritten class: WindowLayer
+ *      - Rewrites it into the ES6 standard
+ *----------------------------------------------------------------------------*/
+
+//-----------------------------------------------------------------------------
+/**
+ * The layer which contains game windows.
+ *
+ * @class
+ * @extends PIXI.Container
+ */
+class WindowLayer extends PIXI.Container {
+
+    /**
+     * Updates the window layer for each frame.
+     */
+    update() {
+        this.children.forEach(child => { if (child.update) child.update(); });
+    } // update
+
+    /**
+     * Renders the object using the WebGL renderer.
+     *
+     * @param {PIXI.Renderer} renderer - The renderer.
+     */
+    render(renderer) {
+        if (!this.visible) return;
+        const [graphics, gl] = [new PIXI.Graphics(), renderer.gl];
+        const children = this.children.clone();
+        renderer.framebuffer.forceStencil();
+        graphics.transform = this.transform;
+        renderer.batch.flush();
+        gl.enable(gl.STENCIL_TEST);
+        while (!children.isEmpty()) {
+            const win = children.pop();
+            if (!win._isWindow || !win.visible || win.openness <= 0) continue;
+            // Edited to help plugins alter render child behaviors in better way
+            this._renderChild(renderer, graphics, gl, win);
+            //
+        }
+        gl.disable(gl.STENCIL_TEST);
+        gl.clear(gl.STENCIL_BUFFER_BIT);
+        gl.clearStencil(0);
+        renderer.batch.flush();
+        this.children.forEach(child => {
+            if (!child._isWindow && child.visible) child.render(renderer);
+        });
+        renderer.batch.flush();
+    } // render
+
+    /**
+     * Renders a child of this window layer
+     * Idempotent
+     * @author DoubleX @since 0.9.5 @version 0.9.5
+     * @param {PIXI.Renderer} renderer - The renderer
+     * @param {PIXI.Graphics} graphics - The Pixi graphics for drawing/rendering
+     * @param {WebGLRenderingContext} gl - The pixi WebGL rendering context
+     * @param {Window} win - The window as the child of this window layer
+     */
+    _renderChild(renderer, graphics, gl, win) {
+        gl.stencilFunc(gl.EQUAL, 0, ~0);
+        gl.stencilOp(gl.KEEP, gl.KEEP, gl.KEEP);
+        win.render(renderer);
+        renderer.batch.flush();
+        graphics.clear();
+        win.drawShape(graphics);
+        gl.stencilFunc(gl.ALWAYS, 1, ~0);
+        gl.stencilOp(gl.REPLACE, gl.REPLACE, gl.REPLACE);
+        gl.blendFunc(gl.ZERO, gl.ONE);
+        graphics.render(renderer);
+        renderer.batch.flush();
+        gl.blendFunc(gl.ONE, gl.ONE_MINUS_SRC_ALPHA);
+    } // _renderChild
+
+} // WindowLayer
