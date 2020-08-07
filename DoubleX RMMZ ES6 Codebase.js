@@ -309,6 +309,557 @@ class ES6ExtendedClassAlias {
 //
 
 /*----------------------------------------------------------------------------
+ *    # Edit class: Array
+ *      - Adds some new array functions
+ *----------------------------------------------------------------------------*/
+
+(function($) {
+
+    /**
+     * Potential Hotspot/Nullipotent
+     * @author DoubleX @interface @since 0.9.5 @version 0.9.5
+     * @memberof JsExtensions
+     * @param {(*, <T>, index, [<T>]) -> *} mapCallback - The callback in the
+     *                                                    Array map method
+     * @param {*?} mapThis_ - The context of mapCallback
+     * @returns {Array} - The fully mapped array from this
+     */
+    $.fastMap = function(mapCallback, mapThis_) {
+        if (this == null) throw new TypeError('this is null or not defined');
+        if (typeof mapCallback !== 'function') {
+            throw new TypeError(mapCallback + ' is not a function');
+        }
+        const newArray = [];
+        // forEach is tested to be the fastest among sandboxes including RMMV
+        this.forEach((elem, i) => {
+            // It's ok to call undefined context with previously bound callbacks
+            newArray.push(mapCallback.call(mapThis_, elem, i, this));
+            //
+        });
+        //
+        return newArray;
+    }; // $.fastMap
+
+    /**
+     * concat array that can be changed in place will lead to needless throwaway
+     * push can't be applied to merge extremely long arrays so fastMerge is made
+     * This method alters the original array(this) as it merges another in place
+     * @author DoubleX @interface @since 0.9.5 @version 0.9.5
+     * @memberof JsExtensions
+     * @param {[*]} arr - The array to be merged
+     * @returns {This} The original array merged with another array in place
+     */
+    $.fastMerge = function(arr) {
+        // forEach is tested to be the fastest among sandboxes including RMMV
+        arr.forEach(elem => this.push(elem));
+        // array.forEach(this.push, this) can't be used as forEach has > 1 args
+        return this;
+    }; // $.fastMerge
+
+    /**
+     * Chaining filter with map will lead to a new redundantly throwaway Array
+     * This method doesn't support the thisArg argument in mapCallback
+     * Potential Hotspot/Nullipotent
+     * @author DoubleX @interface @since 0.9.5 @version 0.9.5
+     * @memberof JsExtensions
+     * @param {(*, <T>, index, [<T>]) -> boolean} filterCallback - The callback
+     *                                                             in the Array
+     *                                                             filter method
+     * @param {(*, *, index) -> *} mapCallback - The callback in the Array map
+     *                                           method
+     * @param {*?} filterThis_ - The context of filterCallback
+     * @param {*?} mapThis_ - The context of mapCallback
+     * @returns {Array} - The fully filtered then mapped array from this
+     */
+    $.filterMap = function(filterCallback, mapCallback, filterThis_, mapThis_) {
+        if (this == null) throw new TypeError('this is null or not defined');
+        if (typeof filterCallback !== 'function') {
+            throw new TypeError(filterCallback + ' is not a function');
+        } else if (typeof mapCallback !== 'function') {
+            throw new TypeError(mapCallback + ' is not a function');
+        }
+        const newArray = [];
+        // forEach is tested to be the fastest among sandboxes including RMMV
+        this.forEach((elem, i) => {
+            // It's ok to call undefined context with previously bound callbacks
+            if (!filterCallback.call(filterThis_, elem, i, this)) return;
+            newArray.push(mapCallback.call(mapThis_, elem, i));
+            //
+        });
+        //
+        return newArray;
+    }; // $.filterMap
+
+    /**
+     * Chaining map with filter will lead to a new redundantly throwaway Array
+     * This method doesn't support the thisArg argument in filterCallback
+     * Potential Hotspot/Nullipotent
+     * @author DoubleX @interface @since 0.9.5 @version 0.9.5
+     * @memberof JsExtensions
+     * @param {(*, <T>, Index, [<T>]) -> *} mapCallback - The callback in the
+     *                                                    Array map method
+     * @param {(*, *, Index) -> Boolean} filterCallback - The callback in the
+     *                                                    Array filter method
+     * @param {*?} mapThis_ - The context of mapCallback
+     * @param {*?} filterThis_ - The context of filterCallback
+     * @returns {Array} - The fully mapped then filtered array from this
+     */
+    $.mapFilter = function(mapCallback, filterCallback, mapThis_, filterThis_) {
+        if (this == null) throw new TypeError('this is null or not defined');
+        if (typeof mapCallback !== 'function') {
+            throw new TypeError(mapCallback + ' is not a function');
+        } else if (typeof filterCallback !== 'function') {
+            throw new TypeError(filterCallback + ' is not a function');
+        }
+        const newArray = [];
+        // forEach is tested to be the fastest among sandboxes including RMMV
+        this.forEach((elem, i) => {
+            // It's ok to call undefined context with previously bound callbacks
+            var mappedElem = mapCallback.call(mapThis_, elem, i, this);
+            if (!filterCallback.call(filterThis_, mappedElem, i)) return;
+            //
+            newArray.push(mappedElem);
+        });
+        //
+        return newArray;
+    }; // $.mapFilter
+
+    /**
+     * Chaining map with reduce will lead to a new redundantly throwaway Array
+     * This method doesn't support the thisArg argument in reduceCallback
+     * Potential Hotspot/Nullipotent
+     * @author DoubleX @interface @since 0.9.5 @version 0.9.5
+     * @memberof JsExtensions
+     * @param {(*, <T>, Index, [<T>]) -> *} mapCallback - The callback in the
+     *                                                    Array map method
+     * @param {(*, *, *, Index) -> *} reduceCallback - The callback in the Array
+     *                                                 reduce method
+     * @param {*?} initVal_ - The initial value of reduceCallback
+     * @param {*?} mapThis_ - The context of mapCallback
+     * @param {*?} reduceThis_ - The context of reduceCallback
+     * @returns {Array} - The fully mapped then reduced array result from this
+     */
+    $.mapReduce = function(mapCallback, reduceCallback, initVal_, mapThis_, reduceThis_) {
+        if (this == null) throw new TypeError('this is null or not defined');
+        const l = this.length, hasInitVal = initVal_ !== undefined;
+        if (typeof mapCallback !== 'function') {
+            throw new TypeError(mapCallback + ' is not a function');
+        } else if (typeof reduceCallback !== 'function') {
+            throw new TypeError(reduceCallback + ' is not a function');
+        } else if (l <= 0 && !hasInitVal) {
+            throw new TypeError('Reduce of empty array with no initial value');
+        }
+        if (hasInitVal) {
+            let val = initVal_;
+            // forEach is tested to be fastest among sandboxes including RMMV
+            this.forEach((elem, i) => {
+                // It's ok to call undefined context with already bound callback
+                var mappedElem = mapCallback.call(mapThis_, elem, i, this);
+                val = reduceCallback.call(reduceThis_, val, mappedElem, i);
+                //
+            });
+            //
+            return val;
+        }
+        /** @todo Uses forEach without checking if (i === 0) to be faster */
+        let val = this[0], i = 1;
+        while (i < l) {
+            // It's ok to call undefined context with already bound callback
+            var mappedElem = mapCallback.call(mapThis_, this[i], i, this);
+            val = reduceCallback.call(reduceThis_, val, mappedElem, i);
+            //
+            i++;
+        }
+        //
+        return val;
+    }; // $.mapReduce
+
+    /**
+     * Potential Hotspot/Nullipotent
+     * @author DoubleX @interface @since 0.9.5 @version 0.9.5
+     * @memberof JsExtensions
+     * @param {Array} arr - The array to be checked against
+     * @returns {boolean} If this's a proper subset of the specified array
+     */
+    $.isProperSubsetOf = function(arr) {
+        return this.isSubsetOf(arr) && !arr.isSubsetOf(this);
+    }; // $.isProperSubsetOf
+
+    /**
+     * Potential Hotspot/Nullipotent
+     * @author DoubleX @interface @since 0.9.5 @version 0.9.5
+     * @memberof JsExtensions
+     * @param {Array} arr - The array to be checked against
+     * @returns {boolean} If this's a proper superset of the specified array
+     */
+    $.isProperSupersetOf = function(arr) {
+        return this.isSupersetOf(arr) && !arr.isSupersetOf(this);
+    }; // $.isProperSupersetOf
+
+    /**
+     * Potential Hotspot/Nullipotent
+     * @author DoubleX @interface @since 0.9.5 @version 0.9.5
+     * @memberof JsExtensions
+     * @param {Array} arr - The array to be checked against
+     * @returns {boolean} If this's a superset of the specified array
+     */
+    $.isSupersetOf = function(arr) { return arr.isSubsetOf(this); };
+
+    /**
+     * Potential Hotspot/Nullipotent
+     * @author DoubleX @interface @since 0.9.5 @version 0.9.5
+     * @memberof JsExtensions
+     * @param {Array} arr - The array to be checked against
+     * @returns {boolean} If this's a subset of the specified array
+     */
+    $.isSubsetOf = function(arr) { return this.difference(arr).isEmpty(); };
+
+    /**
+     * Potential Hotspot/Nullipotent
+     * @author DoubleX @interface @since 0.9.5 @version 0.9.5
+     * @memberof JsExtensions
+     * @returns {boolean} If this array's empty
+     */
+    $.isEmpty = function() { return this.length <= 0; };
+
+    /**
+     * Potential Hotspot/Nullipotent
+     * @author DoubleX @interface @since 0.9.5 @version 0.9.5
+     * @memberof JsExtensions
+     * @param {Array} arr - The array to have symmetric difference with
+     * @returns {Array} The symmetric difference of this and the specified array
+     */
+    $.symmetricDifference = function(arr) {
+        return this.difference(arr).union(arr.difference(this));
+    }; // $.symmetricDifference
+
+    /**
+     * Potential Hotspot/Nullipotent
+     * @author DoubleX @interface @since 0.9.5 @version 0.9.5
+     * @memberof JsExtensions
+     * @param {Array} arr - The array to have union with this array
+     * @returns {Array} The union of this and the specified array
+     */
+    $.union = function(arr) { return this.concat(arr.difference(this)); };
+
+    /**
+     * Potential Hotspot/Nullipotent
+     * @author DoubleX @interface @since 0.9.5 @version 0.9.5
+     * @memberof JsExtensions
+     * @param {Array} arr - The array to have difference with this array
+     * @returns {Array} The difference of this and the specified array
+     */
+    $.difference = function(arr) {
+        return this.filter(elem => arr.excludes(elem));
+    }; // $.difference
+
+    /**
+     * Potential Hotspot/Nullipotent
+     * @author DoubleX @interface @since 0.9.5 @version 0.9.5
+     * @memberof JsExtensions
+     * @param {Array} arr - The array to have intersection with this array
+     * @returns {Array} The intersection of this and the specified array
+     */
+    $.intersection = function(arr) {
+        // The 2nd argument of includes doesn't match with that of filter
+        return this.filter(elem => arr.includes(elem));
+        //
+    }; // $.intersection
+
+    /**
+     * Potential Hotspot/Nullipotent
+     * @author DoubleX @interface @since 0.9.5 @version 0.9.5
+     * @memberof JsExtensions
+     * @param {*} elem - The element to be checked against
+     * @param {index} fromI - The index in this at which to begin searching
+     * @returns {boolean} If this array doesn't have the specified element
+     */
+    $.excludes = function(elem, fromI) { return !this.includes(elem, fromI); };
+
+    /**
+     * Potential Hotspot/Idempotent
+     * @author DoubleX @interface @since 0.9.5 @version 0.9.5
+     * @memberof JsExtensions
+     */
+    $.clear = function() { this.length = 0; }
+
+})(Array.prototype);
+
+/*----------------------------------------------------------------------------
+ *    # Rewritten class: Utils
+ *      - Rewrites it into the ES6 standard
+ *----------------------------------------------------------------------------*/
+
+//-----------------------------------------------------------------------------
+/**
+ * The static class that defines utility methods.
+ *
+ * @namespace
+ */
+class Utils {
+
+    constructor() { throw new Error("This is a static class"); }
+
+    /**
+     * The name of the RPG Maker. "MZ" in the current version.
+     *
+     * @type string
+     * @constant
+     */
+    static RPGMAKER_NAME = "MZ";
+
+    /**
+     * The version of the RPG Maker.
+     *
+     * @type string
+     * @constant
+     */
+    static RPGMAKER_VERSION = "0.9.5";
+
+    /**
+     * Checks whether the current RPG Maker version is greater than or equal to
+     * the given version.
+     *
+     * @param {string} version - The "x.x.x" format string to compare.
+     * @returns {boolean} True if the current version is greater than or equal
+     *                    to the given version.
+     */
+    static checkRMVersion(version) {
+        const array1 = this.RPGMAKER_VERSION.split("."), l = array1.length;
+        const array2 = String(version).split(".");
+        for (let i = 0; i < l; i++) {
+            const [v1, v2] = [+array1[i], +array2[i]];
+            if (v1 > v2) return true;
+            if (v1 < v2) return false;
+        }
+        return true;
+    } // checkRMVersion
+
+    /**
+     * Checks whether the option is in the query string.
+     *
+     * @param {string} name - The option name.
+     * @returns {boolean} True if the option is in the query string.
+     */
+    static isOptionValid(name) {
+        const args = location.search.slice(1);
+        if (args.split("&").includes(name)) return true;
+        if (!this.isNwjs() || nw.App.argv.isEmpty()) return false;
+        return nw.App.argv[0].split("&").includes(name);
+    } // isOptionValid
+
+    /**
+     * Checks whether the platform is NW.js.
+     *
+     * @returns {boolean} True if the platform is NW.js.
+     */
+    static isNwjs() {
+        return typeof require === "function" && typeof process === "object";
+    } // isNwjs
+
+    /**
+     * Checks whether the platform is RPG Atsumaru.
+     *
+     * @returns {boolean} True if the platform is RPG Atsumaru.
+     */
+    static isAtsumaru() { return typeof RPGAtsumaru === "object"; }
+
+    /**
+     * Checks whether the platform is a mobile device.
+     *
+     * @returns {boolean} True if the platform is a mobile device.
+     */
+    static isMobileDevice() {
+        const r = /Android|webOS|iPhone|iPad|iPod|BlackBerry|Opera Mini/i;
+        return !!navigator.userAgent.match(r);
+    } // isMobileDevice
+
+    /**
+     * Checks whether the browser is Mobile Safari.
+     *
+     * @returns {boolean} True if the browser is Mobile Safari.
+     */
+    static isMobileSafari() {
+        const agent = navigator.userAgent;
+        if (!agent.match(/iPhone|iPad|iPod/)) return false;
+        return !!agent.match(/AppleWebKit/) && !agent.match("CriOS");
+    } // isMobileSafari
+
+    /**
+     * Checks whether the browser is Android Chrome.
+     *
+     * @returns {boolean} True if the browser is Android Chrome.
+     */
+    static isAndroidChrome() {
+        const agent = navigator.userAgent;
+        return !!(agent.match(/Android/) && agent.match(/Chrome/));
+    } // isAndroidChrome
+
+    /**
+     * Checks whether the browser is accessing local files.
+     *
+     * @returns {boolean} True if the browser is accessing local files.
+     */
+    static isLocal() { return window.location.href.startsWith("file:"); }
+
+    /**
+     * Checks whether the browser supports WebGL.
+     *
+     * @returns {boolean} True if the browser supports WebGL.
+     */
+    static canUseWebGL() {
+        /** @todo Thinks of if using conditional's better than try catch */
+        try {
+            return !!document.createElement("canvas").getContext("webgl");
+        } catch (e) { return false; }
+        //
+    } // canUseWebGL
+
+    /**
+     * Checks whether the browser supports Web Audio API.
+     *
+     * @returns {boolean} True if the browser supports Web Audio API.
+     */
+    static canUseWebAudioAPI() {
+        return !!(window.AudioContext || window.webkitAudioContext);
+    } // canUseWebAudioAPI
+
+    /**
+     * Checks whether the browser supports CSS Font Loading.
+     *
+     * @returns {boolean} True if the browser supports CSS Font Loading.
+     */
+    static canUseCssFontLoadingfunction() {
+        return !!(document.fonts && document.fonts.ready);
+    } // canUseCssFontLoadingfunction
+
+    /**
+     * Checks whether the browser supports IndexedDB.
+     *
+     * @returns {boolean} True if the browser supports IndexedDB.
+     */
+    static canUseIndexedDB() {
+        if (!window.indexedDB) return;
+        return !!(window.mozIndexedDB || window.webkitIndexedDB);
+    } // canUseIndexedDB
+
+    /**
+     * Checks whether the browser can play ogg files.
+     *
+     * @returns {boolean} True if the browser can play ogg files.
+     */
+    static canPlayOgg() {
+        if (!this._audioElement) {
+            this._audioElement = document.createElement("audio");
+        }
+        if (!this._audioElement) return false;
+        return !!this._audioElement.canPlayType('audio/ogg; codecs="vorbis"');
+    } // canPlayOgg
+
+    /**
+     * Checks whether the browser can play webm files.
+     *
+     * @returns {boolean} True if the browser can play webm files.
+     */
+    static canPlayWebm() {
+        if (!this._videoElement) {
+            this._videoElement = document.createElement("video");
+        }
+        if (!this._videoElement) return false;
+        return !!this._videoElement.canPlayType('video/webm; codecs="vp8, vorbis"');
+    } // canPlayWebm
+
+    /**
+     * Encodes a URI component without escaping slash characters.
+     *
+     * @param {string} str - The input string.
+     * @returns {string} Encoded string.
+     */
+    static encodeURI(str) {
+        return encodeURIComponent(str).replace(/%2F/g, "/");
+    } // encodeURI
+
+    /**
+     * Escapes special characters for HTML.
+     *
+     * @param {string} str - The input string.
+     * @returns {string} Escaped string.
+     */
+    static escapeHtml(str) {
+        const entityMap = {
+            "&": "&amp;",
+            "<": "&lt;",
+            ">": "&gt;",
+            '"': "&quot;",
+            "'": "&#39;",
+            "/": "&#x2F;"
+        };
+        /** @todo Figures out why String(str) is needed here */
+        return String(str).replace(/[&<>"'/]/g, s => entityMap[s]);
+        //
+    } // escapeHtml
+
+    /**
+     * Checks whether the string contains any Arabic characters.
+     *
+     * @returns {boolean} True if the string contains any Arabic characters.
+     */
+    static containsArabic(str) {
+        const regExp = /[\u0600-\u06FF\u0750-\u077F\u08A0-\u08FF]/;
+        return regExp.test(str);
+    } // containsArabic
+
+    /**
+     * Sets information related to encryption.
+     *
+     * @param {boolean} hasImages - Whether the image files are encrypted.
+     * @param {boolean} hasAudio - Whether the audio files are encrypted.
+     * @param {string} key - The encryption key.
+     */
+    static setEncryptionInfo(hasImages, hasAudio, key) {
+        // [Note] This function is implemented for module independence.
+        this._hasEncryptedImages = hasImages;
+        this._hasEncryptedAudio = hasAudio;
+        this._encryptionKey = key;
+    } // setEncryptionInfo
+
+    /**
+     * Checks whether the image files in the game are encrypted.
+     *
+     * @returns {boolean} True if the image files are encrypted.
+     */
+    static hasEncryptedImages() { return this._hasEncryptedImages; }
+
+    /**
+     * Checks whether the audio files in the game are encrypted.
+     *
+     * @returns {boolean} True if the audio files are encrypted.
+     */
+    static hasEncryptedAudio() { return this._hasEncryptedAudio; }
+
+    /**
+     * Decrypts encrypted data.
+     *
+     * @param {ArrayBuffer} source - The data to be decrypted.
+     * @returns {ArrayBuffer} The decrypted data.
+     */
+    static decryptArrayBuffer(source) {
+        const header = new Uint8Array(source, 0, 16);
+        const headerHex = Array.from(header, x => x.toString(16)).join(",");
+        if (headerHex !== "52,50,47,4d,56,0,0,0,0,3,1,0,0,0,0,0") {
+            throw new Error("Decryption error");
+        }
+        const [body, view] = [source.slice(16), new DataView(body)];
+        const key = this._encryptionKey.match(/.{2}/g);
+        for (let i = 0; i < 16; i++) {
+            view.setUint8(i, view.getUint8(i) ^ parseInt(key[i], 16));
+        }
+        return body;
+    } // decryptArrayBuffer
+
+} // Utils
+
+/*----------------------------------------------------------------------------
  *    # Rewritten class: Graphics
  *      - Rewrites it into the ES6 standard
  *----------------------------------------------------------------------------*/
@@ -1237,1684 +1788,44 @@ Graphics.FPSCounter = class {
 }; // Graphics.FPSCounter
 
 /*----------------------------------------------------------------------------
- *    # Rewritten class: Input
- *      - Rewrites it into the ES6 standard
- *----------------------------------------------------------------------------*/
-
-/**
- * The static class that handles input data from the keyboard and gamepads.
- *
- * @namespace
- */
-class Input {
-
-    constructor() { throw new Error("This is a static class"); }
-
-    /**
-     * Initializes the input system.
-     */
-    static initialize() {
-        this.clear();
-        this._setupEventHandlers();
-    } // initialize
-
-    /**
-     * The wait time of the key repeat in frames.
-     *
-     * @type number
-     */
-    static keyRepeatWait = 24;
-
-    /**
-     * The interval of the key repeat in frames.
-     *
-     * @type number
-     */
-    static keyRepeatInterval = 6;
-
-    /**
-     * A hash table to convert from a virtual key code to a mapped key name.
-     *
-     * @type Object
-     */
-    static keyMapper = {
-        9: "tab", // tab
-        13: "ok", // enter
-        16: "shift", // shift
-        17: "control", // control
-        18: "control", // alt
-        27: "escape", // escape
-        32: "ok", // space
-        33: "pageup", // pageup
-        34: "pagedown", // pagedown
-        37: "left", // left arrow
-        38: "up", // up arrow
-        39: "right", // right arrow
-        40: "down", // down arrow
-        45: "escape", // insert
-        81: "pageup", // Q
-        87: "pagedown", // W
-        88: "escape", // X
-        90: "ok", // Z
-        96: "escape", // numpad 0
-        98: "down", // numpad 2
-        100: "left", // numpad 4
-        102: "right", // numpad 6
-        104: "up", // numpad 8
-        120: "debug" // F9
-    }; // keyMapper
-
-    /**
-     * A hash table to convert from a gamepad button to a mapped key name.
-     *
-     * @type Object
-     */
-    static gamepadMapper = {
-        0: "ok", // A
-        1: "cancel", // B
-        2: "shift", // X
-        3: "menu", // Y
-        4: "pageup", // LB
-        5: "pagedown", // RB
-        12: "up", // D-pad up
-        13: "down", // D-pad down
-        14: "left", // D-pad left
-        15: "right" // D-pad right
-    }; // gamepadMapper
-
-    /**
-     * Clears all the input data.
-     */
-    static clear() {
-        [this._currentState, this._previousState] = [new Map(), new Map()];
-        [this._gamepadStates, this._latestButton] = [[], null];
-        this._pressedTime = this._dir4 = this._dir8 = 0;
-        [this._preferredAxis, this._date, this._virtualButton] = ["", 0, null];
-        // Added to support the isJustReleased static function
-        this._isJustReleased = new Map();
-        //
-    } // clear
-
-    /**
-     * Updates the input data.
-     */
-    static update() {
-        this._pollGamepads();
-        // Edited to help plugins update the current states in better ways
-        this._updateLatestButton();
-        this._currentState.forEach(this._updateCurrentState, this);
-        //
-        if (this._virtualButton) this._updateVirtualClick();
-        this._updateDirection();
-    } // update
-
-    /**
-     * Checks whether a key is currently pressed down.
-     *
-     * @param {string} keyName - The mapped name of the key.
-     * @returns {boolean} True if the key is pressed.
-     */
-    static isPressed(keyName) {
-        if (this._isEscCompatiblePressed(keyName)) return true;
-        return !!this._currentState.get(keyName);
-    } // isPressed
-
-    /**
-     * Checks whether a key is just pressed.
-     *
-     * @param {string} keyName - The mapped name of the key.
-     * @returns {boolean} True if the key is triggered.
-     */
-    static isTriggered(keyName) {
-        if (this._isEscCompatiblePressed(keyName)) return true;
-        return this._latestButton === keyName && this._pressedTime === 0;
-    } // isTriggered
-
-    /**
-     * Checks whether a key is just pressed or a key repeat occurred.
-     *
-     * @param {string} keyName - The mapped name of the key.
-     * @returns {boolean} True if the key is repeated.
-     */
-    static isRepeated(keyName) {
-        if (this._isEscCompatiblePressed(keyName)) return true;
-        if (this._latestButton !== keyName) return false;
-        if (this._pressedTime === 0) return true;
-        if (this._pressedTime < this.keyRepeatWait) return false;
-        return this._pressedTime % this.keyRepeatInterval === 0;
-    } // isRepeated
-
-    /**
-     * Checks whether a key is kept depressed.
-     *
-     * @param {string} keyName - The mapped name of the key.
-     * @returns {boolean} True if the key is long-pressed.
-     */
-    static isLongPressed(keyName) {
-        if (this._isEscCompatiblePressed(keyName)) return true;
-        if (this._latestButton !== keyName) return false;
-        return this._pressedTime >= this.keyRepeatWait;
-    } // isLongPressed
-
-    /**
-     * The four direction value as a number of the numpad, or 0 for neutral.
-     *
-     * @readonly
-     * @type number
-     * @name Input.dir4
-     */
-    static get dir4() { return this._dir4; }
-
-    /**
-     * The eight direction value as a number of the numpad, or 0 for neutral.
-     *
-     * @readonly
-     * @type number
-     * @name Input.dir8
-     */
-    static get dir8() { return this._dir8; }
-
-    /**
-     * The time of the last input in milliseconds.
-     *
-     * @readonly
-     * @type number
-     * @name Input.date
-     */
-    static get date() { return this._date; }
-
-    static virtualClick(buttonName) { this._virtualButton = buttonName; }
-
-    /**
-     * Nullipotent
-     * @author DoubleX @interface @since 0.9.5 @version 0.9.5
-     * @enum @param {string} keyName - The mapped name of the key
-     * @returns {boolean} If the key's just released right on this frame
-     */
-    static isJustReleased(keyName) {
-        if (this._isEscCompatiblePressed(keyName)) return true;
-        return this._isJustReleased.has(keyName);
-    } // isJustReleased
-
-    static _setupEventHandlers() {
-        document.addEventListener("keydown", this._onKeyDown.bind(this));
-        document.addEventListener("keyup", this._onKeyUp.bind(this));
-        window.addEventListener("blur", this._onLostFocus.bind(this));
-    } // _setupEventHandlers
-
-    static _onKeyDown(event) {
-        const { keyCode } = event;
-        if (this._shouldPreventDefault(keyCode)) event.preventDefault();
-        // Edited to help plugins alter clear keys in better ways
-        if (this._shouldClear(keyCode)) this.clear(); // Numlock
-        //
-        const buttonName = this.keyMapper[keyCode];
-        if (buttonName) this._currentState.set(buttonName, true);
-    } // _onKeyDown
-
-    static _shouldPreventDefault(keyCode) {
-        switch (keyCode) {
-            case 8: // backspace
-            case 9: // tab
-            case 33: // pageup
-            case 34: // pagedown
-            case 37: // left arrow
-            case 38: // up arrow
-            case 39: // right arrow
-            case 40: // down arrow
-                return true;
-        }
-        return false;
-    } // _shouldPreventDefault
-
-    static _onKeyUp(event) {
-        const buttonName = this.keyMapper[event.keyCode];
-        if (buttonName) this._currentState.set(buttonName, false);
-    } // _onKeyUp
-
-    static _onLostFocus() { this.clear(); }
-
-    static _pollGamepads() {
-        if (!navigator.getGamepads) return;
-        const gamepads = navigator.getGamepads();
-        // Edited to help plugins poll gamepads in better ways
-        if (gamepads) gamepads.forEach(this._pollGamepad, this);
-        //
-    } // _pollGamepads
-
-    static _updateGamepadState(gamepad) {
-        const { index, buttons, axes } = gamepad;
-        const lastState = this._gamepadStates[index] || [];
-        // Edited to help plugins alter new gamepad states in better ways
-        this._gamepadStates[index] = this._newGamepadStates(buttons, axes);
-        //
-        this._gamepadStates[index].forEach((ns, i) => {
-            if (ns === lastState[i]) return;
-            const buttonName = this.gamepadMapper[i];
-            if (buttonName) this._currentState.set(buttonName, ns);
-        });
-    } // _updateGamepadState
-
-    static _updateDirection() {
-        let [x, y] = [this._signX(), this._signY()];
-        this._dir8 = this._makeNumpadDirection(x, y);
-        if (x !== 0 && y !== 0) {
-            this._preferredAxis === "x" ? y = 0 : x = 0;
-        } else if (x !== 0) {
-            this._preferredAxis = "y";
-        } else if (y !== 0) this._preferredAxis = "x";
-        this._dir4 = this._makeNumpadDirection(x, y);
-    } // _updateDirection
-
-    // Edited to dry up codes essentially being the identical knowledge
-    static _signX() { return this._sign("right") - this._sign("left"); }
-    //
-
-    // Edited to dry up codes essentially being the identical knowledge
-    static _signY() {  return this._sign("down") - this._sign("up"); }
-    //
-
-    static _makeNumpadDirection(x, y) {
-        return x === 0 && y === 0 ? 0 : 5 - y * 3 + x;
-    } // _makeNumpadDirection
-
-    static _isEscapeCompatible(keyName) {
-        return keyName === "cancel" || keyName === "menu";
-    } // _isEscapeCompatible
-
-    /**
-     * Updates the latest pressed button states
-     * Hotspot/Idempotent
-     * @author DoubleX @since 0.9.5 @version 0.9.5
-     */
-    static _updateLatestButton() {
-        if (this._currentState.get(this._latestButton)) {
-            this._pressedTime++;
-        } else this._latestButton = null;
-    } // _updateLatestButton
-
-    /**
-     * Updates the current state of all input keys
-     * Hotspot/Idempotent
-     * @author DoubleX @since 0.9.5 @version 0.9.5
-     * @enum @param {boolean} keyState - If the key's currently pressed
-     * @enum @param {string} keyName - The mapped name of the key
-     */
-    static _updateCurrentState(keyState, keyName) {
-        this._updateLatestState(keyName);
-        this._previousState.set(keyName, keyState);
-    } // _updateCurrentState
-
-    /**
-     * Updates the latest state of all input keys
-     * Hotspot/Idempotent
-     * @author DoubleX @since 0.9.5 @version 0.9.5
-     * @enum @param {string} keyName - The mapped name of the key
-     */
-    static _updateLatestState(keyName) {
-        if (this._isJustPressed(keyName)) return this._onStartPress(keyName);
-        // Added to support the isJustReleased static function
-        if (this._isKeyJustReleased(keyName)) {
-            this._isJustReleased.set(keyName, true);
-        } else this._isJustReleased.delete(keyName);
-        //
-    } // _updateLatestState
-
-    /**
-     * Hotspot/Nullipotent
-     * @author DoubleX @since 0.9.5 @version 0.9.5
-     * @enum @param {string} keyName - The mapped name of the key
-     * @returns {boolean} If the key's just pressed right on this frame
-     */
-    static _isJustPressed(keyName) {
-        if (!this._currentState.get(keyName)) return false;
-        return !this._previousState.get(keyName);
-    } // _isJustPressed
-
-    /**
-     * Updates the current input states with the input key that's just pressed
-     * Idempotent
-     * @author DoubleX @since 0.9.5 @version 0.9.5
-     * @enum @param {string} keyName - The mapped name of the key
-     */
-    static _onStartPress(keyName) {
-        [this._latestButton, this._pressedTime] = [keyName, 0];
-        this._date = Date.now();
-        this._isJustReleased.delete(keyName);
-    } // _onStartPress
-
-    /**
-     * Hotspot/Nullipotent
-     * @author DoubleX @since 0.9.5 @version 0.9.5
-     * @enum @param {string} keyName - The mapped name of the key
-     * @returns {boolean} If the key's just released right on this frame
-     */
-    static _isKeyJustReleased(keyName) {
-        if (this._currentState.get(keyName)) return false;
-        return this._previousState.get(keyName);
-    } // _isKeyJustReleased
-
-    /**
-     * Updates the current input states with virtual button that's just clicked
-     * Hotspot/Idempotent
-     * @author DoubleX @since 0.9.5 @version 0.9.5
-     */
-    static _updateVirtualClick() {
-        this._latestButton = this._virtualButton;
-        [this._pressedTime, this._virtualButton] = [0, null];
-    } // _updateVirtualClick
-
-    /**
-     * Hotspot/Nullipotent
-     * @author DoubleX @since 0.9.5 @version 0.9.5
-     * @enum @param {string} keyName - The mapped name of the key
-     * @returns {boolean} If the specified key should be regarded as pressed
-     */
-    static _isEscCompatiblePressed(keyName) {
-        return this._isEscapeCompatible(keyName) && this.isPressed("escape");
-    } // _isEscCompatiblePressed
-
-    /**
-     * Nullipotent
-     * @author DoubleX @since 0.9.5 @version 0.9.5
-     * @enum @param {string} keyName - The mapped name of the key
-     * @returns {boolean} If the pressed key should clear all input states
-     */
-    static _shouldClear(keyCode) { return keyCode === 144; }
-
-    /**
-     * Updates the existing and connected gamepad state
-     * Hotspot/Idempotent
-     * @author DoubleX @since 0.9.5 @version 0.9.5
-     * @enum @param {Gamepad} gamepad - The gamepad to be polled
-     */
-    static _pollGamepad(gamepad) {
-        if (gamepad && gamepad.connected) this._updateGamepadState(gamepad);
-    } // _pollGamepad
-
-    /**
-     * Hotspot/Nullipotent
-     * @author DoubleX @since 0.9.5 @version 0.9.5
-     * @enum @param {[GamepadButton]} buttons - The list of the gamepad buttons
-     * @enum @param {[number]} axes - The amounts of the gamepad axes directions
-     * @returns {[boolean]} The list of new gamepad button states
-     */
-    static _newGamepadStates(buttons, axes) {
-        const [newState, threshold] = [[], 0.5];
-        newState[12] = newState[13] = newState[14] = newState[15] = false;
-        buttons.forEach((button, i) => newState[i] = button.pressed);
-        if (axes[1] < -threshold) {
-            newState[12] = true; // up
-        } else if (axes[1] > threshold) newState[13] = true; // down
-        if (axes[0] < -threshold) {
-            newState[14] = true; // left
-        } else if (axes[0] > threshold) newState[15] = true; // right
-        return newState;
-    } // _newGamepadStates
-
-    /**
-     * Hotspot/Nullipotent
-     * @author DoubleX @since 0.9.5 @version 0.9.5
-     * @enum @param {string} keyName - The mapped name of the key
-     * @enum @returns {number} 1 for the direction of this key and 0 for not
-     */
-    static _sign(keyName) { return this.isPressed(keyName) ? 1 : 0; }
-
-} // Input
-
-/*----------------------------------------------------------------------------
- *    # Edit class: Array
- *      - Adds some new array functions
- *----------------------------------------------------------------------------*/
-
-(function($) {
-
-    /**
-     * Potential Hotspot/Nullipotent
-     * @author DoubleX @interface @since 0.9.5 @version 0.9.5
-     * @memberof JsExtensions
-     * @param {(*, <T>, index, [<T>]) -> *} mapCallback - The callback in the
-     *                                                    Array map method
-     * @param {*?} mapThis_ - The context of mapCallback
-     * @returns {Array} - The fully mapped array from this
-     */
-    $.fastMap = function(mapCallback, mapThis_) {
-        if (this == null) throw new TypeError('this is null or not defined');
-        if (typeof mapCallback !== 'function') {
-            throw new TypeError(mapCallback + ' is not a function');
-        }
-        const newArray = [];
-        // forEach is tested to be the fastest among sandboxes including RMMV
-        this.forEach((elem, i) => {
-            // It's ok to call undefined context with previously bound callbacks
-            newArray.push(mapCallback.call(mapThis_, elem, i, this));
-            //
-        });
-        //
-        return newArray;
-    }; // $.fastMap
-
-    /**
-     * concat array that can be changed in place will lead to needless throwaway
-     * push can't be applied to merge extremely long arrays so fastMerge is made
-     * This method alters the original array(this) as it merges another in place
-     * @author DoubleX @interface @since 0.9.5 @version 0.9.5
-     * @memberof JsExtensions
-     * @param {[*]} arr - The array to be merged
-     * @returns {This} The original array merged with another array in place
-     */
-    $.fastMerge = function(arr) {
-        // forEach is tested to be the fastest among sandboxes including RMMV
-        arr.forEach(elem => this.push(elem));
-        // array.forEach(this.push, this) can't be used as forEach has > 1 args
-        return this;
-    }; // $.fastMerge
-
-    /**
-     * Chaining filter with map will lead to a new redundantly throwaway Array
-     * This method doesn't support the thisArg argument in mapCallback
-     * Potential Hotspot/Nullipotent
-     * @author DoubleX @interface @since 0.9.5 @version 0.9.5
-     * @memberof JsExtensions
-     * @param {(*, <T>, index, [<T>]) -> boolean} filterCallback - The callback
-     *                                                             in the Array
-     *                                                             filter method
-     * @param {(*, *, index) -> *} mapCallback - The callback in the Array map
-     *                                           method
-     * @param {*?} filterThis_ - The context of filterCallback
-     * @param {*?} mapThis_ - The context of mapCallback
-     * @returns {Array} - The fully filtered then mapped array from this
-     */
-    $.filterMap = function(filterCallback, mapCallback, filterThis_, mapThis_) {
-        if (this == null) throw new TypeError('this is null or not defined');
-        if (typeof filterCallback !== 'function') {
-            throw new TypeError(filterCallback + ' is not a function');
-        } else if (typeof mapCallback !== 'function') {
-            throw new TypeError(mapCallback + ' is not a function');
-        }
-        const newArray = [];
-        // forEach is tested to be the fastest among sandboxes including RMMV
-        this.forEach((elem, i) => {
-            // It's ok to call undefined context with previously bound callbacks
-            if (!filterCallback.call(filterThis_, elem, i, this)) return;
-            newArray.push(mapCallback.call(mapThis_, elem, i));
-            //
-        });
-        //
-        return newArray;
-    }; // $.filterMap
-
-    /**
-     * Chaining map with filter will lead to a new redundantly throwaway Array
-     * This method doesn't support the thisArg argument in filterCallback
-     * Potential Hotspot/Nullipotent
-     * @author DoubleX @interface @since 0.9.5 @version 0.9.5
-     * @memberof JsExtensions
-     * @param {(*, <T>, Index, [<T>]) -> *} mapCallback - The callback in the
-     *                                                    Array map method
-     * @param {(*, *, Index) -> Boolean} filterCallback - The callback in the
-     *                                                    Array filter method
-     * @param {*?} mapThis_ - The context of mapCallback
-     * @param {*?} filterThis_ - The context of filterCallback
-     * @returns {Array} - The fully mapped then filtered array from this
-     */
-    $.mapFilter = function(mapCallback, filterCallback, mapThis_, filterThis_) {
-        if (this == null) throw new TypeError('this is null or not defined');
-        if (typeof mapCallback !== 'function') {
-            throw new TypeError(mapCallback + ' is not a function');
-        } else if (typeof filterCallback !== 'function') {
-            throw new TypeError(filterCallback + ' is not a function');
-        }
-        const newArray = [];
-        // forEach is tested to be the fastest among sandboxes including RMMV
-        this.forEach((elem, i) => {
-            // It's ok to call undefined context with previously bound callbacks
-            var mappedElem = mapCallback.call(mapThis_, elem, i, this);
-            if (!filterCallback.call(filterThis_, mappedElem, i)) return;
-            //
-            newArray.push(mappedElem);
-        });
-        //
-        return newArray;
-    }; // $.mapFilter
-
-    /**
-     * Chaining map with reduce will lead to a new redundantly throwaway Array
-     * This method doesn't support the thisArg argument in reduceCallback
-     * Potential Hotspot/Nullipotent
-     * @author DoubleX @interface @since 0.9.5 @version 0.9.5
-     * @memberof JsExtensions
-     * @param {(*, <T>, Index, [<T>]) -> *} mapCallback - The callback in the
-     *                                                    Array map method
-     * @param {(*, *, *, Index) -> *} reduceCallback - The callback in the Array
-     *                                                 reduce method
-     * @param {*?} initVal_ - The initial value of reduceCallback
-     * @param {*?} mapThis_ - The context of mapCallback
-     * @param {*?} reduceThis_ - The context of reduceCallback
-     * @returns {Array} - The fully mapped then reduced array result from this
-     */
-    $.mapReduce = function(mapCallback, reduceCallback, initVal_, mapThis_, reduceThis_) {
-        if (this == null) throw new TypeError('this is null or not defined');
-        const l = this.length, hasInitVal = initVal_ !== undefined;
-        if (typeof mapCallback !== 'function') {
-            throw new TypeError(mapCallback + ' is not a function');
-        } else if (typeof reduceCallback !== 'function') {
-            throw new TypeError(reduceCallback + ' is not a function');
-        } else if (l <= 0 && !hasInitVal) {
-            throw new TypeError('Reduce of empty array with no initial value');
-        }
-        if (hasInitVal) {
-            let val = initVal_;
-            // forEach is tested to be fastest among sandboxes including RMMV
-            this.forEach((elem, i) => {
-                // It's ok to call undefined context with already bound callback
-                var mappedElem = mapCallback.call(mapThis_, elem, i, this);
-                val = reduceCallback.call(reduceThis_, val, mappedElem, i);
-                //
-            });
-            //
-            return val;
-        }
-        /** @todo Uses forEach without checking if (i === 0) to be faster */
-        let val = this[0], i = 1;
-        while (i < l) {
-            // It's ok to call undefined context with already bound callback
-            var mappedElem = mapCallback.call(mapThis_, this[i], i, this);
-            val = reduceCallback.call(reduceThis_, val, mappedElem, i);
-            //
-            i++;
-        }
-        //
-        return val;
-    }; // $.mapReduce
-
-    /**
-     * Potential Hotspot/Nullipotent
-     * @author DoubleX @interface @since 0.9.5 @version 0.9.5
-     * @memberof JsExtensions
-     * @param {Array} arr - The array to be checked against
-     * @returns {boolean} If this's a proper subset of the specified array
-     */
-    $.isProperSubsetOf = function(arr) {
-        return this.isSubsetOf(arr) && !arr.isSubsetOf(this);
-    }; // $.isProperSubsetOf
-
-    /**
-     * Potential Hotspot/Nullipotent
-     * @author DoubleX @interface @since 0.9.5 @version 0.9.5
-     * @memberof JsExtensions
-     * @param {Array} arr - The array to be checked against
-     * @returns {boolean} If this's a proper superset of the specified array
-     */
-    $.isProperSupersetOf = function(arr) {
-        return this.isSupersetOf(arr) && !arr.isSupersetOf(this);
-    }; // $.isProperSupersetOf
-
-    /**
-     * Potential Hotspot/Nullipotent
-     * @author DoubleX @interface @since 0.9.5 @version 0.9.5
-     * @memberof JsExtensions
-     * @param {Array} arr - The array to be checked against
-     * @returns {boolean} If this's a superset of the specified array
-     */
-    $.isSupersetOf = function(arr) { return arr.isSubsetOf(this); };
-
-    /**
-     * Potential Hotspot/Nullipotent
-     * @author DoubleX @interface @since 0.9.5 @version 0.9.5
-     * @memberof JsExtensions
-     * @param {Array} arr - The array to be checked against
-     * @returns {boolean} If this's a subset of the specified array
-     */
-    $.isSubsetOf = function(arr) { return this.difference(arr).isEmpty(); };
-
-    /**
-     * Potential Hotspot/Nullipotent
-     * @author DoubleX @interface @since 0.9.5 @version 0.9.5
-     * @memberof JsExtensions
-     * @returns {boolean} If this array's empty
-     */
-    $.isEmpty = function() { return this.length <= 0; };
-
-    /**
-     * Potential Hotspot/Nullipotent
-     * @author DoubleX @interface @since 0.9.5 @version 0.9.5
-     * @memberof JsExtensions
-     * @param {Array} arr - The array to have symmetric difference with
-     * @returns {Array} The symmetric difference of this and the specified array
-     */
-    $.symmetricDifference = function(arr) {
-        return this.difference(arr).union(arr.difference(this));
-    }; // $.symmetricDifference
-
-    /**
-     * Potential Hotspot/Nullipotent
-     * @author DoubleX @interface @since 0.9.5 @version 0.9.5
-     * @memberof JsExtensions
-     * @param {Array} arr - The array to have union with this array
-     * @returns {Array} The union of this and the specified array
-     */
-    $.union = function(arr) { return this.concat(arr.difference(this)); };
-
-    /**
-     * Potential Hotspot/Nullipotent
-     * @author DoubleX @interface @since 0.9.5 @version 0.9.5
-     * @memberof JsExtensions
-     * @param {Array} arr - The array to have difference with this array
-     * @returns {Array} The difference of this and the specified array
-     */
-    $.difference = function(arr) {
-        return this.filter(elem => arr.excludes(elem));
-    }; // $.difference
-
-    /**
-     * Potential Hotspot/Nullipotent
-     * @author DoubleX @interface @since 0.9.5 @version 0.9.5
-     * @memberof JsExtensions
-     * @param {Array} arr - The array to have intersection with this array
-     * @returns {Array} The intersection of this and the specified array
-     */
-    $.intersection = function(arr) {
-        // The 2nd argument of includes doesn't match with that of filter
-        return this.filter(elem => arr.includes(elem));
-        //
-    }; // $.intersection
-
-    /**
-     * Potential Hotspot/Nullipotent
-     * @author DoubleX @interface @since 0.9.5 @version 0.9.5
-     * @memberof JsExtensions
-     * @param {*} elem - The element to be checked against
-     * @param {index} fromI - The index in this at which to begin searching
-     * @returns {boolean} If this array doesn't have the specified element
-     */
-    $.excludes = function(elem, fromI) { return !this.includes(elem, fromI); };
-
-    /**
-     * Potential Hotspot/Idempotent
-     * @author DoubleX @interface @since 0.9.5 @version 0.9.5
-     * @memberof JsExtensions
-     */
-    $.clear = function() { this.length = 0; }
-
-})(Array.prototype);
-
-/*----------------------------------------------------------------------------
- *    # Rewritten class: JsonEx
+ *    # Rewritten class: Point
  *      - Rewrites it into the ES6 standard
  *----------------------------------------------------------------------------*/
 
 //-----------------------------------------------------------------------------
 /**
- * The static class that handles JSON with object information.
+ * The point class.
  *
- * @namespace
+ * @class
+ * @extends PIXI.Point
+ * @param {number} x - The x coordinate.
+ * @param {number} y - The y coordinate.
  */
-class JsonEx {
-
-    constructor() { throw new Error("This is a static class"); }
-
-    /**
-     * The maximum depth of objects.
-     *
-     * @type number
-     * @default 100
-     */
-    static maxDepth = 100;
-
-    /**
-     * Converts an object to a JSON string with object information.
-     *
-     * @param {object} object - The object to be converted.
-     * @returns {string} The JSON string.
-     */
-    static stringify(object) { return JSON.stringify(this._encode(object, 0)); }
-
-    /**
-     * Parses a JSON string and reconstructs the corresponding object.
-     *
-     * @param {string} json - The JSON string.
-     * @returns {object} The reconstructed object.
-     */
-    static parse(json) { return this._decode(JSON.parse(json)); }
-
-    /**
-     * Makes a deep copy of the specified object.
-     *
-     * @param {object} object - The object to be copied.
-     * @returns {object} The copied object.
-     */
-    static makeDeepCopy(object) { return this.parse(this.stringify(object)); }
-
-    static _encode(value, depth) {
-        // [Note] The handling code for circular references in certain versions of
-        //   MV has been removed because it was too complicated and expensive.
-        if (depth >= this.maxDepth) throw new Error("Object too deep");
-        // Edited to help plugins alter encode behaviors in better ways
-        if (this._isValObj(value)) return this._encodeValObj(value, depth);
-        //
-        return value;
-    } // _encode
-
-    static _decode(value) {
-        // Edited to help plugins alter decode behaviors in better ways
-        return this._isValObj(value) ? this._decodeValObj(value) : value;
-        //
-    } // _decode
-
-    /**
-     * Pure function
-     * @author DoubleX @since 0.9.5 @version 0.9.5
-     * @param {*} val - The value object to be encoded
-     * @param {number} depth - The current depth of the encoded value object
-     * @returns {*} The fully encoded value object
-     */
-    static _encodeValObj(val, depth) {
-        const constructorName = val.constructor.name;
-        if (constructorName !== "Object" && constructorName !== "Array") {
-            val["@"] = constructorName;
-        }
-        Object.entries(val).forEach(([k, v]) => {
-            val[k] = this._encode(v, depth + 1);
-        });
-        return val;
-    } // _encodeValObj
-
-    /**
-     * Pure function
-     * @author DoubleX @since 0.9.5 @version 0.9.5
-     * @param {*} val - The value to be encoded or decoded
-     * @returns {boolean} If the value's indeed a value object
-     */
-    static _isValObj(val) {
-        const type = Object.prototype.toString.call(val);
-        return type === "[object Object]" || type === "[object Array]";
-    } // _isValObj
-
-    /**
-     * Pure function
-     * @author DoubleX @since 0.9.5 @version 0.9.5
-     * @param {*} val - The value object to be decoded
-     * @returns {*} The fully decoded value object
-     */
-    static _decodeValObj(val) {
-        const constructorName = val["@"];
-        if (constructorName) {
-            const constructor = window[constructorName];
-            if (constructor) Object.setPrototypeOf(val, constructor.prototype);
-        }
-        Object.entries(val).forEach(([k, v]) => val[k] = this._decode(v));
-        return val;
-    } // _decodeValObj
-
-} // JsonEx
+class Point extends PIXI.Point {}
+// It's just to play safe in case of any plugin extending PIXI.Point in ES6 way
+ES6ExtendedClassAlias.inherit(Point);
+//
 
 /*----------------------------------------------------------------------------
- *    # Rewritten class: TouchInput
+ *    # Rewritten class: Rectangle
  *      - Rewrites it into the ES6 standard
  *----------------------------------------------------------------------------*/
 
 //-----------------------------------------------------------------------------
 /**
- * The static class that handles input data from the mouse and touchscreen.
+ * The rectangle class.
  *
- * @namespace
+ * @class
+ * @extends PIXI.Rectangle
+ * @param {number} x - The x coordinate for the upper-left corner.
+ * @param {number} y - The y coordinate for the upper-left corner.
+ * @param {number} width - The width of the rectangle.
+ * @param {number} height - The height of the rectangle.
  */
-class TouchInput {
-
-    constructor() { throw new Error("This is a static class"); }
-
-    /**
-     * Initializes the touch system.
-     */
-    static initialize() {
-        this.clear();
-        this._setupEventHandlers();
-    } // initialize
-
-    /**
-     * The wait time of the pseudo key repeat in frames.
-     *
-     * @type number
-     */
-    static keyRepeatWait = 24;
-
-    /**
-     * The interval of the pseudo key repeat in frames.
-     *
-     * @type number
-     */
-    static keyRepeatInterval = 6;
-
-    /**
-     * The threshold number of pixels to treat as moved.
-     *
-     * @type number
-     */
-    static moveThreshold = 10;
-
-    static clear() {
-        this._mousePressed = this._screenPressed = false;
-        [this._pressedTime, this._clicked] = [0, false];
-        this._newState = this._createNewState();
-        this._currentState = this._createNewState();
-        this._x = this._y = this._triggerX = this._triggerY = 0;
-        [this._moved, this._date] = [false, 0];
-    } // clear
-
-    static update() {
-        this._currentState = this._newState;
-        this._newState = this._createNewState();
-        this._clicked = this._currentState.released && !this._moved;
-        if (this.isPressed()) this._pressedTime++;
-    } // update
-
-    /**
-     * Checks whether the mouse button or touchscreen has been pressed and
-     * released at the same position.
-     *
-     * @returns {boolean} True if the mouse button or touchscreen is clicked.
-     */
-    static isClicked() { return this._clicked; }
-
-    /**
-     * Checks whether the mouse button or touchscreen is currently pressed down.
-     *
-     * @returns {boolean} True if the mouse button or touchscreen is pressed.
-     */
-    static isPressed() { return this._mousePressed || this._screenPressed; }
-
-    /**
-     * Checks whether the left mouse button or touchscreen is just pressed.
-     *
-     * @returns {boolean} True if the mouse button or touchscreen is triggered.
-     */
-    static isTriggered() { return this._currentState.triggered; }
-
-    /**
-     * Checks whether the left mouse button or touchscreen is just pressed
-     * or a pseudo key repeat occurred.
-     *
-     * @returns {boolean} True if the mouse button or touchscreen is repeated.
-     */
-    static isRepeated() {
-        if (!this.isPressed()) return false;
-        if (this._currentState.triggered) return true;
-        if (this._pressedTime < this.keyRepeatWait) return false;
-        return this._pressedTime % this.keyRepeatInterval === 0;
-    } // isRepeated
-
-    /**
-     * Checks whether the left mouse button or touchscreen is kept depressed.
-     *
-     * @returns {boolean} True if the left mouse button or touchscreen is long-pressed.
-     */
-    static isLongPressed() {
-        return this.isPressed() && this._pressedTime >= this.keyRepeatWait;
-    } // isLongPressed
-
-    /**
-     * Checks whether the right mouse button is just pressed.
-     *
-     * @returns {boolean} True if the right mouse button is just pressed.
-     */
-    static isCancelled() { return this._currentState.cancelled; }
-
-    /**
-     * Checks whether the mouse or a finger on the touchscreen is moved.
-     *
-     * @returns {boolean} True if the mouse or a finger on the touchscreen is moved.
-     */
-    static isMoved() { return this._currentState.moved; }
-
-    /**
-     * Checks whether the mouse is moved without pressing a button.
-     *
-     * @returns {boolean} True if the mouse is hovered.
-     */
-    static isHovered() { return this._currentState.hovered; }
-
-    /**
-     * Checks whether the left mouse button or touchscreen is released.
-     *
-     * @returns {boolean} True if the mouse button or touchscreen is released.
-     */
-    static isReleased() { return this._currentState.released; }
-
-    /**
-     * The horizontal scroll amount.
-     *
-     * @readonly
-     * @type number
-     * @name TouchInput.wheelX
-     */
-    static get wheelX() { return this._currentState.wheelX; }
-
-    /**
-     * The vertical scroll amount.
-     *
-     * @readonly
-     * @type number
-     * @name TouchInput.wheelY
-     */
-    static get wheelY() { return this._currentState.wheelY; }
-
-    /**
-     * The x coordinate on the canvas area of the latest touch event.
-     *
-     * @readonly
-     * @type number
-     * @name TouchInput.x
-     */
-    static get x() { return this._x; }
-
-    /**
-     * The y coordinate on the canvas area of the latest touch event.
-     *
-     * @readonly
-     * @type number
-     * @name TouchInput.y
-     */
-    static get y() { return this._y; }
-
-    /**
-     * The time of the last input in milliseconds.
-     *
-     * @readonly
-     * @type number
-     * @name TouchInput.date
-     */
-    static get date() { return this._date; }
-
-    static _createNewState() {
-        return {
-            triggered: false,
-            cancelled: false,
-            moved: false,
-            hovered: false,
-            released: false,
-            wheelX: 0,
-            wheelY: 0
-        };
-    } // _createNewState
-
-    static _setupEventHandlers() {
-        // Edited to help plugins alter event handlers in better ways
-        this._setupMouseEventHandlers();
-        this._setupTouchEventHandlers();
-        //
-        window.addEventListener("blur", this._onLostFocus.bind(this));
-    } // _setupEventHandlers
-
-    static _onMouseDown(event) {
-        switch (event.button) {
-            case 0: return this._onLeftButtonDown(event);
-            case 1: return this._onMiddleButtonDown(event);
-            case 2: this._onRightButtonDown(event);
-        }
-    } // _onMouseDown
-
-    static _onLeftButtonDown(event) {
-        // Edited to dry up codes essentially being the identical knowledge
-        const xy = this._pageToCanvasXY(event);
-        if (!Graphics.isInsideCanvas(...xy)) return;
-        //
-        // Edited to help plugins alter left button down behaviors in better way
-        this._onLeftButtonDownInsideCanvas(...xy);
-        //
-    } // _onLeftButtonDown
-
-    static _onMiddleButtonDown(/*event*/) {}
-
-    static _onRightButtonDown(event) {
-        // Edited to dry up codes essentially being the identical knowledge
-        const xy = this._pageToCanvasXY(event);
-        if (Graphics.isInsideCanvas(...xy)) this._onCancel(...xy);
-        //
-    } // _onRightButtonDown
-
-    static _onMouseMove(event) {
-        // Edited to dry up codes essentially being the identical knowledge
-        const xy = this._pageToCanvasXY(event);
-        if (this._mousePressed) return this._onMove(...xy);
-        if (Graphics.isInsideCanvas(...xy)) this._onHover(...xy);
-        //
-    } // _onMouseMove
-
-    static _onMouseUp(event) {
-        // Edited to help plugins alter left button up behaviors in better ways
-        if (event.button === 0) this._onLeftButtonUp(event);
-        //
-    } // _onMouseUp
-
-    static _onWheel(event) {
-        this._newState.wheelX += event.deltaX;
-        this._newState.wheelY += event.deltaY;
-        event.preventDefault();
-    } // _onWheel
-
-    static _onTouchStart(event) {
-        const { changedTouches, touches } = event;
-        changedTouches.forEach(touch => {
-            // Edited to help plugins alter touches inside canvas in better ways
-            const xy = this._pageToCanvasXY(touch);
-            if (!Graphics.isInsideCanvas(...xy)) return;
-            this._onTouchStartInsideCanvas(touches, ...xy);
-            //
-        });
-        /** @todo Extracts this conditional into a well-named static function */
-        if (!window.cordova && !window.navigator.standalone) return;
-        //
-        event.preventDefault();
-    } // _onTouchStart
-
-    static _onTouchMove(event) {
-        event.changedTouches.forEach(this._onMoveTouch, this);
-    } // _onTouchMove
-
-    static _onTouchEnd(event) {
-        event.changedTouches.forEach(this._onReleaseTouch, this);
-    } // _onTouchEnd
-
-    static _onTouchCancelfunction(/*event*/) { this._screenPressed = false; }
-
-    static _onLostFocus() { this.clear(); }
-
-    static _onTrigger(x, y) {
-        this._newState.triggered = true;
-        [this._x, this._y, this._triggerX, this._triggerY] = [x, y, x, y];
-        [this._moved, this._date] = [false, Date.now()];
-    } // _onTrigger
-
-    // Edited to dry up codes essentially being the identical knowledge
-    static _onCancel(x, y) { this._onUpdateNewState("cancelled", x, y); }
-    //
-
-    static _onMove(x, y) {
-        // Edited to help plugins alter the on move event in better ways
-        if (this._isMoved(x, y)) this._moved = true;
-        if (this._moved) this._onUpdateNewState("_moved", x, y);
-        //
-    } // _onMove
-
-    // Edited to dry up codes essentially being the identical knowledge
-    static _onHover(x, y) { this._onUpdateNewState("hovered", x, y); }
-    //
-
-    // Edited to dry up codes essentially being the identical knowledge
-    static _onRelease(x, y) { this._onUpdateNewState("released", x, y); }
-    //
-
-    /**
-     * Setups all mouse event handlers of this touch input static class
-     * Idempotent
-     * @author DoubleX @since 0.9.5 @version 0.9.5
-     */
-    static _setupMouseEventHandlers() {
-      document.addEventListener("mousedown", this._onMouseDown.bind(this));
-      document.addEventListener("mousemove", this._onMouseMove.bind(this));
-      document.addEventListener("mouseup", this._onMouseUp.bind(this));
-      document.addEventListener("wheel", this._onWheel.bind(this), {
-          passive: false
-      });
-    } // _setupMouseEventHandlers
-
-    /**
-     * Setups all touch event handlers of this touch input static class
-     * Idempotent
-     * @author DoubleX @since 0.9.5 @version 0.9.5
-     */
-    static _setupTouchEventHandlers() {
-        const pf = { passive: false };
-        document.addEventListener("touchstart", this._onTouchStart.bind(this), pf);
-        document.addEventListener("touchmove", this._onTouchMove.bind(this), pf);
-        document.addEventListener("touchend", this._onTouchEnd.bind(this));
-        document.addEventListener("touchcancel", this._onTouchCancel.bind(this));
-    } // _setupTouchEventHandlers
-
-    /**
-     * Triggers the left button down event inside the canvas x and y positions
-     * Idempotent
-     * @author DoubleX @since 0.9.5 @version 0.9.5
-     * @param {number} x - The page x position of the touch event
-     * @param {number} y - The page y position of the touch event
-     */
-    static _onLeftButtonDownInsideCanvas(x, y) {
-        [this._mousePressed, this._pressedTime] = [true, 0];
-        this._onTrigger(x, y);
-    } // _onLeftButtonDownInsideCanvas
-
-    /**
-     * Triggers the specified the left button up event
-     * Idempotent
-     * @author DoubleX @since 0.9.5 @version 0.9.5
-     * @param {Event} event - The specified left button up event
-     */
-    static _onLeftButtonUp(event) {
-        this._mousePressed = false;
-        this._onRelease(...this._pageToCanvasXY(event));
-    } // _onLeftButtonUp
-
-    /**
-     * Triggers the touch start event inside canvas for the specified touches
-     * Idempotent
-     * @author DoubleX @since 0.9.5 @version 0.9.5
-     * @param {[Touch]} touches - The specified touches from the specified event
-     * @param {number} x - The page x position of the touch event
-     * @param {number} y - The page y position of the touch event
-     */
-    static _onTouchStartInsideCanvas(touches, x, y) {
-        [this._screenPressed, this._pressedTime] = [true, 0];
-        touches.length >= 2 ? this._onCancel(x, y) : this._onTrigger(x, y);
-        event.preventDefault();
-    } // _onTouchStartInsideCanvas
-
-    /**
-     * Triggers the touch move event for the specified touch
-     * Potential Hotspot/Idempotent
-     * @author DoubleX @since 0.9.5 @version 0.9.5
-     * @param {Touch} touch - The specified touch from the specified event
-     */
-    static _onMoveTouch(touch) { this._onMove(...this._pageToCanvasXY(touch)); }
-
-    /**
-     * Triggers the touch release event for the specified touch
-     * Idempotent
-     * @author DoubleX @since 0.9.5 @version 0.9.5
-     * @param {Touch} touch - The specified touch from the specified event
-     */
-    static _onReleaseTouch(touch) {
-        this._screenPressed = false;
-        this._onRelease(...this._pageToCanvasXY(touch));
-    } // _onReleaseTouch
-
-    /**
-     * Potential Hotspot/Nullipotent
-     * @author DoubleX @since 0.9.5 @version 0.9.5
-     * @param {Event|Touch} eventTouch - The specified event or its touch
-     * @returns {[number]} The converted x and y canvas positions
-     */
-    static _pageToCanvasXY(eventTouch) {
-        return [
-            Graphics.pageToCanvasX(eventTouch.pageX),
-            Graphics.pageToCanvasY(eventTouch.pageY)
-        ];
-    } // _pageToCanvasXY
-
-    /**
-     * Potential Hotspot/Nullipotent
-     * @author DoubleX @since 0.9.5 @version 0.9.5
-     * @param {number} x - The page x position of the touch event
-     * @param {number} y - The page y position of the touch event
-     * @returns {boolean} If the detected touch event's indeed a movement
-     */
-    static _isMoved(x, y) {
-        const dx = Math.abs(x - this._triggerX);
-        const dy = Math.abs(y - this._triggerY);
-        return dx > this.moveThreshold || dy > this.moveThreshold;
-    } // _isMoved
-
-    /**
-     * Updates the specified new states as well as the current x and y positions
-     * Idempotent
-     * @author DoubleX @since 0.9.5 @version 0.9.5
-     * @enum @param {string} state - The name of the new state to be updated
-     * @param {number} x - The page x position of the touch event
-     * @param {number} y - The page y position of the touch event
-     */
-    static _onUpdateNewState(state, x, y) {
-        [this._newState[state], this._x, this._y] = [true, x, y];
-    } // _onUpdateNewState
-
-} // TouchInput
-
-/*----------------------------------------------------------------------------
- *    # Rewritten class: Utils
- *      - Rewrites it into the ES6 standard
- *----------------------------------------------------------------------------*/
-
-//-----------------------------------------------------------------------------
-/**
- * The static class that defines utility methods.
- *
- * @namespace
- */
-class Utils {
-
-    constructor() { throw new Error("This is a static class"); }
-
-    /**
-     * The name of the RPG Maker. "MZ" in the current version.
-     *
-     * @type string
-     * @constant
-     */
-    static RPGMAKER_NAME = "MZ";
-
-    /**
-     * The version of the RPG Maker.
-     *
-     * @type string
-     * @constant
-     */
-    static RPGMAKER_VERSION = "0.9.5";
-
-    /**
-     * Checks whether the current RPG Maker version is greater than or equal to
-     * the given version.
-     *
-     * @param {string} version - The "x.x.x" format string to compare.
-     * @returns {boolean} True if the current version is greater than or equal
-     *                    to the given version.
-     */
-    static checkRMVersion(version) {
-        const array1 = this.RPGMAKER_VERSION.split("."), l = array1.length;
-        const array2 = String(version).split(".");
-        for (let i = 0; i < l; i++) {
-            const [v1, v2] = [+array1[i], +array2[i]];
-            if (v1 > v2) return true;
-            if (v1 < v2) return false;
-        }
-        return true;
-    } // checkRMVersion
-
-    /**
-     * Checks whether the option is in the query string.
-     *
-     * @param {string} name - The option name.
-     * @returns {boolean} True if the option is in the query string.
-     */
-    static isOptionValid(name) {
-        const args = location.search.slice(1);
-        if (args.split("&").includes(name)) return true;
-        if (!this.isNwjs() || nw.App.argv.isEmpty()) return false;
-        return nw.App.argv[0].split("&").includes(name);
-    } // isOptionValid
-
-    /**
-     * Checks whether the platform is NW.js.
-     *
-     * @returns {boolean} True if the platform is NW.js.
-     */
-    static isNwjs() {
-        return typeof require === "function" && typeof process === "object";
-    } // isNwjs
-
-    /**
-     * Checks whether the platform is RPG Atsumaru.
-     *
-     * @returns {boolean} True if the platform is RPG Atsumaru.
-     */
-    static isAtsumaru() { return typeof RPGAtsumaru === "object"; }
-
-    /**
-     * Checks whether the platform is a mobile device.
-     *
-     * @returns {boolean} True if the platform is a mobile device.
-     */
-    static isMobileDevice() {
-        const r = /Android|webOS|iPhone|iPad|iPod|BlackBerry|Opera Mini/i;
-        return !!navigator.userAgent.match(r);
-    } // isMobileDevice
-
-    /**
-     * Checks whether the browser is Mobile Safari.
-     *
-     * @returns {boolean} True if the browser is Mobile Safari.
-     */
-    static isMobileSafari() {
-        const agent = navigator.userAgent;
-        if (!agent.match(/iPhone|iPad|iPod/)) return false;
-        return !!agent.match(/AppleWebKit/) && !agent.match("CriOS");
-    } // isMobileSafari
-
-    /**
-     * Checks whether the browser is Android Chrome.
-     *
-     * @returns {boolean} True if the browser is Android Chrome.
-     */
-    static isAndroidChrome() {
-        const agent = navigator.userAgent;
-        return !!(agent.match(/Android/) && agent.match(/Chrome/));
-    } // isAndroidChrome
-
-    /**
-     * Checks whether the browser is accessing local files.
-     *
-     * @returns {boolean} True if the browser is accessing local files.
-     */
-    static isLocal() { return window.location.href.startsWith("file:"); }
-
-    /**
-     * Checks whether the browser supports WebGL.
-     *
-     * @returns {boolean} True if the browser supports WebGL.
-     */
-    static canUseWebGL() {
-        /** @todo Thinks of if using conditional's better than try catch */
-        try {
-            return !!document.createElement("canvas").getContext("webgl");
-        } catch (e) { return false; }
-        //
-    } // canUseWebGL
-
-    /**
-     * Checks whether the browser supports Web Audio API.
-     *
-     * @returns {boolean} True if the browser supports Web Audio API.
-     */
-    static canUseWebAudioAPI() {
-        return !!(window.AudioContext || window.webkitAudioContext);
-    } // canUseWebAudioAPI
-
-    /**
-     * Checks whether the browser supports CSS Font Loading.
-     *
-     * @returns {boolean} True if the browser supports CSS Font Loading.
-     */
-    static canUseCssFontLoadingfunction() {
-        return !!(document.fonts && document.fonts.ready);
-    } // canUseCssFontLoadingfunction
-
-    /**
-     * Checks whether the browser supports IndexedDB.
-     *
-     * @returns {boolean} True if the browser supports IndexedDB.
-     */
-    static canUseIndexedDB() {
-        if (!window.indexedDB) return;
-        return !!(window.mozIndexedDB || window.webkitIndexedDB);
-    } // canUseIndexedDB
-
-    /**
-     * Checks whether the browser can play ogg files.
-     *
-     * @returns {boolean} True if the browser can play ogg files.
-     */
-    static canPlayOgg() {
-        if (!this._audioElement) {
-            this._audioElement = document.createElement("audio");
-        }
-        if (!this._audioElement) return false;
-        return !!this._audioElement.canPlayType('audio/ogg; codecs="vorbis"');
-    } // canPlayOgg
-
-    /**
-     * Checks whether the browser can play webm files.
-     *
-     * @returns {boolean} True if the browser can play webm files.
-     */
-    static canPlayWebm() {
-        if (!this._videoElement) {
-            this._videoElement = document.createElement("video");
-        }
-        if (!this._videoElement) return false;
-        return !!this._videoElement.canPlayType('video/webm; codecs="vp8, vorbis"');
-    } // canPlayWebm
-
-    /**
-     * Encodes a URI component without escaping slash characters.
-     *
-     * @param {string} str - The input string.
-     * @returns {string} Encoded string.
-     */
-    static encodeURI(str) {
-        return encodeURIComponent(str).replace(/%2F/g, "/");
-    } // encodeURI
-
-    /**
-     * Escapes special characters for HTML.
-     *
-     * @param {string} str - The input string.
-     * @returns {string} Escaped string.
-     */
-    static escapeHtml(str) {
-        const entityMap = {
-            "&": "&amp;",
-            "<": "&lt;",
-            ">": "&gt;",
-            '"': "&quot;",
-            "'": "&#39;",
-            "/": "&#x2F;"
-        };
-        /** @todo Figures out why String(str) is needed here */
-        return String(str).replace(/[&<>"'/]/g, s => entityMap[s]);
-        //
-    } // escapeHtml
-
-    /**
-     * Checks whether the string contains any Arabic characters.
-     *
-     * @returns {boolean} True if the string contains any Arabic characters.
-     */
-    static containsArabic(str) {
-        const regExp = /[\u0600-\u06FF\u0750-\u077F\u08A0-\u08FF]/;
-        return regExp.test(str);
-    } // containsArabic
-
-    /**
-     * Sets information related to encryption.
-     *
-     * @param {boolean} hasImages - Whether the image files are encrypted.
-     * @param {boolean} hasAudio - Whether the audio files are encrypted.
-     * @param {string} key - The encryption key.
-     */
-    static setEncryptionInfo(hasImages, hasAudio, key) {
-        // [Note] This function is implemented for module independence.
-        this._hasEncryptedImages = hasImages;
-        this._hasEncryptedAudio = hasAudio;
-        this._encryptionKey = key;
-    } // setEncryptionInfo
-
-    /**
-     * Checks whether the image files in the game are encrypted.
-     *
-     * @returns {boolean} True if the image files are encrypted.
-     */
-    static hasEncryptedImages() { return this._hasEncryptedImages; }
-
-    /**
-     * Checks whether the audio files in the game are encrypted.
-     *
-     * @returns {boolean} True if the audio files are encrypted.
-     */
-    static hasEncryptedAudio() { return this._hasEncryptedAudio; }
-
-    /**
-     * Decrypts encrypted data.
-     *
-     * @param {ArrayBuffer} source - The data to be decrypted.
-     * @returns {ArrayBuffer} The decrypted data.
-     */
-    static decryptArrayBuffer(source) {
-        const header = new Uint8Array(source, 0, 16);
-        const headerHex = Array.from(header, x => x.toString(16)).join(",");
-        if (headerHex !== "52,50,47,4d,56,0,0,0,0,3,1,0,0,0,0,0") {
-            throw new Error("Decryption error");
-        }
-        const [body, view] = [source.slice(16), new DataView(body)];
-        const key = this._encryptionKey.match(/.{2}/g);
-        for (let i = 0; i < 16; i++) {
-            view.setUint8(i, view.getUint8(i) ^ parseInt(key[i], 16));
-        }
-        return body;
-    } // decryptArrayBuffer
-
-} // Utils
-
-/*----------------------------------------------------------------------------
- *    # Rewritten class: Video
- *      - Rewrites it into the ES6 standard
- *----------------------------------------------------------------------------*/
-
-//-----------------------------------------------------------------------------
-/**
- * The static class that handles video playback.
- *
- * @namespace
- */
-class Video {
-
-    constructor() { throw new Error("This is a static class"); }
-
-    /**
-     * Initializes the video system.
-     *
-     * @param {number} width - The width of the video.
-     * @param {number} height - The height of the video.
-     */
-    static initialize(width, height) {
-        [this._element, this._loading, this._volume] = [null, false, 1];
-        this._createElement();
-        this._setupEventHandlers();
-        this.resize(width, height);
-    } // initialize
-
-    /**
-     * Changes the display size of the video.
-     *
-     * @param {number} width - The width of the video.
-     * @param {number} height - The height of the video.
-     */
-    static resize(width, height) {
-        // Edited to help plugins alter element resize behaviors in better ways
-        if (this._element) this._resizeElem(width, height);
-        //
-    } // resize
-
-    /**
-     * Starts playback of a video.
-     *
-     * @param {string} src.
-     */
-    static play(src) {
-        this._element.src = src;
-        this._element.onloadeddata = this._onLoad.bind(this);
-        this._element.onerror = this._onError.bind(this);
-        this._element.onended = this._onEnd.bind(this);
-        this._element.load();
-        this._loading = true;
-    } // play
-
-    /**
-     * Checks whether the video is playing.
-     *
-     * @returns {boolean} True if the video is playing.
-     */
-    static isPlaying() { return this._loading || this._isVisible(); }
-
-    /**
-     * Sets the volume for videos.
-     *
-     * @param {number} volume - The volume for videos (0 to 1).
-     */
-    static setVolume(volume) {
-        this._volume = volume;
-        // Edited to help plugins alter element volume behaviors in better ways
-        if (this._element) this._setElemVolume();
-        //
-    } // setVolume
-
-    static _createElement() {
-        // Edited to help plugins create video element behaviors in better ways
-        this._element = this._createdElem();
-        //
-        document.body.appendChild(this._element);
-    } // _createElement
-
-    static _onLoad() {
-        this._element.volume = this._volume;
-        this._element.play();
-        this._updateVisibility(true);
-        this._loading = false;
-    } // _onLoad
-
-    static _onError() {
-        this._updateVisibility(false);
-        throw ["LoadError", this._element.src, () => this._element.load()];
-    } // _onError
-
-    static _onEnd() { this._updateVisibility(false); }
-
-    static _updateVisibility(videoVisible) {
-        // Edited to help plugins alter visibilities updates in better ways
-        if (videoVisible) return this._updateWhenVisible();
-        this._updateWhenInvisible();
-        //
-    } // _updateVisibility
-
-    static _isVisible() { return this._element.style.opacity > 0; }
-
-    static _setupEventHandlers() {
-        const onUserGesture = this._onUserGesture.bind(this);
-        document.addEventListener("keydown", onUserGesture);
-        document.addEventListener("mousedown", onUserGesture);
-        document.addEventListener("touchend", onUserGesture);
-    } // _setupEventHandlers
-
-    static _onUserGesture() {
-        /** @todo Extracts this conditional into a well-named static function */
-        if (this._element.src || !this._element.paused) return;
-        //
-        this._element.play().catch(() => 0);
-    } // _onUserGesture
-
-    /**
-     * Resizes the video element
-     * Idempotent
-     * @author DoubleX @since 0.9.5 @version 0.9.5
-     */
-    static _resizeElem(w, h) {
-        const { style } = this._element;
-        [style.width, style.height] = [`${w}px`, `${h}px`];
-    } // _resizeElem
-
-    /**
-     * Sets the volume of the video element
-     * Idempotent
-     * @author DoubleX @since 0.9.5 @version 0.9.5
-     */
-    static _setElemVolume() { this._element.volume = this._volume; }
-
-    /**
-     * Creates a new document with id gameVideo as the video element
-     * Nullipotent
-     * @author DoubleX @since 0.9.5 @version 0.9.5
-     * @returns {DOM} The video element document
-     */
-    static _createdElem() {
-        const elem = document.createElement("video");
-        elem.id = "gameVideo";
-        const { style } = elem;
-        [style.position, style.margin] = ["absolute", "auto"];
-        style.top = style.left = style.right = style.bottom = style.opacity = 0;
-        style.zIndex = 2;
-        elem.setAttribute("playsinline", "");
-        elem.oncontextmenu = () => false;
-        return elem;
-    } // _createdElem
-
-    /**
-     * Updates this video when it should become visible
-     * Idempotent
-     * @author DoubleX @since 0.9.5 @version 0.9.5
-     */
-    static _updateWhenVisible() {
-        Graphics.hideScreen();
-        this._element.style.opacity = 1;
-    } // _updateWhenVisible
-
-    /**
-     * Updates this video when it should become invisible
-     * Idempotent
-     * @author DoubleX @since 0.9.5 @version 0.9.5
-     */
-    static _updateWhenInvisible() {
-        Graphics.showScreen();
-        this._element.style.opacity = 0;
-    } // _updateWhenInvisible
-
-} // Video
+class Rectangle extends PIXI.Rectangle {}
+// It's just to play safe in case of any plugin extending PIXI.Rectangle in ES6
+ES6ExtendedClassAlias.inherit(Rectangle);
+//
 
 /*----------------------------------------------------------------------------
  *    # Rewritten class: Bitmap
@@ -3640,305 +2551,6 @@ class Bitmap {
 } // Bitmap
 
 /*----------------------------------------------------------------------------
- *    # Rewritten class: ColorFilter
- *      - Rewrites it into the ES6 standard
- *----------------------------------------------------------------------------*/
-
-//-----------------------------------------------------------------------------
-/**
- * The color filter for WebGL.
- *
- * @class
- * @extends PIXI.Filter
- */
-
-class ColorFilter extends PIXI.Filter {
-
-    constructor() {
-        super(null, this._fragmentSrc());
-        // Edited to help plugins setup the color filter uniforms in better ways
-        this._initUniforms();
-        //
-    } // constructor
-
-    /**
-     * Sets the hue rotation value.
-     *
-     * @param {number} hue - The hue value (-360, 360).
-     */
-    setHue(hue) { this.uniforms.hue = +hue; }
-
-    /**
-     * Sets the color tone.
-     *
-     * @param {array} tone - The color tone [r, g, b, gray].
-     */
-    setColorTone(tone) {
-        if (!(tone instanceof Array)) {
-            throw new Error("Argument must be an array");
-        }
-        this.uniforms.colorTone = tone.clone();
-    } // setColorTone
-
-    /**
-     * Sets the blend color.
-     *
-     * @param {array} color - The blend color [r, g, b, a].
-     */
-    setBlendColor(color) {
-        if (!(color instanceof Array)) {
-            throw new Error("Argument must be an array");
-        }
-        this.uniforms.blendColor = color.clone();
-    } // setBlendColor
-
-    /**
-     * Sets the brightness.
-     *
-     * @param {number} brightness - The brightness (0 to 255).
-     */
-      setBrightness(brightness) { this.uniforms.brightness = +brightness; }
-
-    _fragmentSrc() {
-        return `varying vec2 vTextureCoord;
-                uniform sampler2D uSampler;
-                uniform float hue;
-                uniform vec4 colorTone;
-                uniform vec4 blendColor;
-                uniform float brightness;
-                vec3 rgbToHsl(vec3 rgb) {
-                  float r = rgb.r;
-                  float g = rgb.g;
-                  float b = rgb.b;
-                  float cmin = min(r, min(g, b));
-                  float cmax = max(r, max(g, b));
-                  float h = 0.0;
-                  float s = 0.0;
-                  float l = (cmin + cmax) / 2.0;
-                  float delta = cmax - cmin;
-                  if (delta > 0.0) {
-                    if (r == cmax) {
-                      h = mod((g - b) / delta + 6.0, 6.0) / 6.0;
-                    } else if (g == cmax) {
-                      h = ((b - r) / delta + 2.0) / 6.0;
-                    else {
-                      h = ((r - g) / delta + 4.0) / 6.0;
-                    }
-                    if (l < 1.0) {
-                      s = delta / (1.0 - abs(2.0 * l - 1.0));
-                    }
-                  }
-                  return vec3(h, s, l);
-                }
-                vec3 hslToRgb(vec3 hsl) {
-                  float h = hsl.x;
-                  float l = hsl.z;
-                  float c = (1.0 - abs(2.0 * l - 1.0)) * hsl.y;
-                  float m = l - c / 2.0;
-                  float cm = c + m;
-                  float xm = c * (1.0 - abs((mod(h * 6.0, 2.0)) - 1.0)) + m;
-                  if (h < 1.0 / 6.0) {
-                    return vec3(cm, xm, m);
-                  } else if (h < 2.0 / 6.0) {
-                    return vec3(xm, cm, m);
-                  } else if (h < 3.0 / 6.0) {
-                    return vec3(m, cm, xm);
-                  } else if (h < 4.0 / 6.0) {
-                    return vec3(m, xm, cm);
-                  } else if (h < 5.0 / 6.0) {
-                    return vec3(xm, m, cm);
-                  } else {
-                    return vec3(cm, m, xm);
-                  }
-                }
-                float fragColorR(float r, float a, float i1, float i3) {
-                  r = clamp((r / a + colorTone.r / 255.0) * a, 0.0, 1.0);
-                  r = clamp(r * i1 + blendColor.r / 255.0 * i3 * a, 0.0, 1.0);
-                  return r * brightness / 255.0;
-                }
-                float fragColorG(float g, float a, float i1, float i3) {
-                  g = clamp((g / a + colorTone.g / 255.0) * a, 0.0, 1.0);
-                  g = clamp(g * i1 + blendColor.g / 255.0 * i3 * a, 0.0, 1.0);
-                  return g * brightness / 255.0;
-                }
-                float fragColorB(float b, float a, float i1, float i3) {
-                  b = clamp((b / a + colorTone.b / 255.0) * a, 0.0, 1.0);
-                  b = clamp(b * i1 + blendColor.b / 255.0 * i3 * a, 0.0, 1.0);
-                  return b * brightness / 255.0;
-                }
-                void main() {
-                  vec4 sample = texture2D(uSampler, vTextureCoord);
-                  float a = sample.a;
-                  vec3 hsl = rgbToHsl(sample.rgb);
-                  hsl.x = mod(hsl.x + hue / 360.0, 1.0);
-                  hsl.y = hsl.y * (1.0 - colorTone.a / 255.0);
-                  vec3 rgb = hslToRgb(hsl);
-                  float i3 = blendColor.a / 255.0;
-                  float i1 = 1.0 - i3;
-                  float r = fragColorR(rgb.r, a, i1, i3);
-                  float g = fragColorG(rgb.g, a, i1, i3);
-                  float b = fragColorB(rgb.b, a, i1, i3);
-                  gl_FragColor = vec4(r, g, b, a);
-                }`;
-    } // _fragmentSrc
-
-    /**
-     * Initializes the uniforms of this color filter
-     * Idempotent
-     * @author DoubleX @since 0.9.5 @version 0.9.5
-     */
-    _initUniforms() {
-        this.uniforms.hue = 0;
-        this.uniforms.colorTone = [0, 0, 0, 0];
-        this.uniforms.blendColor = [0, 0, 0, 0];
-        this.uniforms.brightness = 255;
-    } // _initUniforms
-
-} // ColorFilter
-// It's just to play safe in case of any plugin extending PIXI.Filter in ES6 way
-ES6ExtendedClassAlias.inherit(ColorFilter);
-//
-
-/*----------------------------------------------------------------------------
- *    # Rewritten class: Point
- *      - Rewrites it into the ES6 standard
- *----------------------------------------------------------------------------*/
-
-//-----------------------------------------------------------------------------
-/**
- * The point class.
- *
- * @class
- * @extends PIXI.Point
- * @param {number} x - The x coordinate.
- * @param {number} y - The y coordinate.
- */
-class Point extends PIXI.Point {}
-// It's just to play safe in case of any plugin extending PIXI.Point in ES6 way
-ES6ExtendedClassAlias.inherit(Point);
-//
-
-/*----------------------------------------------------------------------------
- *    # Rewritten class: Rectangle
- *      - Rewrites it into the ES6 standard
- *----------------------------------------------------------------------------*/
-
-//-----------------------------------------------------------------------------
-/**
- * The rectangle class.
- *
- * @class
- * @extends PIXI.Rectangle
- * @param {number} x - The x coordinate for the upper-left corner.
- * @param {number} y - The y coordinate for the upper-left corner.
- * @param {number} width - The width of the rectangle.
- * @param {number} height - The height of the rectangle.
- */
-class Rectangle extends PIXI.Rectangle {}
-// It's just to play safe in case of any plugin extending PIXI.Rectangle in ES6
-ES6ExtendedClassAlias.inherit(Rectangle);
-//
-
-/*----------------------------------------------------------------------------
- *    # Rewritten class: ScreenSprite
- *      - Rewrites it into the ES6 standard
- *----------------------------------------------------------------------------*/
-
-//-----------------------------------------------------------------------------
-/**
- * The sprite which covers the entire game screen.
- *
- * @class
- * @extends PIXI.Container
- */
-class ScreenSprite extends PIXI.Container {
-
-    constructor() {
-        super();
-        this._graphics = new PIXI.Graphics();
-        this.addChild(this._graphics);
-        this.opacity = 0;
-        this._red = this._green = this._blue = -1;
-        this.setBlack();
-    } // constructor
-
-    /**
-     * The opacity of the sprite (0 to 255).
-     *
-     * @type number
-     * @name ScreenSprite#opacity
-     */
-    get opacity() { return this.alpha * 255; }
-    set opacity(value) { this.alpha = value.clamp(0, 255) / 255; }
-
-    /**
-     * Destroys the screen sprite.
-     */
-    destroy() { super.destroy({ children: true, texture: true }); }
-
-    /**
-     * Sets black to the color of the screen sprite.
-     */
-    setBlack() { this.setColor(0, 0, 0); }
-
-    /**
-     * Sets white to the color of the screen sprite.
-     */
-    setWhite() { this.setColor(255, 255, 255); }
-
-    /**
-     * Sets the color of the screen sprite by values.
-     *
-     * @param {number} r - The red value in the range (0, 255).
-     * @param {number} g - The green value in the range (0, 255).
-     * @param {number} b - The blue value in the range (0, 255).
-     */
-    setColor(r, g, b) {
-        // Edited to help plugins alter the set color behaviors in better ways
-        if (this._isNewColor(r, g, b)) this._setNewColor(r, g, b);
-        //
-    } // setColor
-
-    /**
-     * Nullipotent
-     * @author DoubleX @since 0.9.5 @version 0.9.5
-     * @param {number} r - The red value in the range (0, 255)
-     * @param {number} g - The green value in the range (0, 255)
-     * @param {number} b - The blue value in the range (0, 255)
-     * @returns {boolean} If the specified color's different from the current
-     */
-    _isNewColor(r, g, b) {
-        return this._red !== r || this._green !== g || this._blue !== b;
-    } // _isNewColor
-
-    /**
-     * Sets the new screen sprite red, green and blue color components
-     * Idempotent
-     * @author DoubleX @since 0.9.5 @version 0.9.5
-     * @param {number} r - The red value in the range (0, 255)
-     * @param {number} g - The green value in the range (0, 255)
-     * @param {number} b - The blue value in the range (0, 255)
-     */
-    _setNewColor(r = 0, g = 0, b = 0) {
-        // They shouldn't be "", false, null, NaN or other defined falsy values
-        [this._red, this._green, this._blue] = [r, g, b].map(component => {
-            return Math.round(component).clamp(0, 255);
-        });
-        //
-        const graphics = this._graphics;
-        graphics.clear();
-        graphics.beginFill((this._red << 16) | (this._green << 8) | this._blue, 1);
-        /** @todo Fugures out where do -50000 and 100000 come from */
-        graphics.drawRect(-50000, -50000, 100000, 100000);
-        //
-    } // _setNewColor
-
-} // ScreenSprite
-// It's just to play safe in case of any plugin extending PIXI.Container in ES6
-ES6ExtendedClassAlias.inherit(ScreenSprite);
-//
-
-/*----------------------------------------------------------------------------
  *    # Rewritten class: Sprite
  *      - Rewrites it into the ES6 standard
  *----------------------------------------------------------------------------*/
@@ -4308,27 +2920,6 @@ class Sprite extends PIXI.Sprite {
 } // Sprite
 // It's just to play safe in case of any plugin extending PIXI.Sprite in ES6 way
 ES6ExtendedClassAlias.inherit(Sprite);
-//
-
-/*----------------------------------------------------------------------------
- *    # Rewritten class: Stage
- *      - Rewrites it into the ES6 standard
- *----------------------------------------------------------------------------*/
-
-//-----------------------------------------------------------------------------
-/**
- * The root object of the display tree.
- *
- * @class
- * @extends PIXI.Container
- */
-class Stage extends PIXI.Container {
-
-    destroy() { super.destroy({ children: true, texture: true }); }
-
-} // Stage
-// It's just to play safe in case of any plugin extending PIXI.Container in ES6
-ES6ExtendedClassAlias.inherit(Stage);
 //
 
 /*----------------------------------------------------------------------------
@@ -5530,997 +4121,103 @@ ES6ExtendedClassAlias.inherit(TilingSprite);
 //
 
 /*----------------------------------------------------------------------------
- *    # Rewritten class: Weather
+ *    # Rewritten class: ScreenSprite
  *      - Rewrites it into the ES6 standard
  *----------------------------------------------------------------------------*/
 
 //-----------------------------------------------------------------------------
 /**
- * The weather effect which displays rain, storm, or snow.
+ * The sprite which covers the entire game screen.
  *
  * @class
  * @extends PIXI.Container
  */
-class Weather extends PIXI.Container {
+class ScreenSprite extends PIXI.Container {
 
     constructor() {
         super();
-        // Edited to help plugins initialize private variables in better ways
-        this._initPrivateVars();
-        //
-        this._createBitmaps();
-        this._createDimmer();
-        // Edited to help plugins initialize public variables in better ways
-        this._initPublicVars();
-        //
+        this._graphics = new PIXI.Graphics();
+        this.addChild(this._graphics);
+        this.opacity = 0;
+        this._red = this._green = this._blue = -1;
+        this.setBlack();
     } // constructor
 
     /**
-     * Destroys the weather.
+     * The opacity of the sprite (0 to 255).
+     *
+     * @type number
+     * @name ScreenSprite#opacity
      */
-    destroy() {
-        super.destroy({ children: true, texture: true });
-        this._rainBitmap.destroy();
-        this._stormBitmap.destroy();
-        this._snowBitmap.destroy();
-    } // destroy
+    get opacity() { return this.alpha * 255; }
+    set opacity(value) { this.alpha = value.clamp(0, 255) / 255; }
 
     /**
-     * Updates the weather for each frame.
+     * Destroys the screen sprite.
      */
-    update() {
-        this._updateDimmer();
-        this._updateAllSprites();
-    } // update
+    destroy() { super.destroy({ children: true, texture: true }); }
 
-    _createBitmaps() {
-        this._rainBitmap = new Bitmap(1, 60);
-        this._rainBitmap.fillAll("white");
-        this._stormBitmap = new Bitmap(2, 100);
-        this._stormBitmap.fillAll("white");
-        this._snowBitmap = new Bitmap(9, 9);
-        this._snowBitmap.drawCircle(4, 4, 4, "white");
-    } // _createBitmaps
+    /**
+     * Sets black to the color of the screen sprite.
+     */
+    setBlack() { this.setColor(0, 0, 0); }
 
-    _createDimmer() {
-        this._dimmerSprite = new ScreenSprite();
-        this._dimmerSprite.setColor(80, 80, 80);
-        this.addChild(this._dimmerSprite);
-    } // _createDimmer
+    /**
+     * Sets white to the color of the screen sprite.
+     */
+    setWhite() { this.setColor(255, 255, 255); }
 
-    _updateDimmer() {
-        this._dimmerSprite.opacity = Math.floor(this.power * 6);
-    } // _updateDimmer
+    /**
+     * Sets the color of the screen sprite by values.
+     *
+     * @param {number} r - The red value in the range (0, 255).
+     * @param {number} g - The green value in the range (0, 255).
+     * @param {number} b - The blue value in the range (0, 255).
+     */
+    setColor(r, g, b) {
+        // Edited to help plugins alter the set color behaviors in better ways
+        if (this._isNewColor(r, g, b)) this._setNewColor(r, g, b);
+        //
+    } // setColor
 
-    _updateAllSprites() {
-        const maxSprites = Math.floor(this.power * 10);
-        while (this._sprites.length < maxSprites) this._addSprite();
-        while (this._sprites.length > maxSprites) this._removeSprite();
-        this._sprites.forEach(sprite => {
-            this._updateSprite(sprite);
-            sprite.x = sprite.ax - this.origin.x;
-            sprite.y = sprite.ay - this.origin.y;
+    /**
+     * Nullipotent
+     * @author DoubleX @since 0.9.5 @version 0.9.5
+     * @param {number} r - The red value in the range (0, 255)
+     * @param {number} g - The green value in the range (0, 255)
+     * @param {number} b - The blue value in the range (0, 255)
+     * @returns {boolean} If the specified color's different from the current
+     */
+    _isNewColor(r, g, b) {
+        return this._red !== r || this._green !== g || this._blue !== b;
+    } // _isNewColor
+
+    /**
+     * Sets the new screen sprite red, green and blue color components
+     * Idempotent
+     * @author DoubleX @since 0.9.5 @version 0.9.5
+     * @param {number} r - The red value in the range (0, 255)
+     * @param {number} g - The green value in the range (0, 255)
+     * @param {number} b - The blue value in the range (0, 255)
+     */
+    _setNewColor(r = 0, g = 0, b = 0) {
+        // They shouldn't be "", false, null, NaN or other defined falsy values
+        [this._red, this._green, this._blue] = [r, g, b].map(component => {
+            return Math.round(component).clamp(0, 255);
         });
-    } // _updateAllSprites
-
-    _addSprite() {
-        // Edited to help plugins alter sprite add behaviors in better ways
-        const sprite = this._newSprite();
         //
-        this._sprites.push(sprite);
-        this.addChild(sprite);
-    } // _addSprite
-
-    _removeSprite() { this.removeChild(this._sprites.pop()); }
-
-    _updateSprite(sprite) {
-        switch (this.type) {
-            case "rain":
-                this._updateRainSprite(sprite);
-                break;
-            case "storm":
-                this._updateStormSprite(sprite);
-                break;
-            case "snow":
-                this._updateSnowSprite(sprite);
-                break;
-        }
-        /** @todo Figures out where does 40 come from */
-        if (sprite.opacity < 40) this._rebornSprite(sprite);
+        const graphics = this._graphics;
+        graphics.clear();
+        graphics.beginFill((this._red << 16) | (this._green << 8) | this._blue, 1);
+        /** @todo Fugures out where do -50000 and 100000 come from */
+        graphics.drawRect(-50000, -50000, 100000, 100000);
         //
-    } // _updateSprite
+    } // _setNewColor
 
-    _updateRainSprite(sprite) {
-        // Edited to dry up codes essentially being the identical knowledge
-        this._updateWeatherSprite(sprite, this._rainBitmap, Math.PI / 16, 6);
-        //
-    } // _updateRainSprite
-
-    _updateStormSprite(sprite) {
-        // Edited to dry up codes essentially being the identical knowledge
-        this._updateWeatherSprite(sprite, this._stormBitmap, Math.PI / 8, 8);
-        //
-    } // _updateStormSprite
-
-    _updateSnowSprite(sprite) {
-        // Edited to dry up codes essentially being the identical knowledge
-        this._updateWeatherSprite(sprite, this._snowBitmap, Math.PI / 16, 3);
-        //
-    } // _updateSnowSprite
-
-    /**
-     * Initializes all private variables of this weather
-     * Idempotent
-     * @author DoubleX @since 0.9.5 @version 0.9.5
-     */
-    _initPrivateVars() {
-        [this._width, this._height] = [Graphics.width, Graphics.height];
-        this._sprites = [];
-    } // _initPrivateVars
-
-    /**
-     * Initializes all public variables of this weather
-     * Idempotent
-     * @author DoubleX @since 0.9.5 @version 0.9.5
-     */
-    _initPublicVars() {
-        /**
-         * The type of the weather in ["none", "rain", "storm", "snow"].
-         *
-         * @type string
-         */
-        this.type = "none";
-        /**
-         * The power of the weather in the range (0, 9).
-         *
-         * @type number
-         */
-        this.power = 0;
-        /**
-         * The origin point of the tiling sprite for scrolling.
-         *
-         * @type Point
-         */
-        this.origin = new Point();
-    } // _initPublicVars
-
-    /**
-     * Nullipotent
-     * @author DoubleX @since 0.9.5 @version 0.9.5
-     * @returns {Sprite} The new weather sprite to be added in the list
-     */
-    _newSprite() {
-        const sprite = new Sprite(this.viewport);
-        sprite.opacity = 0;
-        return sprite;
-    } // _newSprite
-
-    /**
-     * Updates the sprite with the specified weather, radian and opacity change
-     * Idempotent
-     * @author DoubleX @since 0.9.5 @version 0.9.5
-     * @param {Sprite} sprite - The weather sprite to be updated
-     * @param {Bitmap} bitmap - The new bitmap of the weather sprite
-     * @param {number} radian - The new rotation of the weather sprite
-     * @param {number} opacityDecrement - The weather sprite opacity decrement
-     */
-    _updateWeatherSprite(sprite, bitmap, radian, opacityDecrement) {
-        [sprite.bitmap, sprite.rotation] = [bitmap, radian];
-        sprite.ax -= opacityDecrement * Math.sin(sprite.rotation);
-        sprite.ay += opacityDecrement * Math.cos(sprite.rotation);
-        sprite.opacity -= opacityDecrement;
-    } // _updateWeatherSprite
-
-} // Weather
+} // ScreenSprite
 // It's just to play safe in case of any plugin extending PIXI.Container in ES6
-ES6ExtendedClassAlias.inherit(Weather);
+ES6ExtendedClassAlias.inherit(ScreenSprite);
 //
-
-/*----------------------------------------------------------------------------
- *    # Rewritten class: WebAudio
- *      - Rewrites it into the ES6 standard
- *----------------------------------------------------------------------------*/
-
-//-----------------------------------------------------------------------------
-/**
- * The audio object of Web Audio API.
- *
- * @class
- * @param {string} url - The url of the audio file.
- */
-class WebAudio {
-
-    constructor(url) {
-        this.clear();
-        this._url = url;
-        this._startLoading();
-    } // constructor
-
-    /**
-     * Initializes the audio system.
-     *
-     * @returns {boolean} True if the audio system is available.
-     */
-    static initialize() {
-        this._context = this._masterGainNode = null;
-        this._masterVolume = 1;
-        this._createContext();
-        this._createMasterGainNode();
-        this._setupEventHandlers();
-        return !!this._context;
-    } // initialize
-
-    /**
-     * Sets the master volume for all audio.
-     *
-     * @param {number} value - The master volume (0 to 1).
-     */
-    static setMasterVolume(value) {
-        this._masterVolume = value;
-        this._resetVolume();
-    } // setMasterVolume
-
-    static _createContext() {
-        try {
-            const AudioContext = window.AudioContext || window.webkitAudioContext;
-            this._context = new AudioContext();
-        } catch (e) { this._context = null; }
-    } // _createContext
-
-    static _currentTime() {
-        return this._context ? this._context.currentTime : 0;
-    } // _currentTime
-
-    static _createMasterGainNode() {
-        // Edited to help plugins create master gain node in better ways
-        if (this._context) this._createMasterGainNodeWithContext();
-        //
-    } // _createMasterGainNode
-
-    static _setupEventHandlers() {
-        const onUserGesture = this._onUserGesture.bind(this);
-        const onVisibilityChange = this._onVisibilityChange.bind(this);
-        document.addEventListener("keydown", onUserGesture);
-        document.addEventListener("mousedown", onUserGesture);
-        document.addEventListener("touchend", onUserGesture);
-        document.addEventListener("visibilitychange", onVisibilityChange);
-    } // _setupEventHandlers
-
-    static _onUserGesture() {
-        const context = this._context;
-        if (context && context.state === "suspended") context.resume();
-    } // _onUserGesture
-
-    static _onVisibilityChange() {
-        if (document.visibilityState === "hidden") return this._onHide();
-        this._onShow();
-    } // _onVisibilityChange
-
-    static _onHide() {
-        if (this._shouldMuteOnHide()) this._fadeOut(1);
-    } // _onHide
-
-    static _onShow() {
-        if (this._shouldMuteOnHide()) this._fadeIn(1);
-    } // _onShow
-
-    static _shouldMuteOnHide() {
-        return Utils.isMobileDevice() && !window.navigator.standalone;
-    } // _shouldMuteOnHide
-
-    static _resetVolume() {
-        // Edited to help plugins reset volume with gain node in better ways
-        if (this._masterGainNode) this._resetVolWithMasterGainNode();
-        //
-    } // _resetColume
-
-    static _fadeIn(duration) {
-        // Edited to help plugins fade in with master gain node in better ways
-        if (this._masterGainNode) this._fadeInWithMasterGainNode(duration);
-        //
-    } // _fadeIn
-
-    static _fadeOut(duration) {
-        // Edited to help plugins fade out with master gain node in better ways
-        if (this._masterGainNode) this._fadeOutWithMasterGainNode(duration);
-        //
-    } // _fadeOut
-
-    /**
-     * Clears the audio data.
-     */
-    clear() {
-        this.stop();
-        this._data = this._buffer = null;
-        this._sourceNode = this._gainNode = this._pannerNode = null;
-        this._totalTime = this._sampleRate = 0;
-        this._loop = this._loopStart = this._loopLength = 0;
-        this._loopStartTime = this._loopLengthTime = this._startTime = 0;
-        this._volume = this._pitch = 1;
-        [this._pan, this._endTimer] = [0, null];
-        [this._loadListeners, this._stopListeners] = [[], []];
-        this._lastUpdateTime = 0;
-        this._isLoaded = this._isError = this._isPlaying = false;
-        this._decoder = null;
-    } // clear
-
-    /**
-     * The url of the audio file.
-     *
-     * @readonly
-     * @type string
-     * @name WebAudio#url
-     */
-    get url() { return this._url; }
-
-    /**
-     * The volume of the audio.
-     *
-     * @type number
-     * @name WebAudio#volume
-     */
-    get volume() { return this._volume; }
-    set volume(value) {
-        this._volume = value;
-        if (!this._gainNode) return;
-        this._gainNode.gain.setValueAtTime(value, WebAudio._currentTime());
-    } // volume
-
-    /**
-     * The pitch of the audio.
-     *
-     * @type number
-     * @name WebAudio#pitch
-     */
-    get pitch() { return this._pitch; }
-    set pitch(value) {
-        if (this._pitch === value) return;
-        this._pitch = value;
-        if (this.isPlaying()) this.play(this._loop, 0);
-    } // pitch
-
-    /**
-     * The pan of the audio.
-     *
-     * @type number
-     * @name WebAudio#pan
-     */
-    get pan() { return this._pan; }
-    set pan(value) {
-        this._pan = value;
-        this._updatePanner();
-    } // pan
-
-    /**
-     * Checks whether the audio data is ready to play.
-     *
-     * @returns {boolean} True if the audio data is ready to play.
-     */
-    isReady() { return !!this._buffer; }
-
-    /**
-     * Checks whether a loading error has occurred.
-     *
-     * @returns {boolean} True if a loading error has occurred.
-     */
-    isError() { return this._isError; }
-
-    /**
-     * Checks whether the audio is playing.
-     *
-     * @returns {boolean} True if the audio is playing.
-     */
-    isPlaying() { return this._isPlaying; }
-
-    /**
-     * Plays the audio.
-     *
-     * @param {boolean} loop - Whether the audio data play in a loop.
-     * @param {number} offset - The start position to play in seconds.
-     */
-    play(loop, offset) {
-        this._loop = loop;
-        if (this.isReady()) {
-            this._startPlaying(offset || 0);
-        } else if (WebAudio._context) {
-            this.addLoadListener(this.play.bind(this, loop, offset));
-        }
-        this._isPlaying = true;
-    } // play
-
-    /**
-     * Stops the audio.
-     */
-    stop() {
-        this._isPlaying = false;
-        this._removeEndTimer();
-        this._removeNodes();
-        this._loadListeners = [];
-        // Edited to help plugins call stop listeners in better ways
-        if (this._stopListeners) this._callStopListeners();
-        //
-    } // stop
-
-    /**
-     * Destroys the audio.
-     */
-    destroy() {
-        this.stop();
-        this._destroyDecoder();
-    } // destroy
-
-    /**
-     * Performs the audio fade-in.
-     *
-     * @param {number} duration - Fade-in time in seconds.
-     */
-    fadeIn(duration) {
-        // Edited to help plugins alter fade in ready behaviors in better ways
-        if (this.isReady()) return this._fadeInWhenReady(duration);
-        //
-        this.addLoadListener(this.fadeIn.bind(this, duration));
-    } // fadeIn
-
-    /**
-     * Performs the audio fade-out.
-     *
-     * @param {number} duration - Fade-out time in seconds.
-     */
-    fadeOut(duration) {
-        // Edited to help plugins alter fade out with gain node in better ways
-        if (this._gainNode) this._fadeOutWithGainNode(duration);
-        //
-        [this._isPlaying, this._loadListeners] = [false, []];
-    } // fadeOut
-
-    /**
-     * Gets the seek position of the audio.
-     */
-    // Edited to help plugins alter seeking with context in better ways
-    seek() { return WebAudio._context ? this._seekWithContext() : 0; }
-    //
-
-    /**
-     * Adds a callback function that will be called when the audio data is loaded.
-     *
-     * @param {function} listner - The callback function.
-     */
-    addLoadListener(listner) { this._loadListeners.push(listner); }
-
-    /**
-     * Adds a callback function that will be called when the playback is stopped.
-     *
-     * @param {function} listner - The callback function.
-     */
-    addStopListener(listner) { this._stopListeners.push(listner); }
-
-    /**
-     * Tries to load the audio again.
-     */
-    retry() {
-        this._startLoading();
-        if (this._isPlaying) this.play(this._loop, 0);
-    } // retry
-
-    // Edited to help plugins alter start loading behaviors in better ways
-    _startLoading() { if (WebAudio._context) this._startLoadingWithContext(); }
-    //
-
-    _shouldUseDecoder() {
-        return !Utils.canPlayOgg() && typeof VorbisDecoder === "function";
-    } // _shouldUseDecoder
-
-    _createDecoder() {
-        this._decoder = new VorbisDecoder(
-            WebAudio._context,
-            this._onDecode.bind(this),
-            this._onError.bind(this)
-        );
-    } // _createDecoder
-
-    _destroyDecoder() {
-        if (!this._decoder) return;
-        this._decoder.destroy();
-        this._decoder = null;
-    } // _destroyDecoder
-
-    _realUrl() { return `${this._url}${Utils.hasEncryptedAudio() ? "_" : ""}`; }
-
-    // Edited to help plugins alter start loading xhr behaviors in better ways
-    _startXhrLoading(url) { this._newLoadingXhr(url).sned(); }
-    //
-
-    _startFetching(url) {
-        fetch(url).then(this._onFetch.bind(this)).catch(this._onError.bind(this));
-    } // _startFetching
-
-    _onXhrLoad(xhr) {
-        // Edited to help pluggins alter the xhr load behaviors in better ways
-        xhr.status < 400 ? this._onXhrLoadSuc(xhr) : this._onError();
-        //
-    } // _onXhrLoad
-
-    _onFetch(response) {
-        // Edited to help plugins alter on fetch ok behaviors in better ways
-        response.ok ? this._onFetchOk(response) : this._onError();
-        //
-    } // _onFetch
-
-    _onError() {
-        if (this._sourceNode) this._stopSourceNode();
-        [this._data, this._isError] = [null, true];
-    } // _onError
-
-    _onFetchProcess(value) {
-        const currentData = this._data;
-        const currentSize = currentData ? currentData.length : 0;
-        const newData = new Uint8Array(currentSize + value.length);
-        if (currentData) newData.set(currentData);
-        newData.set(value, currentSize);
-        this._data = newData;
-        this._updateBufferOnFetch();
-    } // _onFetchProcess
-
-    _updateBufferOnFetch() {
-        // [Note] Too frequent updates have a negative impact on sound quality.
-        //   In addition, decodeAudioData() may fail if the data is being fetched
-        //   and is too small.
-        const currentTime = performance.now();
-        const deltaTime = currentTime - this._lastUpdateTime;
-        /** @todo Extracts these codes into well-named functions */
-        if (deltaTime >= 500 && this._data.length >= 50000) {
-            this._updateBuffer();
-            this._lastUpdateTime = currentTime;
-        }
-        //
-    } // _updateBufferOnFetch
-
-    _updateBuffer() {
-        const arrayBuffer = this._readableBuffer();
-        this._readLoopComments(arrayBuffer);
-        this._decodeAudioData(arrayBuffer);
-    } // _updateBuffer
-
-    _readableBuffer() {
-        if (!Utils.hasEncryptedAudio()) return this._data.buffer;
-        return Utils.decryptArrayBuffer(this._data.buffer);
-    } // _readableBuffer
-
-    _decodeAudioData(arrayBuffer) {
-        if (this._shouldUseDecoder()) {
-            /** @todo Extracts these codes into a well-named function */
-            if (this._decoder) this._decoder.send(arrayBuffer, this._isLoaded);
-            //
-        } else {
-            // [Note] Make a temporary copy of arrayBuffer because
-            //   decodeAudioData() detaches it.
-            WebAudio._context
-                .decodeAudioData(arrayBuffer.slice())
-                .then(this._onDecode.bind(this))
-                .catch(this._onError.bind(this));
-        }
-    } // _decodeAudioData
-
-    _onDecode(buffer) {
-        [this._buffer, this._totalTime] = [buffer, buffer.duration];
-        /** @todo Extracts these codes into well-named functions */
-        if (this._loopLength > 0 && this._sampleRate > 0) {
-            this._loopStartTime = this._loopStart / this._sampleRate;
-            this._loopLengthTime = this._loopLength / this._sampleRate;
-        } else {
-            [this._loopStartTime, this._loopLengthTime] = [0, this._totalTime];
-        }
-        //
-        if (this._sourceNode) this._refreshSourceNode();
-        this._onLoad();
-    } // _onDecode
-
-    _refreshSourceNode() {
-        this._stopSourceNode();
-        this._createSourceNode();
-        // Edited to help plugins alter refresh source node in better ways
-        if (this._isPlaying) this._refreshSourceNodeWhenPlaying();
-        //
-    } // _refreshSourceNode
-
-    _startPlaying(offset) {
-        // Edited to help plugins alter the start playing offset in better ways
-        const playingOffset = this._startPlayingOffset(offset);
-        //
-        this._removeEndTimer();
-        this._removeNodes();
-        this._createPannerNode();
-        this._createGainNode();
-        this._createSourceNode();
-        this._startSourceNode(0, playingOffset);
-        this._startTime = WebAudio._currentTime() - playingOffset / this._pitch;
-        this._createEndTimer();
-    } // _startPlaying
-
-    _startSourceNode(when, offset) {
-        if (offset >= this._buffer.duration) return;
-        this._sourceNode.start(when, offset);
-    } // _startSourceNode
-
-    // Ignore InvalidStateError
-    _stopSourceNode() { try { this._sourceNode.stop(); } catch (e) {} }
-
-    _createPannerNode() {
-        this._pannerNode = WebAudio._context.createPanner();
-        this._pannerNode.panningModel = "equalpower";
-        this._pannerNode.connect(WebAudio._masterGainNode);
-        this._updatePanner();
-    } // _createPannerNode
-
-    _createGainNode() {
-        const currentTime = WebAudio._currentTime();
-        this._gainNode = WebAudio._context.createGain();
-        this._gainNode.gain.setValueAtTime(this._volume, currentTime);
-        this._gainNode.connect(this._pannerNode);
-    } // _createGainNode
-
-    _createSourceNode() {
-        const currentTime = WebAudio._currentTime();
-        this._sourceNode = WebAudio._context.createBufferSource();
-        this._sourceNode.buffer = this._buffer;
-        this._sourceNode.loop = this._loop && this._isLoaded;
-        this._sourceNode.loopStart = this._loopStartTime;
-        this._sourceNode.loopEnd = this._loopStartTime + this._loopLengthTime;
-        this._sourceNode.playbackRate.setValueAtTime(this._pitch, currentTime);
-        this._sourceNode.connect(this._gainNode);
-    } // _createSourceNode
-
-    // Edited to help plugins alter the remove nodes behaviors in better way
-    _removeNodes() { if (this._sourceNode) this._removeNodesWithSourceNode(); }
-
-    _createEndTimer() {
-        /** @todo Extracts these codes into well-named functions */
-        if (this._sourceNode && !this._loop) {
-            const endTime = this._startTime + this._totalTime / this._pitch;
-            const delay = endTime - WebAudio._currentTime();
-            this._endTimer = setTimeout(this.stop.bind(this), delay * 1000);
-        }
-        //
-    } // _createEndTimer
-
-    _removeEndTimer() {
-        if (!this._endTimer) return;
-        clearTimeout(this._endTimer);
-        this._endTimer = null;
-    } // _removeEndTimer
-
-    _updatePanner() {
-         if (!this._pannerNode) return;
-         this._pannerNode.setPosition(this._pan, 0, 1 - Math.abs(this._pan));
-    } // _updatePanner
-
-    _onLoad() {
-        while (!this._loadListeners.isEmpty()) this._loadListeners.shift()();
-    } // _onLoad
-
-    _readLoopComments(arrayBuffer) {
-        const view = new DataView(arrayBuffer), maxI = view.byteLength - 30;
-        let index = 0;
-        while (index < maxI) {
-            if (this._readFourCharacters(view, index) !== "OggS") break;
-            index += 26;
-            const [numSegments, segments] = [view.getUint8(index++), []];
-            for (let i = 0; i < numSegments; i++) {
-                segments.push(view.getUint8(index++));
-            }
-            // Edited to help plugins alter loop comment packets in better ways
-            const packets = this._loopCommentPackets(segments);
-            //
-            let vorbisHeaderFound = false;
-            packets.forEach(size => {
-                if (this._readFourCharacters(view, index + 1) === "vorb") {
-                    // Edited to help plugins alter read packet in better ways
-                    this._readLoopCommentPacket(view, index, size);
-                    //
-                    vorbisHeaderFound = true;
-                }
-                index += size;
-            });
-            if (!vorbisHeaderFound) break;
-        }
-    } // _readLoopComments
-
-    _readMetaData(view, index, size) {
-        const maxI = index + size - 10;
-        for (let i = index; i < maxI; i++) {
-            if (this._readFourCharacters(view, i) !== "LOOP") continue;
-            let text = "";
-            while (view.getUint8(i) > 0) {
-                text += String.fromCharCode(view.getUint8(i++));
-            }
-            // Edited to help plugins alter loop start/length in better ways
-            this._readMetaLoopStartLength(text);
-            //
-            if (text === "LOOPSTART" || text === "LOOPLENGTH") {
-                let text2 = "";
-                i += 16;
-                while (view.getUint8(i) > 0) {
-                    text2 += String.fromCharCode(view.getUint8(i++));
-                }
-                if (text === "LOOPSTART") {
-                    this._loopStart = parseInt(text2);
-                } else this._loopLength = parseInt(text2);
-            }
-        }
-    } // _readMetaData
-
-    _readFourCharacters(view, index) {
-        let string = "";
-        if (index <= view.byteLength - 4) {
-            for (let i = 0; i < 4; i++) {
-                string += String.fromCharCode(view.getUint8(index + i));
-            }
-        }
-        return string;
-    } // _readFourCharacters
-
-    /**
-     * Creates the master gain node with the global web audio context
-     * Idempotent
-     * @author DoubleX @since 0.9.5 @version 0.9.5
-     */
-    static _createMasterGainNodeWithContext() {
-        this._masterGainNode = this._context.createGain();
-        this._resetVolume();
-        this._masterGainNode.connect(this._context.destination);
-    } // _createMasterGainNodeWithContext
-
-    /**
-     * Resets the master volume with its master gain node being present
-     * Idempotent
-     * @author DoubleX @since 0.9.5 @version 0.9.5
-     */
-    static _resetVolWithMasterGainNode() {
-        const [gain, volume] = [this._masterGainNode.gain, this._masterVolume];
-        const currentTime = this._currentTime();
-        gain.setValueAtTime(volume, currentTime);
-    } // _resetVolWithMasterGainNode
-
-    /**
-     * Fades in the global web audio with its master gain node being present
-     * Idempotent
-     * @author DoubleX @since 0.9.5 @version 0.9.5
-     * @param {number} duration - Fade-out time in seconds
-     */
-    static _fadeInWithMasterGainNode(duration) {
-        const [gain, volume] = [this._masterGainNode.gain, this._masterVolume];
-        const currentTime = this._currentTime();
-        /** @todo Dries up these codes representing identical knowledge */
-        gain.setValueAtTime(0, currentTime);
-        gain.linearRampToValueAtTime(volume, currentTime + duration);
-        //
-    } // _fadeInWithMasterGainNode
-
-    /**
-     * Fades out the global web audio with its master gain node being present
-     * Idempotent
-     * @author DoubleX @since 0.9.5 @version 0.9.5
-     * @param {number} duration - Fade-out time in seconds
-     */
-    static _fadeOutWithMasterGainNode(duration) {
-        const [gain, volume] = [this._masterGainNode.gain, this._masterVolume];
-        const currentTime = this._currentTime();
-        /** @todo Dries up these codes representing identical knowledge */
-        gain.setValueAtTime(volume, currentTime);
-        gain.linearRampToValueAtTime(0, currentTime + duration);
-        //
-    } // _fadeOutWithMasterGainNode
-
-    /**
-     * Calls all stop listeners when this web audio's just stopped
-     * Idempotent
-     * @author DoubleX @since 0.9.5 @version 0.9.5
-     * @param {number} duration - Fade-out time in seconds
-     */
-    _callStopListeners() {
-        while (!this._stopListeners.isEmpty()) this._stopListeners.shift()();
-    } // _callStopListeners
-
-    /**
-     * Fades in this web audio when it's ready
-     * Idempotent
-     * @author DoubleX @since 0.9.5 @version 0.9.5
-     * @param {number} duration - Fade-out time in seconds
-     */
-    _fadeInWhenReady(duration) {
-        if (this._gainNode) this._fadeInWhenReadyWithGainNode(duration);
-    } // _fadeInWhenReady
-
-    /**
-     * Fades in this web audio when it's ready with its gain node being present
-     * Idempotent
-     * @author DoubleX @since 0.9.5 @version 0.9.5
-     * @param {number} duration - Fade-out time in seconds
-     */
-    _fadeInWhenReadyWithGainNode(duration) {
-        const gain = this._gainNode.gain;
-        const currentTime = WebAudio._currentTime();
-        /** @todo Dries up these codes representing identical knowledge */
-        gain.setValueAtTime(0, currentTime);
-        gain.linearRampToValueAtTime(this._volume, currentTime + duration);
-        //
-    } // _fadeInWhenReadyWithGainNode
-
-    /**
-     * Fades out this web audio with its gain node being present
-     * Idempotent
-     * @author DoubleX @since 0.9.5 @version 0.9.5
-     * @param {number} duration - Fade-out time in seconds
-     */
-    _fadeOutWithGainNode(duration) {
-        const gain = this._gainNode.gain;
-        const currentTime = WebAudio._currentTime();
-        /** @todo Dries up these codes representing identical knowledge */
-        gain.setValueAtTime(this._volume, currentTime);
-        gain.linearRampToValueAtTime(0, currentTime + duration);
-        //
-    } // _fadeOutWithGainNode
-
-    /**
-     * Nullipotent
-     * @author DoubleX @since 0.9.5 @version 0.9.5
-     * @returns {number} The seek position of this web audio with global context
-     */
-    _seekWithContext() {
-        let pos = (WebAudio._currentTime() - this._startTime) * this._pitch;
-        if (this._loopLength > 0) {
-            const seekPos = this._loopStart + this._loopLength;
-            while (pos >= seekPos) pos -= this._loopLength;
-        }
-        return pos;
-    } // _seekWithContext
-
-    /**
-     * Starts loading this web audio data with the global web audio context
-     * Idempotent
-     * @author DoubleX @since 0.9.5 @version 0.9.5
-     */
-    _startLoadingWithContext() {
-        const url = this._realUrl();
-        Utils.isLocal() ? this._startXhrLoading(url) : this._startFetching(url);
-        this._lastUpdateTime = -10000;
-        this._isError = this._isLoaded = false;
-        this._destroyDecoder();
-        if (this._shouldUseDecoder()) this._createDecoder();
-    } // _startLoadingWithContext
-
-    /**
-     * Nullipotent
-     * @author DoubleX @since 0.9.5 @version 0.9.5
-     * @returns {XMLHttpRequest} The GET XMLHttpRequest receiving array buffers
-     */
-    _newLoadingXhr(url) {
-        const xhr = new XMLHttpRequest();
-        xhr.open("GET", url);
-        xhr.responseType = "arraybuffer";
-        xhr.onload = this._onXhrLoad.bind(this, xhr);
-        xhr.onerror = this._onError.bind(this);
-        return xhr;
-    } // _newLoadingXhr
-
-    /**
-     * Loads the data and updates the buffer of this local web audio
-     * Idempotent
-     * @author DoubleX @since 0.9.5 @version 0.9.5
-     * @param {XMLHttpRequest} xhr - The GET XMLHttpRequest with array buffers
-     */
-    _onXhrLoadSuc(xhr) {
-        [this._data, this._isLoaded] = [new Uint8Array(xhr.response), true];
-        this._updateBuffer();
-    } // _onXhrLoadSuc
-
-    /**
-     * Triggers the events when the non-local web audio fetches' okay
-     * Idempotent
-     * @author DoubleX @since 0.9.5 @version 0.9.5
-     * @param {Response} response - The non-local web audio fetch okay response
-     */
-    _onFetchOk(response) {
-        const reader = response.body.getReader();
-        /** @todo Extracts this into a method without obscuring the recursion */
-        const readChunk = ({ done, value }) => {
-            if (done) {
-                this._isLoaded = true;
-                this._updateBuffer();
-                return 0;
-            } else {
-                this._onFetchProcess(value);
-                return reader.read().then(readChunk);
-            }
-        };
-        //
-        reader.read().then(readChunk).catch(this._onError.bind(this));
-    } // _onFetchOk
-
-    /**
-     * Refreshes the source node of this web audio when it's playing
-     * Idempotent
-     * @author DoubleX @since 0.9.5 @version 0.9.5
-     */
-    _refreshSourceNodeWhenPlaying() {
-        const currentTime = WebAudio._currentTime();
-        this._startSourceNode(0, (currentTime - this._startTime) * this._pitch);
-        this._removeEndTimer();
-        this._createEndTimer();
-    } // _refreshSourceNodeWhenPlaying
-
-    /**
-     * Nullipotent
-     * @author DoubleX @since 0.9.5 @version 0.9.5
-     * @param {number} offset - The raw start playing offset of this web audio
-     * @returns {number} The corrected start playing offset of this web audio
-     */
-    _startPlayingOffset(offset) {
-        if (this._loopLengthTime <= 0) return offset;
-        const loopEnd = this._loopStartTime + this._loopLengthTime;
-        let playingOffset = offset;
-        while (playingOffset >= loopEnd) playingOffset -= this._loopLengthTime;
-        return playingOffset;
-    } // _startPlayingOffset
-
-    /**
-     * This method shouldn't be called without an existing source node
-     * Idempotent
-     * @author DoubleX @since 0.9.5 @version 0.9.5
-     */
-    _removeNodesWithSourceNode() {
-        this._stopSourceNode();
-        this._sourceNode = this._gainNode = this._pannerNode = null;
-    } // _removeNodesWithSourceNode
-
-    /**
-     * Reads the loop comment from a packet in the packet list of this web audio
-     * Idempotent
-     * @author DoubleX @since 0.9.5 @version 0.9.5
-     * @param {[uint8]} segments - The list of 8 bit integers in array buffer
-     * @returns {[number]} The list of the sizes of the loop comment packets
-     */
-    _loopCommentPackets(segments) {
-        const packets = [];
-        while (!segments.isEmpty()) {
-            let packetSize = 0;
-            while (segments[0] === 255) packetSize += segments.shift();
-            packetSize += segments.shift();
-            packets.push(packetSize);
-        }
-        return packets;
-    } // _loopCommentPackets
-
-    /**
-     * Reads the loop comment from a packet in the packet list of this web audio
-     * Idempotent
-     * @author DoubleX @since 0.9.5 @version 0.9.5
-     * @param {DataView} view - The data view of the loop comment array buffer
-     * @param {index} i - The index of the current byte in the data array buffer
-     * @param {number} size - The size of this packet to be read
-     */
-    _readLoopCommentPacket(view, i, size) {
-        const headerType = view.getUint8(i);
-        if (headerType === 1) {
-            this._sampleRate = view.getUint32(i + 12, true);
-        } else if (headerType === 3) this._readMetaData(view, i, size);
-    } // _readLoopCommentPacket
-
-    /**
-     * Reads the loop start and length meta data for this web audio
-     * Idempotent
-     * @author DoubleX @since 0.9.5 @version 0.9.5
-     * @param {string} text - The meta data text having the loop start/length
-     */
-    _readMetaLoopStartLength(text) {
-        if (text.match(/LOOPSTART=([0-9]+)/)) {
-            this._loopStart = parseInt(RegExp.$1);
-        }
-        if (!text.match(/LOOPLENGTH=([0-9]+)/)) return;
-        this._loopLength = parseInt(RegExp.$1);
-    } // _readMetaLoopStartLength
-
-} // WebAudio
 
 /*----------------------------------------------------------------------------
  *    # Rewritten class: Window
@@ -7361,3 +5058,2306 @@ class WindowLayer extends PIXI.Container {
 // It's just to play safe in case of any plugin extending PIXI.Container in ES6
 ES6ExtendedClassAlias.inherit(WindowLayer);
 //
+
+/*----------------------------------------------------------------------------
+ *    # Rewritten class: Weather
+ *      - Rewrites it into the ES6 standard
+ *----------------------------------------------------------------------------*/
+
+//-----------------------------------------------------------------------------
+/**
+ * The weather effect which displays rain, storm, or snow.
+ *
+ * @class
+ * @extends PIXI.Container
+ */
+class Weather extends PIXI.Container {
+
+    constructor() {
+        super();
+        // Edited to help plugins initialize private variables in better ways
+        this._initPrivateVars();
+        //
+        this._createBitmaps();
+        this._createDimmer();
+        // Edited to help plugins initialize public variables in better ways
+        this._initPublicVars();
+        //
+    } // constructor
+
+    /**
+     * Destroys the weather.
+     */
+    destroy() {
+        super.destroy({ children: true, texture: true });
+        this._rainBitmap.destroy();
+        this._stormBitmap.destroy();
+        this._snowBitmap.destroy();
+    } // destroy
+
+    /**
+     * Updates the weather for each frame.
+     */
+    update() {
+        this._updateDimmer();
+        this._updateAllSprites();
+    } // update
+
+    _createBitmaps() {
+        this._rainBitmap = new Bitmap(1, 60);
+        this._rainBitmap.fillAll("white");
+        this._stormBitmap = new Bitmap(2, 100);
+        this._stormBitmap.fillAll("white");
+        this._snowBitmap = new Bitmap(9, 9);
+        this._snowBitmap.drawCircle(4, 4, 4, "white");
+    } // _createBitmaps
+
+    _createDimmer() {
+        this._dimmerSprite = new ScreenSprite();
+        this._dimmerSprite.setColor(80, 80, 80);
+        this.addChild(this._dimmerSprite);
+    } // _createDimmer
+
+    _updateDimmer() {
+        this._dimmerSprite.opacity = Math.floor(this.power * 6);
+    } // _updateDimmer
+
+    _updateAllSprites() {
+        const maxSprites = Math.floor(this.power * 10);
+        while (this._sprites.length < maxSprites) this._addSprite();
+        while (this._sprites.length > maxSprites) this._removeSprite();
+        this._sprites.forEach(sprite => {
+            this._updateSprite(sprite);
+            sprite.x = sprite.ax - this.origin.x;
+            sprite.y = sprite.ay - this.origin.y;
+        });
+    } // _updateAllSprites
+
+    _addSprite() {
+        // Edited to help plugins alter sprite add behaviors in better ways
+        const sprite = this._newSprite();
+        //
+        this._sprites.push(sprite);
+        this.addChild(sprite);
+    } // _addSprite
+
+    _removeSprite() { this.removeChild(this._sprites.pop()); }
+
+    _updateSprite(sprite) {
+        switch (this.type) {
+            case "rain":
+                this._updateRainSprite(sprite);
+                break;
+            case "storm":
+                this._updateStormSprite(sprite);
+                break;
+            case "snow":
+                this._updateSnowSprite(sprite);
+                break;
+        }
+        /** @todo Figures out where does 40 come from */
+        if (sprite.opacity < 40) this._rebornSprite(sprite);
+        //
+    } // _updateSprite
+
+    _updateRainSprite(sprite) {
+        // Edited to dry up codes essentially being the identical knowledge
+        this._updateWeatherSprite(sprite, this._rainBitmap, Math.PI / 16, 6);
+        //
+    } // _updateRainSprite
+
+    _updateStormSprite(sprite) {
+        // Edited to dry up codes essentially being the identical knowledge
+        this._updateWeatherSprite(sprite, this._stormBitmap, Math.PI / 8, 8);
+        //
+    } // _updateStormSprite
+
+    _updateSnowSprite(sprite) {
+        // Edited to dry up codes essentially being the identical knowledge
+        this._updateWeatherSprite(sprite, this._snowBitmap, Math.PI / 16, 3);
+        //
+    } // _updateSnowSprite
+
+    /**
+     * Initializes all private variables of this weather
+     * Idempotent
+     * @author DoubleX @since 0.9.5 @version 0.9.5
+     */
+    _initPrivateVars() {
+        [this._width, this._height] = [Graphics.width, Graphics.height];
+        this._sprites = [];
+    } // _initPrivateVars
+
+    /**
+     * Initializes all public variables of this weather
+     * Idempotent
+     * @author DoubleX @since 0.9.5 @version 0.9.5
+     */
+    _initPublicVars() {
+        /**
+         * The type of the weather in ["none", "rain", "storm", "snow"].
+         *
+         * @type string
+         */
+        this.type = "none";
+        /**
+         * The power of the weather in the range (0, 9).
+         *
+         * @type number
+         */
+        this.power = 0;
+        /**
+         * The origin point of the tiling sprite for scrolling.
+         *
+         * @type Point
+         */
+        this.origin = new Point();
+    } // _initPublicVars
+
+    /**
+     * Nullipotent
+     * @author DoubleX @since 0.9.5 @version 0.9.5
+     * @returns {Sprite} The new weather sprite to be added in the list
+     */
+    _newSprite() {
+        const sprite = new Sprite(this.viewport);
+        sprite.opacity = 0;
+        return sprite;
+    } // _newSprite
+
+    /**
+     * Updates the sprite with the specified weather, radian and opacity change
+     * Idempotent
+     * @author DoubleX @since 0.9.5 @version 0.9.5
+     * @param {Sprite} sprite - The weather sprite to be updated
+     * @param {Bitmap} bitmap - The new bitmap of the weather sprite
+     * @param {number} radian - The new rotation of the weather sprite
+     * @param {number} opacityDecrement - The weather sprite opacity decrement
+     */
+    _updateWeatherSprite(sprite, bitmap, radian, opacityDecrement) {
+        [sprite.bitmap, sprite.rotation] = [bitmap, radian];
+        sprite.ax -= opacityDecrement * Math.sin(sprite.rotation);
+        sprite.ay += opacityDecrement * Math.cos(sprite.rotation);
+        sprite.opacity -= opacityDecrement;
+    } // _updateWeatherSprite
+
+} // Weather
+// It's just to play safe in case of any plugin extending PIXI.Container in ES6
+ES6ExtendedClassAlias.inherit(Weather);
+//
+
+/*----------------------------------------------------------------------------
+ *    # Rewritten class: ColorFilter
+ *      - Rewrites it into the ES6 standard
+ *----------------------------------------------------------------------------*/
+
+//-----------------------------------------------------------------------------
+/**
+ * The color filter for WebGL.
+ *
+ * @class
+ * @extends PIXI.Filter
+ */
+
+class ColorFilter extends PIXI.Filter {
+
+    constructor() {
+        super(null, this._fragmentSrc());
+        // Edited to help plugins setup the color filter uniforms in better ways
+        this._initUniforms();
+        //
+    } // constructor
+
+    /**
+     * Sets the hue rotation value.
+     *
+     * @param {number} hue - The hue value (-360, 360).
+     */
+    setHue(hue) { this.uniforms.hue = +hue; }
+
+    /**
+     * Sets the color tone.
+     *
+     * @param {array} tone - The color tone [r, g, b, gray].
+     */
+    setColorTone(tone) {
+        if (!(tone instanceof Array)) {
+            throw new Error("Argument must be an array");
+        }
+        this.uniforms.colorTone = tone.clone();
+    } // setColorTone
+
+    /**
+     * Sets the blend color.
+     *
+     * @param {array} color - The blend color [r, g, b, a].
+     */
+    setBlendColor(color) {
+        if (!(color instanceof Array)) {
+            throw new Error("Argument must be an array");
+        }
+        this.uniforms.blendColor = color.clone();
+    } // setBlendColor
+
+    /**
+     * Sets the brightness.
+     *
+     * @param {number} brightness - The brightness (0 to 255).
+     */
+      setBrightness(brightness) { this.uniforms.brightness = +brightness; }
+
+    _fragmentSrc() {
+        return `varying vec2 vTextureCoord;
+                uniform sampler2D uSampler;
+                uniform float hue;
+                uniform vec4 colorTone;
+                uniform vec4 blendColor;
+                uniform float brightness;
+                vec3 rgbToHsl(vec3 rgb) {
+                  float r = rgb.r;
+                  float g = rgb.g;
+                  float b = rgb.b;
+                  float cmin = min(r, min(g, b));
+                  float cmax = max(r, max(g, b));
+                  float h = 0.0;
+                  float s = 0.0;
+                  float l = (cmin + cmax) / 2.0;
+                  float delta = cmax - cmin;
+                  if (delta > 0.0) {
+                    if (r == cmax) {
+                      h = mod((g - b) / delta + 6.0, 6.0) / 6.0;
+                    } else if (g == cmax) {
+                      h = ((b - r) / delta + 2.0) / 6.0;
+                    else {
+                      h = ((r - g) / delta + 4.0) / 6.0;
+                    }
+                    if (l < 1.0) {
+                      s = delta / (1.0 - abs(2.0 * l - 1.0));
+                    }
+                  }
+                  return vec3(h, s, l);
+                }
+                vec3 hslToRgb(vec3 hsl) {
+                  float h = hsl.x;
+                  float l = hsl.z;
+                  float c = (1.0 - abs(2.0 * l - 1.0)) * hsl.y;
+                  float m = l - c / 2.0;
+                  float cm = c + m;
+                  float xm = c * (1.0 - abs((mod(h * 6.0, 2.0)) - 1.0)) + m;
+                  if (h < 1.0 / 6.0) {
+                    return vec3(cm, xm, m);
+                  } else if (h < 2.0 / 6.0) {
+                    return vec3(xm, cm, m);
+                  } else if (h < 3.0 / 6.0) {
+                    return vec3(m, cm, xm);
+                  } else if (h < 4.0 / 6.0) {
+                    return vec3(m, xm, cm);
+                  } else if (h < 5.0 / 6.0) {
+                    return vec3(xm, m, cm);
+                  } else {
+                    return vec3(cm, m, xm);
+                  }
+                }
+                float fragColorR(float r, float a, float i1, float i3) {
+                  r = clamp((r / a + colorTone.r / 255.0) * a, 0.0, 1.0);
+                  r = clamp(r * i1 + blendColor.r / 255.0 * i3 * a, 0.0, 1.0);
+                  return r * brightness / 255.0;
+                }
+                float fragColorG(float g, float a, float i1, float i3) {
+                  g = clamp((g / a + colorTone.g / 255.0) * a, 0.0, 1.0);
+                  g = clamp(g * i1 + blendColor.g / 255.0 * i3 * a, 0.0, 1.0);
+                  return g * brightness / 255.0;
+                }
+                float fragColorB(float b, float a, float i1, float i3) {
+                  b = clamp((b / a + colorTone.b / 255.0) * a, 0.0, 1.0);
+                  b = clamp(b * i1 + blendColor.b / 255.0 * i3 * a, 0.0, 1.0);
+                  return b * brightness / 255.0;
+                }
+                void main() {
+                  vec4 sample = texture2D(uSampler, vTextureCoord);
+                  float a = sample.a;
+                  vec3 hsl = rgbToHsl(sample.rgb);
+                  hsl.x = mod(hsl.x + hue / 360.0, 1.0);
+                  hsl.y = hsl.y * (1.0 - colorTone.a / 255.0);
+                  vec3 rgb = hslToRgb(hsl);
+                  float i3 = blendColor.a / 255.0;
+                  float i1 = 1.0 - i3;
+                  float r = fragColorR(rgb.r, a, i1, i3);
+                  float g = fragColorG(rgb.g, a, i1, i3);
+                  float b = fragColorB(rgb.b, a, i1, i3);
+                  gl_FragColor = vec4(r, g, b, a);
+                }`;
+    } // _fragmentSrc
+
+    /**
+     * Initializes the uniforms of this color filter
+     * Idempotent
+     * @author DoubleX @since 0.9.5 @version 0.9.5
+     */
+    _initUniforms() {
+        this.uniforms.hue = 0;
+        this.uniforms.colorTone = [0, 0, 0, 0];
+        this.uniforms.blendColor = [0, 0, 0, 0];
+        this.uniforms.brightness = 255;
+    } // _initUniforms
+
+} // ColorFilter
+// It's just to play safe in case of any plugin extending PIXI.Filter in ES6 way
+ES6ExtendedClassAlias.inherit(ColorFilter);
+//
+
+/*----------------------------------------------------------------------------
+ *    # Rewritten class: Stage
+ *      - Rewrites it into the ES6 standard
+ *----------------------------------------------------------------------------*/
+
+//-----------------------------------------------------------------------------
+/**
+ * The root object of the display tree.
+ *
+ * @class
+ * @extends PIXI.Container
+ */
+class Stage extends PIXI.Container {
+
+    destroy() { super.destroy({ children: true, texture: true }); }
+
+} // Stage
+// It's just to play safe in case of any plugin extending PIXI.Container in ES6
+ES6ExtendedClassAlias.inherit(Stage);
+//
+
+/*----------------------------------------------------------------------------
+ *    # Rewritten class: WebAudio
+ *      - Rewrites it into the ES6 standard
+ *----------------------------------------------------------------------------*/
+
+//-----------------------------------------------------------------------------
+/**
+ * The audio object of Web Audio API.
+ *
+ * @class
+ * @param {string} url - The url of the audio file.
+ */
+class WebAudio {
+
+    constructor(url) {
+        this.clear();
+        this._url = url;
+        this._startLoading();
+    } // constructor
+
+    /**
+     * Initializes the audio system.
+     *
+     * @returns {boolean} True if the audio system is available.
+     */
+    static initialize() {
+        this._context = this._masterGainNode = null;
+        this._masterVolume = 1;
+        this._createContext();
+        this._createMasterGainNode();
+        this._setupEventHandlers();
+        return !!this._context;
+    } // initialize
+
+    /**
+     * Sets the master volume for all audio.
+     *
+     * @param {number} value - The master volume (0 to 1).
+     */
+    static setMasterVolume(value) {
+        this._masterVolume = value;
+        this._resetVolume();
+    } // setMasterVolume
+
+    static _createContext() {
+        try {
+            const AudioContext = window.AudioContext || window.webkitAudioContext;
+            this._context = new AudioContext();
+        } catch (e) { this._context = null; }
+    } // _createContext
+
+    static _currentTime() {
+        return this._context ? this._context.currentTime : 0;
+    } // _currentTime
+
+    static _createMasterGainNode() {
+        // Edited to help plugins create master gain node in better ways
+        if (this._context) this._createMasterGainNodeWithContext();
+        //
+    } // _createMasterGainNode
+
+    static _setupEventHandlers() {
+        const onUserGesture = this._onUserGesture.bind(this);
+        const onVisibilityChange = this._onVisibilityChange.bind(this);
+        document.addEventListener("keydown", onUserGesture);
+        document.addEventListener("mousedown", onUserGesture);
+        document.addEventListener("touchend", onUserGesture);
+        document.addEventListener("visibilitychange", onVisibilityChange);
+    } // _setupEventHandlers
+
+    static _onUserGesture() {
+        const context = this._context;
+        if (context && context.state === "suspended") context.resume();
+    } // _onUserGesture
+
+    static _onVisibilityChange() {
+        if (document.visibilityState === "hidden") return this._onHide();
+        this._onShow();
+    } // _onVisibilityChange
+
+    static _onHide() {
+        if (this._shouldMuteOnHide()) this._fadeOut(1);
+    } // _onHide
+
+    static _onShow() {
+        if (this._shouldMuteOnHide()) this._fadeIn(1);
+    } // _onShow
+
+    static _shouldMuteOnHide() {
+        return Utils.isMobileDevice() && !window.navigator.standalone;
+    } // _shouldMuteOnHide
+
+    static _resetVolume() {
+        // Edited to help plugins reset volume with gain node in better ways
+        if (this._masterGainNode) this._resetVolWithMasterGainNode();
+        //
+    } // _resetColume
+
+    static _fadeIn(duration) {
+        // Edited to help plugins fade in with master gain node in better ways
+        if (this._masterGainNode) this._fadeInWithMasterGainNode(duration);
+        //
+    } // _fadeIn
+
+    static _fadeOut(duration) {
+        // Edited to help plugins fade out with master gain node in better ways
+        if (this._masterGainNode) this._fadeOutWithMasterGainNode(duration);
+        //
+    } // _fadeOut
+
+    /**
+     * Clears the audio data.
+     */
+    clear() {
+        this.stop();
+        this._data = this._buffer = null;
+        this._sourceNode = this._gainNode = this._pannerNode = null;
+        this._totalTime = this._sampleRate = 0;
+        this._loop = this._loopStart = this._loopLength = 0;
+        this._loopStartTime = this._loopLengthTime = this._startTime = 0;
+        this._volume = this._pitch = 1;
+        [this._pan, this._endTimer] = [0, null];
+        [this._loadListeners, this._stopListeners] = [[], []];
+        this._lastUpdateTime = 0;
+        this._isLoaded = this._isError = this._isPlaying = false;
+        this._decoder = null;
+    } // clear
+
+    /**
+     * The url of the audio file.
+     *
+     * @readonly
+     * @type string
+     * @name WebAudio#url
+     */
+    get url() { return this._url; }
+
+    /**
+     * The volume of the audio.
+     *
+     * @type number
+     * @name WebAudio#volume
+     */
+    get volume() { return this._volume; }
+    set volume(value) {
+        this._volume = value;
+        if (!this._gainNode) return;
+        this._gainNode.gain.setValueAtTime(value, WebAudio._currentTime());
+    } // volume
+
+    /**
+     * The pitch of the audio.
+     *
+     * @type number
+     * @name WebAudio#pitch
+     */
+    get pitch() { return this._pitch; }
+    set pitch(value) {
+        if (this._pitch === value) return;
+        this._pitch = value;
+        if (this.isPlaying()) this.play(this._loop, 0);
+    } // pitch
+
+    /**
+     * The pan of the audio.
+     *
+     * @type number
+     * @name WebAudio#pan
+     */
+    get pan() { return this._pan; }
+    set pan(value) {
+        this._pan = value;
+        this._updatePanner();
+    } // pan
+
+    /**
+     * Checks whether the audio data is ready to play.
+     *
+     * @returns {boolean} True if the audio data is ready to play.
+     */
+    isReady() { return !!this._buffer; }
+
+    /**
+     * Checks whether a loading error has occurred.
+     *
+     * @returns {boolean} True if a loading error has occurred.
+     */
+    isError() { return this._isError; }
+
+    /**
+     * Checks whether the audio is playing.
+     *
+     * @returns {boolean} True if the audio is playing.
+     */
+    isPlaying() { return this._isPlaying; }
+
+    /**
+     * Plays the audio.
+     *
+     * @param {boolean} loop - Whether the audio data play in a loop.
+     * @param {number} offset - The start position to play in seconds.
+     */
+    play(loop, offset) {
+        this._loop = loop;
+        if (this.isReady()) {
+            this._startPlaying(offset || 0);
+        } else if (WebAudio._context) {
+            this.addLoadListener(this.play.bind(this, loop, offset));
+        }
+        this._isPlaying = true;
+    } // play
+
+    /**
+     * Stops the audio.
+     */
+    stop() {
+        this._isPlaying = false;
+        this._removeEndTimer();
+        this._removeNodes();
+        this._loadListeners = [];
+        // Edited to help plugins call stop listeners in better ways
+        if (this._stopListeners) this._callStopListeners();
+        //
+    } // stop
+
+    /**
+     * Destroys the audio.
+     */
+    destroy() {
+        this.stop();
+        this._destroyDecoder();
+    } // destroy
+
+    /**
+     * Performs the audio fade-in.
+     *
+     * @param {number} duration - Fade-in time in seconds.
+     */
+    fadeIn(duration) {
+        // Edited to help plugins alter fade in ready behaviors in better ways
+        if (this.isReady()) return this._fadeInWhenReady(duration);
+        //
+        this.addLoadListener(this.fadeIn.bind(this, duration));
+    } // fadeIn
+
+    /**
+     * Performs the audio fade-out.
+     *
+     * @param {number} duration - Fade-out time in seconds.
+     */
+    fadeOut(duration) {
+        // Edited to help plugins alter fade out with gain node in better ways
+        if (this._gainNode) this._fadeOutWithGainNode(duration);
+        //
+        [this._isPlaying, this._loadListeners] = [false, []];
+    } // fadeOut
+
+    /**
+     * Gets the seek position of the audio.
+     */
+    // Edited to help plugins alter seeking with context in better ways
+    seek() { return WebAudio._context ? this._seekWithContext() : 0; }
+    //
+
+    /**
+     * Adds a callback function that will be called when the audio data is loaded.
+     *
+     * @param {function} listner - The callback function.
+     */
+    addLoadListener(listner) { this._loadListeners.push(listner); }
+
+    /**
+     * Adds a callback function that will be called when the playback is stopped.
+     *
+     * @param {function} listner - The callback function.
+     */
+    addStopListener(listner) { this._stopListeners.push(listner); }
+
+    /**
+     * Tries to load the audio again.
+     */
+    retry() {
+        this._startLoading();
+        if (this._isPlaying) this.play(this._loop, 0);
+    } // retry
+
+    // Edited to help plugins alter start loading behaviors in better ways
+    _startLoading() { if (WebAudio._context) this._startLoadingWithContext(); }
+    //
+
+    _shouldUseDecoder() {
+        return !Utils.canPlayOgg() && typeof VorbisDecoder === "function";
+    } // _shouldUseDecoder
+
+    _createDecoder() {
+        this._decoder = new VorbisDecoder(
+            WebAudio._context,
+            this._onDecode.bind(this),
+            this._onError.bind(this)
+        );
+    } // _createDecoder
+
+    _destroyDecoder() {
+        if (!this._decoder) return;
+        this._decoder.destroy();
+        this._decoder = null;
+    } // _destroyDecoder
+
+    _realUrl() { return `${this._url}${Utils.hasEncryptedAudio() ? "_" : ""}`; }
+
+    // Edited to help plugins alter start loading xhr behaviors in better ways
+    _startXhrLoading(url) { this._newLoadingXhr(url).sned(); }
+    //
+
+    _startFetching(url) {
+        fetch(url).then(this._onFetch.bind(this)).catch(this._onError.bind(this));
+    } // _startFetching
+
+    _onXhrLoad(xhr) {
+        // Edited to help pluggins alter the xhr load behaviors in better ways
+        xhr.status < 400 ? this._onXhrLoadSuc(xhr) : this._onError();
+        //
+    } // _onXhrLoad
+
+    _onFetch(response) {
+        // Edited to help plugins alter on fetch ok behaviors in better ways
+        response.ok ? this._onFetchOk(response) : this._onError();
+        //
+    } // _onFetch
+
+    _onError() {
+        if (this._sourceNode) this._stopSourceNode();
+        [this._data, this._isError] = [null, true];
+    } // _onError
+
+    _onFetchProcess(value) {
+        const currentData = this._data;
+        const currentSize = currentData ? currentData.length : 0;
+        const newData = new Uint8Array(currentSize + value.length);
+        if (currentData) newData.set(currentData);
+        newData.set(value, currentSize);
+        this._data = newData;
+        this._updateBufferOnFetch();
+    } // _onFetchProcess
+
+    _updateBufferOnFetch() {
+        // [Note] Too frequent updates have a negative impact on sound quality.
+        //   In addition, decodeAudioData() may fail if the data is being fetched
+        //   and is too small.
+        const currentTime = performance.now();
+        const deltaTime = currentTime - this._lastUpdateTime;
+        /** @todo Extracts these codes into well-named functions */
+        if (deltaTime >= 500 && this._data.length >= 50000) {
+            this._updateBuffer();
+            this._lastUpdateTime = currentTime;
+        }
+        //
+    } // _updateBufferOnFetch
+
+    _updateBuffer() {
+        const arrayBuffer = this._readableBuffer();
+        this._readLoopComments(arrayBuffer);
+        this._decodeAudioData(arrayBuffer);
+    } // _updateBuffer
+
+    _readableBuffer() {
+        if (!Utils.hasEncryptedAudio()) return this._data.buffer;
+        return Utils.decryptArrayBuffer(this._data.buffer);
+    } // _readableBuffer
+
+    _decodeAudioData(arrayBuffer) {
+        if (this._shouldUseDecoder()) {
+            /** @todo Extracts these codes into a well-named function */
+            if (this._decoder) this._decoder.send(arrayBuffer, this._isLoaded);
+            //
+        } else {
+            // [Note] Make a temporary copy of arrayBuffer because
+            //   decodeAudioData() detaches it.
+            WebAudio._context
+                .decodeAudioData(arrayBuffer.slice())
+                .then(this._onDecode.bind(this))
+                .catch(this._onError.bind(this));
+        }
+    } // _decodeAudioData
+
+    _onDecode(buffer) {
+        [this._buffer, this._totalTime] = [buffer, buffer.duration];
+        /** @todo Extracts these codes into well-named functions */
+        if (this._loopLength > 0 && this._sampleRate > 0) {
+            this._loopStartTime = this._loopStart / this._sampleRate;
+            this._loopLengthTime = this._loopLength / this._sampleRate;
+        } else {
+            [this._loopStartTime, this._loopLengthTime] = [0, this._totalTime];
+        }
+        //
+        if (this._sourceNode) this._refreshSourceNode();
+        this._onLoad();
+    } // _onDecode
+
+    _refreshSourceNode() {
+        this._stopSourceNode();
+        this._createSourceNode();
+        // Edited to help plugins alter refresh source node in better ways
+        if (this._isPlaying) this._refreshSourceNodeWhenPlaying();
+        //
+    } // _refreshSourceNode
+
+    _startPlaying(offset) {
+        // Edited to help plugins alter the start playing offset in better ways
+        const playingOffset = this._startPlayingOffset(offset);
+        //
+        this._removeEndTimer();
+        this._removeNodes();
+        this._createPannerNode();
+        this._createGainNode();
+        this._createSourceNode();
+        this._startSourceNode(0, playingOffset);
+        this._startTime = WebAudio._currentTime() - playingOffset / this._pitch;
+        this._createEndTimer();
+    } // _startPlaying
+
+    _startSourceNode(when, offset) {
+        if (offset >= this._buffer.duration) return;
+        this._sourceNode.start(when, offset);
+    } // _startSourceNode
+
+    // Ignore InvalidStateError
+    _stopSourceNode() { try { this._sourceNode.stop(); } catch (e) {} }
+
+    _createPannerNode() {
+        this._pannerNode = WebAudio._context.createPanner();
+        this._pannerNode.panningModel = "equalpower";
+        this._pannerNode.connect(WebAudio._masterGainNode);
+        this._updatePanner();
+    } // _createPannerNode
+
+    _createGainNode() {
+        const currentTime = WebAudio._currentTime();
+        this._gainNode = WebAudio._context.createGain();
+        this._gainNode.gain.setValueAtTime(this._volume, currentTime);
+        this._gainNode.connect(this._pannerNode);
+    } // _createGainNode
+
+    _createSourceNode() {
+        const currentTime = WebAudio._currentTime();
+        this._sourceNode = WebAudio._context.createBufferSource();
+        this._sourceNode.buffer = this._buffer;
+        this._sourceNode.loop = this._loop && this._isLoaded;
+        this._sourceNode.loopStart = this._loopStartTime;
+        this._sourceNode.loopEnd = this._loopStartTime + this._loopLengthTime;
+        this._sourceNode.playbackRate.setValueAtTime(this._pitch, currentTime);
+        this._sourceNode.connect(this._gainNode);
+    } // _createSourceNode
+
+    // Edited to help plugins alter the remove nodes behaviors in better way
+    _removeNodes() { if (this._sourceNode) this._removeNodesWithSourceNode(); }
+
+    _createEndTimer() {
+        /** @todo Extracts these codes into well-named functions */
+        if (this._sourceNode && !this._loop) {
+            const endTime = this._startTime + this._totalTime / this._pitch;
+            const delay = endTime - WebAudio._currentTime();
+            this._endTimer = setTimeout(this.stop.bind(this), delay * 1000);
+        }
+        //
+    } // _createEndTimer
+
+    _removeEndTimer() {
+        if (!this._endTimer) return;
+        clearTimeout(this._endTimer);
+        this._endTimer = null;
+    } // _removeEndTimer
+
+    _updatePanner() {
+         if (!this._pannerNode) return;
+         this._pannerNode.setPosition(this._pan, 0, 1 - Math.abs(this._pan));
+    } // _updatePanner
+
+    _onLoad() {
+        while (!this._loadListeners.isEmpty()) this._loadListeners.shift()();
+    } // _onLoad
+
+    _readLoopComments(arrayBuffer) {
+        const view = new DataView(arrayBuffer), maxI = view.byteLength - 30;
+        let index = 0;
+        while (index < maxI) {
+            if (this._readFourCharacters(view, index) !== "OggS") break;
+            index += 26;
+            const [numSegments, segments] = [view.getUint8(index++), []];
+            for (let i = 0; i < numSegments; i++) {
+                segments.push(view.getUint8(index++));
+            }
+            // Edited to help plugins alter loop comment packets in better ways
+            const packets = this._loopCommentPackets(segments);
+            //
+            let vorbisHeaderFound = false;
+            packets.forEach(size => {
+                if (this._readFourCharacters(view, index + 1) === "vorb") {
+                    // Edited to help plugins alter read packet in better ways
+                    this._readLoopCommentPacket(view, index, size);
+                    //
+                    vorbisHeaderFound = true;
+                }
+                index += size;
+            });
+            if (!vorbisHeaderFound) break;
+        }
+    } // _readLoopComments
+
+    _readMetaData(view, index, size) {
+        const maxI = index + size - 10;
+        for (let i = index; i < maxI; i++) {
+            if (this._readFourCharacters(view, i) !== "LOOP") continue;
+            let text = "";
+            while (view.getUint8(i) > 0) {
+                text += String.fromCharCode(view.getUint8(i++));
+            }
+            // Edited to help plugins alter loop start/length in better ways
+            this._readMetaLoopStartLength(text);
+            //
+            if (text === "LOOPSTART" || text === "LOOPLENGTH") {
+                let text2 = "";
+                i += 16;
+                while (view.getUint8(i) > 0) {
+                    text2 += String.fromCharCode(view.getUint8(i++));
+                }
+                if (text === "LOOPSTART") {
+                    this._loopStart = parseInt(text2);
+                } else this._loopLength = parseInt(text2);
+            }
+        }
+    } // _readMetaData
+
+    _readFourCharacters(view, index) {
+        let string = "";
+        if (index <= view.byteLength - 4) {
+            for (let i = 0; i < 4; i++) {
+                string += String.fromCharCode(view.getUint8(index + i));
+            }
+        }
+        return string;
+    } // _readFourCharacters
+
+    /**
+     * Creates the master gain node with the global web audio context
+     * Idempotent
+     * @author DoubleX @since 0.9.5 @version 0.9.5
+     */
+    static _createMasterGainNodeWithContext() {
+        this._masterGainNode = this._context.createGain();
+        this._resetVolume();
+        this._masterGainNode.connect(this._context.destination);
+    } // _createMasterGainNodeWithContext
+
+    /**
+     * Resets the master volume with its master gain node being present
+     * Idempotent
+     * @author DoubleX @since 0.9.5 @version 0.9.5
+     */
+    static _resetVolWithMasterGainNode() {
+        const [gain, volume] = [this._masterGainNode.gain, this._masterVolume];
+        const currentTime = this._currentTime();
+        gain.setValueAtTime(volume, currentTime);
+    } // _resetVolWithMasterGainNode
+
+    /**
+     * Fades in the global web audio with its master gain node being present
+     * Idempotent
+     * @author DoubleX @since 0.9.5 @version 0.9.5
+     * @param {number} duration - Fade-out time in seconds
+     */
+    static _fadeInWithMasterGainNode(duration) {
+        const [gain, volume] = [this._masterGainNode.gain, this._masterVolume];
+        const currentTime = this._currentTime();
+        /** @todo Dries up these codes representing identical knowledge */
+        gain.setValueAtTime(0, currentTime);
+        gain.linearRampToValueAtTime(volume, currentTime + duration);
+        //
+    } // _fadeInWithMasterGainNode
+
+    /**
+     * Fades out the global web audio with its master gain node being present
+     * Idempotent
+     * @author DoubleX @since 0.9.5 @version 0.9.5
+     * @param {number} duration - Fade-out time in seconds
+     */
+    static _fadeOutWithMasterGainNode(duration) {
+        const [gain, volume] = [this._masterGainNode.gain, this._masterVolume];
+        const currentTime = this._currentTime();
+        /** @todo Dries up these codes representing identical knowledge */
+        gain.setValueAtTime(volume, currentTime);
+        gain.linearRampToValueAtTime(0, currentTime + duration);
+        //
+    } // _fadeOutWithMasterGainNode
+
+    /**
+     * Calls all stop listeners when this web audio's just stopped
+     * Idempotent
+     * @author DoubleX @since 0.9.5 @version 0.9.5
+     * @param {number} duration - Fade-out time in seconds
+     */
+    _callStopListeners() {
+        while (!this._stopListeners.isEmpty()) this._stopListeners.shift()();
+    } // _callStopListeners
+
+    /**
+     * Fades in this web audio when it's ready
+     * Idempotent
+     * @author DoubleX @since 0.9.5 @version 0.9.5
+     * @param {number} duration - Fade-out time in seconds
+     */
+    _fadeInWhenReady(duration) {
+        if (this._gainNode) this._fadeInWhenReadyWithGainNode(duration);
+    } // _fadeInWhenReady
+
+    /**
+     * Fades in this web audio when it's ready with its gain node being present
+     * Idempotent
+     * @author DoubleX @since 0.9.5 @version 0.9.5
+     * @param {number} duration - Fade-out time in seconds
+     */
+    _fadeInWhenReadyWithGainNode(duration) {
+        const gain = this._gainNode.gain;
+        const currentTime = WebAudio._currentTime();
+        /** @todo Dries up these codes representing identical knowledge */
+        gain.setValueAtTime(0, currentTime);
+        gain.linearRampToValueAtTime(this._volume, currentTime + duration);
+        //
+    } // _fadeInWhenReadyWithGainNode
+
+    /**
+     * Fades out this web audio with its gain node being present
+     * Idempotent
+     * @author DoubleX @since 0.9.5 @version 0.9.5
+     * @param {number} duration - Fade-out time in seconds
+     */
+    _fadeOutWithGainNode(duration) {
+        const gain = this._gainNode.gain;
+        const currentTime = WebAudio._currentTime();
+        /** @todo Dries up these codes representing identical knowledge */
+        gain.setValueAtTime(this._volume, currentTime);
+        gain.linearRampToValueAtTime(0, currentTime + duration);
+        //
+    } // _fadeOutWithGainNode
+
+    /**
+     * Nullipotent
+     * @author DoubleX @since 0.9.5 @version 0.9.5
+     * @returns {number} The seek position of this web audio with global context
+     */
+    _seekWithContext() {
+        let pos = (WebAudio._currentTime() - this._startTime) * this._pitch;
+        if (this._loopLength > 0) {
+            const seekPos = this._loopStart + this._loopLength;
+            while (pos >= seekPos) pos -= this._loopLength;
+        }
+        return pos;
+    } // _seekWithContext
+
+    /**
+     * Starts loading this web audio data with the global web audio context
+     * Idempotent
+     * @author DoubleX @since 0.9.5 @version 0.9.5
+     */
+    _startLoadingWithContext() {
+        const url = this._realUrl();
+        Utils.isLocal() ? this._startXhrLoading(url) : this._startFetching(url);
+        this._lastUpdateTime = -10000;
+        this._isError = this._isLoaded = false;
+        this._destroyDecoder();
+        if (this._shouldUseDecoder()) this._createDecoder();
+    } // _startLoadingWithContext
+
+    /**
+     * Nullipotent
+     * @author DoubleX @since 0.9.5 @version 0.9.5
+     * @returns {XMLHttpRequest} The GET XMLHttpRequest receiving array buffers
+     */
+    _newLoadingXhr(url) {
+        const xhr = new XMLHttpRequest();
+        xhr.open("GET", url);
+        xhr.responseType = "arraybuffer";
+        xhr.onload = this._onXhrLoad.bind(this, xhr);
+        xhr.onerror = this._onError.bind(this);
+        return xhr;
+    } // _newLoadingXhr
+
+    /**
+     * Loads the data and updates the buffer of this local web audio
+     * Idempotent
+     * @author DoubleX @since 0.9.5 @version 0.9.5
+     * @param {XMLHttpRequest} xhr - The GET XMLHttpRequest with array buffers
+     */
+    _onXhrLoadSuc(xhr) {
+        [this._data, this._isLoaded] = [new Uint8Array(xhr.response), true];
+        this._updateBuffer();
+    } // _onXhrLoadSuc
+
+    /**
+     * Triggers the events when the non-local web audio fetches' okay
+     * Idempotent
+     * @author DoubleX @since 0.9.5 @version 0.9.5
+     * @param {Response} response - The non-local web audio fetch okay response
+     */
+    _onFetchOk(response) {
+        const reader = response.body.getReader();
+        /** @todo Extracts this into a method without obscuring the recursion */
+        const readChunk = ({ done, value }) => {
+            if (done) {
+                this._isLoaded = true;
+                this._updateBuffer();
+                return 0;
+            } else {
+                this._onFetchProcess(value);
+                return reader.read().then(readChunk);
+            }
+        };
+        //
+        reader.read().then(readChunk).catch(this._onError.bind(this));
+    } // _onFetchOk
+
+    /**
+     * Refreshes the source node of this web audio when it's playing
+     * Idempotent
+     * @author DoubleX @since 0.9.5 @version 0.9.5
+     */
+    _refreshSourceNodeWhenPlaying() {
+        const currentTime = WebAudio._currentTime();
+        this._startSourceNode(0, (currentTime - this._startTime) * this._pitch);
+        this._removeEndTimer();
+        this._createEndTimer();
+    } // _refreshSourceNodeWhenPlaying
+
+    /**
+     * Nullipotent
+     * @author DoubleX @since 0.9.5 @version 0.9.5
+     * @param {number} offset - The raw start playing offset of this web audio
+     * @returns {number} The corrected start playing offset of this web audio
+     */
+    _startPlayingOffset(offset) {
+        if (this._loopLengthTime <= 0) return offset;
+        const loopEnd = this._loopStartTime + this._loopLengthTime;
+        let playingOffset = offset;
+        while (playingOffset >= loopEnd) playingOffset -= this._loopLengthTime;
+        return playingOffset;
+    } // _startPlayingOffset
+
+    /**
+     * This method shouldn't be called without an existing source node
+     * Idempotent
+     * @author DoubleX @since 0.9.5 @version 0.9.5
+     */
+    _removeNodesWithSourceNode() {
+        this._stopSourceNode();
+        this._sourceNode = this._gainNode = this._pannerNode = null;
+    } // _removeNodesWithSourceNode
+
+    /**
+     * Reads the loop comment from a packet in the packet list of this web audio
+     * Idempotent
+     * @author DoubleX @since 0.9.5 @version 0.9.5
+     * @param {[uint8]} segments - The list of 8 bit integers in array buffer
+     * @returns {[number]} The list of the sizes of the loop comment packets
+     */
+    _loopCommentPackets(segments) {
+        const packets = [];
+        while (!segments.isEmpty()) {
+            let packetSize = 0;
+            while (segments[0] === 255) packetSize += segments.shift();
+            packetSize += segments.shift();
+            packets.push(packetSize);
+        }
+        return packets;
+    } // _loopCommentPackets
+
+    /**
+     * Reads the loop comment from a packet in the packet list of this web audio
+     * Idempotent
+     * @author DoubleX @since 0.9.5 @version 0.9.5
+     * @param {DataView} view - The data view of the loop comment array buffer
+     * @param {index} i - The index of the current byte in the data array buffer
+     * @param {number} size - The size of this packet to be read
+     */
+    _readLoopCommentPacket(view, i, size) {
+        const headerType = view.getUint8(i);
+        if (headerType === 1) {
+            this._sampleRate = view.getUint32(i + 12, true);
+        } else if (headerType === 3) this._readMetaData(view, i, size);
+    } // _readLoopCommentPacket
+
+    /**
+     * Reads the loop start and length meta data for this web audio
+     * Idempotent
+     * @author DoubleX @since 0.9.5 @version 0.9.5
+     * @param {string} text - The meta data text having the loop start/length
+     */
+    _readMetaLoopStartLength(text) {
+        if (text.match(/LOOPSTART=([0-9]+)/)) {
+            this._loopStart = parseInt(RegExp.$1);
+        }
+        if (!text.match(/LOOPLENGTH=([0-9]+)/)) return;
+        this._loopLength = parseInt(RegExp.$1);
+    } // _readMetaLoopStartLength
+
+} // WebAudio
+
+/*----------------------------------------------------------------------------
+ *    # Rewritten class: Video
+ *      - Rewrites it into the ES6 standard
+ *----------------------------------------------------------------------------*/
+
+//-----------------------------------------------------------------------------
+/**
+ * The static class that handles video playback.
+ *
+ * @namespace
+ */
+class Video {
+
+    constructor() { throw new Error("This is a static class"); }
+
+    /**
+     * Initializes the video system.
+     *
+     * @param {number} width - The width of the video.
+     * @param {number} height - The height of the video.
+     */
+    static initialize(width, height) {
+        [this._element, this._loading, this._volume] = [null, false, 1];
+        this._createElement();
+        this._setupEventHandlers();
+        this.resize(width, height);
+    } // initialize
+
+    /**
+     * Changes the display size of the video.
+     *
+     * @param {number} width - The width of the video.
+     * @param {number} height - The height of the video.
+     */
+    static resize(width, height) {
+        // Edited to help plugins alter element resize behaviors in better ways
+        if (this._element) this._resizeElem(width, height);
+        //
+    } // resize
+
+    /**
+     * Starts playback of a video.
+     *
+     * @param {string} src.
+     */
+    static play(src) {
+        this._element.src = src;
+        this._element.onloadeddata = this._onLoad.bind(this);
+        this._element.onerror = this._onError.bind(this);
+        this._element.onended = this._onEnd.bind(this);
+        this._element.load();
+        this._loading = true;
+    } // play
+
+    /**
+     * Checks whether the video is playing.
+     *
+     * @returns {boolean} True if the video is playing.
+     */
+    static isPlaying() { return this._loading || this._isVisible(); }
+
+    /**
+     * Sets the volume for videos.
+     *
+     * @param {number} volume - The volume for videos (0 to 1).
+     */
+    static setVolume(volume) {
+        this._volume = volume;
+        // Edited to help plugins alter element volume behaviors in better ways
+        if (this._element) this._setElemVolume();
+        //
+    } // setVolume
+
+    static _createElement() {
+        // Edited to help plugins create video element behaviors in better ways
+        this._element = this._createdElem();
+        //
+        document.body.appendChild(this._element);
+    } // _createElement
+
+    static _onLoad() {
+        this._element.volume = this._volume;
+        this._element.play();
+        this._updateVisibility(true);
+        this._loading = false;
+    } // _onLoad
+
+    static _onError() {
+        this._updateVisibility(false);
+        throw ["LoadError", this._element.src, () => this._element.load()];
+    } // _onError
+
+    static _onEnd() { this._updateVisibility(false); }
+
+    static _updateVisibility(videoVisible) {
+        // Edited to help plugins alter visibilities updates in better ways
+        if (videoVisible) return this._updateWhenVisible();
+        this._updateWhenInvisible();
+        //
+    } // _updateVisibility
+
+    static _isVisible() { return this._element.style.opacity > 0; }
+
+    static _setupEventHandlers() {
+        const onUserGesture = this._onUserGesture.bind(this);
+        document.addEventListener("keydown", onUserGesture);
+        document.addEventListener("mousedown", onUserGesture);
+        document.addEventListener("touchend", onUserGesture);
+    } // _setupEventHandlers
+
+    static _onUserGesture() {
+        /** @todo Extracts this conditional into a well-named static function */
+        if (this._element.src || !this._element.paused) return;
+        //
+        this._element.play().catch(() => 0);
+    } // _onUserGesture
+
+    /**
+     * Resizes the video element
+     * Idempotent
+     * @author DoubleX @since 0.9.5 @version 0.9.5
+     */
+    static _resizeElem(w, h) {
+        const { style } = this._element;
+        [style.width, style.height] = [`${w}px`, `${h}px`];
+    } // _resizeElem
+
+    /**
+     * Sets the volume of the video element
+     * Idempotent
+     * @author DoubleX @since 0.9.5 @version 0.9.5
+     */
+    static _setElemVolume() { this._element.volume = this._volume; }
+
+    /**
+     * Creates a new document with id gameVideo as the video element
+     * Nullipotent
+     * @author DoubleX @since 0.9.5 @version 0.9.5
+     * @returns {DOM} The video element document
+     */
+    static _createdElem() {
+        const elem = document.createElement("video");
+        elem.id = "gameVideo";
+        const { style } = elem;
+        [style.position, style.margin] = ["absolute", "auto"];
+        style.top = style.left = style.right = style.bottom = style.opacity = 0;
+        style.zIndex = 2;
+        elem.setAttribute("playsinline", "");
+        elem.oncontextmenu = () => false;
+        return elem;
+    } // _createdElem
+
+    /**
+     * Updates this video when it should become visible
+     * Idempotent
+     * @author DoubleX @since 0.9.5 @version 0.9.5
+     */
+    static _updateWhenVisible() {
+        Graphics.hideScreen();
+        this._element.style.opacity = 1;
+    } // _updateWhenVisible
+
+    /**
+     * Updates this video when it should become invisible
+     * Idempotent
+     * @author DoubleX @since 0.9.5 @version 0.9.5
+     */
+    static _updateWhenInvisible() {
+        Graphics.showScreen();
+        this._element.style.opacity = 0;
+    } // _updateWhenInvisible
+
+} // Video
+
+/*----------------------------------------------------------------------------
+ *    # Rewritten class: Input
+ *      - Rewrites it into the ES6 standard
+ *----------------------------------------------------------------------------*/
+
+/**
+ * The static class that handles input data from the keyboard and gamepads.
+ *
+ * @namespace
+ */
+class Input {
+
+    constructor() { throw new Error("This is a static class"); }
+
+    /**
+     * Initializes the input system.
+     */
+    static initialize() {
+        this.clear();
+        this._setupEventHandlers();
+    } // initialize
+
+    /**
+     * The wait time of the key repeat in frames.
+     *
+     * @type number
+     */
+    static keyRepeatWait = 24;
+
+    /**
+     * The interval of the key repeat in frames.
+     *
+     * @type number
+     */
+    static keyRepeatInterval = 6;
+
+    /**
+     * A hash table to convert from a virtual key code to a mapped key name.
+     *
+     * @type Object
+     */
+    static keyMapper = {
+        9: "tab", // tab
+        13: "ok", // enter
+        16: "shift", // shift
+        17: "control", // control
+        18: "control", // alt
+        27: "escape", // escape
+        32: "ok", // space
+        33: "pageup", // pageup
+        34: "pagedown", // pagedown
+        37: "left", // left arrow
+        38: "up", // up arrow
+        39: "right", // right arrow
+        40: "down", // down arrow
+        45: "escape", // insert
+        81: "pageup", // Q
+        87: "pagedown", // W
+        88: "escape", // X
+        90: "ok", // Z
+        96: "escape", // numpad 0
+        98: "down", // numpad 2
+        100: "left", // numpad 4
+        102: "right", // numpad 6
+        104: "up", // numpad 8
+        120: "debug" // F9
+    }; // keyMapper
+
+    /**
+     * A hash table to convert from a gamepad button to a mapped key name.
+     *
+     * @type Object
+     */
+    static gamepadMapper = {
+        0: "ok", // A
+        1: "cancel", // B
+        2: "shift", // X
+        3: "menu", // Y
+        4: "pageup", // LB
+        5: "pagedown", // RB
+        12: "up", // D-pad up
+        13: "down", // D-pad down
+        14: "left", // D-pad left
+        15: "right" // D-pad right
+    }; // gamepadMapper
+
+    /**
+     * Clears all the input data.
+     */
+    static clear() {
+        [this._currentState, this._previousState] = [new Map(), new Map()];
+        [this._gamepadStates, this._latestButton] = [[], null];
+        this._pressedTime = this._dir4 = this._dir8 = 0;
+        [this._preferredAxis, this._date, this._virtualButton] = ["", 0, null];
+        // Added to support the isJustReleased static function
+        this._isJustReleased = new Map();
+        //
+    } // clear
+
+    /**
+     * Updates the input data.
+     */
+    static update() {
+        this._pollGamepads();
+        // Edited to help plugins update the current states in better ways
+        this._updateLatestButton();
+        this._currentState.forEach(this._updateCurrentState, this);
+        //
+        if (this._virtualButton) this._updateVirtualClick();
+        this._updateDirection();
+    } // update
+
+    /**
+     * Checks whether a key is currently pressed down.
+     *
+     * @param {string} keyName - The mapped name of the key.
+     * @returns {boolean} True if the key is pressed.
+     */
+    static isPressed(keyName) {
+        if (this._isEscCompatiblePressed(keyName)) return true;
+        return !!this._currentState.get(keyName);
+    } // isPressed
+
+    /**
+     * Checks whether a key is just pressed.
+     *
+     * @param {string} keyName - The mapped name of the key.
+     * @returns {boolean} True if the key is triggered.
+     */
+    static isTriggered(keyName) {
+        if (this._isEscCompatiblePressed(keyName)) return true;
+        return this._latestButton === keyName && this._pressedTime === 0;
+    } // isTriggered
+
+    /**
+     * Checks whether a key is just pressed or a key repeat occurred.
+     *
+     * @param {string} keyName - The mapped name of the key.
+     * @returns {boolean} True if the key is repeated.
+     */
+    static isRepeated(keyName) {
+        if (this._isEscCompatiblePressed(keyName)) return true;
+        if (this._latestButton !== keyName) return false;
+        if (this._pressedTime === 0) return true;
+        if (this._pressedTime < this.keyRepeatWait) return false;
+        return this._pressedTime % this.keyRepeatInterval === 0;
+    } // isRepeated
+
+    /**
+     * Checks whether a key is kept depressed.
+     *
+     * @param {string} keyName - The mapped name of the key.
+     * @returns {boolean} True if the key is long-pressed.
+     */
+    static isLongPressed(keyName) {
+        if (this._isEscCompatiblePressed(keyName)) return true;
+        if (this._latestButton !== keyName) return false;
+        return this._pressedTime >= this.keyRepeatWait;
+    } // isLongPressed
+
+    /**
+     * The four direction value as a number of the numpad, or 0 for neutral.
+     *
+     * @readonly
+     * @type number
+     * @name Input.dir4
+     */
+    static get dir4() { return this._dir4; }
+
+    /**
+     * The eight direction value as a number of the numpad, or 0 for neutral.
+     *
+     * @readonly
+     * @type number
+     * @name Input.dir8
+     */
+    static get dir8() { return this._dir8; }
+
+    /**
+     * The time of the last input in milliseconds.
+     *
+     * @readonly
+     * @type number
+     * @name Input.date
+     */
+    static get date() { return this._date; }
+
+    static virtualClick(buttonName) { this._virtualButton = buttonName; }
+
+    /**
+     * Nullipotent
+     * @author DoubleX @interface @since 0.9.5 @version 0.9.5
+     * @enum @param {string} keyName - The mapped name of the key
+     * @returns {boolean} If the key's just released right on this frame
+     */
+    static isJustReleased(keyName) {
+        if (this._isEscCompatiblePressed(keyName)) return true;
+        return this._isJustReleased.has(keyName);
+    } // isJustReleased
+
+    static _setupEventHandlers() {
+        document.addEventListener("keydown", this._onKeyDown.bind(this));
+        document.addEventListener("keyup", this._onKeyUp.bind(this));
+        window.addEventListener("blur", this._onLostFocus.bind(this));
+    } // _setupEventHandlers
+
+    static _onKeyDown(event) {
+        const { keyCode } = event;
+        if (this._shouldPreventDefault(keyCode)) event.preventDefault();
+        // Edited to help plugins alter clear keys in better ways
+        if (this._shouldClear(keyCode)) this.clear(); // Numlock
+        //
+        const buttonName = this.keyMapper[keyCode];
+        if (buttonName) this._currentState.set(buttonName, true);
+    } // _onKeyDown
+
+    static _shouldPreventDefault(keyCode) {
+        switch (keyCode) {
+            case 8: // backspace
+            case 9: // tab
+            case 33: // pageup
+            case 34: // pagedown
+            case 37: // left arrow
+            case 38: // up arrow
+            case 39: // right arrow
+            case 40: // down arrow
+                return true;
+        }
+        return false;
+    } // _shouldPreventDefault
+
+    static _onKeyUp(event) {
+        const buttonName = this.keyMapper[event.keyCode];
+        if (buttonName) this._currentState.set(buttonName, false);
+    } // _onKeyUp
+
+    static _onLostFocus() { this.clear(); }
+
+    static _pollGamepads() {
+        if (!navigator.getGamepads) return;
+        const gamepads = navigator.getGamepads();
+        // Edited to help plugins poll gamepads in better ways
+        if (gamepads) gamepads.forEach(this._pollGamepad, this);
+        //
+    } // _pollGamepads
+
+    static _updateGamepadState(gamepad) {
+        const { index, buttons, axes } = gamepad;
+        const lastState = this._gamepadStates[index] || [];
+        // Edited to help plugins alter new gamepad states in better ways
+        this._gamepadStates[index] = this._newGamepadStates(buttons, axes);
+        //
+        this._gamepadStates[index].forEach((ns, i) => {
+            if (ns === lastState[i]) return;
+            const buttonName = this.gamepadMapper[i];
+            if (buttonName) this._currentState.set(buttonName, ns);
+        });
+    } // _updateGamepadState
+
+    static _updateDirection() {
+        let [x, y] = [this._signX(), this._signY()];
+        this._dir8 = this._makeNumpadDirection(x, y);
+        if (x !== 0 && y !== 0) {
+            this._preferredAxis === "x" ? y = 0 : x = 0;
+        } else if (x !== 0) {
+            this._preferredAxis = "y";
+        } else if (y !== 0) this._preferredAxis = "x";
+        this._dir4 = this._makeNumpadDirection(x, y);
+    } // _updateDirection
+
+    // Edited to dry up codes essentially being the identical knowledge
+    static _signX() { return this._sign("right") - this._sign("left"); }
+    //
+
+    // Edited to dry up codes essentially being the identical knowledge
+    static _signY() {  return this._sign("down") - this._sign("up"); }
+    //
+
+    static _makeNumpadDirection(x, y) {
+        return x === 0 && y === 0 ? 0 : 5 - y * 3 + x;
+    } // _makeNumpadDirection
+
+    static _isEscapeCompatible(keyName) {
+        return keyName === "cancel" || keyName === "menu";
+    } // _isEscapeCompatible
+
+    /**
+     * Updates the latest pressed button states
+     * Hotspot/Idempotent
+     * @author DoubleX @since 0.9.5 @version 0.9.5
+     */
+    static _updateLatestButton() {
+        if (this._currentState.get(this._latestButton)) {
+            this._pressedTime++;
+        } else this._latestButton = null;
+    } // _updateLatestButton
+
+    /**
+     * Updates the current state of all input keys
+     * Hotspot/Idempotent
+     * @author DoubleX @since 0.9.5 @version 0.9.5
+     * @enum @param {boolean} keyState - If the key's currently pressed
+     * @enum @param {string} keyName - The mapped name of the key
+     */
+    static _updateCurrentState(keyState, keyName) {
+        this._updateLatestState(keyName);
+        this._previousState.set(keyName, keyState);
+    } // _updateCurrentState
+
+    /**
+     * Updates the latest state of all input keys
+     * Hotspot/Idempotent
+     * @author DoubleX @since 0.9.5 @version 0.9.5
+     * @enum @param {string} keyName - The mapped name of the key
+     */
+    static _updateLatestState(keyName) {
+        if (this._isJustPressed(keyName)) return this._onStartPress(keyName);
+        // Added to support the isJustReleased static function
+        if (this._isKeyJustReleased(keyName)) {
+            this._isJustReleased.set(keyName, true);
+        } else this._isJustReleased.delete(keyName);
+        //
+    } // _updateLatestState
+
+    /**
+     * Hotspot/Nullipotent
+     * @author DoubleX @since 0.9.5 @version 0.9.5
+     * @enum @param {string} keyName - The mapped name of the key
+     * @returns {boolean} If the key's just pressed right on this frame
+     */
+    static _isJustPressed(keyName) {
+        if (!this._currentState.get(keyName)) return false;
+        return !this._previousState.get(keyName);
+    } // _isJustPressed
+
+    /**
+     * Updates the current input states with the input key that's just pressed
+     * Idempotent
+     * @author DoubleX @since 0.9.5 @version 0.9.5
+     * @enum @param {string} keyName - The mapped name of the key
+     */
+    static _onStartPress(keyName) {
+        [this._latestButton, this._pressedTime] = [keyName, 0];
+        this._date = Date.now();
+        this._isJustReleased.delete(keyName);
+    } // _onStartPress
+
+    /**
+     * Hotspot/Nullipotent
+     * @author DoubleX @since 0.9.5 @version 0.9.5
+     * @enum @param {string} keyName - The mapped name of the key
+     * @returns {boolean} If the key's just released right on this frame
+     */
+    static _isKeyJustReleased(keyName) {
+        if (this._currentState.get(keyName)) return false;
+        return this._previousState.get(keyName);
+    } // _isKeyJustReleased
+
+    /**
+     * Updates the current input states with virtual button that's just clicked
+     * Hotspot/Idempotent
+     * @author DoubleX @since 0.9.5 @version 0.9.5
+     */
+    static _updateVirtualClick() {
+        this._latestButton = this._virtualButton;
+        [this._pressedTime, this._virtualButton] = [0, null];
+    } // _updateVirtualClick
+
+    /**
+     * Hotspot/Nullipotent
+     * @author DoubleX @since 0.9.5 @version 0.9.5
+     * @enum @param {string} keyName - The mapped name of the key
+     * @returns {boolean} If the specified key should be regarded as pressed
+     */
+    static _isEscCompatiblePressed(keyName) {
+        return this._isEscapeCompatible(keyName) && this.isPressed("escape");
+    } // _isEscCompatiblePressed
+
+    /**
+     * Nullipotent
+     * @author DoubleX @since 0.9.5 @version 0.9.5
+     * @enum @param {string} keyName - The mapped name of the key
+     * @returns {boolean} If the pressed key should clear all input states
+     */
+    static _shouldClear(keyCode) { return keyCode === 144; }
+
+    /**
+     * Updates the existing and connected gamepad state
+     * Hotspot/Idempotent
+     * @author DoubleX @since 0.9.5 @version 0.9.5
+     * @enum @param {Gamepad} gamepad - The gamepad to be polled
+     */
+    static _pollGamepad(gamepad) {
+        if (gamepad && gamepad.connected) this._updateGamepadState(gamepad);
+    } // _pollGamepad
+
+    /**
+     * Hotspot/Nullipotent
+     * @author DoubleX @since 0.9.5 @version 0.9.5
+     * @enum @param {[GamepadButton]} buttons - The list of the gamepad buttons
+     * @enum @param {[number]} axes - The amounts of the gamepad axes directions
+     * @returns {[boolean]} The list of new gamepad button states
+     */
+    static _newGamepadStates(buttons, axes) {
+        const [newState, threshold] = [[], 0.5];
+        newState[12] = newState[13] = newState[14] = newState[15] = false;
+        buttons.forEach((button, i) => newState[i] = button.pressed);
+        if (axes[1] < -threshold) {
+            newState[12] = true; // up
+        } else if (axes[1] > threshold) newState[13] = true; // down
+        if (axes[0] < -threshold) {
+            newState[14] = true; // left
+        } else if (axes[0] > threshold) newState[15] = true; // right
+        return newState;
+    } // _newGamepadStates
+
+    /**
+     * Hotspot/Nullipotent
+     * @author DoubleX @since 0.9.5 @version 0.9.5
+     * @enum @param {string} keyName - The mapped name of the key
+     * @enum @returns {number} 1 for the direction of this key and 0 for not
+     */
+    static _sign(keyName) { return this.isPressed(keyName) ? 1 : 0; }
+
+} // Input
+
+/*----------------------------------------------------------------------------
+ *    # Rewritten class: TouchInput
+ *      - Rewrites it into the ES6 standard
+ *----------------------------------------------------------------------------*/
+
+//-----------------------------------------------------------------------------
+/**
+ * The static class that handles input data from the mouse and touchscreen.
+ *
+ * @namespace
+ */
+class TouchInput {
+
+    constructor() { throw new Error("This is a static class"); }
+
+    /**
+     * Initializes the touch system.
+     */
+    static initialize() {
+        this.clear();
+        this._setupEventHandlers();
+    } // initialize
+
+    /**
+     * The wait time of the pseudo key repeat in frames.
+     *
+     * @type number
+     */
+    static keyRepeatWait = 24;
+
+    /**
+     * The interval of the pseudo key repeat in frames.
+     *
+     * @type number
+     */
+    static keyRepeatInterval = 6;
+
+    /**
+     * The threshold number of pixels to treat as moved.
+     *
+     * @type number
+     */
+    static moveThreshold = 10;
+
+    static clear() {
+        this._mousePressed = this._screenPressed = false;
+        [this._pressedTime, this._clicked] = [0, false];
+        this._newState = this._createNewState();
+        this._currentState = this._createNewState();
+        this._x = this._y = this._triggerX = this._triggerY = 0;
+        [this._moved, this._date] = [false, 0];
+    } // clear
+
+    static update() {
+        this._currentState = this._newState;
+        this._newState = this._createNewState();
+        this._clicked = this._currentState.released && !this._moved;
+        if (this.isPressed()) this._pressedTime++;
+    } // update
+
+    /**
+     * Checks whether the mouse button or touchscreen has been pressed and
+     * released at the same position.
+     *
+     * @returns {boolean} True if the mouse button or touchscreen is clicked.
+     */
+    static isClicked() { return this._clicked; }
+
+    /**
+     * Checks whether the mouse button or touchscreen is currently pressed down.
+     *
+     * @returns {boolean} True if the mouse button or touchscreen is pressed.
+     */
+    static isPressed() { return this._mousePressed || this._screenPressed; }
+
+    /**
+     * Checks whether the left mouse button or touchscreen is just pressed.
+     *
+     * @returns {boolean} True if the mouse button or touchscreen is triggered.
+     */
+    static isTriggered() { return this._currentState.triggered; }
+
+    /**
+     * Checks whether the left mouse button or touchscreen is just pressed
+     * or a pseudo key repeat occurred.
+     *
+     * @returns {boolean} True if the mouse button or touchscreen is repeated.
+     */
+    static isRepeated() {
+        if (!this.isPressed()) return false;
+        if (this._currentState.triggered) return true;
+        if (this._pressedTime < this.keyRepeatWait) return false;
+        return this._pressedTime % this.keyRepeatInterval === 0;
+    } // isRepeated
+
+    /**
+     * Checks whether the left mouse button or touchscreen is kept depressed.
+     *
+     * @returns {boolean} True if the left mouse button or touchscreen is long-pressed.
+     */
+    static isLongPressed() {
+        return this.isPressed() && this._pressedTime >= this.keyRepeatWait;
+    } // isLongPressed
+
+    /**
+     * Checks whether the right mouse button is just pressed.
+     *
+     * @returns {boolean} True if the right mouse button is just pressed.
+     */
+    static isCancelled() { return this._currentState.cancelled; }
+
+    /**
+     * Checks whether the mouse or a finger on the touchscreen is moved.
+     *
+     * @returns {boolean} True if the mouse or a finger on the touchscreen is moved.
+     */
+    static isMoved() { return this._currentState.moved; }
+
+    /**
+     * Checks whether the mouse is moved without pressing a button.
+     *
+     * @returns {boolean} True if the mouse is hovered.
+     */
+    static isHovered() { return this._currentState.hovered; }
+
+    /**
+     * Checks whether the left mouse button or touchscreen is released.
+     *
+     * @returns {boolean} True if the mouse button or touchscreen is released.
+     */
+    static isReleased() { return this._currentState.released; }
+
+    /**
+     * The horizontal scroll amount.
+     *
+     * @readonly
+     * @type number
+     * @name TouchInput.wheelX
+     */
+    static get wheelX() { return this._currentState.wheelX; }
+
+    /**
+     * The vertical scroll amount.
+     *
+     * @readonly
+     * @type number
+     * @name TouchInput.wheelY
+     */
+    static get wheelY() { return this._currentState.wheelY; }
+
+    /**
+     * The x coordinate on the canvas area of the latest touch event.
+     *
+     * @readonly
+     * @type number
+     * @name TouchInput.x
+     */
+    static get x() { return this._x; }
+
+    /**
+     * The y coordinate on the canvas area of the latest touch event.
+     *
+     * @readonly
+     * @type number
+     * @name TouchInput.y
+     */
+    static get y() { return this._y; }
+
+    /**
+     * The time of the last input in milliseconds.
+     *
+     * @readonly
+     * @type number
+     * @name TouchInput.date
+     */
+    static get date() { return this._date; }
+
+    static _createNewState() {
+        return {
+            triggered: false,
+            cancelled: false,
+            moved: false,
+            hovered: false,
+            released: false,
+            wheelX: 0,
+            wheelY: 0
+        };
+    } // _createNewState
+
+    static _setupEventHandlers() {
+        // Edited to help plugins alter event handlers in better ways
+        this._setupMouseEventHandlers();
+        this._setupTouchEventHandlers();
+        //
+        window.addEventListener("blur", this._onLostFocus.bind(this));
+    } // _setupEventHandlers
+
+    static _onMouseDown(event) {
+        switch (event.button) {
+            case 0: return this._onLeftButtonDown(event);
+            case 1: return this._onMiddleButtonDown(event);
+            case 2: this._onRightButtonDown(event);
+        }
+    } // _onMouseDown
+
+    static _onLeftButtonDown(event) {
+        // Edited to dry up codes essentially being the identical knowledge
+        const xy = this._pageToCanvasXY(event);
+        if (!Graphics.isInsideCanvas(...xy)) return;
+        //
+        // Edited to help plugins alter left button down behaviors in better way
+        this._onLeftButtonDownInsideCanvas(...xy);
+        //
+    } // _onLeftButtonDown
+
+    static _onMiddleButtonDown(/*event*/) {}
+
+    static _onRightButtonDown(event) {
+        // Edited to dry up codes essentially being the identical knowledge
+        const xy = this._pageToCanvasXY(event);
+        if (Graphics.isInsideCanvas(...xy)) this._onCancel(...xy);
+        //
+    } // _onRightButtonDown
+
+    static _onMouseMove(event) {
+        // Edited to dry up codes essentially being the identical knowledge
+        const xy = this._pageToCanvasXY(event);
+        if (this._mousePressed) return this._onMove(...xy);
+        if (Graphics.isInsideCanvas(...xy)) this._onHover(...xy);
+        //
+    } // _onMouseMove
+
+    static _onMouseUp(event) {
+        // Edited to help plugins alter left button up behaviors in better ways
+        if (event.button === 0) this._onLeftButtonUp(event);
+        //
+    } // _onMouseUp
+
+    static _onWheel(event) {
+        this._newState.wheelX += event.deltaX;
+        this._newState.wheelY += event.deltaY;
+        event.preventDefault();
+    } // _onWheel
+
+    static _onTouchStart(event) {
+        const { changedTouches, touches } = event;
+        changedTouches.forEach(touch => {
+            // Edited to help plugins alter touches inside canvas in better ways
+            const xy = this._pageToCanvasXY(touch);
+            if (!Graphics.isInsideCanvas(...xy)) return;
+            this._onTouchStartInsideCanvas(touches, ...xy);
+            //
+        });
+        /** @todo Extracts this conditional into a well-named static function */
+        if (!window.cordova && !window.navigator.standalone) return;
+        //
+        event.preventDefault();
+    } // _onTouchStart
+
+    static _onTouchMove(event) {
+        event.changedTouches.forEach(this._onMoveTouch, this);
+    } // _onTouchMove
+
+    static _onTouchEnd(event) {
+        event.changedTouches.forEach(this._onReleaseTouch, this);
+    } // _onTouchEnd
+
+    static _onTouchCancelfunction(/*event*/) { this._screenPressed = false; }
+
+    static _onLostFocus() { this.clear(); }
+
+    static _onTrigger(x, y) {
+        this._newState.triggered = true;
+        [this._x, this._y, this._triggerX, this._triggerY] = [x, y, x, y];
+        [this._moved, this._date] = [false, Date.now()];
+    } // _onTrigger
+
+    // Edited to dry up codes essentially being the identical knowledge
+    static _onCancel(x, y) { this._onUpdateNewState("cancelled", x, y); }
+    //
+
+    static _onMove(x, y) {
+        // Edited to help plugins alter the on move event in better ways
+        if (this._isMoved(x, y)) this._moved = true;
+        if (this._moved) this._onUpdateNewState("_moved", x, y);
+        //
+    } // _onMove
+
+    // Edited to dry up codes essentially being the identical knowledge
+    static _onHover(x, y) { this._onUpdateNewState("hovered", x, y); }
+    //
+
+    // Edited to dry up codes essentially being the identical knowledge
+    static _onRelease(x, y) { this._onUpdateNewState("released", x, y); }
+    //
+
+    /**
+     * Setups all mouse event handlers of this touch input static class
+     * Idempotent
+     * @author DoubleX @since 0.9.5 @version 0.9.5
+     */
+    static _setupMouseEventHandlers() {
+      document.addEventListener("mousedown", this._onMouseDown.bind(this));
+      document.addEventListener("mousemove", this._onMouseMove.bind(this));
+      document.addEventListener("mouseup", this._onMouseUp.bind(this));
+      document.addEventListener("wheel", this._onWheel.bind(this), {
+          passive: false
+      });
+    } // _setupMouseEventHandlers
+
+    /**
+     * Setups all touch event handlers of this touch input static class
+     * Idempotent
+     * @author DoubleX @since 0.9.5 @version 0.9.5
+     */
+    static _setupTouchEventHandlers() {
+        const pf = { passive: false };
+        document.addEventListener("touchstart", this._onTouchStart.bind(this), pf);
+        document.addEventListener("touchmove", this._onTouchMove.bind(this), pf);
+        document.addEventListener("touchend", this._onTouchEnd.bind(this));
+        document.addEventListener("touchcancel", this._onTouchCancel.bind(this));
+    } // _setupTouchEventHandlers
+
+    /**
+     * Triggers the left button down event inside the canvas x and y positions
+     * Idempotent
+     * @author DoubleX @since 0.9.5 @version 0.9.5
+     * @param {number} x - The page x position of the touch event
+     * @param {number} y - The page y position of the touch event
+     */
+    static _onLeftButtonDownInsideCanvas(x, y) {
+        [this._mousePressed, this._pressedTime] = [true, 0];
+        this._onTrigger(x, y);
+    } // _onLeftButtonDownInsideCanvas
+
+    /**
+     * Triggers the specified the left button up event
+     * Idempotent
+     * @author DoubleX @since 0.9.5 @version 0.9.5
+     * @param {Event} event - The specified left button up event
+     */
+    static _onLeftButtonUp(event) {
+        this._mousePressed = false;
+        this._onRelease(...this._pageToCanvasXY(event));
+    } // _onLeftButtonUp
+
+    /**
+     * Triggers the touch start event inside canvas for the specified touches
+     * Idempotent
+     * @author DoubleX @since 0.9.5 @version 0.9.5
+     * @param {[Touch]} touches - The specified touches from the specified event
+     * @param {number} x - The page x position of the touch event
+     * @param {number} y - The page y position of the touch event
+     */
+    static _onTouchStartInsideCanvas(touches, x, y) {
+        [this._screenPressed, this._pressedTime] = [true, 0];
+        touches.length >= 2 ? this._onCancel(x, y) : this._onTrigger(x, y);
+        event.preventDefault();
+    } // _onTouchStartInsideCanvas
+
+    /**
+     * Triggers the touch move event for the specified touch
+     * Potential Hotspot/Idempotent
+     * @author DoubleX @since 0.9.5 @version 0.9.5
+     * @param {Touch} touch - The specified touch from the specified event
+     */
+    static _onMoveTouch(touch) { this._onMove(...this._pageToCanvasXY(touch)); }
+
+    /**
+     * Triggers the touch release event for the specified touch
+     * Idempotent
+     * @author DoubleX @since 0.9.5 @version 0.9.5
+     * @param {Touch} touch - The specified touch from the specified event
+     */
+    static _onReleaseTouch(touch) {
+        this._screenPressed = false;
+        this._onRelease(...this._pageToCanvasXY(touch));
+    } // _onReleaseTouch
+
+    /**
+     * Potential Hotspot/Nullipotent
+     * @author DoubleX @since 0.9.5 @version 0.9.5
+     * @param {Event|Touch} eventTouch - The specified event or its touch
+     * @returns {[number]} The converted x and y canvas positions
+     */
+    static _pageToCanvasXY(eventTouch) {
+        return [
+            Graphics.pageToCanvasX(eventTouch.pageX),
+            Graphics.pageToCanvasY(eventTouch.pageY)
+        ];
+    } // _pageToCanvasXY
+
+    /**
+     * Potential Hotspot/Nullipotent
+     * @author DoubleX @since 0.9.5 @version 0.9.5
+     * @param {number} x - The page x position of the touch event
+     * @param {number} y - The page y position of the touch event
+     * @returns {boolean} If the detected touch event's indeed a movement
+     */
+    static _isMoved(x, y) {
+        const dx = Math.abs(x - this._triggerX);
+        const dy = Math.abs(y - this._triggerY);
+        return dx > this.moveThreshold || dy > this.moveThreshold;
+    } // _isMoved
+
+    /**
+     * Updates the specified new states as well as the current x and y positions
+     * Idempotent
+     * @author DoubleX @since 0.9.5 @version 0.9.5
+     * @enum @param {string} state - The name of the new state to be updated
+     * @param {number} x - The page x position of the touch event
+     * @param {number} y - The page y position of the touch event
+     */
+    static _onUpdateNewState(state, x, y) {
+        [this._newState[state], this._x, this._y] = [true, x, y];
+    } // _onUpdateNewState
+
+} // TouchInput
+
+/*----------------------------------------------------------------------------
+ *    # Rewritten class: JsonEx
+ *      - Rewrites it into the ES6 standard
+ *----------------------------------------------------------------------------*/
+
+//-----------------------------------------------------------------------------
+/**
+ * The static class that handles JSON with object information.
+ *
+ * @namespace
+ */
+class JsonEx {
+
+    constructor() { throw new Error("This is a static class"); }
+
+    /**
+     * The maximum depth of objects.
+     *
+     * @type number
+     * @default 100
+     */
+    static maxDepth = 100;
+
+    /**
+     * Converts an object to a JSON string with object information.
+     *
+     * @param {object} object - The object to be converted.
+     * @returns {string} The JSON string.
+     */
+    static stringify(object) { return JSON.stringify(this._encode(object, 0)); }
+
+    /**
+     * Parses a JSON string and reconstructs the corresponding object.
+     *
+     * @param {string} json - The JSON string.
+     * @returns {object} The reconstructed object.
+     */
+    static parse(json) { return this._decode(JSON.parse(json)); }
+
+    /**
+     * Makes a deep copy of the specified object.
+     *
+     * @param {object} object - The object to be copied.
+     * @returns {object} The copied object.
+     */
+    static makeDeepCopy(object) { return this.parse(this.stringify(object)); }
+
+    static _encode(value, depth) {
+        // [Note] The handling code for circular references in certain versions of
+        //   MV has been removed because it was too complicated and expensive.
+        if (depth >= this.maxDepth) throw new Error("Object too deep");
+        // Edited to help plugins alter encode behaviors in better ways
+        if (this._isValObj(value)) return this._encodeValObj(value, depth);
+        //
+        return value;
+    } // _encode
+
+    static _decode(value) {
+        // Edited to help plugins alter decode behaviors in better ways
+        return this._isValObj(value) ? this._decodeValObj(value) : value;
+        //
+    } // _decode
+
+    /**
+     * Pure function
+     * @author DoubleX @since 0.9.5 @version 0.9.5
+     * @param {*} val - The value object to be encoded
+     * @param {number} depth - The current depth of the encoded value object
+     * @returns {*} The fully encoded value object
+     */
+    static _encodeValObj(val, depth) {
+        const constructorName = val.constructor.name;
+        if (constructorName !== "Object" && constructorName !== "Array") {
+            val["@"] = constructorName;
+        }
+        Object.entries(val).forEach(([k, v]) => {
+            val[k] = this._encode(v, depth + 1);
+        });
+        return val;
+    } // _encodeValObj
+
+    /**
+     * Pure function
+     * @author DoubleX @since 0.9.5 @version 0.9.5
+     * @param {*} val - The value to be encoded or decoded
+     * @returns {boolean} If the value's indeed a value object
+     */
+    static _isValObj(val) {
+        const type = Object.prototype.toString.call(val);
+        return type === "[object Object]" || type === "[object Array]";
+    } // _isValObj
+
+    /**
+     * Pure function
+     * @author DoubleX @since 0.9.5 @version 0.9.5
+     * @param {*} val - The value object to be decoded
+     * @returns {*} The fully decoded value object
+     */
+    static _decodeValObj(val) {
+        const constructorName = val["@"];
+        if (constructorName) {
+            const constructor = window[constructorName];
+            if (constructor) Object.setPrototypeOf(val, constructor.prototype);
+        }
+        Object.entries(val).forEach(([k, v]) => val[k] = this._decode(v));
+        return val;
+    } // _decodeValObj
+
+} // JsonEx
