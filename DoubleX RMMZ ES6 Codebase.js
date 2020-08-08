@@ -4042,7 +4042,7 @@ class TilingSprite extends PIXI.TilingSprite {
         this.texture.baseTexture = this._bitmap.baseTexture;
         this._refresh();
     } // _onBitmapLoad
-    
+
     // Edited to help plugins alter texture refresh behaviors in better ways
     _refresh() { if (this.texture) this._refreshWithTexture(); }
     //
@@ -7748,7 +7748,6 @@ class AudioManager {
 
     /**
      * Stores the current bgm buffer position then immediately stops it
-     * Idempotent
      * @author DoubleX @since 0.9.5 @version 0.9.5
      */
     static _stopCurrentBgmBuffer() {
@@ -7805,7 +7804,6 @@ class AudioManager {
 
     /**
      * This function shouldn't be called without an existing se name
-     * Idempotent
      * @author DoubleX @since 0.9.5 @version 0.9.5
      * @param {Audio} se - The se with its name, pan, pitch and volume
      */
@@ -7830,7 +7828,6 @@ class AudioManager {
 
     /**
      * This function shouldn't be called without an existing se name
-     * Idempotent
      * @author DoubleX @since 0.9.5 @version 0.9.5
      * @param {Audio} se - The se with its name, pan, pitch and volume
      */
@@ -7934,5 +7931,938 @@ class AudioManager {
     } // _checkBufferError
 
 } // AudioManager
+
+/*----------------------------------------------------------------------------
+ *    # Rewritten class: BattleManager
+ *      - Rewrites it into the ES6 standard
+ *----------------------------------------------------------------------------*/
+
+//-----------------------------------------------------------------------------
+// BattleManager
+//
+// The static class that manages battle progress.
+
+class BattleManager {
+
+    constructor() { throw new Error("This is a static class"); }
+
+    static setup(troopId, canEscape, canLose) {
+        this.initMembers();
+        [this._canEscape, this._canLose] = [canEscape, canLose];
+        $gameTroop.setup(troopId);
+        $gameScreen.onBattleStart();
+        this.makeEscapeRatio();
+    } // setup
+
+    static initMembers() {
+        this._phase = "";
+        this._inputting = this._canEscape = this._canLose = false;
+        [this._battleTest, this._eventCallback] = [false, null];
+        this._preemptive = this._surprise = false;
+        this._currentActor = this._actionForcedBattler = null;
+        this._mapBgm = this._mapBgs = null;
+        this._actionBattlers = [];
+        this._subject = this._action = null;
+        this._targets = [];
+        this._logWindow = this._spriteset = null;
+        [this._escapeRatio, this._escaped, this._rewards] = [0, false, {}];
+        this._tpbNeedsPartyCommand = true;
+        // Added _isBattleEnd to help plugins check if the battle should end
+        this._isBattleEnd = false;
+        //
+        // Added to help plugins check if the event main's updated
+        this._isUpdateEventMain = false;
+        //
+    } // initMembers
+
+    static isTpb() { return $dataSystem.battleSystem >= 1; }
+
+    static isActiveTpb() { return $dataSystem.battleSystem === 1; }
+
+    static isBattleTest() { return this._battleTest; }
+
+    static setBattleTest(battleTest) { this._battleTest = battleTest; }
+
+    static setEventCallback(callback) { this._eventCallback = callback; }
+
+    static setLogWindow(logWindow) { this._logWindow = logWindow; }
+
+    static setSpriteset(spriteset) { this._spriteset = spriteset; }
+
+    static onEncounter() {
+        // Edited to help plugins alter encounter behaviors in better ways
+        this._preemptive = this._encounterPreemptive();
+        this._surprise = this._encounterSurprise();
+        //
+    } // onEncounter
+
+    static ratePreemptive() {
+        return $gameParty.ratePreemptive($gameTroop.agility());
+    } // ratePreemptive
+
+    static rateSurprise() {
+        return $gameParty.rateSurprise($gameTroop.agility());
+    } // rateSurprise
+
+    static saveBgmAndBgs() {
+        this._mapBgm = AudioManager.saveBgm();
+        this._mapBgs = AudioManager.saveBgs();
+    } // saveBgmAndBgs
+
+    static playBattleBgm() {
+        AudioManager.playBgm($gameSystem.battleBgm());
+        AudioManager.stopBgs();
+    } // playBattleBgm
+
+    static playVictoryMe() { AudioManager.playMe($gameSystem.victoryMe()); }
+
+    static playDefeatMe() { AudioManager.playMe($gameSystem.defeatMe()); }
+
+    static replayBgmAndBgs() {
+        if (this._mapBgm) {
+            AudioManager.replayBgm(this._mapBgm);
+        } else AudioManager.stopBgm();
+        if (this._mapBgs) AudioManager.replayBgs(this._mapBgs);
+    } // replayBgmAndBgs
+
+    // Edited to help plugins alter escape ratio behaviors in better ways
+    static makeEscapeRatio() { this._escapeRatio = this._newEscRatio(); }
+    //
+
+    static update(timeActive) {
+        if (!this.isBusy() && !this.updateEvent()) this.updatePhase(timeActive);
+        if (this.isTpb()) this.updateTpbInput();
+    } // update
+
+    static updatePhase(timeActive) {
+        switch (this._phase) {
+            case "start": return this.updateStart();
+            case "turn": return this.updateTurn(timeActive);
+            case "action": return this.updateAction();
+            case "turnEnd": return this.updateTurnEnd();
+            case "battleEnd": return this.updateBattleEnd();
+        }
+    } // updatePhase
+
+    static updateEvent() {
+        switch (this._phase) {
+            case "start":
+            case "turn":
+            case "turnEnd":
+                /** @todo Extracts these codes into a well-named function */
+                if (!this.isActionForced()) return this.updateEventMain();
+                this.processForcedAction();
+                return true;
+                //
+        }
+        return this.checkAbort();
+    } // updateEvent
+
+    static updateEventMain() {
+        $gameTroop.updateInterpreter();
+        $gameParty.requestMotionRefresh();
+        // Edited to help plugins check if the event main's updated
+        if ($gameTroop.isEventRunning() || this.checkBattleEnd()) {
+            return this._isUpdateEventMain = true;
+        }
+        $gameTroop.setupBattleEvent();
+        return this._isUpdateEventMain = 
+                $gameTroop.isEventRunning() || SceneManager.isSceneChanging();
+        //
+    } // updateEventMain
+
+    static isBusy() {
+        if ($gameMessage.isBusy()) return true;
+        return this._spriteset.isBusy() || this._logWindow.isBusy();
+    } // isBusy
+
+    static updateTpbInput() {
+        this._inputting ? this.checkTpbInputClose() : this.checkTpbInputOpen();
+    } // updateTpbInput
+
+    static checkTpbInputClose() {
+        // Edited to help plugins alter cancel current input in better ways
+        if (this._isCancelCurInput()) this._cancelCurInput();
+        //
+    } // checkTpbInputClose
+
+    static checkTpbInputOpen() {
+        if (!this.isPartyTpbInputtable()) return;
+        if (!this._tpbNeedsPartyCommand) return this.selectNextCommand();
+        [this._inputting, this._tpbNeedsPartyCommand] = [true, false];
+    } // checkTpbInputOpen
+
+    static isPartyTpbInputtable() {
+        return $gameParty.canInput() && this.isTpbMainPhase();
+    } // isPartyTpbInputtable
+
+    static needsActorInputCancel() {
+        return this._currentActor && !this._currentActor.canInput();
+    } // needsActorInputCancel
+
+    static isTpbMainPhase() {
+        return ["turn", "turnEnd", "action"].includes(this._phase);
+    } // isTpbMainPhase
+
+    static isInputting() { return this._inputting; }
+
+    static isInTurn() { return this._phase === "turn"; }
+
+    static isTurnEnd() { return this._phase === "turnEnd"; }
+
+    static isAborting() { return this._phase === "aborting"; }
+
+    static isBattleEnd() { return this._phase === "battleEnd"; }
+
+    static canEscape() { return this._canEscape; }
+
+    static canLose() { return this._canLose; }
+
+    static isEscaped() { return this._escaped; }
+
+    static actor() { return this._currentActor; }
+
+    static startBattle() {
+        this._phase = "start";
+        $gameSystem.onBattleStart();
+        $gameParty.onBattleStart(this._preemptive);
+        $gameTroop.onBattleStart(this._surprise);
+        this.displayStartMessages();
+    } // startBattle
+
+    static displayStartMessages() {
+        $gameTroop.enemyNames().forEach(name => {
+            $gameMessage.add(TextManager.emerge.format(name));
+        });
+        if (this._preemptive) {
+            $gameMessage.add(TextManager.preemptive.format($gameParty.name()));
+        } else if (this._surprise) {
+            $gameMessage.add(TextManager.surprise.format($gameParty.name()));
+        }
+    } // displayStartMessages
+
+    static startInput() {
+        [this._phase, this._inputting] = ["input", true];
+        $gameParty.makeActions();
+        $gameTroop.makeActions();
+        this._currentActor = null;
+        // Edited to help plugins alter start input behaviors in better ways
+        if (!this._canInputActs()) this.startTurn();
+        //
+    } // startInput
+
+    static inputtingAction() {
+        return this._currentActor ? this._currentActor.inputtingAction() : null;
+    } // inputtingAction
+
+    static selectNextCommand() {
+        // Edited to help plugins alter select next command in better ways
+        if (this._currentActor) this._selectNextCmdWithCurActor();
+        //
+        this.selectNextActor();
+    } // selectNextCommand
+
+    static selectNextActor() {
+        this.changeCurrentActor(true);
+        if (!this._currentActor) {
+            /** @todo Extracts these codes into a well-named function */
+            if (this.isTpb()) return this.changeCurrentActor(true);
+            this.startTurn();
+            //
+        }
+    } // selectNextActor
+
+    static selectPreviousCommand() {
+        if (this._currentActor) {
+            if (this._currentActor.selectPreviousCommand()) return;
+            this.cancelActorInput();
+        }
+        this.selectPreviousActor();
+    } // selectPreviousCommand
+
+    static selectPreviousActor() {
+        // Edited to help plugins alter select previous actor in better ways
+        if (this.isTpb()) return this._selectPrevTpbActor();
+        //
+        this.changeCurrentActor(false);
+    } // selectPreviousActor
+
+    static changeCurrentActor(forward) {
+        // Edited to help plugins alter change current actor in better ways
+        this._currentActor = this._newCurActor_(forward);
+        //
+        this.startActorInput();
+    } // changeCurrentActor
+
+    static startActorInput() {
+        // Edited to help plugins alter start actor input in better ways
+        if (this._currentActor) this._startCurActorInput();
+        //
+    } // startActorInput
+
+    static finishActorInput() {
+        // Edited to help plugins alter finish actor input in better ways
+        if (this._currentActor) this._finishCurActorInput();
+        //
+    } // finishActorInput
+
+    static cancelActorInput() {
+        if (this._currentActor) this._currentActor.setActionState("undecided");
+    } // cancelActorInput
+
+    static updateStart() {
+        this.isTpb() ? this._phase = "turn" : this.startInput();
+    } // updateStart
+
+    static startTurn() {
+        this._phase = "turn";
+        $gameTroop.increaseTurn();
+        $gameParty.requestMotionRefresh();
+        // Edited to help plugins alter start turn based turn in better ways
+        if (!this.isTpb()) this._startTurnWithoutTpb();
+        //
+    } // startTurn
+
+    static updateTurn(timeActive) {
+        $gameParty.requestMotionRefresh();
+        const isTpb = this.isTpb();
+        if (isTpb && timeActive) this.updateTpb();
+        if (!this._subject) this._subject = this.getNextSubject();
+        if (this._subject) return this.processTurn();
+        if (!isTpb) this.endTurn();
+    } // updateTurn
+
+    static updateTpb() {
+        $gameParty.updateTpb();
+        $gameTroop.updateTpb();
+        this.updateAllTpbBattlers();
+        this.checkTpbTurnEnd();
+    } // updateTpb
+
+    static updateAllTpbBattlers() {
+        this.allBattleMembers().forEach(this.updateTpbBattler, this);
+    } // updateAllTpbBattlers
+
+    static updateTpbBattler(battler) {
+        // Edited to help plugins alter the update tpb battler in better ways
+        if (battler.isTpbTurnEnd()) {
+            return this._updateTpbBattlerTurnEnd(battler);
+        }
+        if (battler.isTpbReady()) return this._updateReadyTpbBattler(battler);
+        if (battler.isTpbTimeout()) this._updateTpbBattlerTimeout(battler);
+        //
+    } // updateTpbBattler
+
+    static checkTpbTurnEnd() { if ($gameTroop.isTpbTurnEnd()) this.endTurn(); }
+
+    static processTurn() {
+        const subject = this._subject, action = subject.currentAction();
+        // Edited to help plugins alter process turn behaviors in better ways
+        if (action) return this._procTurnWithAct(action);
+        this._procTurnWithoutAct();
+        //
+    } // processTurn
+
+    static endBattlerActions(battler) {
+        // Edited to help plugins alter battler action end state in better ways
+        battler.setActionState(this._battlerActEndState());
+        //
+        battler.onAllActionsEnd();
+        battler.clearTpbChargeTime();
+        this.displayBattlerStatus(battler, true);
+    } // endBattlerActions
+
+    static endTurn() {
+        this._phase = "turnEnd";
+        this._preemptive = this._surprise = false;
+        if (!this.isTpb()) this.endAllBattlersTurn();
+    } // endTurn
+
+    static endAllBattlersTurn() {
+        // Edited to help plugins alter end all battlers turn in better ways
+        this.allBattleMembers().forEach(this._endBattlerTurn, this);
+        //
+    } // endAllBattlersTurn
+
+    static displayBattlerStatus(battler, current) {
+        this._logWindow.displayAutoAffectedStatus(battler);
+        if (current) this._logWindow.displayCurrentState(battler);
+        this._logWindow.displayRegeneration(battler);
+    } // displayBattlerStatus
+
+    static updateTurnEnd() {
+        this.isTpb() ? this.startTurn() : this.startInput();
+    } // updateTurnEnd
+
+    static getNextSubject() {
+        for (;;) {
+            const battler = this._actionBattlers.shift();
+            if (!battler) return null;
+            if (battler.isBattleMember() && battler.isAlive()) return battler;
+        }
+    } // getNextSubject
+
+    static allBattleMembers() {
+        return $gameParty.battleMembers().concat($gameTroop.members());
+    } // allBattleMembers
+    
+    // Edited to help plugins alter make action orders in better ways
+    static makeActionOrders() { this._actionBattlers = this._newActBattlers(); }
+    //
+
+    static startAction() {
+        const subject = this._subject, action = subject.currentAction();
+        const targets = action.makeTargets();
+        [this._phase, this._action, this._targets] = ["action", action, targets];
+        subject.useItem(action.item());
+        this._action.applyGlobal();
+        this._logWindow.startAction(subject, action, targets);
+    } // startAction
+
+    static updateAction() {
+        const target = this._targets.shift();
+        if (target) return this.invokeAction(this._subject, target);
+        this.endAction();
+    } // updateAction
+
+    static endAction() {
+        this._logWindow.endAction(this._subject);
+        this._phase = "turn";
+        /** @todo Extracts these codes into well-named functions */
+        if (this._subject.numActions() !== 0) return;
+        this.endBattlerActions(this._subject);
+        this._subject = null;
+        //
+    } // endAction
+
+    static invokeAction(subject, target) {
+        this._logWindow.push("pushBaseLine");
+        // Edited to help plugins alter invoke action behaviors in better ways
+        if (this._isInvokeCnt(target)) {
+            this.invokeCounterAttack(subject, target);
+        } else if (this._isInvokeMrf(target)) {
+            this.invokeMagicReflection(subject, target);
+        } else this.invokeNormalAction(subject, target);
+        //
+        subject.setLastTarget(target);
+        this._logWindow.push("popBaseLine");
+    } // invokeAction
+
+    static invokeNormalAction(subject, target) {
+        const realTarget = this.applySubstitute(target);
+        this._action.apply(realTarget);
+        this._logWindow.displayActionResults(subject, realTarget);
+    } // invokeNormalAction
+
+    static invokeCounterAttack(subject, target) {
+        const action = new Game_Action(target);
+        action.setAttack();
+        action.apply(subject);
+        this._logWindow.displayCounter(target);
+        this._logWindow.displayActionResults(target, subject);
+    } // invokeCounterAttack
+
+    static invokeMagicReflection(subject, target) {
+        this._action._reflectionTarget = target;
+        this._logWindow.displayReflection(target);
+        this._action.apply(subject);
+        this._logWindow.displayActionResults(target, subject);
+    } // invokeMagicReflection
+
+    static applySubstitute(target) {
+        if (!this.checkSubstitute(target)) return target;
+        return this._displayedSubTarget(target);
+    } // applySubstitute
+
+    static checkSubstitute(target) {
+        return target.isDying() && !this._action.isCertainHit();
+    } // checkSubstitute
+
+    static isActionForced() { return !!this._actionForcedBattler; }
+
+    static forceAction(battler) {
+        this._actionForcedBattler = battler;
+        this._actionBattlers.remove(battler);
+    } // forceAction
+
+    static processForcedAction() {
+        // Edited to help plugins alter process forced actions in better ways
+        if (this._actionForcedBattler) this._procForcedActBattler();
+        //
+    } // processForcedAction
+
+    static abort() { this._phase = "aborting"; }
+
+    static checkBattleEnd() {
+        // Added _isBattleEnd to help plugins check if the battle should end
+        if (!this._phase) return this._isBattleEnd = false;
+        if (this.checkAbort()) return this._isBattleEnd = true;
+        if ($gameParty.isAllDead()) {
+            this.processDefeat();
+        } else if ($gameTroop.isAllDead()) this.processVictory();
+        return this._isBattleEnd = true;
+        //
+    } // checkBattleEnd
+
+    static checkAbort() {
+        if (this._isProcAbort()) this.processAbort();
+        return false;
+    } // checkAbort
+
+    static processVictory() {
+        $gameParty.removeBattleStates();
+        $gameParty.performVictory();
+        this.playVictoryMe();
+        this.replayBgmAndBgs();
+        this.makeRewards();
+        this.displayVictoryMessage();
+        this.displayRewards();
+        this.gainRewards();
+        this.endBattle(0);
+    } // processVictory
+
+    static processEscape() {
+        $gameParty.performEscape();
+        SoundManager.playEscape();
+        const success = this._isEscSuc();
+        success ? this.onEscapeSuccess() : this.onEscapeFailure();
+        return success;
+    } // processEscape
+
+    static onEscapeSuccess() {
+        this.displayEscapeSuccessMessage();
+        this._escaped = true;
+        this.processAbort();
+    } // onEscapeSuccess
+
+    static onEscapeFailure() {
+        $gameParty.onEscapeFailure();
+        this.displayEscapeFailureMessage();
+        // Edited to help plugins alter escape ratio increment in better ways
+        this._escapeRatio += this._escRatioIncrement();
+        //
+        if (!this.isTpb()) this.startTurn();
+    } // onEscapeFailure
+
+    static processAbort() {
+        $gameParty.removeBattleStates();
+        this._logWindow.clear();
+        this.replayBgmAndBgs();
+        this.endBattle(1);
+    } // processAbort
+
+    static processDefeat() {
+        this.displayDefeatMessage();
+        this.playDefeatMe();
+        this._canLose ? this.replayBgmAndBgs() : AudioManager.stopBgm();
+        this.endBattle(2);
+    } // processDefeat
+
+    static endBattle(result) {
+        this._phase = "battleEnd";
+        this.cancelActorInput();
+        this._inputting = false;
+        if (this._eventCallback) this._eventCallback(result);
+        if (result === 0) return $gameSystem.onBattleWin();
+        if (this._escaped) $gameSystem.onBattleEscape();
+    } // endBattle
+
+    static updateBattleEnd() {
+        // Edited to help plugins alter update battle end in better ways
+        if (this.isBattleTest()) {
+            this._updateBattleTestEnd();
+        } else if (this._shouldDefeat()) {
+            this._updateBattleEndDefeat();
+        } else SceneManager.pop();
+        //
+        this._phase = "";
+    } // updateBattleEnd
+
+    // Edited to help plugins alter make rewards behaviors in better ways
+    static makeRewards() { this._rewards = this._newRewards(); }
+    //
+
+    static displayVictoryMessage() {
+        $gameMessage.add(TextManager.victory.format($gameParty.name()));
+    } // displayVictoryMessage
+
+    static displayDefeatMessage() {
+        $gameMessage.add(TextManager.defeat.format($gameParty.name()));
+    } // displayDefeatMessage
+
+    static displayEscapeSuccessMessage() {
+        $gameMessage.add(TextManager.escapeStart.format($gameParty.name()));
+    } // displayEscapeSuccessMessage
+
+    static displayEscapeFailureMessage() {
+        $gameMessage.add(TextManager.escapeStart.format($gameParty.name()));
+        $gameMessage.add("\\." + TextManager.escapeFailure);
+    } // displayEscapeFailureMessage
+
+    static displayRewards() {
+        this.displayExp();
+        this.displayGold();
+        this.displayDropItems();
+    } // displayRewards
+
+    static displayExp() {
+        const exp = this._rewards.exp;
+        if (exp <= 0) return;
+        const text = TextManager.obtainExp.format(exp, TextManager.exp);
+        $gameMessage.add("\\." + text);
+    } // displayExp
+
+    static displayGold() {
+        const gold = this._rewards.gold;
+        if (gold <= 0) return;
+        $gameMessage.add("\\." + TextManager.obtainGold.format(gold));
+    } // displayGold
+
+    static displayDropItems() {
+        // Edited to help plugins alter display drop items in better ways
+        if (!this._rewards.items.isEmpty()) this._displayExistingDropItems();
+        //
+    } // displayDropItems
+
+    static gainRewards() {
+        this.gainExp();
+        this.gainGold();
+        this.gainDropItems();
+    } // gainRewards
+
+    static gainExp() {
+        const exp = this._rewards.exp;
+        $gameParty.allMembers().forEach(actor => actor.gainExp(exp));
+    } // gainExp
+
+    static gainGold() { $gameParty.gainGold(this._rewards.gold) }
+
+    static gainDropItems() {
+        this._rewards.items.forEach(item => $gameParty.gainItem(item, 1));
+    } // gainDropItems
+
+    /**
+     * Nullipotent
+     * @author DoubleX @since 0.9.5 @version 0.9.5
+     * @returns {boolean} Whether the battle has a preemptive start
+     */
+    static _encounterPreemptive() {
+        return Math.random() < this.ratePreemptive();
+    } // _encounterPreemptive
+
+    /**
+     * Nullipotent
+     * @author DoubleX @since 0.9.5 @version 0.9.5
+     * @returns {boolean} Whether the battle has a surprise start
+     */
+    static _encounterSurprise() {
+        return Math.random() < this.rateSurprise() && !this._preemptive;
+    } // _encounterSurprise
+
+    /**
+     * Nullipotent
+     * @author DoubleX @since 0.9.5 @version 0.9.5
+     * @returns {number} The probability of the party escape attempt to succeed
+     */
+    static _newEscRatio() {
+        return 0.5 * $gameParty.agility() / $gameTroop.agility();
+    } // _newEscRatio
+
+    /**
+     * Nullipotent
+     * @author DoubleX @since 0.9.5 @version 0.9.5
+     * @returns {boolean} Whether the current input progress should be cancelled
+     */
+    static _isCancelCurInput() {
+        return !this.isPartyTpbInputtable() || this.needsActorInputCancel();
+    } // _isCancelCurInput
+
+    /**
+     * Cancels the player inputs of the currently inputting actor
+     * Idempotent
+     * @author DoubleX @since 0.9.5 @version 0.9.5
+     */
+    static _cancelCurInput() {
+        this.cancelActorInput();
+        [this._currentActor, this._inputting] = [null, false];
+    } // _cancelCurInput
+
+    /**
+     * Nullipotent
+     * @author DoubleX @since 0.9.5 @version 0.9.5
+     * @returns {boolean} Whether players can input actions for the game party
+     */
+    static _canInputActs() { return !this._surprise && $gameParty.canInput(); }
+
+    /**
+     * This function shouldn't be called without an existing current actor
+     * @author DoubleX @since 0.9.5 @version 0.9.5
+     */
+    static _selectNextCmdWithCurActor() {
+        if (this._currentActor.selectNextCommand()) return;
+        this.finishActorInput();
+    } // _selectNextCmdWithCurActor
+
+    /**
+     * Selects the previous inputable actor in the TPB system
+     * @author DoubleX @since 0.9.5 @version 0.9.5
+     */
+    static _selectPrevTpbActor() {
+        this.changeCurrentActor(true);
+        if (!this._currentActor) this._inputting = $gameParty.canInput();
+    } // _selectPrevTpbActor
+
+    /**
+     * Nullipotent
+     * @author DoubleX @since 0.9.5 @version 0.9.5
+     * @returns {Game_Actor?} The actor as the selected one to input actions
+     */
+    static _newCurActor_(forward) {
+        const members = $gameParty.battleMembers();
+        const iIncrement = forward ? 1 : -1;
+        let currentI = members.indexOf(this._currentActor);
+        for (;;) {
+            currentI += iIncrement;
+            const actor = members[currentI];
+            if (!actor) return null;
+            if (actor.canInput()) return actor;
+        }
+    } // _newCurActor_
+
+    /**
+     * This function shouldn't be called without the existing current actor
+     * @author DoubleX @since 0.9.5 @version 0.9.5
+     */
+    static _startCurActorInput() {
+        this._currentActor.setActionState("inputting");
+        this._inputting = true;
+    } // _startCurActorInput
+
+    /**
+     * This function shouldn't be called without the existing current actor
+     * @author DoubleX @since 0.9.5 @version 0.9.5
+     */
+    static _finishCurActorInput() {
+        if (this.isTpb()) this._currentActor.startTpbCasting();
+        this._currentActor.setActionState("waiting");
+    } // _finishCurActorInput
+
+    /**
+     * Starts the battle turn in the default turn based battle system
+     * @author DoubleX @since 0.9.5 @version 0.9.5
+     */
+    static _startTurnWithoutTpb() {
+        this.makeActionOrders();
+        this._logWindow.startTurn();
+        this._inputting = false;
+    } // _startTurnWithoutTpb
+
+    /**
+     * Updates the battler individual turn in the TPB system
+     * @author DoubleX @since 0.9.5 @version 0.9.5
+     * @param {Game_Battler} battler - The battler to have the turn ended
+     */
+    static _updateTpbBattlerTurnEnd(battler) {
+        battler.onTurnEnd();
+        battler.startTpbTurn();
+        this.displayBattlerStatus(battler, false);
+    } // _updateTpbBattlerTurnEnd
+
+    /**
+     * Updates the battler being ready to execute actions
+     * @author DoubleX @since 0.9.5 @version 0.9.5
+     * @param {Game_Battler} battler - The battler ready to execute actions
+     */
+    static _updateReadyTpbBattler(battler) {
+        battler.startTpbAction();
+        this._actionBattlers.push(battler);
+    } // _updateReadyTpbBattler
+
+    /**
+     * Updates the battler just reaching the timeout
+     * @author DoubleX @since 0.9.5 @version 0.9.5
+     * @param {Game_Battler} battler - The battler just reaching the timeout
+     */
+    static _updateTpbBattlerTimeout(battler) {
+        battler.onTpbTimeout();
+        this.displayBattlerStatus(battler, true);
+    } // _updateTpbBattlerTimeout
+
+    /**
+     * Processes the battle turn with an action to be executed
+     * @author DoubleX @since 0.9.5 @version 0.9.5
+     * @param {Game_Action} action - The action to be executed
+     */
+    static _procTurnWithAct(action) {
+        action.prepare();
+        if (action.isValid()) this.startAction();
+        subject.removeCurrentAction();
+    } // _procTurnWithAct
+
+    /**
+     * Processes the battle turn without an action to be executed
+     * @author DoubleX @since 0.9.5 @version 0.9.5
+     */
+    static _procTurnWithoutAct() {
+        this.endAction();
+        this._subject = null;
+    } // _procTurnWithoutAct
+
+    /**
+     * Nullipotent
+     * @author DoubleX @since 0.9.5 @version 0.9.5
+     * @returns {pose} The pose of the battler ending executing an action
+     */
+    static _battlerActEndState() { return this.isTpb() ? "undecided" : "done"; }
+
+    /**
+     * Ends the individual turn of the specified battler
+     * @author DoubleX @since 0.9.5 @version 0.9.5
+     * @returns {Game_Battler} battler - The battler to have the turn ended
+     */
+    static _endBattlerTurn(battler) {
+        battler.onTurnEnd();
+        this.displayBattlerStatus(battler, false);
+    } // _endBattlerTurn
+
+    /**
+     * Nullipotent
+     * @author DoubleX @since 0.9.5 @version 0.9.5
+     * @returns {[Game_Battler]} The list of action execution subjects
+     */
+    static _newActBattlers() {
+        const battlers = [];
+        if (!this._surprise) battlers.push(...$gameParty.battleMembers());
+        if (!this._preemptive) battlers.push(...$gameTroop.members());
+        battlers.forEach(battler => battler.makeSpeed());
+        battlers.sort((a, b) => b.speed() - a.speed());
+        return battlers;
+    } // _newActBattlers
+
+    /**
+     * Nullipotent
+     * @author DoubleX @since 0.9.5 @version 0.9.5
+     * @returns {boolean} Whether the battle should be aborted
+     */
+    static _isInvokeCnt(target) {
+        return Math.random() < this._action.itemCnt(target);
+    } // _isInvokeCnt
+
+    /**
+     * Nullipotent
+     * @author DoubleX @since 0.9.5 @version 0.9.5
+     * @returns {boolean} Whether the battle should be aborted
+     */
+    static _isInvokeMrf(target) {
+        return Math.random() < this._action.itemMrf(target)
+    } // _isInvokeMrf
+
+    /**
+     * Displays the action target substitute if any
+     * @author DoubleX @since 0.9.5 @version 0.9.5
+     * @returns {Game_Battler} The battler as the action target substitute
+     */
+    static _displayedSubTarget(target) {
+        const substitute = target.friendsUnit().substituteBattler();
+        if (!substitute || target === substitute) return target;
+        this._logWindow.displaySubstitute(substitute, target);
+        return substitute;
+    } // _displayedSubTarget
+
+    /**
+     * Setups the forced action and its action execution subject
+     * @author DoubleX @since 0.9.5 @version 0.9.5
+     */
+    static _procForcedActBattler() {
+        if (this._subject) this.endBattlerActions(this._subject);
+        this._subject = this._actionForcedBattler;
+        this._actionForcedBattler = null;
+        this.startAction();
+        this._subject.removeCurrentAction();
+    } // _procForcedActBattler
+
+    /**
+     * Nullipotent
+     * @author DoubleX @since 0.9.5 @version 0.9.5
+     * @returns {boolean} Whether the battle should be aborted
+     */
+    static _isProcAbort() { return $gameParty.isEmpty() || this.isAborting() }
+
+    /**
+     * Nullipotent
+     * @author DoubleX @since 0.9.5 @version 0.9.5
+     * @returns {boolean} Whether the party escape attempt should succeed
+     */
+    static _isEscSuc() {
+        return this._preemptive || Math.random() < this._escapeRatio;
+    } //_isEscSuc
+
+    /**
+     * Nullipotent
+     * @author DoubleX @since 0.9.5 @version 0.9.5
+     * @returns {number} The party escape attempt success probability increment
+     */
+    static _escRatioIncrement() { return 0.1; }
+
+    /**
+     * Triggers events to happen upon a battle test end
+     * Idempotent
+     * @author DoubleX @since 0.9.5 @version 0.9.5
+     */
+    static _updateBattleTestEnd() {
+        AudioManager.stopBgm();
+        SceneManager.exit();
+    } // _updateBattleTestEnd
+
+    /**
+     * Nullipotent
+     * @author DoubleX @since 0.9.5 @version 0.9.5
+     * @returns {boolean} Whether the battle should end with a defeat
+     */
+    static _shouldDefeat() { return !this._escaped && $gameParty.isAllDead(); }
+
+    /**
+     * Triggers events to happen upon a battle that's supposed to be a defeat
+     * @author DoubleX @since 0.9.5 @version 0.9.5
+     */
+    static _updateBattleEndDefeat() {
+        if (this._canLose) return this._updateBattleEndCanLose();
+        SceneManager.goto(Scene_Gameover);
+    } // _updateBattleEndDefeat
+
+    /**
+     * Triggers events to happen upon a battle that's lost but can lose
+     * @author DoubleX @since 0.9.5 @version 0.9.5
+     */
+    static _updateBattleEndCanLose() {
+        $gameParty.reviveBattleMembers();
+        SceneManager.pop();
+    } // _updateBattleEndCanLose
+
+    /**
+     * Nullipotent
+     * @author DoubleX @since 0.9.5 @version 0.9.5
+     * @returns {{*}} The new battle victory rewards
+     */
+    static _newRewards() {
+        return {
+            gold: $gameTroop.goldTotal(),
+            exp: $gameTroop.expTotal(),
+            items: $gameTroop.makeDropItems()
+        };
+    } // _newRewards
+
+    /**
+     * Displays all existing drop items as the battle victory rewards
+     * @author DoubleX @since 0.9.5 @version 0.9.5
+     */
+    static _displayExistingDropItems() {
+        $gameMessage.newPage();
+        this._rewards.items.forEach(({ name }) => {
+            $gameMessage.add(TextManager.obtainItem.format(name));
+        });
+    } // _displayExistingDropItems
+
+} // BattleManager
 
 /*----------------------------------------------------------------------------*/
