@@ -306,7 +306,13 @@ class ES6ExtendedClassAlias {
     } // _updateStaticFuncs
 
 } // ES6ExtendedClassAlias
-//
+// You can copy this class without giving me crefit or asking users to do so
+
+/*============================================================================*/
+
+/*----------------------------------------------------------------------------
+ *    ## Core
+ *----------------------------------------------------------------------------*/
 
 /*----------------------------------------------------------------------------
  *    # Edit class: Array
@@ -7361,3 +7367,572 @@ class JsonEx {
     } // _decodeValObj
 
 } // JsonEx
+
+/*----------------------------------------------------------------------------*/
+
+/*----------------------------------------------------------------------------
+ *    ## Managers
+ *----------------------------------------------------------------------------*/
+
+/*----------------------------------------------------------------------------
+ *    # Rewritten class: AudioManager
+ *      - Rewrites it into the ES6 standard
+ *----------------------------------------------------------------------------*/
+
+//-----------------------------------------------------------------------------
+// AudioManager
+//
+// The static class that handles BGM, BGS, ME and SE.
+class AudioManager {
+
+    constructor() { throw new Error("This is a static class"); }
+
+    static _bgmVolume = 100;
+    static _bgsVolume = 100;
+    static _meVolume = 100;
+    static _seVolume = 100;
+    static _currentBgm = null;
+    static _currentBgs = null;
+    static _bgmBuffer = null;
+    static _bgsBuffer = null;
+    static _meBuffer = null;
+    static _seBuffers = [];
+    static _staticBuffers = [];
+    static _replayFadeTime = 0.5;
+    static _path = "audio/";
+
+    get bgmVolume() { return this._bgmVolume; }
+    set bgmVolume(value) {
+        this._bgmVolume = value;
+        this.updateBgmParameters(this._currentBgm);
+    } // bgmVolume
+
+    get bgsVolume() { return this._bgsVolume; }
+    set bgsVolume(value) {
+        this._bgsVolume = value;
+        this.updateBgsParameters(this._currentBgs);
+    } // bgsVolume
+
+    get meVolume() { return this._meVolume; }
+    set meVolume(value) {
+        this._meVolume = value;
+        this.updateMeParameters(this._currentMe);
+    } // meVolume
+
+    get seVolume() { return this._seVolume; }
+    set seVolume(value) { this._seVolume = value; }
+
+    static playBgm(bgm, pos) {
+        // Edited to help plugins alter play new bgm behaviors in better ways
+        if (this.isCurrentBgm(bgm)) {
+            this.updateBgmParameters(bgm);
+        } else this._playNewBgm(bgm, pos);
+        //
+        this.updateCurrentBgm(bgm, pos);
+    } // playBgm
+
+    static replayBgm(bgm) {
+        if (this.isCurrentBgm(bgm)) return this.updateBgmParameters(bgm);
+        // Edited to help plugins alter replay new bgm behaviors in better ways
+        this._replayNewBgm(bgm);
+        //
+    } // replayBgm
+
+    static isCurrentBgm(bgm) {
+        if (!this._currentBgm) return false;
+        return this._bgmBuffer && this._currentBgm.name === bgm.name;
+    } // isCurrentBgm
+
+    static updateBgmParameters(bgm) {
+        this.updateBufferParameters(this._bgmBuffer, this._bgmVolume, bgm);
+    } // updateBgmParameters
+
+    static updateCurrentBgm(bgm, pos) {
+        this._currentBgm = {
+            name: bgm.name,
+            volume: bgm.volume,
+            pitch: bgm.pitch,
+            pan: bgm.pan,
+            pos: pos
+        };
+    } // updateCurrentBgm
+
+    // Edited to help plugins alter stop bgm behaviors in better ways
+    static stopBgm() { if (this._bgmBuffer) this._stopBgmWithBuffer(); }
+    //
+
+    static fadeOutBgm(duration) {
+        if (!this._hasCurrentBgmBuffer()) return;
+        this._fadeOutCurrentBgmWithBuffer(duration);
+    } // fadeOutBgm
+
+    static fadeInBgm(duration) {
+        if (this._hasCurrentBgmBuffer()) this._bgmBuffer.fadeIn(duration);
+    } // fadeInBgm
+
+    static playBgs(bgs, pos) {
+        // Edited to help plugins alter play new bgs behaviors in better ways
+        if (this.isCurrentBgs(bgs)) {
+            this.updateBgsParameters(bgs);
+        } else this._playNewBgs(bgs, pos);
+        //
+        this.updateCurrentBgs(bgs, pos);
+    } // playBgs
+
+    static replayBgs(bgs) {
+        if (this.isCurrentBgs(bgs)) return this.updateBgsParameters(bgs);
+        // Edited to help plugins alter replay new bgs behaviors in better ways
+        this._replayNewBgs(bgs);
+        //
+    } // replayBgs
+
+    static isCurrentBgs(bgs) {
+        if (!this._currentBgs) return false;
+        return this._bgsBuffer && this._currentBgs.name === bgs.name;
+    } // isCurrentBgs
+
+    static updateBgsParameters(bgs) {
+        this.updateBufferParameters(this._bgsBuffer, this._bgsVolume, bgs);
+    } // updateBgsParameters
+
+    static updateCurrentBgs(bgs, pos) {
+        this._currentBgs = {
+            name: bgs.name,
+            volume: bgs.volume,
+            pitch: bgs.pitch,
+            pan: bgs.pan,
+            pos: pos
+        };
+    } // updateCurrentBgs
+
+    // Edited to help plugins alter stop bgs behaviors in better ways
+    static stopBgs() { if (this._bgsBuffer) this._stopBgsWithBuffer(); }
+    //
+
+    static fadeOutBgs(duration) {
+        if (!this._hasCurrentBgsBuffer()) return;
+        this._fadeOutCurrentBgsWithBuffer(duration);
+    } // fadeOutBgs
+
+    static fadeInBgs(duration) {
+        if (this._hasCurrentBgsBuffer()) this._bgsBuffer.fadeIn(duration);
+    } // fadeInBgs
+
+    static playMe(me) {
+        this.stopMe();
+        // Edited to help plugins alter play me behaviors in better ways
+        if (me.name) this._playMeWithName(me);
+        //
+    } // playMe
+
+    static updateMeParameters(me) {
+        this.updateBufferParameters(this._meBuffer, this._meVolume, me);
+    } // updateMeParameters
+
+    static fadeOutMe(duration) {
+        if (this._meBuffer) this._meBuffer.fadeOut(duration);
+    } // fadeOutMe
+
+    static stopMe() { if (this._meBuffer) this._stopMeWithBuffer(); }
+
+    static playSe(se) { if (se.name) this._playSeWithName(se); } // playSe
+
+    static updateSeParameters(buffer, se) {
+        this.updateBufferParameters(buffer, this._seVolume, se);
+    } // updateSeParameters
+
+    static cleanupSe() {
+        this._seBuffers = this._seBuffers.filter(buffer => buffer.isPlaying());
+    } // cleanupSe
+
+    static stopSe() {
+        this._seBuffers.forEach(buffer => buffer.destroy());
+        this._seBuffers = [];
+    } // stopSe
+
+    // Edited to help plugins alter play static se behviors in better ways
+    static playStaticSe(se) { if (se.name) this._playStaticSeWithName(se); }
+    //
+
+    static loadStaticSe(se) {
+        if (!se.name || this.isStaticSe(se)) return;
+        this._staticBuffers.push(this.createBuffer("se/", se.name));
+    } // loadStaticSe
+
+    static isStaticSe(se) {
+        const { name } = se;
+        return this._staticBuffers.some(buffer => buffer.name === name);
+    } // isStaticSe
+
+    static stopAll() {
+        this.stopMe();
+        this.stopBgm();
+        this.stopBgs();
+        this.stopSe();
+    } // stopAll
+
+    static saveBgm() {
+        if (this._currentBgm) return this._saveCurrentBgm();
+        return this.makeEmptyAudioObject();
+    } // saveBgm
+
+    static saveBgs() {
+        if (this._currentBgs) return this._saveCurrentBgs();
+        return this.makeEmptyAudioObject();
+    } // saveBgs
+
+    static makeEmptyAudioObject() { return { name: "", volume: 0, pitch: 0 }; }
+
+    static createBuffer(folder, name) {
+        // Edited to help plugins alter the buffer url in better ways
+        const buffer = new WebAudio(this._newBufferUrl(folder, name));
+        //
+        [buffer.name, buffer.frameCount] = [name, Graphics.frameCount];
+        return buffer;
+    } // createBuffer
+
+    static updateBufferParameters(buffer, configVolume, audio) {
+        if (!buffer || !audio) return;
+        buffer.volume = (configVolume * (audio.volume || 0)) / 10000;
+        buffer.pitch = (audio.pitch || 0) / 100;
+        buffer.pan = (audio.pan || 0) / 100;
+    } // updateBufferParameters
+
+    static audioFileExt() { return ".ogg"; }
+
+    static checkErrors() {
+        const buffers = [this._bgmBuffer, this._bgsBuffer, this._meBuffer];
+        buffers.fastMerge(this._seBuffers).fastMerge(this._staticBuffers);
+        // Edited to help plugins alter check error behaviors in better ways
+        buffers.forEach(this._checkBufferError, this);
+        //
+    } // checkErrors
+
+    static throwLoadError(webAudio) {
+        throw ["LoadError", webAudio.url, webAudio.retry.bind(webAudio)];
+    } // throwLoadError
+
+    /**
+     * Plays the specified new bgm with the specified position
+     * Idempotent
+     * @author DoubleX @since 0.9.5 @version 0.9.5
+     * @param {Audio} bgm - The bgm with its name, pan, pitch and volume
+     * @param {number} pos - The start position to play in seconds
+     */
+    static _playNewBgm(bgm, pos) {
+        this.stopBgm();
+        if (bgm.name) this._playNewBgmWithName(bgm, pos);
+    } // _playNewBgm
+
+    /**
+     * This function shouldn't be called without an existing bgm name
+     * Idempotent
+     * @author DoubleX @since 0.9.5 @version 0.9.5
+     * @param {Audio} bgm - The bgm with its name, pan, pitch and volume
+     * @param {number} pos - The start position to play in seconds
+     */
+    static _playNewBgmWithName(bgm, pos) {
+        this._bgmBuffer = this.createBuffer("bgm/", bgm.name);
+        this.updateBgmParameters(bgm);
+        if (!this._meBuffer) this._bgmBuffer.play(true, pos || 0);
+    } // _playNewBgmWithName
+
+    /**
+     * Replays the specified new bgm
+     * Idempotent
+     * @author DoubleX @since 0.9.5 @version 0.9.5
+     * @param {Audio} bgm - The bgm with its name, pan, pitch and volume
+     */
+    static _replayNewBgm(bgm) {
+        this.playBgm(bgm, bgm.pos);
+        if (this._bgmBuffer) this._bgmBuffer.fadeIn(this._replayFadeTime);
+    } // _replayNewBgm
+
+    /**
+     * This function shouldn't be called without an existing bgm buffer
+     * Idempotent
+     * @author DoubleX @since 0.9.5 @version 0.9.5
+     */
+    static _stopBgmWithBuffer() {
+        this._bgmBuffer.destroy();
+        this._bgmBuffer = this._currentBgm = null;
+    } // _stopBgmWithBuffer
+
+    /**
+     * This function shouldn't be called without the current bgm and bgm buffer
+     * Idempotent
+     * @author DoubleX @since 0.9.5 @version 0.9.5
+     * @param {number} duration - Fade-out time in seconds
+     */
+    static _fadeOutCurrentBgmWithBuffer(duration) {
+        this._bgmBuffer.fadeOut(duration);
+        this._currentBgm = null;
+    } // _fadeOutCurrentBgmWithBuffer
+
+    /**
+     * Plays the specified new bgs with the specified position
+     * Idempotent
+     * @author DoubleX @since 0.9.5 @version 0.9.5
+     * @param {Audio} bgs - The bgs with its name, pan, pitch and volume
+     * @param {number} pos - The start position to play in seconds
+     */
+    static _playNewBgs(bgs, pos) {
+        this.stopBgs();
+        if (bgs.name) this._playNewBgsWithName(bgs, pos);
+    } // _playNewBgs
+
+    /**
+     * This function shouldn't be called without an existing bgs name
+     * Idempotent
+     * @author DoubleX @since 0.9.5 @version 0.9.5
+     * @param {Audio} bgs - The bgs with its name, pan, pitch and volume
+     * @param {number} pos - The start position to play in seconds
+     */
+    static _playNewBgsWithName(bgs, pos) {
+        this._bgsBuffer = this.createBuffer("bgs/", bgs.name);
+        this.updateBgsParameters(bgs);
+        this._bgsBuffer.play(true, pos || 0);
+    } // _playNewBgsWithName
+
+    /**
+     * Replays the specified new bgs
+     * Idempotent
+     * @author DoubleX @since 0.9.5 @version 0.9.5
+     * @param {Audio} bgs - The bgs with its name, pan, pitch and volume
+     */
+    static _replayNewBgs(bgs) {
+        this.playBgs(bgs, bgs.pos);
+        if (this._bgsBuffer) this._bgsBuffer.fadeIn(this._replayFadeTime);
+    } // _replayNewBgs
+
+    /**
+     * This function shouldn't be called without an existing bgs buffer
+     * Idempotent
+     * @author DoubleX @since 0.9.5 @version 0.9.5
+     */
+    static _stopBgsWithBuffer() {
+        this._bgsBuffer.destroy();
+        this._bgsBuffer = this._currentBgs = null;
+    } // _stopBgsWithBuffer
+
+    /**
+     * Nullipotent
+     * @author DoubleX @since 0.9.5 @version 0.9.5
+     * @returns {boolean} Whether the bgs buffer and the current bgs exist
+     */
+    static _hasCurrentBgsBuffer() {
+        return this._bgsBuffer && this._currentBgs;
+    } // _hasCurrentBgmBuffer
+
+    /**
+     * This function shouldn't be called without the current bgs and bgs buffer
+     * Idempotent
+     * @author DoubleX @since 0.9.5 @version 0.9.5
+     * @param {number} duration - Fade-out time in seconds
+     */
+    static _fadeOutCurrentBgsWithBuffer(duration) {
+        this._bgsBuffer.fadeOut(duration);
+        this._currentBgs = null;
+    } // _fadeOutCurrentBgsWithBuffer
+
+    /**
+     * This function shouldn't be called without an existing me name
+     * Idempotent
+     * @author DoubleX @since 0.9.5 @version 0.9.5
+     * @param {Audio} me - The me with its name, pan, pitch and volume
+     */
+    static _playMeWithName(me) {
+        if (this._hasCurrentBgmBuffer()) this._stopCurrentBgmBuffer();
+        this._playMeBufferWithName(me);
+    } // _playMeWithName
+
+    /**
+     * Stores the current bgm buffer position then immediately stops it
+     * Idempotent
+     * @author DoubleX @since 0.9.5 @version 0.9.5
+     */
+    static _stopCurrentBgmBuffer() {
+        this._currentBgm.pos = this._bgmBuffer.seek();
+        this._bgmBuffer.stop();
+    } // _stopCurrentBgmBuffer
+
+    /**
+     * This function shouldn't be called without an existing me name
+     * Idempotent
+     * @author DoubleX @since 0.9.5 @version 0.9.5
+     * @param {Audio} me - The me with its name, pan, pitch and volume
+     */
+    static _playMeBufferWithName(me) {
+        this._meBuffer = this.createBuffer("me/", me.name);
+        this.updateMeParameters(me);
+        this._meBuffer.play(false);
+        this._meBuffer.addStopListener(this.stopMe.bind(this));
+    } // _playMeBufferWithName
+
+    /**
+     * This function shouldn't be called without an existing me buffer
+     * Idempotent
+     * @author DoubleX @since 0.9.5 @version 0.9.5
+     */
+    static _stopMeWithBuffer() {
+        this._destroyMeBuffer();
+        /** @todo Extracts these codes into well-named functions */
+        if (this._hasCurrentBgmBuffer() && !this._bgmBuffer.isPlaying()) {
+            this._bgmBuffer.play(true, this._currentBgm.pos);
+            this._bgmBuffer.fadeIn(this._replayFadeTime);
+        }
+        //
+    } // _stopMeWithBuffer
+
+    /**
+     * This function shouldn't be called without an existing me buffer
+     * Idempotent
+     * @author DoubleX @since 0.9.5 @version 0.9.5
+     */
+    static _destroyMeBuffer() {
+        this._meBuffer.destroy();
+        this._meBuffer = null;
+    } // _destroyMeBuffer
+
+    /**
+     * Nullipotent
+     * @author DoubleX @since 0.9.5 @version 0.9.5
+     * @returns {boolean} Whether the bgm buffer and the current bgm exist
+     */
+    static _hasCurrentBgmBuffer() {
+        return this._bgmBuffer && this._currentBgm;
+    } // _hasCurrentBgmBuffer
+
+    /**
+     * This function shouldn't be called without an existing se name
+     * Idempotent
+     * @author DoubleX @since 0.9.5 @version 0.9.5
+     * @param {Audio} se - The se with its name, pan, pitch and volume
+     */
+    static _playSeWithName(se) {
+        // [Note] Do not play the same sound in the same frame.
+        if (this._hasLatestBuffer(se.name)) return;
+        this._playNewSeBufferWithName(se);
+    } // _playSeWithName
+
+    /**
+     * Nullipotent
+     * @author DoubleX @since 0.9.5 @version 0.9.5
+     * @param {string} seName - The name of the specified se to be checked
+     * @returns {boolean} Whether the specified se name has a latest buffer
+     */
+    static _hasLatestBuffer(seName) {
+        const frameCount = Graphics.frameCount;
+        return this._seBuffers.some(buffer => {
+            return buffer.frameCount === frameCount && buffer.name === seName;
+        });
+    } // _hasLatestBuffer
+
+    /**
+     * This function shouldn't be called without an existing se name
+     * Idempotent
+     * @author DoubleX @since 0.9.5 @version 0.9.5
+     * @param {Audio} se - The se with its name, pan, pitch and volume
+     */
+    static _playNewSeBufferWithName(se) {
+        // [Note] Do not play the same sound in the same frame.
+        const buffer = this.createBuffer("se/", name);
+        this.updateSeParameters(buffer, se);
+        buffer.play(false);
+        this._seBuffers.push(buffer);
+        this.cleanupSe();
+    } // _playNewSeBufferWithName
+
+    /**
+     * This function shouldn't be called without an existing se name
+     * Idempotent
+     * @author DoubleX @since 0.9.5 @version 0.9.5
+     * @param {Audio} se - The se with its name, pan, pitch and volume
+     */
+    static _playStaticSeWithName(se) {
+        this.loadStaticSe(se);
+        const { name } = se.name;
+        const staticBuffer_ = this._staticBuffers.find(buffer => {
+            return buffer.name === name;
+        });
+        if (staticBuffer_) this._playStaticSeBufferWithName(staticBuffer_, se);
+    } // _playStaticSeWithName
+
+    /**
+     * This function shouldn't be called without an existing se name
+     * Idempotent
+     * @author DoubleX @since 0.9.5 @version 0.9.5
+     * @param {WebAudio} buffer - The static buffer of static se to be played
+     * @param {Audio} se - The se with its name, pan, pitch and volume
+     */
+    static _playStaticSeBufferWithName(buffer, se) {
+        buffer.stop();
+        this.updateSeParameters(buffer, se);
+        buffer.play(false);
+    } // _playStaticSeBufferWithName
+
+    /**
+     * This function shouldn't be called without an existing current bgm
+     * Idempotent
+     * @author DoubleX @since 0.9.5 @version 0.9.5
+     */
+    static _saveCurrentBgm() {
+        const { name, volume, pitch, pan } = this._currentBgm;
+        return {
+            name,
+            volume,
+            pitch,
+            pan,
+            pos: this._bufferPos(this._bgmBuffer)
+        };
+    } // _saveCurrentBgm
+
+    /**
+     * This function shouldn't be called without an existing current bgs
+     * Idempotent
+     * @author DoubleX @since 0.9.5 @version 0.9.5
+     */
+    static _saveCurrentBgs() {
+        const { name, volume, pitch, pan } = this._currentBgs;
+        return {
+            name,
+            volume,
+            pitch,
+            pan,
+            pos: this._bufferPos(this._bgsBuffer)
+        };
+    } // _saveCurrentBgs
+
+    /**
+     * Nullipotent
+     * @author DoubleX @since 0.9.5 @version 0.9.5
+     * @param {WebAudio?} buffer_ - The audio buffer to has its positions seeked
+     * @returns {number} The current position of the specified audio buffer
+     */
+    static _bufferPos(buffer_) { return buffer_ ? buffer_.seek() : 0 }
+
+    /**
+     * Nullipotent
+     * @author DoubleX @since 0.9.5 @version 0.9.5
+     * @param {string} folder - The folder of the audio creating its new buffer
+     * @param {string} name - The name of the audio creating its new buffer
+     * @returns {string} The url of the audio buffer to be created
+     */
+    static _newBufferUrl(folder, name) {
+        const ext = this.audioFileExt();
+        return `${this._path}${folder}${Utils.encodeURI(name)}${ext}`;
+    } // _newBufferUrl
+
+    /**
+     * Checks if the specified buffer has errors to be thrown
+     * Idempotent
+     * @author DoubleX @since 0.9.5 @version 0.9.5
+     * @param {WebAudio?} buffer_ - The audio buffer to have its errors checked
+     */
+    static _checkBufferError(buffer_) {
+        if (buffer_ && buffer_.isError()) this.throwLoadError(buffer_);
+    } // _checkBufferError
+
+} // AudioManager
+
+/*----------------------------------------------------------------------------*/
