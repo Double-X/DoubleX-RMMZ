@@ -7375,6 +7375,82 @@ class JsonEx {
  *----------------------------------------------------------------------------*/
 
 /*----------------------------------------------------------------------------
+ *    # Rewritten class: ConfigManager
+ *      - Rewrites it into the ES6 standard
+ *----------------------------------------------------------------------------*/
+
+//-----------------------------------------------------------------------------
+// ConfigManager
+//
+// The static class that manages the configuration data.
+
+class ConfigManager {
+
+    constructor() { throw new Error("This is a static class"); }
+
+    static alwaysDash = false;
+    static commandRemember = false;
+    static touchUI = true;
+    static _isLoaded = false;
+
+    get bgmVolume() { return AudioManager._bgmVolume; }
+    get bgmVolume(value) { AudioManager.bgmVolume = value; }
+
+    get bgsVolume() { return AudioManager.bgsVolume; }
+    set bgsVolume(value) { AudioManager.bgsVolume = value; }
+
+    get meVolume() { return AudioManager.meVolume; }
+    set meVolume(value) { AudioManager.meVolume = value; }
+
+    get seVolume() { return AudioManager.seVolume; }
+    set seVolume(value) { AudioManager.seVolume = value; }
+
+    static load() {
+        StorageManager.loadObject("config")
+            .then(config => this.applyData(config || {}))
+            .catch(() => 0)
+            .then(() => {
+                this._isLoaded = true;
+                return 0;
+            })
+            .catch(() => 0);
+    } // load
+
+    static save() { StorageManager.saveObject("config", this.makeData()); }
+
+    static isLoaded() { return this._isLoaded; }
+
+    static makeData() {
+        const config = {};
+        config.alwaysDash = this.alwaysDash;
+        config.commandRemember = this.commandRemember;
+        config.touchUI = this.touchUI;
+        [config.bgmVolume, config.bgsVolume] = [this.bgmVolume, this.bgsVolume];
+        [config.meVolume, config.seVolume] = [this.meVolume, this.seVolume];
+        return config;
+    } // makeData
+
+    static applyData(config) {
+        this.alwaysDash = this.readFlag(config, "alwaysDash", false);
+        this.commandRemember = this.readFlag(config, "commandRemember", false);
+        this.touchUI = this.readFlag(config, "touchUI", true);
+        this.bgmVolume = this.readVolume(config, "bgmVolume");
+        this.bgsVolume = this.readVolume(config, "bgsVolume");
+        this.meVolume = this.readVolume(config, "meVolume");
+        this.seVolume = this.readVolume(config, "seVolume");
+    } // applyData
+
+    static readFlag(config, name, defaultValue) {
+        return name in config ? !!config[name] : defaultValue;
+    } // readFlag
+
+    static readVolume(config, name) {
+        return name in config ? Number(config[name]).clamp(0, 100) : 100;
+    } // readVolume
+
+} // ConfigManager
+
+/*----------------------------------------------------------------------------
  *    # Rewritten class: AudioManager
  *      - Rewrites it into the ES6 standard
  *----------------------------------------------------------------------------*/
@@ -7933,6 +8009,104 @@ class AudioManager {
 } // AudioManager
 
 /*----------------------------------------------------------------------------
+ *    # Rewritten class: ColorManager
+ *      - Rewrites it into the ES6 standard
+ *----------------------------------------------------------------------------*/
+
+//-----------------------------------------------------------------------------
+// ColorManager
+//
+// The static class that handles the window colors.
+
+class ColorManager {
+
+    constructor() { throw new Error("This is a static class"); }
+
+    static loadWindowskin() {
+        this._windowskin = ImageManager.loadSystem("Window");
+    } // loadWindowskin
+
+    static textColor(n) {
+        const py = 144 + Math.floor(n / 8) * 12 + 6;
+        return this._windowskin.getPixel(96 + (n % 8) * 12 + 6, py);
+    } // textColor
+
+    static normalColor() { return this.textColor(0); }
+
+    static systemColor() { return this.textColor(16); }
+
+    static crisisColor() { return this.textColor(17); }
+
+    static deathColor() { return this.textColor(18); }
+
+    static gaugeBackColor() { return this.textColor(19); }
+
+    static hpGaugeColor1() { return this.textColor(20); }
+
+    static hpGaugeColor2() { return this.textColor(21); }
+
+    static mpGaugeColor1() { return this.textColor(22); }
+
+    static mpGaugeColor2() { return this.textColor(23); }
+
+    static mpCostColor() { return this.textColor(23); }
+
+    static powerUpColor() { return this.textColor(24); }
+
+    static powerDownColor() { return this.textColor(25); }
+
+    static ctGaugeColor1() { return this.textColor(26); }
+
+    static ctGaugeColor2() { return this.textColor(27); }
+
+    static tpGaugeColor1() { return this.textColor(28); }
+
+    static tpGaugeColor2() { return this.textColor(29); }
+
+    static tpCostColor() { return this.textColor(29); }
+
+    static pendingColor() { return this._windowskin.getPixel(120, 120); }
+
+    static hpColor(actor) {
+        if (!actor) return this.normalColor();
+        if (actor.isDead()) return this.deathColor();
+        if (actor.isDying()) return this.crisisColor();
+        return this.normalColor();
+    } // hpColor
+
+    static mpColor(/*actor*/) { return this.normalColor(); }
+
+    static tpColor(/*actor*/) { return this.normalColor(); }
+
+    static paramchangeTextColor(change) {
+        if (change > 0) return this.powerUpColor();
+        if (change < 0) return this.powerDownColor();
+        return this.normalColor();
+    } // paramchangeTextColor
+
+    static damageColor(colorType) {
+        switch (colorType) {
+            case 0: /* HP damage */ return "#ffffff";
+            case 1: /* HP recover */ return "#b9ffb5";
+            case 2: /* MP damage */ return "#ffff90";
+            case 3: /* MP recover */ return "#80b0ff";
+            default: return "#808080";
+        }
+    } // damageColor
+
+    static outlineColor() { return "rgba(0, 0, 0, 0.6)"; }
+
+    static dimColor1() { return "rgba(0, 0, 0, 0.6)"; }
+
+    static dimColor2() { return "rgba(0, 0, 0, 0)"; }
+
+    static itemBackColor1() { return "rgba(32, 32, 32, 0.5)"; }
+
+    static itemBackColor2() { return "rgba(0, 0, 0, 0.5)"; }
+
+} // ColorManager
+
+/*----------------------------------------------------------------------------
  *    # Rewritten class: BattleManager
  *      - Rewrites it into the ES6 standard
  *----------------------------------------------------------------------------*/
@@ -8059,7 +8233,7 @@ class BattleManager {
     } // updateEvent
 
     static updateEventMain() {
-        $gameTroop.updateInterpreter();
+         $gameTroop.updateInterpreter();
         $gameParty.requestMotionRefresh();
         // Edited to help plugins check if the event main's updated
         if ($gameTroop.isEventRunning() || this.checkBattleEnd()) {
@@ -8256,7 +8430,7 @@ class BattleManager {
     static checkTpbTurnEnd() { if ($gameTroop.isTpbTurnEnd()) this.endTurn(); }
 
     static processTurn() {
-        const subject = this._subject, action = subject.currentAction();
+        const action = this._subject.currentAction();
         // Edited to help plugins alter process turn behaviors in better ways
         if (action) return this._procTurnWithAct(action);
         this._procTurnWithoutAct();
@@ -8273,8 +8447,7 @@ class BattleManager {
     } // endBattlerActions
 
     static endTurn() {
-        this._phase = "turnEnd";
-        this._preemptive = this._surprise = false;
+        this._phase = "turnEnd", this._preemptive = this._surprise = false;
         if (!this.isTpb()) this.endAllBattlersTurn();
     } // endTurn
 
@@ -8305,7 +8478,7 @@ class BattleManager {
     static allBattleMembers() {
         return $gameParty.battleMembers().concat($gameTroop.members());
     } // allBattleMembers
-    
+     
     // Edited to help plugins alter make action orders in better ways
     static makeActionOrders() { this._actionBattlers = this._newActBattlers(); }
     //
@@ -8381,9 +8554,9 @@ class BattleManager {
     static isActionForced() { return !!this._actionForcedBattler; }
 
     static forceAction(battler) {
-        this._actionForcedBattler = battler;
-        this._actionBattlers.remove(battler);
-    } // forceAction
+         this._actionForcedBattler = battler;
+         this._actionBattlers.remove(battler);
+     } // forceAction
 
     static processForcedAction() {
         // Edited to help plugins alter process forced actions in better ways
@@ -8535,7 +8708,7 @@ class BattleManager {
         $gameParty.allMembers().forEach(actor => actor.gainExp(exp));
     } // gainExp
 
-    static gainGold() { $gameParty.gainGold(this._rewards.gold) }
+    static gainGold() { $gameParty.gainGold(this._rewards.gold); }
 
     static gainDropItems() {
         this._rewards.items.forEach(item => $gameParty.gainItem(item, 1));
@@ -8696,7 +8869,7 @@ class BattleManager {
     static _procTurnWithAct(action) {
         action.prepare();
         if (action.isValid()) this.startAction();
-        subject.removeCurrentAction();
+        this._subject.removeCurrentAction();
     } // _procTurnWithAct
 
     /**
@@ -8754,7 +8927,7 @@ class BattleManager {
      * @returns {boolean} Whether the battle should be aborted
      */
     static _isInvokeMrf(target) {
-        return Math.random() < this._action.itemMrf(target)
+        return Math.random() < this._action.itemMrf(target);
     } // _isInvokeMrf
 
     /**
@@ -8786,7 +8959,7 @@ class BattleManager {
      * @author DoubleX @since 0.9.5 @version 0.9.5
      * @returns {boolean} Whether the battle should be aborted
      */
-    static _isProcAbort() { return $gameParty.isEmpty() || this.isAborting() }
+    static _isProcAbort() { return $gameParty.isEmpty() || this.isAborting(); }
 
     /**
      * Nullipotent
@@ -8860,7 +9033,7 @@ class BattleManager {
         $gameMessage.newPage();
         this._rewards.items.forEach(({ name }) => {
             $gameMessage.add(TextManager.obtainItem.format(name));
-        });
+       });
     } // _displayExistingDropItems
 
 } // BattleManager
