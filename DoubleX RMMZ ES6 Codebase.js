@@ -12,7 +12,11 @@
  *    2. This plugin's supposed to be fully compatible with those not written
  *       with this plugin in mind, so plugin developers don't have to write 2
  *       versions per plugin
- *    3. THIS PLUGIN'S INTENDED TO GIVES AN EXTRA OPTION TO PLUGIN DEVELOPERS
+ *    3. This plugin also added some new APIs and refactored some codes to
+ *       further facilitate more effective and efficient plugin development by
+ *       making the default RMMZ codebase quality improvements even more
+ *       drastic
+ *    4. THIS PLUGIN'S INTENDED TO GIVES AN EXTRA OPTION TO PLUGIN DEVELOPERS
  *       RATHER THAN REPLACING THE DEFAULT RMMZ CODEBASE
  *----------------------------------------------------------------------------
  *    # Terms Of Use
