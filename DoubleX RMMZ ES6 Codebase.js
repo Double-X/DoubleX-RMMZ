@@ -279,6 +279,60 @@
  *         - _readLittleEndian
  *         - _readBigEndian
  *   # Managers MV functions/methods/variables not in MZ added by this plugin
+ *     1. ImageManager
+ *         Static Functions
+ *        - _generateCacheKey
+ *        - loadEmptyBitmap
+ *        - loadNormalBitmap
+ *        - reserveAnimation
+ *        - reserveBattleback1
+ *        - reserveBattleback2
+ *        - reserveEnemy
+ *        - reserveCharacter
+ *        - reserveFace
+ *        - reserveParallax
+ *        - reservePicture
+ *        - reserveSvActor
+ *        - reserveSvEnemy
+ *        - reserveSystem
+ *        - reserveTileset
+ *        - reserveTitle1
+ *        - reserveTitle2
+ *        - reserveBitmap
+ *        - reserveNormalBitmap
+ *        - releaseReservation
+ *        - setDefaultReservationId
+ *        - requestAnimation
+ *        - requestBattleback1
+ *        - requestBattleback2
+ *        - requestEnemy
+ *        - requestCharacter
+ *        - requestFace
+ *        - requestParallax
+ *        - requestPicture
+ *        - requestSvActor
+ *        - requestSvEnemy
+ *        - requestSystem
+ *        - requestTileset
+ *        - requestTitle1
+ *        - requestTitle2
+ *        - requestBitmap
+ *        - requestNormalBitmap
+ *        - update
+ *        - clearRequest
+ *        Static Variables
+ *        - cache
+ *        - _imageCache
+ *        - _requestQueue
+ *        - _systemReservationId
+ *     2. AudioManager
+ *         Static Functions
+ *        - createDecryptBuffer
+ *        - shouldUseHtml5Audio
+ *        - checkWebAudioError
+ *        Static Variables
+ *        - _masterVolume
+ *        - _blobUrl
  *============================================================================
  */
 
@@ -9067,6 +9121,62 @@ class DataManager {
         this.correctDataErrors();
     } // _onLoadGameSuc
 
+    // RMMV static variable not present in the default RMMZ codebase
+    static _lastAccessedId = 1;
+    //
+
+    // RMMV static functions not present in the default RMMZ codebase
+    static isThisGameFile(savefileId) {
+        var globalInfo = this.loadGlobalInfo();
+        if (globalInfo && globalInfo[savefileId]) {
+            if (StorageManager.isLocalMode()) {
+                return true;
+            } else {
+                var savefile = globalInfo[savefileId];
+                return (savefile.globalId === this._globalId &&
+                        savefile.title === $dataSystem.gameTitle);
+            }
+        } else {
+            return false;
+        }
+    }
+
+    static loadSavefileInfo(savefileId) {
+        var globalInfo = this.loadGlobalInfo();
+        return (globalInfo && globalInfo[savefileId]) ? globalInfo[savefileId] : null;
+    }
+
+    static lastAccessedSavefileId() {
+        return this._lastAccessedId;
+    }
+
+    static saveGameWithoutRescue(savefileId) {
+        var json = JsonEx.stringify(this.makeSaveContents());
+        if (json.length >= 200000) {
+            console.warn('Save data too big!');
+        }
+        StorageManager.save(savefileId, json);
+        this._lastAccessedId = savefileId;
+        var globalInfo = this.loadGlobalInfo() || [];
+        globalInfo[savefileId] = this.makeSavefileInfo();
+        this.saveGlobalInfo(globalInfo);
+        return true;
+    }
+
+    static loadGameWithoutRescue(savefileId) {
+        var globalInfo = this.loadGlobalInfo();
+        if (this.isThisGameFile(savefileId)) {
+            var json = StorageManager.load(savefileId);
+            this.createGameObjects();
+            this.extractSaveContents(JsonEx.parse(json));
+            this._lastAccessedId = savefileId;
+            return true;
+        } else {
+            return false;
+        }
+    }
+    //
+
 } // DataManager
 
 /*----------------------------------------------------------------------------
@@ -9359,6 +9469,218 @@ class ImageManager {
     static _bitmapUrl(folder, filename) {
         return `${folder}${Utils.encodeURI(filename)}.png`;
     } // _bitmapUrl
+
+    // RMMV static variables not present in the default RMMZ codebase
+    static cache = new CacheMap(ImageManager);
+
+    static _imageCache = new ImageCache();
+    static _requestQueue = new RequestQueue();
+    static _systemReservationId = Utils.generateRuntimeId();
+    //
+
+    // RMMV static functions not present in the default RMMZ codebase
+    static _generateCacheKey(path, hue) { return  path + ':' + hue; }
+
+    static loadEmptyBitmap() {
+        var empty = this._imageCache.get('empty');
+        if(!empty){
+            empty = new Bitmap();
+            this._imageCache.add('empty', empty);
+            this._imageCache.reserve('empty', empty, this._systemReservationId);
+        }
+    
+        return empty;
+    }
+
+    static loadNormalBitmap(path, hue) {
+        var key = this._generateCacheKey(path, hue);
+        var bitmap = this._imageCache.get(key);
+        if (!bitmap) {
+            bitmap = Bitmap.load(decodeURIComponent(path));
+            bitmap.addLoadListener(function() {
+                bitmap.rotateHue(hue);
+            });
+            this._imageCache.add(key, bitmap);
+        }else if(!bitmap.isReady()){
+            bitmap.decode();
+        }
+        return bitmap;
+    }
+
+    static reserveAnimation(filename, hue, reservationId) {
+        return this.reserveBitmap('img/animations/', filename, hue, true, reservationId);
+    }
+
+    static reserveBattleback1(filename, hue, reservationId) {
+        return this.reserveBitmap('img/battlebacks1/', filename, hue, true, reservationId);
+    }
+
+    static reserveBattleback2(filename, hue, reservationId) {
+        return this.reserveBitmap('img/battlebacks2/', filename, hue, true, reservationId);
+    }
+
+    static reserveEnemy(filename, hue, reservationId) {
+        return this.reserveBitmap('img/enemies/', filename, hue, true, reservationId);
+    }
+
+    static reserveCharacter(filename, hue, reservationId) {
+        return this.reserveBitmap('img/characters/', filename, hue, false, reservationId);
+    }
+
+    static reserveFace(filename, hue, reservationId) {
+        return this.reserveBitmap('img/faces/', filename, hue, true, reservationId);
+    }
+
+    static reserveParallax(filename, hue, reservationId) {
+        return this.reserveBitmap('img/parallaxes/', filename, hue, true, reservationId);
+    }
+
+    static reservePicture(filename, hue, reservationId) {
+        return this.reserveBitmap('img/pictures/', filename, hue, true, reservationId);
+    }
+
+    static reserveSvActor(filename, hue, reservationId) {
+        return this.reserveBitmap('img/sv_actors/', filename, hue, false, reservationId);
+    }
+
+    static reserveSvEnemy(filename, hue, reservationId) {
+        return this.reserveBitmap('img/sv_enemies/', filename, hue, true, reservationId);
+    }
+
+    static reserveSystem(filename, hue, reservationId) {
+        return this.reserveBitmap('img/system/', filename, hue, false, reservationId || this._systemReservationId);
+    }
+
+    static reserveTileset(filename, hue, reservationId) {
+        return this.reserveBitmap('img/tilesets/', filename, hue, false, reservationId);
+    }
+
+    static reserveTitle1(filename, hue, reservationId) {
+        return this.reserveBitmap('img/titles1/', filename, hue, true, reservationId);
+    }
+
+    static reserveTitle2(filename, hue, reservationId) {
+        return this.reserveBitmap('img/titles2/', filename, hue, true, reservationId);
+    }
+
+    static reserveBitmap(folder, filename, hue, smooth, reservationId) {
+        if (filename) {
+            var path = folder + encodeURIComponent(filename) + '.png';
+            var bitmap = this.reserveNormalBitmap(path, hue || 0, reservationId || this._defaultReservationId);
+            bitmap.smooth = smooth;
+            return bitmap;
+        } else {
+            return this.loadEmptyBitmap();
+        }
+    }
+
+    static reserveNormalBitmap(path, hue, reservationId) {
+        var bitmap = this.loadNormalBitmap(path, hue);
+        this._imageCache.reserve(this._generateCacheKey(path, hue), bitmap, reservationId);
+    
+        return bitmap;
+    }
+
+    static releaseReservation(reservationId){
+        this._imageCache.releaseReservation(reservationId);
+    }
+
+    static setDefaultReservationId(reservationId){
+        this._defaultReservationId = reservationId;
+    }
+
+    static requestAnimation(filename, hue) {
+        return this.requestBitmap('img/animations/', filename, hue, true);
+    }
+
+    static requestBattleback1(filename, hue) {
+        return this.requestBitmap('img/battlebacks1/', filename, hue, true);
+    }
+
+    static requestBattleback2(filename, hue) {
+        return this.requestBitmap('img/battlebacks2/', filename, hue, true);
+    }
+
+    static requestEnemy(filename, hue) {
+        return this.requestBitmap('img/enemies/', filename, hue, true);
+    }
+
+    static requestCharacter(filename, hue) {
+        return this.requestBitmap('img/characters/', filename, hue, false);
+    }
+
+    static requestFace(filename, hue) {
+        return this.requestBitmap('img/faces/', filename, hue, true);
+    }
+
+    static requestParallax(filename, hue) {
+        return this.requestBitmap('img/parallaxes/', filename, hue, true);
+    }
+
+    static requestPicture(filename, hue) {
+        return this.requestBitmap('img/pictures/', filename, hue, true);
+    }
+
+    static requestSvActor(filename, hue) {
+        return this.requestBitmap('img/sv_actors/', filename, hue, false);
+    }
+
+    static requestSvEnemy(filename, hue) {
+        return this.requestBitmap('img/sv_enemies/', filename, hue, true);
+    }
+
+    static requestSystem(filename, hue) {
+        return this.requestBitmap('img/system/', filename, hue, false);
+    }
+
+    static requestTileset(filename, hue) {
+        return this.requestBitmap('img/tilesets/', filename, hue, false);
+    }
+
+    static requestTitle1(filename, hue) {
+        return this.requestBitmap('img/titles1/', filename, hue, true);
+    }
+
+    static requestTitle2(filename, hue) {
+        return this.requestBitmap('img/titles2/', filename, hue, true);
+    }
+
+    static requestBitmap(folder, filename, hue, smooth) {
+        if (filename) {
+            var path = folder + encodeURIComponent(filename) + '.png';
+            var bitmap = this.requestNormalBitmap(path, hue || 0);
+            bitmap.smooth = smooth;
+            return bitmap;
+        } else {
+            return this.loadEmptyBitmap();
+        }
+    }
+
+    static requestNormalBitmap(path, hue) {
+        var key = this._generateCacheKey(path, hue);
+        var bitmap = this._imageCache.get(key);
+        if(!bitmap){
+            bitmap = Bitmap.request(path);
+            bitmap.addLoadListener(function(){
+                bitmap.rotateHue(hue);
+            });
+            this._imageCache.add(key, bitmap);
+            this._requestQueue.enqueue(key, bitmap);
+        }else{
+            this._requestQueue.raisePriority(key);
+        }
+    
+        return bitmap;
+    }
+
+    static update() {
+        this._requestQueue.update();
+    }
+
+    static clearRequest() {
+        this._requestQueue.clear();
+    }
+    //
 
 } // ImageManager
 
@@ -9993,6 +10315,45 @@ class AudioManager {
     static _checkBufferError(buffer_) {
         if (buffer_ && buffer_.isError()) this.throwLoadError(buffer_);
     } // _checkBufferError
+
+
+    // RMMV static variables not present in the default RMMZ codebase
+    static _masterVolume   = 1;   // (min: 0, max: 1)
+    static _blobUrl        = null;
+
+    static get masterVolume() {
+        return this._masterVolume;
+    }
+    static set masterVolume(value) {
+        this._masterVolume = value;
+        WebAudio.setMasterVolume(this._masterVolume);
+        Graphics.setVideoVolume(this._masterVolume);
+    }
+    //
+
+    // RMMV static functions not present in the default RMMZ codebase
+    static createDecryptBuffer(url, bgm, pos){
+        this._blobUrl = url;
+        this._bgmBuffer = this.createBuffer('bgm', bgm.name);
+        this.updateBgmParameters(bgm);
+        if (!this._meBuffer) {
+            this._bgmBuffer.play(true, pos || 0);
+        }
+        this.updateCurrentBgm(bgm, pos);
+    }
+
+    static shouldUseHtml5Audio() {
+        // The only case where we wanted html5audio was android/ no encrypt
+        // Atsuma-ru asked to force webaudio there too, so just return false for ALL    // return Utils.isAndroidChrome() && !Decrypter.hasEncryptedAudio;
+     return false;
+    }
+
+    static checkWebAudioError(webAudio) {
+        if (webAudio && webAudio.isError()) {
+            throw new Error('Failed to load: ' + webAudio.url);
+        }
+    }
+    //
 
 } // AudioManager
 
