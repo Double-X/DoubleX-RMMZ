@@ -16,7 +16,10 @@
  *       further facilitate more effective and efficient plugin development by
  *       making the default RMMZ codebase quality improvements even more
  *       drastic
- *    4. THIS PLUGIN'S INTENDED TO GIVES AN EXTRA OPTION TO PLUGIN DEVELOPERS
+ *    4. This plugin also helps converting RMMV plugins into RMMZ counterparts
+ *       by porting default MV classes/functions/methodsvariables/ not present
+ *       in the default RMMZ codebase
+ *    5. THIS PLUGIN'S INTENDED TO GIVES AN EXTRA OPTION TO PLUGIN DEVELOPERS
  *       RATHER THAN REPLACING THE DEFAULT RMMZ CODEBASE
  *----------------------------------------------------------------------------
  *    # Terms Of Use
@@ -182,6 +185,100 @@
  *         Returns if this array doesn't include the specified element
  *     16. clear()
  *         Empties the whole array
+ *   # Core MV functions/methods/variables not in MZ added by this plugin
+ *     1. Utils
+ *        Static Functions
+ *        - canReadGameFiles
+ *        - rgbToCssColor
+ *        - generateRuntimeId
+ *        - isSupportPassiveEvent
+ *        Static Variables
+ *        - _id
+ *        - _supportPassiveEvent
+ *     2. CacheEntry
+ *     3. CacheMap
+ *     4. ImageCache
+ *     5. RequestQueue
+ *        The whole class
+ *     6. Rectangle
+ *        Static Variable
+ *        - Rectangle.emptyRectangle
+ *     7. Bitmap
+ *        Instance Methods
+ *        - _clearImgInstance
+ *        - touch
+ *        - bltImage
+ *        - adjustTone
+ *        - rotateHue
+ *        - blur
+ *        - _setDirty
+ *        - checkDirty
+ *        - isRequestReady
+ *        Instance Variable
+ *        - cacheEntry
+ *     8. Graphics
+ *        Static Functions
+ *        - _setupCssFontLoading
+ *        - canUseCssFontLoading
+ *        - hasWebGL
+ *        - canUseDifferenceBlend
+ *        - canUseSaturationBlend
+ *        - loadFont
+ *        - isFontLoaded
+ *        - _testCanvasBlendModes
+ *        - _modifyExistingElements
+ *        - _createGameFontLoader
+ *        - _createFontLoader
+ *        - _disableTextSelection
+ *        Static Variables
+ *        - _cssFontLoading
+ *        - _fontLoaded
+ *        - BLEND_NORMAL
+ *        - BLEND_ADD
+ *        - BLEND_MULTIPLY
+ *        - BLEND_SCREEN
+ *        - scale
+ *     9. Input
+ *        Static Function
+ *        - _wrapNwjsAlert
+ *     10. TouchInput
+ *         Static Function
+ *         - _onPointerDown
+ *     11. Sprite
+ *         Instance Methods
+ *         - _isInBitmapRect
+ *         - _needsTint
+ *     12. Tilemap
+ *         Instance Methods
+ *         - refreshTileset
+ *         - _readLastTiles
+ *         - _writeLastTiles
+ *         - _drawTile
+ *         - _drawNormalTile
+ *         - _drawAutotile
+ *         - _drawTableEdge
+ *         - _drawShadow
+ *         Instance Variables
+ *         - tileWidth
+ *         - tileHeight
+ *         - _lastTiles
+ *     13. ToneFilter
+ *         The whole class
+ *     14. ToneSprite
+ *         The whole class
+ *     15. WebAudio
+ *         Static Function
+ *         - _onTouchStart
+ *         Static Variable
+ *         - _unlocked
+ *         Instance Methods
+ *         - _createNodes
+ *         - _connectNodes
+ *         - _readOgg
+ *         - _readMp4
+ *         - _readLittleEndian
+ *         - _readBigEndian
+ *   # Managers MV functions/methods/variables not in MZ added by this plugin
  *============================================================================
  */
 
@@ -194,6 +291,7 @@ DoubleX_RMMZ["ES6 Codebase"] = "0.9.5";
  *----------------------------------------------------------------------------
  *    # Plugin Support Info:
  *      1. Prerequisites
+ *         - Basic knowledge on what the default RMMV codebase does in general
  *         - Basic knowledge on what the default RMMZ codebase does in general
  *         - Some RMMZ plugin development proficiency to fully comprehend this
  *           plugin
@@ -335,12 +433,12 @@ class ES6ExtendedClassAlias {
      * @returns {Array} - The fully mapped array from this
      */
     $.fastMap = function(mapCallback, mapThis_) {
-        if (this == null) throw new TypeError('this is null or not defined');
-        if (typeof mapCallback !== 'function') {
-            throw new TypeError(mapCallback + ' is not a function');
+        if (this == null) throw new TypeError("this is null or not defined");
+        if (typeof mapCallback !== "function") {
+            throw new TypeError(`${mapCallback} is not a function`);
         }
         const newArray = [];
-        // forEach is tested to be the fastest among sandboxes including RMMV
+        // forEach is tested to be the fastest among sandboxes including NW.js
         this.forEach((elem, i) => {
             // It's ok to call undefined context with previously bound callbacks
             newArray.push(mapCallback.call(mapThis_, elem, i, this));
@@ -360,7 +458,7 @@ class ES6ExtendedClassAlias {
      * @returns {This} The original array merged with another array in place
      */
     $.fastMerge = function(arr) {
-        // forEach is tested to be the fastest among sandboxes including RMMV
+        // forEach is tested to be the fastest among sandboxes including NW.js
         arr.forEach(elem => this.push(elem));
         // array.forEach(this.push, this) can't be used as forEach has > 1 args
         return this;
@@ -382,14 +480,14 @@ class ES6ExtendedClassAlias {
      * @returns {Array} - The fully filtered then mapped array from this
      */
     $.filterMap = function(filterCallback, mapCallback, filterThis_, mapThis_) {
-        if (this == null) throw new TypeError('this is null or not defined');
-        if (typeof filterCallback !== 'function') {
-            throw new TypeError(filterCallback + ' is not a function');
-        } else if (typeof mapCallback !== 'function') {
-            throw new TypeError(mapCallback + ' is not a function');
+        if (this == null) throw new TypeError("this is null or not defined");
+        if (typeof filterCallback !== "function") {
+            throw new TypeError(`${filterCallback} is not a function`);
+        } else if (typeof mapCallback !== "function") {
+            throw new TypeError(`${mapCallback} is not a function`);
         }
         const newArray = [];
-        // forEach is tested to be the fastest among sandboxes including RMMV
+        // forEach is tested to be the fastest among sandboxes including NW.js
         this.forEach((elem, i) => {
             // It's ok to call undefined context with previously bound callbacks
             if (!filterCallback.call(filterThis_, elem, i, this)) return;
@@ -415,14 +513,14 @@ class ES6ExtendedClassAlias {
      * @returns {Array} - The fully mapped then filtered array from this
      */
     $.mapFilter = function(mapCallback, filterCallback, mapThis_, filterThis_) {
-        if (this == null) throw new TypeError('this is null or not defined');
-        if (typeof mapCallback !== 'function') {
-            throw new TypeError(mapCallback + ' is not a function');
-        } else if (typeof filterCallback !== 'function') {
-            throw new TypeError(filterCallback + ' is not a function');
+        if (this == null) throw new TypeError("this is null or not defined");
+        if (typeof mapCallback !== "function") {
+            throw new TypeError(`${mapCallback} is not a function`);
+        } else if (typeof filterCallback !== "function") {
+            throw new TypeError(`${filterCallback} is not a function`);
         }
         const newArray = [];
-        // forEach is tested to be the fastest among sandboxes including RMMV
+        // forEach is tested to be the fastest among sandboxes including NW.js
         this.forEach((elem, i) => {
             // It's ok to call undefined context with previously bound callbacks
             var mappedElem = mapCallback.call(mapThis_, elem, i, this);
@@ -450,18 +548,18 @@ class ES6ExtendedClassAlias {
      * @returns {Array} - The fully mapped then reduced array result from this
      */
     $.mapReduce = function(mapCallback, reduceCallback, initVal_, mapThis_, reduceThis_) {
-        if (this == null) throw new TypeError('this is null or not defined');
+        if (this == null) throw new TypeError("this is null or not defined");
         const l = this.length, hasInitVal = initVal_ !== undefined;
-        if (typeof mapCallback !== 'function') {
-            throw new TypeError(mapCallback + ' is not a function');
-        } else if (typeof reduceCallback !== 'function') {
-            throw new TypeError(reduceCallback + ' is not a function');
+        if (typeof mapCallback !== "function") {
+            throw new TypeError(`${mapCallback} is not a function`);
+        } else if (typeof reduceCallback !== "function") {
+            throw new TypeError(`${reduceCallback} is not a function`);
         } else if (l <= 0 && !hasInitVal) {
-            throw new TypeError('Reduce of empty array with no initial value');
+            throw new TypeError("Reduce of empty array with no initial value");
         }
         if (hasInitVal) {
             let val = initVal_;
-            // forEach is tested to be fastest among sandboxes including RMMV
+            // forEach is tested to be fastest among sandboxes including NW.js
             this.forEach((elem, i) => {
                 // It's ok to call undefined context with already bound callback
                 var mappedElem = mapCallback.call(mapThis_, elem, i, this);
@@ -866,6 +964,49 @@ class Utils {
         }
         return body;
     } // decryptArrayBuffer
+
+    // RMMV static functions not present in the default RMMZ codebase
+    static canReadGameFiles() {
+        var scripts = document.getElementsByTagName('script');
+        var lastScript = scripts[scripts.length - 1];
+        var xhr = new XMLHttpRequest();
+        try {
+            xhr.open('GET', lastScript.src);
+            xhr.overrideMimeType('text/javascript');
+            xhr.send();
+            return true;
+        } catch (e) {
+            return false;
+        }
+    }
+
+    static rgbToCssColor(r, g, b) {
+        r = Math.round(r);
+        g = Math.round(g);
+        b = Math.round(b);
+        return 'rgb(' + r + ',' + g + ',' + b + ')';
+    }
+    
+    static _id = 1;
+    static generateRuntimeId() { return Utils._id++; }
+    
+    static _supportPassiveEvent = null;
+
+    static isSupportPassiveEvent() {
+        if (typeof Utils._supportPassiveEvent === "boolean") {
+            return Utils._supportPassiveEvent;
+        }
+        // test support passive event
+        // https://github.com/WICG/EventListenerOptions/blob/gh-pages/explainer.md#feature-detection
+        var passive = false;
+        var options = Object.defineProperty({}, "passive", {
+            get: function() { passive = true; }
+        });
+        window.addEventListener("test", null, options);
+        Utils._supportPassiveEvent = passive;
+        return passive;
+    }
+    //
 
 } // Utils
 
@@ -1312,7 +1453,16 @@ class Graphics {
         // Added to help plugins alter key events in better ways
         this._initKeyEvents();
         //
+        // RMMV instance variables not present in the default RMMZ codebase
+        this._canUseDifferenceBlend = false;
+        this._canUseSaturationBlend = false;
+        this._hiddenCanvas = null;
+        //
     } // _initPrivateVars
+    
+    // Added to help plugins alter key events in better ways
+    static _keyEvents = new Map();
+    //
 
     /**
      * Adds a new private variable to help plugins alter key events
@@ -1320,7 +1470,7 @@ class Graphics {
      * @author DoubleX @since 0.9.5 @version 0.9.5
      */
     static _initKeyEvents() {
-        this._keyEvents = new Map();
+        this._keyEvents.clear();
         const fpsKeyFunc = this._switchFPSCounterKey.bind(this);
         this._keyEvents.set(fpsKeyFunc, this._switchFPSCounter.bind(this));
         const stretchKeyFunc = this._switchStretchModeKey.bind(this);
@@ -1663,6 +1813,157 @@ class Graphics {
         return context;
     } // _effekseerContextWithoutRescue
 
+    // RMMV static variables not present in the default RMMZ codebase
+    static _cssFontLoading =  document.fonts && document.fonts.ready;
+    static _fontLoaded = null;
+    //
+
+    // RMMV static functions not present in the default RMMZ codebase
+    static _setupCssFontLoading() {
+        if(Graphics._cssFontLoading){
+            document.fonts.ready.then(function(fonts){
+                Graphics._fontLoaded = fonts;
+            }).catch(function(error){
+                SceneManager.onError(error);
+            });
+        }
+    }
+
+    static canUseCssFontLoading() {
+        return !!this._cssFontLoading;
+    }
+    //
+
+    // RMMV static variables not present in the default RMMZ codebase
+    static BLEND_NORMAL   = 0;
+    static BLEND_ADD      = 1;
+    static BLEND_MULTIPLY = 2;
+    static BLEND_SCREEN   = 3;
+    //
+
+    // RMMV static functions not present in the default RMMZ codebase
+    static hasWebGL() {
+        try {
+            var canvas = document.createElement('canvas');
+            return !!(canvas.getContext('webgl') || canvas.getContext('experimental-webgl'));
+        } catch (e) {
+            return false;
+        }
+    }
+
+    static canUseDifferenceBlend() {
+        return this._canUseDifferenceBlend;
+    }
+
+    static canUseSaturationBlend() {
+        return this._canUseSaturationBlend;
+    }
+
+    static loadFont(name, url) {
+        var style = document.createElement('style');
+        var head = document.getElementsByTagName('head');
+        var rule = '@font-face { font-family: "' + name + '"; src: url("' + url + '"); }';
+        style.type = 'text/css';
+        head.item(0).appendChild(style);
+        style.sheet.insertRule(rule, 0);
+        this._createFontLoader(name);
+    }
+
+    static isFontLoaded(name) {
+        if (Graphics._cssFontLoading) {
+            if(Graphics._fontLoaded){
+                return Graphics._fontLoaded.check('10px "'+name+'"');
+            }
+    
+            return false;
+        } else {
+            if (!this._hiddenCanvas) {
+                this._hiddenCanvas = document.createElement('canvas');
+            }
+            var context = this._hiddenCanvas.getContext('2d');
+            var text = 'abcdefghijklmnopqrstuvwxyz';
+            var width1, width2;
+            context.font = '40px ' + name + ', sans-serif';
+            width1 = context.measureText(text).width;
+            context.font = '40px sans-serif';
+            width2 = context.measureText(text).width;
+            return width1 !== width2;
+        }
+    }
+    //
+
+    // RMMV static variable not present in the default RMMZ codebase
+    static get scale() {
+        return this.defaultScale;
+    }
+    static set scale(value) {
+        this.defaultScale = value;
+    } // defaultScale
+    //
+
+    // RMMV static functions not present in the default RMMZ codebase
+    static _testCanvasBlendModes() {
+        var canvas, context, imageData1, imageData2;
+        canvas = document.createElement('canvas');
+        canvas.width = 1;
+        canvas.height = 1;
+        context = canvas.getContext('2d');
+        context.globalCompositeOperation = 'source-over';
+        context.fillStyle = 'white';
+        context.fillRect(0, 0, 1, 1);
+        context.globalCompositeOperation = 'difference';
+        context.fillStyle = 'white';
+        context.fillRect(0, 0, 1, 1);
+        imageData1 = context.getImageData(0, 0, 1, 1);
+        context.globalCompositeOperation = 'source-over';
+        context.fillStyle = 'black';
+        context.fillRect(0, 0, 1, 1);
+        context.globalCompositeOperation = 'saturation';
+        context.fillStyle = 'white';
+        context.fillRect(0, 0, 1, 1);
+        imageData2 = context.getImageData(0, 0, 1, 1);
+        this._canUseDifferenceBlend = imageData1.data[0] === 0;
+        this._canUseSaturationBlend = imageData2.data[0] === 0;
+    }
+
+    static _modifyExistingElements() {
+        var elements = document.getElementsByTagName('*');
+        for (var i = 0; i < elements.length; i++) {
+            if (elements[i].style.zIndex > 0) {
+                elements[i].style.zIndex = 0;
+            }
+        }
+    }
+
+    static _createGameFontLoader() {
+        this._createFontLoader('GameFont');
+    }
+
+    static _createFontLoader(name) {
+        var div = document.createElement('div');
+        var text = document.createTextNode('.');
+        div.style.fontFamily = name;
+        div.style.fontSize = '0px';
+        div.style.color = 'transparent';
+        div.style.position = 'absolute';
+        div.style.margin = 'auto';
+        div.style.top = '0px';
+        div.style.left = '0px';
+        div.style.width = '1px';
+        div.style.height = '1px';
+        div.appendChild(text);
+        document.body.appendChild(div);
+    }
+
+    static _disableTextSelection() {
+        var body = document.body;
+        body.style.userSelect = 'none';
+        body.style.webkitUserSelect = 'none';
+        body.style.msUserSelect = 'none';
+        body.style.mozUserSelect = 'none';
+    }
+    //
+
 } // Graphics
 
 /*----------------------------------------------------------------------------
@@ -1832,7 +2133,13 @@ ES6ExtendedClassAlias.inherit(Point);
  * @param {number} width - The width of the rectangle.
  * @param {number} height - The height of the rectangle.
  */
-class Rectangle extends PIXI.Rectangle {}
+class Rectangle extends PIXI.Rectangle {
+
+    // RMMV static variable not present in the default RMMZ codebase
+    static emptyRectangle = new Rectangle(0, 0, 0, 0);
+    //
+
+} // Rectangle
 // It's just to play safe in case of any plugin extending PIXI.Rectangle in ES6
 ES6ExtendedClassAlias.inherit(Rectangle);
 //
@@ -2406,6 +2713,9 @@ class Bitmap {
          * @type number
          */
         this.outlineWidth = 3;
+        // RMMV instance variable not present in the default RMMZ codebase
+        this.cacheEntry = null;
+        //
     } // _initPublicVars
 
     /**
@@ -2557,6 +2867,166 @@ class Bitmap {
         const arrayBuffer = Utils.decryptArrayBuffer(xhr.response);
         this._image.src = URL.createObjectURL(new Blob([arrayBuffer]));
     } // _onXhrLoadSuc
+
+    // RMMV static variable not present in the default RMMZ codebase
+    static _reuseImages = [];
+    //
+
+    // RMMV instance methods not present in the default RMMZ codebase
+    _clearImgInstance() {
+        this._image.src = "";
+        this._image.onload = null;
+        this._image.onerror = null;
+        this._errorListener = null;
+        this._loadListener = null;
+    
+        Bitmap._reuseImages.push(this._image);
+        this._image = null;
+    }
+
+    touch() {
+        if (this.cacheEntry) {
+            this.cacheEntry.touch();
+        }
+    }
+
+    bltImage(source, sx, sy, sw, sh, dx, dy, dw, dh) {
+        dw = dw || sw;
+        dh = dh || sh;
+        if (sx >= 0 && sy >= 0 && sw > 0 && sh > 0 && dw > 0 && dh > 0 &&
+            sx + sw <= source.width && sy + sh <= source.height) {
+            this._context.globalCompositeOperation = 'source-over';
+            this._context.drawImage(source._image, sx, sy, sw, sh, dx, dy, dw, dh);
+            this._setDirty();
+        }
+    }
+
+    adjustTone(r, g, b) {
+        if ((r || g || b) && this.width > 0 && this.height > 0) {
+            var context = this._context;
+            var imageData = context.getImageData(0, 0, this.width, this.height);
+            var pixels = imageData.data;
+            for (var i = 0; i < pixels.length; i += 4) {
+                pixels[i + 0] += r;
+                pixels[i + 1] += g;
+                pixels[i + 2] += b;
+            }
+            context.putImageData(imageData, 0, 0);
+            this._setDirty();
+        }
+    }
+
+    rotateHue(offset) {
+        function rgbToHsl(r, g, b) {
+            var cmin = Math.min(r, g, b);
+            var cmax = Math.max(r, g, b);
+            var h = 0;
+            var s = 0;
+            var l = (cmin + cmax) / 2;
+            var delta = cmax - cmin;
+    
+            if (delta > 0) {
+                if (r === cmax) {
+                    h = 60 * (((g - b) / delta + 6) % 6);
+                } else if (g === cmax) {
+                    h = 60 * ((b - r) / delta + 2);
+                } else {
+                    h = 60 * ((r - g) / delta + 4);
+                }
+                s = delta / (255 - Math.abs(2 * l - 255));
+            }
+            return [h, s, l];
+        }
+    
+        function hslToRgb(h, s, l) {
+            var c = (255 - Math.abs(2 * l - 255)) * s;
+            var x = c * (1 - Math.abs((h / 60) % 2 - 1));
+            var m = l - c / 2;
+            var cm = c + m;
+            var xm = x + m;
+    
+            if (h < 60) {
+                return [cm, xm, m];
+            } else if (h < 120) {
+                return [xm, cm, m];
+            } else if (h < 180) {
+                return [m, cm, xm];
+            } else if (h < 240) {
+                return [m, xm, cm];
+            } else if (h < 300) {
+                return [xm, m, cm];
+            } else {
+                return [cm, m, xm];
+            }
+        }
+    
+        if (offset && this.width > 0 && this.height > 0) {
+            offset = ((offset % 360) + 360) % 360;
+            var context = this._context;
+            var imageData = context.getImageData(0, 0, this.width, this.height);
+            var pixels = imageData.data;
+            for (var i = 0; i < pixels.length; i += 4) {
+                var hsl = rgbToHsl(pixels[i + 0], pixels[i + 1], pixels[i + 2]);
+                var h = (hsl[0] + offset) % 360;
+                var s = hsl[1];
+                var l = hsl[2];
+                var rgb = hslToRgb(h, s, l);
+                pixels[i + 0] = rgb[0];
+                pixels[i + 1] = rgb[1];
+                pixels[i + 2] = rgb[2];
+            }
+            context.putImageData(imageData, 0, 0);
+            this._setDirty();
+        }
+    }
+
+    blur() {
+        for (var i = 0; i < 2; i++) {
+            var w = this.width;
+            var h = this.height;
+            var canvas = this._canvas;
+            var context = this._context;
+            var tempCanvas = document.createElement('canvas');
+            var tempContext = tempCanvas.getContext('2d');
+            tempCanvas.width = w + 2;
+            tempCanvas.height = h + 2;
+            tempContext.drawImage(canvas, 0, 0, w, h, 1, 1, w, h);
+            tempContext.drawImage(canvas, 0, 0, w, 1, 1, 0, w, 1);
+            tempContext.drawImage(canvas, 0, 0, 1, h, 0, 1, 1, h);
+            tempContext.drawImage(canvas, 0, h - 1, w, 1, 1, h + 1, w, 1);
+            tempContext.drawImage(canvas, w - 1, 0, 1, h, w + 1, 1, 1, h);
+            context.save();
+            context.fillStyle = 'black';
+            context.fillRect(0, 0, w, h);
+            context.globalCompositeOperation = 'lighter';
+            context.globalAlpha = 1 / 9;
+            for (var y = 0; y < 3; y++) {
+                for (var x = 0; x < 3; x++) {
+                    context.drawImage(tempCanvas, x, y, w, h, 0, 0, w, h);
+                }
+            }
+            context.restore();
+        }
+        this._setDirty();
+    }
+
+    _setDirty() {
+        this._dirty = true;
+    }
+
+    checkDirty() {
+        if (this._dirty) {
+            this._baseTexture.update();
+            this._dirty = false;
+        }
+    }
+
+    isRequestReady() {
+        return this._loadingState !== 'pending' &&
+            this._loadingState !== 'requesting' &&
+            this._loadingState !== 'decrypting';
+    }
+    //
 
 } // Bitmap
 
@@ -2927,6 +3397,18 @@ class Sprite extends PIXI.Sprite {
         //
     } // _refreshWithBaseTexture
 
+    // RMMV instance methods not present in the default RMMZ codebase
+    _isInBitmapRect(x, y, w, h) {
+        return (this._bitmap && x + w > 0 && y + h > 0 &&
+                x < this._bitmap.width && y < this._bitmap.height);
+    }
+
+    _needsTint() {
+        var tone = this._colorTone;
+        return tone[0] || tone[1] || tone[2] || tone[3] || this._blendColor[3] > 0;
+    }
+    //
+
 } // Sprite
 // It's just to play safe in case of any plugin extending PIXI.Sprite in ES6 way
 ES6ExtendedClassAlias.inherit(Sprite);
@@ -3033,7 +3515,12 @@ class Tilemap extends PIXI.Container {
     /**
      * Forces to repaint the entire tilemap.
      */
-    refresh() { this._needsRepaint = true; }
+    refresh() {
+        this._needsRepaint = true;
+        // RMMV instance variable not present in the default RMMZ codebase
+        this._lastTiles.length = 0;
+        //
+    } // refresh
 
     /**
      * Updates the transform on all children of this container for rendering.
@@ -3457,6 +3944,9 @@ class Tilemap extends PIXI.Container {
         [this._margin, this._tileWidth, this._tileHeight] = [20, 48, 48];
         this._mapWidth = this._mapHeight = 0;
         [this._mapData, this._bitmaps] = [null, []];
+        // RMMV instance variable not present in the default RMMZ codebase
+        this._lastTiles = [];
+        //
     } // _initPrivateVars
 
     /**
@@ -3536,6 +4026,222 @@ class Tilemap extends PIXI.Container {
             layer.addRect(setNumber, sx1, sy1, dx1, dy1, w1, h1 / 2);
         }
     } // _addTileA2TableEdge
+
+    // RMMV instance variables not present in the default RMMZ codebase
+    get tileWidth() {
+        return this._tileWidth;
+    }
+    set tileWidth(value) {
+        if (this._tileWidth !== value) {
+            this._tileWidth = value;
+            this._createLayers();
+        }
+    }
+
+    get tileHeight() {
+        return this._tileHeight;
+    }
+    set tileHeight(value) {
+        if (this._tileHeight !== value) {
+            this._tileHeight = value;
+            this._createLayers();
+        }
+    }
+    //
+
+    // RMMV instance methods not present in the default RMMZ codebase
+    refreshTileset() {
+    
+    }
+
+    _readLastTiles(i, x, y) {
+        var array1 = this._lastTiles[i];
+        if (array1) {
+            var array2 = array1[y];
+            if (array2) {
+                var tiles = array2[x];
+                if (tiles) {
+                    return tiles;
+                }
+            }
+        }
+        return [];
+    }
+
+    _writeLastTiles(i, x, y, tiles) {
+        var array1 = this._lastTiles[i];
+        if (!array1) {
+            array1 = this._lastTiles[i] = [];
+        }
+        var array2 = array1[y];
+        if (!array2) {
+            array2 = array1[y] = [];
+        }
+        array2[x] = tiles;
+    }
+
+    _drawTile(bitmap, tileId, dx, dy) {
+        if (Tilemap.isVisibleTile(tileId)) {
+            if (Tilemap.isAutotile(tileId)) {
+                this._drawAutotile(bitmap, tileId, dx, dy);
+            } else {
+                this._drawNormalTile(bitmap, tileId, dx, dy);
+            }
+        }
+    }
+
+    _drawNormalTile(bitmap, tileId, dx, dy) {
+        var setNumber = 0;
+    
+        if (Tilemap.isTileA5(tileId)) {
+            setNumber = 4;
+        } else {
+            setNumber = 5 + Math.floor(tileId / 256);
+        }
+    
+        var w = this._tileWidth;
+        var h = this._tileHeight;
+        var sx = (Math.floor(tileId / 128) % 2 * 8 + tileId % 8) * w;
+        var sy = (Math.floor(tileId % 256 / 8) % 16) * h;
+    
+        var source = this.bitmaps[setNumber];
+        if (source) {
+            bitmap.bltImage(source, sx, sy, w, h, dx, dy, w, h);
+        }
+    }
+
+    _drawAutotile(bitmap, tileId, dx, dy) {
+        var autotileTable = Tilemap.FLOOR_AUTOTILE_TABLE;
+        var kind = Tilemap.getAutotileKind(tileId);
+        var shape = Tilemap.getAutotileShape(tileId);
+        var tx = kind % 8;
+        var ty = Math.floor(kind / 8);
+        var bx = 0;
+        var by = 0;
+        var setNumber = 0;
+        var isTable = false;
+    
+        if (Tilemap.isTileA1(tileId)) {
+            var waterSurfaceIndex = [0, 1, 2, 1][this.animationFrame % 4];
+            setNumber = 0;
+            if (kind === 0) {
+                bx = waterSurfaceIndex * 2;
+                by = 0;
+            } else if (kind === 1) {
+                bx = waterSurfaceIndex * 2;
+                by = 3;
+            } else if (kind === 2) {
+                bx = 6;
+                by = 0;
+            } else if (kind === 3) {
+                bx = 6;
+                by = 3;
+            } else {
+                bx = Math.floor(tx / 4) * 8;
+                by = ty * 6 + Math.floor(tx / 2) % 2 * 3;
+                if (kind % 2 === 0) {
+                    bx += waterSurfaceIndex * 2;
+                }
+                else {
+                    bx += 6;
+                    autotileTable = Tilemap.WATERFALL_AUTOTILE_TABLE;
+                    by += this.animationFrame % 3;
+                }
+            }
+        } else if (Tilemap.isTileA2(tileId)) {
+            setNumber = 1;
+            bx = tx * 2;
+            by = (ty - 2) * 3;
+            isTable = this._isTableTile(tileId);
+        } else if (Tilemap.isTileA3(tileId)) {
+            setNumber = 2;
+            bx = tx * 2;
+            by = (ty - 6) * 2;
+            autotileTable = Tilemap.WALL_AUTOTILE_TABLE;
+        } else if (Tilemap.isTileA4(tileId)) {
+            setNumber = 3;
+            bx = tx * 2;
+            by = Math.floor((ty - 10) * 2.5 + (ty % 2 === 1 ? 0.5 : 0));
+            if (ty % 2 === 1) {
+                autotileTable = Tilemap.WALL_AUTOTILE_TABLE;
+            }
+        }
+    
+        var table = autotileTable[shape];
+        var source = this.bitmaps[setNumber];
+    
+        if (table && source) {
+            var w1 = this._tileWidth / 2;
+            var h1 = this._tileHeight / 2;
+            for (var i = 0; i < 4; i++) {
+                var qsx = table[i][0];
+                var qsy = table[i][1];
+                var sx1 = (bx * 2 + qsx) * w1;
+                var sy1 = (by * 2 + qsy) * h1;
+                var dx1 = dx + (i % 2) * w1;
+                var dy1 = dy + Math.floor(i / 2) * h1;
+                if (isTable && (qsy === 1 || qsy === 5)) {
+                    var qsx2 = qsx;
+                    var qsy2 = 3;
+                    if (qsy === 1) {
+                        qsx2 = [0,3,2,1][qsx];
+                    }
+                    var sx2 = (bx * 2 + qsx2) * w1;
+                    var sy2 = (by * 2 + qsy2) * h1;
+                    bitmap.bltImage(source, sx2, sy2, w1, h1, dx1, dy1, w1, h1);
+                    dy1 += h1/2;
+                    bitmap.bltImage(source, sx1, sy1, w1, h1/2, dx1, dy1, w1, h1/2);
+                } else {
+                    bitmap.bltImage(source, sx1, sy1, w1, h1, dx1, dy1, w1, h1);
+                }
+            }
+        }
+    }
+
+    _drawTableEdge(bitmap, tileId, dx, dy) {
+        if (Tilemap.isTileA2(tileId)) {
+            var autotileTable = Tilemap.FLOOR_AUTOTILE_TABLE;
+            var kind = Tilemap.getAutotileKind(tileId);
+            var shape = Tilemap.getAutotileShape(tileId);
+            var tx = kind % 8;
+            var ty = Math.floor(kind / 8);
+            var setNumber = 1;
+            var bx = tx * 2;
+            var by = (ty - 2) * 3;
+            var table = autotileTable[shape];
+    
+            if (table) {
+                var source = this.bitmaps[setNumber];
+                var w1 = this._tileWidth / 2;
+                var h1 = this._tileHeight / 2;
+                for (var i = 0; i < 2; i++) {
+                    var qsx = table[2 + i][0];
+                    var qsy = table[2 + i][1];
+                    var sx1 = (bx * 2 + qsx) * w1;
+                    var sy1 = (by * 2 + qsy) * h1 + h1/2;
+                    var dx1 = dx + (i % 2) * w1;
+                    var dy1 = dy + Math.floor(i / 2) * h1;
+                    bitmap.bltImage(source, sx1, sy1, w1, h1/2, dx1, dy1, w1, h1/2);
+                }
+            }
+        }
+    }
+
+    _drawShadow(bitmap, shadowBits, dx, dy) {
+        if (shadowBits & 0x0f) {
+            var w1 = this._tileWidth / 2;
+            var h1 = this._tileHeight / 2;
+            var color = 'rgba(0,0,0,0.5)';
+            for (var i = 0; i < 4; i++) {
+                if (shadowBits & (1 << i)) {
+                    var dx1 = dx + (i % 2) * w1;
+                    var dy1 = dy + Math.floor(i / 2) * h1;
+                    bitmap.fillRect(dx1, dy1, w1, h1, color);
+                }
+            }
+        }
+    }
+    //
 
 } // Tilemap
 // It's just to play safe in case of any plugin extending PIXI.Container in ES6
@@ -5748,7 +6454,7 @@ class WebAudio {
     _realUrl() { return `${this._url}${Utils.hasEncryptedAudio() ? "_" : ""}`; }
 
     // Edited to help plugins alter start loading xhr behaviors in better ways
-    _startXhrLoading(url) { this._newLoadingXhr(url).sned(); }
+    _startXhrLoading(url) { this._newLoadingXhr(url).send(); }
     //
 
     _startFetching(url) {
@@ -6241,6 +6947,109 @@ class WebAudio {
         this._loopLength = parseInt(RegExp.$1);
     } // _readMetaLoopStartLength
 
+    // RMMV static variable not present in the default RMMZ codebase
+    static _unlocked       = false;
+    //
+
+    // RMMV static function not present in the default RMMZ codebase
+    static _onTouchStart() {
+        var context = WebAudio._context;
+        if (context && !this._unlocked) {
+            var node = context.createBufferSource();
+            node.start(0);
+            this._unlocked = true;
+        }
+    }
+    //
+
+    // RMMV instance methods not present in the default RMMZ codebase
+    _createNodes() {
+        var context = WebAudio._context;
+        this._sourceNode = context.createBufferSource();
+        this._sourceNode.buffer = this._buffer;
+        this._sourceNode.loopStart = this._loopStart;
+        this._sourceNode.loopEnd = this._loopStart + this._loopLength;
+        this._sourceNode.playbackRate.setValueAtTime(this._pitch, context.currentTime);
+        this._gainNode = context.createGain();
+        this._gainNode.gain.setValueAtTime(this._volume, context.currentTime);
+        this._pannerNode = context.createPanner();
+        this._pannerNode.panningModel = 'equalpower';
+        this._updatePanner();
+    }
+
+    _connectNodes() {
+        this._sourceNode.connect(this._gainNode);
+        this._gainNode.connect(this._pannerNode);
+        this._pannerNode.connect(WebAudio._masterGainNode);
+    }
+
+    _readOgg(array) {
+        var index = 0;
+        while (index < array.length) {
+            if (this._readFourCharacters(array, index) === 'OggS') {
+                index += 26;
+                var vorbisHeaderFound = false;
+                var numSegments = array[index++];
+                var segments = [];
+                for (var i = 0; i < numSegments; i++) {
+                    segments.push(array[index++]);
+                }
+                for (i = 0; i < numSegments; i++) {
+                    if (this._readFourCharacters(array, index + 1) === 'vorb') {
+                        var headerType = array[index];
+                        if (headerType === 1) {
+                            this._sampleRate = this._readLittleEndian(array, index + 12);
+                        } else if (headerType === 3) {
+                            this._readMetaData(array, index, segments[i]);
+                        }
+                        vorbisHeaderFound = true;
+                    }
+                    index += segments[i];
+                }
+                if (!vorbisHeaderFound) {
+                    break;
+                }
+            } else {
+                break;
+            }
+        }
+    }
+
+    _readMp4(array) {
+        if (this._readFourCharacters(array, 4) === 'ftyp') {
+            var index = 0;
+            while (index < array.length) {
+                var size = this._readBigEndian(array, index);
+                var name = this._readFourCharacters(array, index + 4);
+                if (name === 'moov') {
+                    index += 8;
+                } else {
+                    if (name === 'mvhd') {
+                        this._sampleRate = this._readBigEndian(array, index + 20);
+                    }
+                    if (name === 'udta' || name === 'meta') {
+                        this._readMetaData(array, index, size);
+                    }
+                    index += size;
+                    if (size <= 1) {
+                        break;
+                    }
+                }
+            }
+        }
+    }
+
+    _readLittleEndian(array, index) {
+        return (array[index + 3] * 0x1000000 + array[index + 2] * 0x10000 +
+                array[index + 1] * 0x100 + array[index + 0]);
+    }
+
+    _readBigEndian(array, index) {
+        return (array[index + 0] * 0x1000000 + array[index + 1] * 0x10000 +
+                array[index + 2] * 0x100 + array[index + 3]);
+    }
+    //
+
 } // WebAudio
 
 /*----------------------------------------------------------------------------
@@ -6502,17 +7311,21 @@ class Input {
         14: "left", // D-pad left
         15: "right" // D-pad right
     }; // gamepadMapper
+    
+    // Added to support the isJustReleased static function
+    static _isJustReleased = new Map();
+    //
 
     /**
      * Clears all the input data.
      */
     static clear() {
-        [this._currentState, this._previousState] = [new Map(), new Map()];
+        [this._currentState, this._previousState] = [{}, {}];
         [this._gamepadStates, this._latestButton] = [[], null];
         this._pressedTime = this._dir4 = this._dir8 = 0;
         [this._preferredAxis, this._date, this._virtualButton] = ["", 0, null];
         // Added to support the isJustReleased static function
-        this._isJustReleased = new Map();
+        this._isJustReleased.clear();
         //
     } // clear
 
@@ -6523,7 +7336,9 @@ class Input {
         this._pollGamepads();
         // Edited to help plugins update the current states in better ways
         this._updateLatestButton();
-        this._currentState.forEach(this._updateCurrentState, this);
+        for (const keyName in this._currentState) {
+            this._updateCurrentState(this._currentState[keyName], keyName);
+        }
         //
         if (this._virtualButton) this._updateVirtualClick();
         this._updateDirection();
@@ -6537,7 +7352,7 @@ class Input {
      */
     static isPressed(keyName) {
         if (this._isEscCompatiblePressed(keyName)) return true;
-        return !!this._currentState.get(keyName);
+        return !!this._currentState[keyName];
     } // isPressed
 
     /**
@@ -6627,10 +7442,10 @@ class Input {
         const { keyCode } = event;
         if (this._shouldPreventDefault(keyCode)) event.preventDefault();
         // Edited to help plugins alter clear keys in better ways
-        if (this._shouldClear(keyCode)) this.clear(); // Numlock
+        if (this._shouldClear(keyCode)) this.clear();
         //
         const buttonName = this.keyMapper[keyCode];
-        if (buttonName) this._currentState.set(buttonName, true);
+        if (buttonName) this._currentState[buttonName] = true;
     } // _onKeyDown
 
     static _shouldPreventDefault(keyCode) {
@@ -6650,7 +7465,7 @@ class Input {
 
     static _onKeyUp(event) {
         const buttonName = this.keyMapper[event.keyCode];
-        if (buttonName) this._currentState.set(buttonName, false);
+        if (buttonName) this._currentState[buttonName] = false;
     } // _onKeyUp
 
     static _onLostFocus() { this.clear(); }
@@ -6672,7 +7487,7 @@ class Input {
         this._gamepadStates[index].forEach((ns, i) => {
             if (ns === lastState[i]) return;
             const buttonName = this.gamepadMapper[i];
-            if (buttonName) this._currentState.set(buttonName, ns);
+            if (buttonName) this._currentState[buttonName] = ns;
         });
     } // _updateGamepadState
 
@@ -6709,7 +7524,7 @@ class Input {
      * @author DoubleX @since 0.9.5 @version 0.9.5
      */
     static _updateLatestButton() {
-        if (this._currentState.get(this._latestButton)) {
+        if (this._currentState[this._latestButton]) {
             this._pressedTime++;
         } else this._latestButton = null;
     } // _updateLatestButton
@@ -6723,7 +7538,7 @@ class Input {
      */
     static _updateCurrentState(keyState, keyName) {
         this._updateLatestState(keyName);
-        this._previousState.set(keyName, keyState);
+        this._previousState[keyName] = keyState;
     } // _updateCurrentState
 
     /**
@@ -6748,8 +7563,8 @@ class Input {
      * @returns {boolean} If the key's just pressed right on this frame
      */
     static _isJustPressed(keyName) {
-        if (!this._currentState.get(keyName)) return false;
-        return !this._previousState.get(keyName);
+        if (!this._currentState[keyName]) return false;
+        return !this._previousState[keyName];
     } // _isJustPressed
 
     /**
@@ -6771,8 +7586,8 @@ class Input {
      * @returns {boolean} If the key's just released right on this frame
      */
     static _isKeyJustReleased(keyName) {
-        if (this._currentState.get(keyName)) return false;
-        return this._previousState.get(keyName);
+        if (this._currentState[keyName]) return false;
+        return this._previousState[keyName];
     } // _isKeyJustReleased
 
     /**
@@ -6801,7 +7616,7 @@ class Input {
      * @enum @param {string} keyName - The mapped name of the key
      * @returns {boolean} If the pressed key should clear all input states
      */
-    static _shouldClear(keyCode) { return keyCode === 144; }
+    static _shouldClear(keyCode) { return keyCode === 144; /* Numlock */ }
 
     /**
      * Updates the existing and connected gamepad state
@@ -6840,6 +7655,21 @@ class Input {
      * @enum @returns {number} 1 for the direction of this key and 0 for not
      */
     static _sign(keyName) { return this.isPressed(keyName) ? 1 : 0; }
+
+    // RMMV static function not present in the default RMMZ codebase
+    static _wrapNwjsAlert() {
+        if (Utils.isNwjs()) {
+            var _alert = window.alert;
+            window.alert = function() {
+                var gui = require('nw.gui');
+                var win = gui.Window.get();
+                _alert.apply(this, arguments);
+                win.focus();
+                Input.clear();
+            };
+        }
+    }
+    //
 
 } // Input
 
@@ -7260,6 +8090,20 @@ class TouchInput {
         [this._newState[state], this._x, this._y] = [true, x, y];
     } // _onUpdateNewState
 
+    // RMMV static function not present in the default RMMZ codebase
+    static _onPointerDown(event) {
+        if (event.pointerType === 'touch' && !event.isPrimary) {
+            var x = Graphics.pageToCanvasX(event.pageX);
+            var y = Graphics.pageToCanvasY(event.pageY);
+            if (Graphics.isInsideCanvas(x, y)) {
+                // For Microsoft Edge
+                this._onCancel(x, y);
+                event.preventDefault();
+            }
+        }
+    }
+    //
+
 } // TouchInput
 
 /*----------------------------------------------------------------------------
@@ -7372,11 +8216,858 @@ class JsonEx {
 
 } // JsonEx
 
+/*----------------------------------------------------------------------------
+ *    # New class: CacheEntry
+ *      - A RMMV class not present in the default RMMZ codebase
+ *----------------------------------------------------------------------------*/
+
+class CacheEntry {
+
+    constructor(cache, key, item) {
+        this.cache = cache;
+        this.key = key;
+        this.item = item;
+        this.cached = false;
+        this.touchTicks = 0;
+        this.touchSeconds = 0;
+        this.ttlTicks = 0;
+        this.ttlSeconds = 0;
+        this.freedByTTL = false;
+    }
+
+    free(byTTL) {
+        this.freedByTTL = byTTL || false;
+        if (this.cached) {
+            this.cached = false;
+            delete this.cache._inner[this.key];
+        }
+    }
+
+    allocate() {
+        if (!this.cached) {
+            this.cache._inner[this.key] = this;
+            this.cached = true;
+        }
+        this.touch();
+        return this;
+    }
+
+    setTimeToLive(ticks, seconds) {
+        this.ttlTicks = ticks || 0;
+        this.ttlSeconds = seconds || 0;
+        return this;
+    }
+
+    isStillAlive() {
+        var cache = this.cache;
+        return ((this.ttlTicks == 0) || (this.touchTicks + this.ttlTicks < cache.updateTicks )) &&
+            ((this.ttlSeconds == 0) || (this.touchSeconds + this.ttlSeconds < cache.updateSeconds ));
+    }
+
+    touch() {
+        var cache = this.cache;
+        if (this.cached) {
+            this.touchTicks = cache.updateTicks;
+            this.touchSeconds = cache.updateSeconds;
+        } else if (this.freedByTTL) {
+            this.freedByTTL = false;
+            if (!cache._inner[this.key]) {
+                cache._inner[this.key] = this;
+            }
+        }
+    }
+
+}
+
+/*----------------------------------------------------------------------------
+ *    # New class: CacheMap
+ *      - A RMMV class not present in the default RMMZ codebase
+ *----------------------------------------------------------------------------*/
+
+class CacheMap {
+
+    constructor(manager) {
+        this.manager = manager;
+        this._inner = {};
+        this._lastRemovedEntries = {};
+        this.updateTicks = 0;
+        this.lastCheckTTL = 0;
+        this.delayCheckTTL = 100.0;
+        this.updateSeconds = Date.now();
+    }
+
+    checkTTL() {
+        var cache = this._inner;
+        var temp = this._lastRemovedEntries;
+        if (!temp) {
+            temp = [];
+            this._lastRemovedEntries = temp;
+        }
+        for (var key in cache) {
+            var entry = cache[key];
+            if (!entry.isStillAlive()) {
+                temp.push(entry);
+            }
+        }
+        for (var i = 0; i < temp.length; i++) {
+            temp[i].free(true);
+        }
+        temp.length = 0;
+    }
+
+    getItem(key) {
+        var entry = this._inner[key];
+        if (entry) {
+            return entry.item;
+        }
+        return null;
+    }
+
+    clear() {
+        var keys = Object.keys(this._inner);
+        for (var i = 0; i < keys.length; i++) {
+            this._inner[keys[i]].free();
+        }
+    }
+
+    setItem(key, item) {
+        return new CacheEntry(this, key, item).allocate();
+    }
+
+    update(ticks, delta) {
+        this.updateTicks += ticks;
+        this.updateSeconds += delta;
+        if (this.updateSeconds >= this.delayCheckTTL + this.lastCheckTTL) {
+            this.lastCheckTTL = this.updateSeconds;
+            this.checkTTL();
+        }
+    }
+
+}
+
+/*----------------------------------------------------------------------------
+ *    # New class: ImageCache
+ *      - A RMMV class not present in the default RMMZ codebase
+ *----------------------------------------------------------------------------*/
+
+class ImageCache {
+
+    constructor() {
+        this._items = {};
+    }
+
+    static limit = 10 * 1000 * 1000;
+
+    initialize(){
+        this._items = {};
+    }
+
+    add(key, value) {
+        this._items[key] = {
+            bitmap: value,
+            touch: Date.now(),
+            key: key
+        };
+    
+        this._truncateCache();
+    }
+
+    get(key) {
+        if(this._items[key]){
+            var item = this._items[key];
+            item.touch = Date.now();
+            return item.bitmap;
+        }
+    
+        return null;
+    }
+
+    reserve(key, value, reservationId) {
+        if(!this._items[key]){
+            this._items[key] = {
+                bitmap: value,
+                touch: Date.now(),
+                key: key
+            };
+        }
+    
+        this._items[key].reservationId = reservationId;
+    }
+
+    releaseReservation(reservationId) {
+        var items = this._items;
+    
+        Object.keys(items)
+            .map(function(key){return items[key];})
+            .forEach(function(item){
+                if(item.reservationId === reservationId){
+                    delete item.reservationId;
+                }
+            });
+    }
+
+    _truncateCache() {
+        var items = this._items;
+        var sizeLeft = ImageCache.limit;
+    
+        Object.keys(items).map(function(key){
+            return items[key];
+        }).sort(function(a, b){
+            return b.touch - a.touch;
+        }).forEach(function(item){
+            if(sizeLeft > 0 || this._mustBeHeld(item)){
+                var bitmap = item.bitmap;
+                sizeLeft -= bitmap.width * bitmap.height;
+            }else{
+                delete items[item.key];
+            }
+        }.bind(this));
+    }
+
+    _mustBeHeld(item) {
+        // request only is weak so It's purgeable
+        if(item.bitmap.isRequestOnly()) return false;
+        // reserved item must be held
+        if(item.reservationId) return true;
+        // not ready bitmap must be held (because of checking isReady())
+        if(!item.bitmap.isReady()) return true;
+        // then the item may purgeable
+        return false;
+    }
+
+    isReady() {
+        var items = this._items;
+        return !Object.keys(items).some(function(key){
+            return !items[key].bitmap.isRequestOnly() && !items[key].bitmap.isReady();
+        });
+    }
+
+    getErrorBitmap() {
+        var items = this._items;
+        var bitmap = null;
+        if(Object.keys(items).some(function(key){
+                if(items[key].bitmap.isError()){
+                    bitmap = items[key].bitmap;
+                    return true;
+                }
+                return false;
+            })) {
+            return bitmap;
+        }
+    
+        return null;
+    }
+
+}
+
+/*----------------------------------------------------------------------------
+ *    # New class: RequestQueue
+ *      - A RMMV class not present in the default RMMZ codebase
+ *----------------------------------------------------------------------------*/
+
+class RequestQueue {
+
+    constructor() {
+        this._queue = [];
+    }
+
+    enqueue(key, value) {
+        this._queue.push({
+            key: key,
+            value: value,
+        });
+    }
+
+    update() {
+        if(this._queue.length === 0) return;
+    
+        var top = this._queue[0];
+        if(top.value.isRequestReady()){
+            this._queue.shift();
+            if(this._queue.length !== 0){
+                this._queue[0].value.startRequest();
+            }
+        }else{
+            top.value.startRequest();
+        }
+    }
+
+    raisePriority(key) {
+        for(var n = 0; n < this._queue.length; n++){
+            var item = this._queue[n];
+            if(item.key === key){
+                this._queue.splice(n, 1);
+                this._queue.unshift(item);
+                break;
+            }
+        }
+    }
+
+    clear() {
+        this._queue.splice(0);
+    }
+
+}
+
+/*----------------------------------------------------------------------------
+ *    # New class: ToneFilter
+ *      - A RMMV class not present in the default RMMZ codebase
+ *----------------------------------------------------------------------------*/
+
+class ToneFilter extends PIXI.filters.ColorMatrixFilter {
+
+    adjustHue(value) {
+        this.hue(value, true);
+    }
+
+    adjustSaturation(value) {
+        value = (value || 0).clamp(-255, 255) / 255;
+        this.saturate(value, true);
+    }
+
+    adjustTone(r, g, b) {
+        r = (r || 0).clamp(-255, 255) / 255;
+        g = (g || 0).clamp(-255, 255) / 255;
+        b = (b || 0).clamp(-255, 255) / 255;
+    
+        if (r !== 0 || g !== 0 || b !== 0) {
+            var matrix = [
+                1, 0, 0, r, 0,
+                0, 1, 0, g, 0,
+                0, 0, 1, b, 0,
+                0, 0, 0, 1, 0
+            ];
+    
+            this._loadMatrix(matrix, true);
+        }
+    }
+
+}
+// Just to play safe in case of plugin extending PIXI.filters.ColorMatrixFilter
+ES6ExtendedClassAlias.inherit(ToneFilter);
+//
+
+/*----------------------------------------------------------------------------
+ *    # New class: ToneSprite
+ *      - A RMMV class not present in the default RMMZ codebase
+ *----------------------------------------------------------------------------*/
+
+class ToneSprite extends PIXI.Container {
+
+    constructor() {
+        super();
+        this.clear();
+    }
+
+    clear() {
+        this._red = 0;
+        this._green = 0;
+        this._blue = 0;
+        this._gray = 0;
+    }
+
+    setTone(r, g, b, gray) {
+        this._red = Math.round(r || 0).clamp(-255, 255);
+        this._green = Math.round(g || 0).clamp(-255, 255);
+        this._blue = Math.round(b || 0).clamp(-255, 255);
+        this._gray = Math.round(gray || 0).clamp(0, 255);
+    }
+
+    _renderCanvas(renderer) {
+        if (this.visible) {
+            var context = renderer.context;
+            var t = this.worldTransform;
+            var r = renderer.resolution;
+            var width = Graphics.width;
+            var height = Graphics.height;
+            context.save();
+            context.setTransform(t.a, t.b, t.c, t.d, t.tx * r, t.ty * r);
+            if (Graphics.canUseSaturationBlend() && this._gray > 0) {
+                context.globalCompositeOperation = 'saturation';
+                context.globalAlpha = this._gray / 255;
+                context.fillStyle = '#ffffff';
+                context.fillRect(0, 0, width, height);
+            }
+            context.globalAlpha = 1;
+            var r1 = Math.max(0, this._red);
+            var g1 = Math.max(0, this._green);
+            var b1 = Math.max(0, this._blue);
+            if (r1 || g1 || b1) {
+                context.globalCompositeOperation = 'lighter';
+                context.fillStyle = Utils.rgbToCssColor(r1, g1, b1);
+                context.fillRect(0, 0, width, height);
+            }
+            if (Graphics.canUseDifferenceBlend()) {
+                var r2 = Math.max(0, -this._red);
+                var g2 = Math.max(0, -this._green);
+                var b2 = Math.max(0, -this._blue);
+                if (r2 || g2 || b2) {
+                    context.globalCompositeOperation = 'difference';
+                    context.fillStyle = '#ffffff';
+                    context.fillRect(0, 0, width, height);
+                    context.globalCompositeOperation = 'lighter';
+                    context.fillStyle = Utils.rgbToCssColor(r2, g2, b2);
+                    context.fillRect(0, 0, width, height);
+                    context.globalCompositeOperation = 'difference';
+                    context.fillStyle = '#ffffff';
+                    context.fillRect(0, 0, width, height);
+                }
+            }
+            context.restore();
+        }
+    }
+
+    _renderWebGL(renderer) {
+
+    }
+
+}
+// It's just to play safe in case of any plugin extending PIXI.Container in ES6
+ES6ExtendedClassAlias.inherit(ToneSprite);
+//
+
 /*----------------------------------------------------------------------------*/
 
 /*----------------------------------------------------------------------------
  *    ## Managers
  *----------------------------------------------------------------------------*/
+
+/*----------------------------------------------------------------------------
+ *    # Rewritten class: DataManager
+ *      - Rewrites it into the ES6 standard
+ *----------------------------------------------------------------------------*/
+
+//-----------------------------------------------------------------------------
+// DataManager
+//
+// The static class that manages the database and game objects.
+
+// They can't use let as they must be attached to the global window object
+$dataActors = $dataClasses = $dataSkills = $dataItems = null;
+$dataStates = $dataAnimations = $dataTilesets = $dataCommonEvents = null;
+$dataSystem = $dataMapInfos = $dataMap = null;
+$gameTemp = $gameSystem = $gameScreen = $gameTimer = $gameMessage = null;
+$gameSwitches = $gameVariables = $gameSelfSwitches = null;
+$gameActors = $gameParty = $gameTroop = $gameMap = $gamePlayer = null;
+$testEvent = null;
+//
+
+class DataManager {
+
+    constructor() { throw new Error("This is a static class"); }
+
+    static _globalInfo = null;
+    static _errors = [];
+
+    static _databaseFiles = [
+        { name: "$dataActors", src: "Actors.json" },
+        { name: "$dataClasses", src: "Classes.json" },
+        { name: "$dataSkills", src: "Skills.json" },
+        { name: "$dataItems", src: "Items.json" },
+        { name: "$dataWeapons", src: "Weapons.json" },
+        { name: "$dataArmors", src: "Armors.json" },
+        { name: "$dataEnemies", src: "Enemies.json" },
+        { name: "$dataTroops", src: "Troops.json" },
+        { name: "$dataStates", src: "States.json" },
+        { name: "$dataAnimations", src: "Animations.json" },
+        { name: "$dataTilesets", src: "Tilesets.json" },
+        { name: "$dataCommonEvents", src: "CommonEvents.json" },
+        { name: "$dataSystem", src: "System.json" },
+        { name: "$dataMapInfos", src: "MapInfos.json" }
+    ]; // _databaseFiles
+
+    static loadGlobalInfo() {
+        StorageManager.loadObject("global").then(globalInfo => {
+            // Edited to help plugins alter load global info in better ways
+            this._loadGlobalInfoSuc(globalInfo);
+            //
+            return 0;
+        }).catch(() => this._globalInfo = []);
+    } // loadGlobalInfo
+
+    static removeInvalidGlobalInfo() {
+        const globalInfo = this._globalInfo;
+        for (const info of globalInfo) {
+            const savefileId = globalInfo.indexOf(info);
+            if (!this.savefileExists(savefileId)) delete globalInfo[savefileId];
+        }
+    } // removeInvalidGlobalInfo
+
+    static saveGlobalInfo() {
+        StorageManager.saveObject("global", this._globalInfo);
+    } // saveGlobalInfo
+
+    static isGlobalInfoLoaded() { return !!this._globalInfo; }
+
+    static loadDatabase() {
+        const test = this.isBattleTest() || this.isEventTest();
+        const prefix = test ? "Test_" : "";
+        this._databaseFiles.forEach(({ name, src }) => {
+            this.loadDataFile(name, `${prefix}${src}`);
+        });
+        if (!this.isEventTest()) return;
+        this.loadDataFile("$testEvent", `${prefix}Event.json`);
+    } // loadDatabase
+
+    static loadDataFile(name, src) {
+        window[name] = null;
+        // Edited to help plugins alter load data file behaviors in better ways
+        this._loadDataFileXhr(name, src).send();
+        //
+    } // loadDataFile
+
+    static onXhrLoad(xhr, name, src, url) {
+        // Edited to help plugins alter load xhr behaviors in better ways
+        if (xhr.status < 400) return this._onXhrLoadSuc(xhr, name);
+        //
+        this.onXhrError(name, src, url);
+    } // onXhrLoad
+
+    static onXhrError(name, src, url) { this._errors.push({ name, src, url }); }
+
+    static isDatabaseLoaded() {
+        this.checkError();
+        return this._databaseFiles.every(({ name }) => window[name]);
+    } // isDatabaseLoaded
+
+    static loadMapData(mapId) {
+        if (mapId <= 0) return this.makeEmptyMap();
+        // Edited to help plugins alter load map data behaviors in better ways
+        this.loadDataFile("$dataMap", this._mapFilename(mapId));
+        //
+    } // loadMapData
+
+    // Edited to help plugins alter empty map behaviors in better ways
+    static makeEmptyMap() { $dataMap = this._newEmptyMap(); }
+    //
+
+    static isMapLoaded() {
+        this.checkError();
+        return !!$dataMap;
+    } // isMapLoaded
+
+    static onLoad(object) {
+        // Edited to help plugins alter on load behaviors in better ways
+        if (this.isMapObject(object)) return this._onloadMapObj(object);
+        this.extractArrayMetadata(object);
+        //
+    } // onLoad
+
+    static isMapObject(object) { return !!(object.data && object.events); }
+
+    static extractArrayMetadata(array) {
+        if (Array.isArray(array)) array.forEach(data => {
+            if (data && "note" in data) this.extractMetadata(data);
+        });
+    } // extractArrayMetadata
+
+    static extractMetadata(data) {
+        const regExp = /<([^<>:]+)(:?)([^>]*)>/g;
+        data.meta = {};
+        for (;;) {
+            const match = regExp.exec(data.note);
+            if (!match) break;
+            data.meta[match[1]] = match[2] === ":" ? match[3] : true;
+        }
+    } // extractMetadata
+
+    static checkError() {
+        if (this._errors.isEmpty()) return;
+        const { name, src, url } = this._errors.shift();
+        throw ["LoadError", url, this.loadDataFile.bind(this, name, src)];
+    } // checkError
+
+    static isBattleTest() { return Utils.isOptionValid("btest"); }
+
+    static isEventTest() { return Utils.isOptionValid("etest"); }
+
+    static isSkill(item) { return item && $dataSkills.includes(item); }
+
+    static isItem(item) { return item && $dataItems.includes(item); }
+
+    static isWeapon(item) { return item && $dataWeapons.includes(item); }
+
+    static isArmor(item) { return item && $dataArmors.includes(item); }
+
+    static createGameObjects() {
+        [$gameTemp, $gameSystem] = [new Game_Temp(), new Game_System()];
+        [$gameScreen, $gameTimer] = [new Game_Screen(), new Game_Timer()];
+        $gameMessage = new Game_Message();
+        $gameSwitches = new Game_Switches();
+        $gameVariables = new Game_Variables();
+        $gameSelfSwitches = new Game_SelfSwitches();
+        $gameActors = new Game_Actors();
+        [$gameParty, $gameTroop] = [new Game_Party(), new Game_Troop()];
+        [$gameMap, $gamePlayer] = [new Game_Map(), new Game_Player()];
+    } // createGameObjects
+
+    static setupNewGame() {
+        this.createGameObjects();
+        this.selectSavefileForNewGame();
+        $gameParty.setupStartingMembers();
+        $gamePlayer.setupForNewGame();
+        Graphics.frameCount = 0;
+    } // setupNewGame
+
+    static setupBattleTest() {
+        this.createGameObjects();
+        $gameParty.setupBattleTest();
+        /** @todo Extracts these codes into well-named BattleManager function */
+        BattleManager.setup($dataSystem.testTroopId, true, false);
+        BattleManager.setBattleTest(true);
+        BattleManager.playBattleBgm();
+        //
+    } // setupBattleTest
+
+    static setupEventTest() {
+        this.createGameObjects();
+        this.selectSavefileForNewGame();
+        $gameParty.setupStartingMembers();
+        $gamePlayer.reserveTransfer(-1, 8, 6);
+        $gamePlayer.setTransparent(false);
+    } // setupEventTest
+
+    static isAnySavefileExists() { return this._globalInfo.some(x => x); }
+
+    static latestSavefileId() {
+        /** @todo Dries up these codes representing identical knowledge */
+        const globalInfo = this._globalInfo;
+        const validInfo = globalInfo.slice(1).filter(x => x);
+        const latest = Math.max(...validInfo.map(x => x.timestamp));
+        const i = globalInfo.findIndex(x => x && x.timestamp === latest);
+        return i > 0 ? i : 0;
+        //
+    } // latestSavefileId
+
+    static earliestSavefileId() {
+        /** @todo Dries up these codes representing identical knowledge */
+        const globalInfo = this._globalInfo;
+        const validInfo = globalInfo.slice(1).filter(x => x);
+        const earliest = Math.min(...validInfo.map(x => x.timestamp));
+        const i = globalInfo.findIndex(x => x && x.timestamp === earliest);
+        return i > 0 ? i : 0;
+        //
+    } // earliestSavefileId
+
+    static emptySavefileId() {
+        const globalInfo = this._globalInfo, l = globalInfo.length;
+        const maxSavefiles = this.maxSavefiles();
+        if (l < maxSavefiles) return Math.max(1, l);
+        const i = globalInfo.slice(1).findIndex(x => !x);
+        return i >= 0 ? i + 1 : -1;
+    } // emptySavefileId
+
+    static loadAllSavefileImages() {
+        this._globalInfo.forEach(info => {
+            if (info) this.loadSavefileImages(info);
+        });
+    } // loadAllSavefileImages
+
+    static loadSavefileImages(info) {
+        // Edited to help plugins alter load save file images in better ways
+        this._loadSaveFileCharImgs(info.characters);
+        this._loadSaveFileFaceImgs(info.faces);
+        //
+    } // loadSavefileImages
+
+    static maxSavefiles() { return 20; }
+
+    static savefileInfo(savefileId) {
+        const globalInfo = this._globalInfo;
+        return globalInfo[savefileId] ? globalInfo[savefileId] : null;
+    } // savefileInfo
+
+    static savefileExists(savefileId) {
+        return StorageManager.exists(this.makeSavename(savefileId));
+    } // savefileExists
+
+    static saveGame(savefileId) {
+        const contents = this.makeSaveContents();
+        const saveName = this.makeSavename(savefileId);
+        return StorageManager.saveObject(saveName, contents).then(() => {
+            // Edited to help plugins alter save game behaviors in better ways
+            this._onSaveGameSuc(savefileId);
+            //
+            return 0;
+        });
+    } // saveGame
+
+    static loadGame(savefileId) {
+        const saveName = this.makeSavename(savefileId);
+        return StorageManager.loadObject(saveName).then(contents => {
+            // Edited to help plugins alter load game behaviors in better ways
+            this._onLoadGameSuc(contents);
+            //
+            return 0;
+        });
+    } // loadGame
+
+    static makeSavename(savefileId) { return "file%1".format(savefileId); }
+
+    static selectSavefileForNewGame() {
+        const emptySavefileId = this.emptySavefileId();
+        if (emptySavefileId > 0) {
+            $gameSystem.setSavefileId(emptySavefileId);
+        } else $gameSystem.setSavefileId(this.earliestSavefileId());
+    } // selectSavefileForNewGame
+
+    static makeSavefileInfo() {
+        return {
+            title: $dataSystem.gameTitle,
+            characters: $gameParty.charactersForSavefile(),
+            faces: $gameParty.facesForSavefile(),
+            playtime: $gameSystem.playtimeText(),
+            timestamp: Date.now()
+        };
+    } // makeSavefileInfo
+
+    static makeSaveContents() {
+        // A save data does not contain $gameTemp, $gameMessage, and $gameTroop.
+        return {
+            system: $gameSystem,
+            screen: $gameScreen,
+            timer: $gameTimer,
+            switches: $gameSwitches,
+            variables: $gameVariables,
+            selfSwitches: $gameSelfSwitches,
+            actors: $gameActors,
+            party: $gameParty,
+            map: $gameMap,
+            player: $gamePlayer
+        };
+    } // makeSaveContents
+
+    static extractSaveContents(contents) {
+        [$gameSystem, $gameScreen] = [contents.system, contents.screen];
+        $gameTimer = contents.timer;
+        $gameSwitches = contents.switches;
+        $gameVariables = contents.variables;
+        $gameSelfSwitches = contents.selfSwitches;
+        [$gameActors, $gameParty] = [contents.actors, contents.party];
+        [$gameMap, $gamePlayer] = [contents.map, contents.player];
+    } // extractSaveContents
+
+    static correctDataErrors() { $gameParty.removeInvalidMembers(); }
+
+    /**
+     * Triggers events upon successfully loading the global information
+     * Idempotent
+     * @author DoubleX @since 0.9.5 @version 0.9.5
+     * @param {[SaveInfo]} globalInfo - Check makeSavefileInfo for details
+     */
+    static _loadGlobalInfoSuc(globalInfo) {
+        this._globalInfo = globalInfo;
+        this.removeInvalidGlobalInfo();
+    } // _loadGlobalInfoSuc
+
+    /**
+     * Nullipotent
+     * @author DoubleX @since 0.9.5 @version 0.9.5
+     * @param {string} name - The name of the global data contents container
+     * @param {string} src - The name of data json file to be loaded
+     * @returns {XMLHttpRequest} The GET XMLHttpRequest loading data json file
+     */
+    static _loadDataFileXhr(name, src) {
+        const [xhr, url] = [new XMLHttpRequest(), `data/${src}`];
+        xhr.open("GET", url);
+        xhr.overrideMimeType("application/json");
+        xhr.onload = this.onXhrLoad.bind(this, xhr, name, src, url);
+        xhr.onerror = this.onXhrError.bind(this, name, src, url);
+        return xhr;
+    } // _loadDataFileXhr
+
+    /**
+     * Triggers eevents upon successfully loading the data json file
+     * Idempotent
+     * @author DoubleX @since 0.9.5 @version 0.9.5
+     * @param {XMLHttpRequest} xhr - GET XMLHttpRequest loading data json file
+     * @param {string} name - The name of the global data contents container
+     */
+    static _onXhrLoadSuc(xhr, name) {
+        window[name] = JSON.parse(xhr.responseText);
+        this.onLoad(window[name]);
+    } // _onXhrLoadSuc
+
+    /**
+     * Nullipotent
+     * @author DoubleX @since 0.9.5 @version 0.9.5
+     * @param {id} mapId - The id of the map stored in the data json file
+     * @returns {string} The name of the data json file storing the map
+     */
+    static _mapFilename(mapId) { return "Map%1.json".format(mapId.padZero(3)); }
+
+    /**
+     * Nullipotent
+     * @author DoubleX @since 0.9.5 @version 0.9.5
+     * @returns {DataMap} The data of the empty map in the json format
+     */
+    static _newEmptyMap() {
+        return {
+            data: [],
+            events: [],
+            width: 100,
+            height: 100,
+            scrollType: 3
+        };
+    } // _newEmptyMap
+
+    /**
+     * Loads all the map data json file contents
+     * Idempotent
+     * @author DoubleX @since 0.9.5 @version 0.9.5
+     * @param {DataMap} obj - The global map data json file contents container
+     */
+    static _onloadMapObj(obj) {
+        this.extractMetadata(obj);
+        this.extractArrayMetadata(obj.events);
+    } // _onloadMapObj
+
+    /**
+     * Loads all the save file character images
+     * Idempotent
+     * @author DoubleX @since 0.9.5 @version 0.9.5
+     * @param {[Image]} chars - The list of loaded save file character images
+     */
+    static _loadSaveFileCharImgs(chars) {
+        if (!chars || !Symbol.iterator in chars) return;
+        chars.forEach(char => ImageManager.loadCharacter(char[0]));
+    } // _loadSaveFileCharImgs
+
+    /**
+     * Loads all the save file face images
+     * Idempotent
+     * @author DoubleX @since 0.9.5 @version 0.9.5
+     * @param {[Image]} faces - The list of loaded save file face images
+     */
+    static _loadSaveFileFaceImgs(faces) {
+        if (!faces || !Symbol.iterator in faces) return;
+        faces.forEach(face => ImageManager.loadFace(face[0]));
+    } // _loadSaveFileFaceImgs
+
+    /**
+     * Triggers eevents upon successfully saving the game file
+     * Idempotent
+     * @author DoubleX @since 0.9.5 @version 0.9.5
+     * @param {id} savefileId - The id of the successfully saved game file
+     */
+    static _onSaveGameSuc(savefileId) {
+        this._globalInfo[savefileId] = this.makeSavefileInfo();
+        this.saveGlobalInfo();
+    } // _onSaveGameSuc
+
+    /**
+     * Triggers eevents upon successfully loading the game file
+     * Idempotent
+     * @author DoubleX @since 0.9.5 @version 0.9.5
+     * @param {SaveFile} contents - Check makeSaveContents for details
+     */
+    static _onLoadGameSuc(contents) {
+        this.createGameObjects();
+        this.extractSaveContents(contents);
+        this.correctDataErrors();
+    } // _onLoadGameSuc
+
+} // DataManager
 
 /*----------------------------------------------------------------------------
  *    # Rewritten class: ConfigManager
@@ -7410,14 +9101,12 @@ class ConfigManager {
     set seVolume(value) { AudioManager.seVolume = value; }
 
     static load() {
-        StorageManager.loadObject("config")
-            .then(config => this.applyData(config || {}))
-            .catch(() => 0)
-            .then(() => {
-                this._isLoaded = true;
-                return 0;
-            })
-            .catch(() => 0);
+        StorageManager.loadObject("config").then(config => {
+            this.applyData(config || {});
+        }).catch(() => 0).then(() => {
+            this._isLoaded = true;
+            return 0;
+        }).catch(() => 0);
     } // load
 
     static save() { StorageManager.saveObject("config", this.makeData()); }
@@ -7453,6 +9142,301 @@ class ConfigManager {
     } // readVolume
 
 } // ConfigManager
+
+/*----------------------------------------------------------------------------
+ *    # Rewritten class: FontManager
+ *      - Rewrites it into the ES6 standard
+ *----------------------------------------------------------------------------*/
+
+//-----------------------------------------------------------------------------
+// FontManager
+//
+// The static class that loads font files.
+
+class FontManager {
+
+    constructor() { throw new Error("This is a static class"); }
+
+    static _urls = {};
+    static _states = {};
+
+    static load(family, filename) {
+        if (this._states[family] === "loaded") return;
+        if (filename) return this.startLoading(family, this.makeUrl(filename));
+        [this._urls[family], this._states[family]] = ["", "loaded"];
+    } // load
+
+    static isReady() {
+        for (const family in this._states) {
+            const state = this._states[family];
+            if (state === "loading") return false;
+            if (state === "error") this.throwLoadError(family);
+        }
+        return true;
+    } // isReady
+
+    static startLoading(family, url) {
+        // Edited to help plugins alter start loading behaviors in better ways
+        const font = new FontFace(family, this._fontFaceSource(url));
+        [this._urls[family], this._states[family]] = [url, "loading"];
+        font.load().then(() => {
+            this._onLoadSuc(font, family);
+            return 0;
+        }).catch(() => this._onLoadErr(family));
+        //
+    } // startLoading
+
+    static throwLoadError(family) {
+        const url = this._urls[family];
+        throw ["LoadError", url, this.startLoading.bind(this, family, url)];
+    } // throwLoadError
+
+    static makeUrl(filename) { return `fonts/${Utils.encodeURI(filename)}`; }
+
+    /**
+     * Nullipotent
+     * @author DoubleX @since 0.9.5 @version 0.9.5
+     * @param {string} url - The source url of the font face to be loaded
+     * @returns {string} The source of the font face to be loaded
+     */
+    static _fontFaceSource(url) { return `url(${url})`; }
+
+    /**
+     * Triggers events upon successfully loading the specified font face
+     * @author DoubleX @since 0.9.5 @version 0.9.5
+     * @param {string} font - The font face just being successfully loaded
+     * @param {string} family - The family owning the specified font face
+     */
+    static _onLoadSuc(font, family) {
+        document.fonts.add(font);
+        this._states[family] = "loaded";
+    } // _onLoadSuc
+
+    /**
+     * Triggers events upon failing to load the font face
+     * @author DoubleX @since 0.9.5 @version 0.9.5
+     * @param {string} family - The family owning the font face being loaded
+     */
+    static _onLoadErr(family) { this._states[family] = "error"; }
+
+} // FontManager
+
+/*----------------------------------------------------------------------------
+ *    # Rewritten class: ImageManager
+ *      - Rewrites it into the ES6 standard
+ *----------------------------------------------------------------------------*/
+
+//-----------------------------------------------------------------------------
+// ImageManager
+//
+// The static class that loads images, creates bitmap objects and retains them.
+class ImageManager {
+
+    constructor() { throw new Error("This is a static class"); }
+
+    static iconWidth = 32;
+    static iconHeight = 32;
+    static faceWidth = 144;
+    static faceHeight = 144;
+
+    static _cache = {};
+    static _system = {};
+    static _emptyBitmap = new Bitmap(1, 1);
+
+    static loadAnimation(filename) {
+        return this.loadBitmap("img/animations/", filename);
+    } // loadAnimation
+
+    static loadBattleback1(filename) {
+        return this.loadBitmap("img/battlebacks1/", filename);
+    } // loadBattleback1
+
+    static loadBattleback2(filename) {
+        return this.loadBitmap("img/battlebacks2/", filename);
+    } // loadBattleback2
+
+    static loadEnemy(filename) {
+        return this.loadBitmap("img/enemies/", filename);
+    } // loadEnemy
+
+    static loadCharacter(filename) {
+        return this.loadBitmap("img/characters/", filename);
+    } // loadCharacter
+
+    static loadFace(filename) {
+        return this.loadBitmap("img/faces/", filename);
+    } // loadFace
+
+    static loadParallax(filename) {
+        return this.loadBitmap("img/parallaxes/", filename);
+    } // loadParallax
+
+    static loadPicture(filename) {
+        return this.loadBitmap("img/pictures/", filename);
+    } // loadPicture
+
+    static loadSvActor(filename) {
+        return this.loadBitmap("img/sv_actors/", filename);
+    } // loadSvActor
+
+    static loadSvEnemy(filename) {
+        return this.loadBitmap("img/sv_enemies/", filename);
+    } // loadSvEnemy
+
+    static loadSystem(filename) {
+        return this.loadBitmap("img/system/", filename);
+    } // loadSystem
+
+    static loadTileset(filename) {
+        return this.loadBitmap("img/tilesets/", filename);
+    } // loadTileset
+
+    static loadTitle1(filename) {
+        return this.loadBitmap("img/titles1/", filename);
+    } // loadTitle1
+
+    static loadTitle2(filename) {
+        return this.loadBitmap("img/titles2/", filename);
+    } // loadTitle2
+
+    static loadBitmap(folder, filename) {
+        if (!filename) return this._emptyBitmap;
+        // Edited to help plugins alter load bitmnap behaviors in better ways
+        return this.loadBitmapFromUrl(this._bitmapUrl(folder, filename));
+        //
+    } // loadBitmap
+
+    static loadBitmapFromUrl(url) {
+        const cache = url.includes("/system/") ? this._system : this._cache;
+        if (!cache[url]) cache[url] = Bitmap.load(url);
+        return cache[url];
+    } // loadBitmapFromUrl
+
+    static clear() {
+        const cache = this._cache;
+        for (const url in cache) cache[url].destroy();
+        this._cache = {};
+    } // clear
+
+    static isReady() {
+        for (const cache of [this._cache, this._system]) {
+            for (const url in cache) {
+                const bitmap = cache[url];
+                if (bitmap.isError()) this.throwLoadError(bitmap);
+                if (!bitmap.isReady()) return false;
+            }
+        }
+        return true;
+    } // isReady
+
+    static throwLoadError(bitmap) {
+        throw ["LoadError", bitmap.url, bitmap.retry.bind(bitmap)];
+    } // throwLoadError
+
+    static isObjectCharacter(filename) {
+        /** @todo Dries up these codes representing identical knowledge */
+        const sign = filename.match(/^[!$]+/);
+        return sign && sign[0].includes("!");
+        //
+    } // isObjectCharacter
+
+    static isBigCharacter(filename) {
+        /** @todo Dries up these codes representing identical knowledge */
+        const sign = filename.match(/^[!$]+/);
+        return sign && sign[0].includes("$");
+        //
+    } // isBigCharacter
+
+    static isZeroParallax(filename) { return filename.charAt(0) === "!"; }
+
+    /**
+     * Nullipotent
+     * @author DoubleX @since 0.9.5 @version 0.9.5
+     * @param {string} folder - The relative file path of bitmap to be loaded
+     * @param {string} filename - The file name of the bitmap to be loaded
+     * @returns {string} The url of the bitmap to be loaded
+     */
+    static _bitmapUrl(folder, filename) {
+        return `${folder}${Utils.encodeURI(filename)}.png`;
+    } // _bitmapUrl
+
+} // ImageManager
+
+/*----------------------------------------------------------------------------
+ *    # Rewritten class: EffectManager
+ *      - Rewrites it into the ES6 standard
+ *----------------------------------------------------------------------------*/
+
+//-----------------------------------------------------------------------------
+// EffectManager
+//
+// The static class that loads Effekseer effects.
+class EffectManager {
+
+    constructor() { throw new Error("This is a static class"); }
+
+    static _cache = {};
+    static _errorUrls = [];
+
+    static load(filename) {
+        if (!filename) return null;
+        const url = this.makeUrl(filename), effect = this._cache[url];
+        if (!effect && Graphics.effekseer) this.startLoading(url);
+        return effect;
+    } // load
+
+    static startLoading(url) {
+        const onLoad = this.onLoad.bind(this, url);
+        const onError = this.onError.bind(this, url);
+        const effect = Graphics.effekseer.loadEffect(url, 1, onLoad, onError);
+        this._cache[url] = effect;
+        return effect;
+    } // startLoading
+    
+    static clear() {
+        for (const url in this._cache) {
+            Graphics.effekseer.releaseEffect(this._cache[url]);
+        }
+        this._cache = {};
+    } // clear
+
+    static onLoad(/*url*/) {}
+
+    static onError(url) { this._errorUrls.push(url); }
+
+    static makeUrl(filename) {
+        return `effects/${Utils.encodeURI(filename)}.efkefc`;
+    } // makeUrl
+
+    static checkErrors() {
+        const url = this._errorUrls.shift();
+        if (url) this.throwLoadError(url);
+    } // checkErrors
+
+    static throwLoadError(url) {
+        throw ["LoadError", url, this.startLoading.bind(this, url)];
+    } // throwLoadError
+
+    static isReady() {
+        this.checkErrors();
+        // Edited to help plugins alter is ready behaviors in better ways
+        return this._isAllEffectsLoaded();
+        //
+    } // isReady
+
+    /**
+     * Hotspot/Nullipotent
+     * @author DoubleX @since 0.9.5 @version 0.9.5
+     * @returns {boolean} If all cached Effekseer effects are loaded
+     */
+    static _isAllEffectsLoaded() {
+        for (const url in this._cache) {
+            if (!this._cache[url].isLoaded) return false;
+        }
+        return true;
+    } // _isAllEffectsLoaded
+
+} // EffectManager
 
 /*----------------------------------------------------------------------------
  *    # Rewritten class: AudioManager
@@ -8237,7 +10221,7 @@ class BattleManager {
     } // updateEvent
 
     static updateEventMain() {
-         $gameTroop.updateInterpreter();
+        $gameTroop.updateInterpreter();
         $gameParty.requestMotionRefresh();
         // Edited to help plugins check if the event main's updated
         if ($gameTroop.isEventRunning() || this.checkBattleEnd()) {
@@ -8334,9 +10318,10 @@ class BattleManager {
     } // inputtingAction
 
     static selectNextCommand() {
-        // Edited to help plugins alter select next command in better ways
-        if (this._currentActor) this._selectNextCmdWithCurActor();
-        //
+        if (this._currentActor) {
+            if (this._currentActor.selectNextCommand()) return;
+            this.finishActorInput();
+        }
         this.selectNextActor();
     } // selectNextCommand
 
@@ -8673,7 +10658,7 @@ class BattleManager {
 
     static displayEscapeFailureMessage() {
         $gameMessage.add(TextManager.escapeStart.format($gameParty.name()));
-        $gameMessage.add("\\." + TextManager.escapeFailure);
+        $gameMessage.add(`\\.${TextManager.escapeFailure}`);
     } // displayEscapeFailureMessage
 
     static displayRewards() {
@@ -8686,13 +10671,13 @@ class BattleManager {
         const exp = this._rewards.exp;
         if (exp <= 0) return;
         const text = TextManager.obtainExp.format(exp, TextManager.exp);
-        $gameMessage.add("\\." + text);
+        $gameMessage.add(`\\.${text}`);
     } // displayExp
 
     static displayGold() {
         const gold = this._rewards.gold;
         if (gold <= 0) return;
-        $gameMessage.add("\\." + TextManager.obtainGold.format(gold));
+        $gameMessage.add(`\\.${TextManager.obtainGold.format(gold)}`);
     } // displayGold
 
     static displayDropItems() {
@@ -8770,15 +10755,6 @@ class BattleManager {
      * @returns {boolean} Whether players can input actions for the game party
      */
     static _canInputActs() { return !this._surprise && $gameParty.canInput(); }
-
-    /**
-     * This function shouldn't be called without an existing current actor
-     * @author DoubleX @since 0.9.5 @version 0.9.5
-     */
-    static _selectNextCmdWithCurActor() {
-        if (this._currentActor.selectNextCommand()) return;
-        this.finishActorInput();
-    } // _selectNextCmdWithCurActor
 
     /**
      * Selects the previous inputable actor in the TPB system
