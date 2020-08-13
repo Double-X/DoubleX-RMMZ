@@ -279,7 +279,16 @@
  *         - _readLittleEndian
  *         - _readBigEndian
  *   # Managers MV functions/methods/variables not in MZ added by this plugin
- *     1. ImageManager
+ *     1. StorageManager
+ *        Static Functions
+ *        - localFileBackupExists
+ *        - webStorageBackupExists
+ *        - webStorageExists
+ *        - removeWebStorage
+ *        - localFileDirectoryPath
+ *        - localFilePath
+ *        - webStorageKey
+ *     2. ImageManager
  *         Static Functions
  *        - _generateCacheKey
  *        - loadEmptyBitmap
@@ -325,14 +334,20 @@
  *        - _imageCache
  *        - _requestQueue
  *        - _systemReservationId
- *     2. AudioManager
- *         Static Functions
+ *     3. AudioManager
+ *        Static Functions
  *        - createDecryptBuffer
  *        - shouldUseHtml5Audio
  *        - checkWebAudioError
  *        Static Variables
  *        - _masterVolume
  *        - _blobUrl
+ *     4. SceneManager
+ *        Static Functions
+ *        - _getTimeInMsWithoutMobileSafari
+ *        - checkFileAccess
+ *        - initNwjs
+ *        - setupErrorHandlers
  *============================================================================
  */
 
@@ -1040,10 +1055,10 @@ class Utils {
         b = Math.round(b);
         return 'rgb(' + r + ',' + g + ',' + b + ')';
     }
-    
+
     static _id = 1;
     static generateRuntimeId() { return Utils._id++; }
-    
+
     static _supportPassiveEvent = null;
 
     static isSupportPassiveEvent() {
@@ -1513,7 +1528,7 @@ class Graphics {
         this._hiddenCanvas = null;
         //
     } // _initPrivateVars
-    
+
     // Added to help plugins alter key events in better ways
     static _keyEvents = new Map();
     //
@@ -1928,7 +1943,7 @@ class Graphics {
             if(Graphics._fontLoaded){
                 return Graphics._fontLoaded.check('10px "'+name+'"');
             }
-    
+
             return false;
         } else {
             if (!this._hiddenCanvas) {
@@ -2933,7 +2948,7 @@ class Bitmap {
         this._image.onerror = null;
         this._errorListener = null;
         this._loadListener = null;
-    
+
         Bitmap._reuseImages.push(this._image);
         this._image = null;
     }
@@ -2978,7 +2993,7 @@ class Bitmap {
             var s = 0;
             var l = (cmin + cmax) / 2;
             var delta = cmax - cmin;
-    
+
             if (delta > 0) {
                 if (r === cmax) {
                     h = 60 * (((g - b) / delta + 6) % 6);
@@ -2991,14 +3006,14 @@ class Bitmap {
             }
             return [h, s, l];
         }
-    
+
         function hslToRgb(h, s, l) {
             var c = (255 - Math.abs(2 * l - 255)) * s;
             var x = c * (1 - Math.abs((h / 60) % 2 - 1));
             var m = l - c / 2;
             var cm = c + m;
             var xm = x + m;
-    
+
             if (h < 60) {
                 return [cm, xm, m];
             } else if (h < 120) {
@@ -3013,7 +3028,7 @@ class Bitmap {
                 return [cm, m, xm];
             }
         }
-    
+
         if (offset && this.width > 0 && this.height > 0) {
             offset = ((offset % 360) + 360) % 360;
             var context = this._context;
@@ -4105,7 +4120,7 @@ class Tilemap extends PIXI.Container {
 
     // RMMV instance methods not present in the default RMMZ codebase
     refreshTileset() {
-    
+
     }
 
     _readLastTiles(i, x, y) {
@@ -4146,18 +4161,18 @@ class Tilemap extends PIXI.Container {
 
     _drawNormalTile(bitmap, tileId, dx, dy) {
         var setNumber = 0;
-    
+
         if (Tilemap.isTileA5(tileId)) {
             setNumber = 4;
         } else {
             setNumber = 5 + Math.floor(tileId / 256);
         }
-    
+
         var w = this._tileWidth;
         var h = this._tileHeight;
         var sx = (Math.floor(tileId / 128) % 2 * 8 + tileId % 8) * w;
         var sy = (Math.floor(tileId % 256 / 8) % 16) * h;
-    
+
         var source = this.bitmaps[setNumber];
         if (source) {
             bitmap.bltImage(source, sx, sy, w, h, dx, dy, w, h);
@@ -4174,7 +4189,7 @@ class Tilemap extends PIXI.Container {
         var by = 0;
         var setNumber = 0;
         var isTable = false;
-    
+
         if (Tilemap.isTileA1(tileId)) {
             var waterSurfaceIndex = [0, 1, 2, 1][this.animationFrame % 4];
             setNumber = 0;
@@ -4220,10 +4235,10 @@ class Tilemap extends PIXI.Container {
                 autotileTable = Tilemap.WALL_AUTOTILE_TABLE;
             }
         }
-    
+
         var table = autotileTable[shape];
         var source = this.bitmaps[setNumber];
-    
+
         if (table && source) {
             var w1 = this._tileWidth / 2;
             var h1 = this._tileHeight / 2;
@@ -4263,7 +4278,7 @@ class Tilemap extends PIXI.Container {
             var bx = tx * 2;
             var by = (ty - 2) * 3;
             var table = autotileTable[shape];
-    
+
             if (table) {
                 var source = this.bitmaps[setNumber];
                 var w1 = this._tileWidth / 2;
@@ -7365,7 +7380,7 @@ class Input {
         14: "left", // D-pad left
         15: "right" // D-pad right
     }; // gamepadMapper
-    
+
     // Added to support the isJustReleased static function
     static _isJustReleased = new Map();
     //
@@ -8422,7 +8437,7 @@ class ImageCache {
             touch: Date.now(),
             key: key
         };
-    
+
         this._truncateCache();
     }
 
@@ -8432,7 +8447,7 @@ class ImageCache {
             item.touch = Date.now();
             return item.bitmap;
         }
-    
+
         return null;
     }
 
@@ -8444,13 +8459,13 @@ class ImageCache {
                 key: key
             };
         }
-    
+
         this._items[key].reservationId = reservationId;
     }
 
     releaseReservation(reservationId) {
         var items = this._items;
-    
+
         Object.keys(items)
             .map(function(key){return items[key];})
             .forEach(function(item){
@@ -8463,7 +8478,7 @@ class ImageCache {
     _truncateCache() {
         var items = this._items;
         var sizeLeft = ImageCache.limit;
-    
+
         Object.keys(items).map(function(key){
             return items[key];
         }).sort(function(a, b){
@@ -8508,7 +8523,7 @@ class ImageCache {
             })) {
             return bitmap;
         }
-    
+
         return null;
     }
 
@@ -8534,7 +8549,7 @@ class RequestQueue {
 
     update() {
         if(this._queue.length === 0) return;
-    
+
         var top = this._queue[0];
         if(top.value.isRequestReady()){
             this._queue.shift();
@@ -8583,7 +8598,7 @@ class ToneFilter extends PIXI.filters.ColorMatrixFilter {
         r = (r || 0).clamp(-255, 255) / 255;
         g = (g || 0).clamp(-255, 255) / 255;
         b = (b || 0).clamp(-255, 255) / 255;
-    
+
         if (r !== 0 || g !== 0 || b !== 0) {
             var matrix = [
                 1, 0, 0, r, 0,
@@ -8591,7 +8606,7 @@ class ToneFilter extends PIXI.filters.ColorMatrixFilter {
                 0, 0, 1, b, 0,
                 0, 0, 0, 1, 0
             ];
-    
+
             this._loadMatrix(matrix, true);
         }
     }
@@ -9254,6 +9269,344 @@ class ConfigManager {
 } // ConfigManager
 
 /*----------------------------------------------------------------------------
+ *    # Rewritten class: StorageManager
+ *      - Rewrites it into the ES6 standard
+ *----------------------------------------------------------------------------*/
+
+//-----------------------------------------------------------------------------
+// StorageManager
+//
+// The static class that manages storage for saving game data.
+class StorageManager {
+
+    constructor() { throw new Error("This is a static class"); }
+
+    static _forageKeys = [];
+    static _forageKeysUpdated = false;
+
+    static isLocalMode() { return Utils.isNwjs(); }
+
+    static saveObject(saveName, object) {
+        return this.objectToJson(object)
+            .then(this.jsonToZip.bind(this))
+            .then(zip => this.saveZip(saveName, zip));
+    } // saveObject
+
+    static loadObject(saveName) {
+        return this.loadZip(saveName)
+            .then(this.zipToJson.bind(this))
+            .then(this.jsonToObject.bind(this));
+    } // loadObject
+
+    static objectToJson(object) {
+        return new Promise((resolve, reject) => {
+            try { resolve(JsonEx.stringify(object)); } catch (e) { reject(e); }
+        });
+    } // objectToJson
+
+    static jsonToObject(json) {
+        return new Promise((resolve, reject) => {
+            try { resolve(JsonEx.parse(json)); } catch (e) { reject(e); }
+        });
+    } // jsonToObject
+
+    static jsonToZip(json) {
+        return new Promise((resolve, reject) => {
+            try {
+                // Edited to help plugins alter json to zip in better ways
+                const zip = this._zipFromJson(json);
+                this._checkSaveDataSize(zip);
+                //
+                resolve(zip);
+            } catch (e) { reject(e); }
+        });
+    } // jsonToZip
+
+    static zipToJson(zip) {
+        return new Promise((resolve, reject) => {
+            try {
+                // Edited to help plugins alter zip to json in better ways
+                if (zip) return resolve(this._jsonFromZip(zip));
+                //
+                resolve("null");
+            } catch (e) {
+                reject(e);
+            }
+        });
+    } // zipToJson
+
+    static saveZip(saveName, zip) {
+        if (this.isLocalMode()) return this.saveToLocalFile(saveName, zip);
+        return this.saveToForage(saveName, zip);
+    } // saveZip
+
+    static loadZip(saveName) {
+        if (this.isLocalMode()) return this.loadFromLocalFile(saveName);
+        return this.loadFromForage(saveName);
+    } // loadZip
+
+    static exists(saveName) {
+        if (this.isLocalMode()) return this.localFileExists(saveName);
+        return this.forageExists(saveName);
+    } // exists
+
+    static remove(saveName) {
+        if (this.isLocalMode()) return this.removeLocalFile(saveName);
+        return this.removeForage(saveName);
+    } // remove
+
+    static saveToLocalFile(saveName, zip) {
+        const filePath = this.filePath(saveName);
+        const backupFilePath = `${filePath}_`;
+        return new Promise((resolve, reject) => {
+            // Edited to help plugins alter save to local file in better ways
+            this._onPrepareSaveToLocalFile(filePath, backupFilePath);
+            try {
+                this._onSaveToLocalFileWithoutRescue(zip, filePath, backupFilePath);
+                resolve();
+            } catch (e) {
+                this._onTryRollbackFailedLocalFileSave(filePath, backupFilePath);
+                reject(e);
+            }
+            //
+        });
+    } // saveToLocalFile
+
+    static loadFromLocalFile(saveName) {
+        return new Promise((resolve, reject) => {
+            // It's almost immediately run so file path can be called here
+            const data = this.fsReadFile(this.filePath(saveName));
+            //
+            data ? resolve(data) : reject(new Error("Savefile not found"));
+        });
+    } // loadFromLocalFile
+
+    static localFileExists(saveName) {
+        return require("fs").existsSync(this.filePath(saveName));
+    } // localFileExists
+
+    static removeLocalFile(saveName) { this.fsUnlink(this.filePath(saveName)); }
+
+    static saveToForage(saveName, zip) {
+        const testKey = this.forageTestKey();
+        setTimeout(localforage.removeItem.bind(this, testKey));
+        return localforage
+            .setItem(testKey, zip)
+            .then(localforage.setItem(this.forageKey(saveName), zip))
+            .then(this.updateForageKeys());
+    } // saveToForage
+
+    static loadFromForage(saveName) {
+        return localforage.getItem(this.forageKey(saveName));
+    } // loadFromForage
+
+    static forageExists(saveName) {
+        return this._forageKeys.includes(this.forageKey(saveName));
+    } // forageExists
+
+    static removeForage(saveName) {
+        const key = this.forageKey(saveName);
+        return localforage.removeItem(key).then(this.updateForageKeys());
+    } // removeForage
+
+    static updateForageKeys() {
+        this._forageKeysUpdated = false;
+        return localforage.keys().then(keys => {
+            // Edited to help plugins alter update forage keys in better ways
+            this._onUpdateForageKeySuc(keys);
+            //
+            return 0;
+        });
+    } // updateForageKeys
+
+    static forageKeysUpdated() { return this._forageKeysUpdated; }
+
+    static fsMkdir(path) {
+        const fs = require("fs");
+        if (!fs.existsSync(path)) fs.mkdirSync(path);
+    } // fsMkdir
+
+    static fsRename(oldPath, newPath) {
+        const fs = require("fs");
+        if (fs.existsSync(oldPath)) fs.renameSync(oldPath, newPath);
+    } // fsRename
+
+    static fsUnlink(path) {
+        const fs = require("fs");
+        if (fs.existsSync(path)) fs.unlinkSync(path);
+    } // fsUnlink
+
+    static fsReadFile(path) {
+        const fs = require("fs");
+        if (!fs.existsSync(path)) return null;
+        return fs.readFileSync(path, { encoding: "utf8" });
+    } // fsReadFile
+
+    static fsWriteFile(path, data) { require("fs").writeFileSync(path, data); }
+
+    static fileDirectoryPath() {
+        const path = require("path");
+        return path.join(path.dirname(process.mainModule.filename), "save/");
+    } // fileDirectoryPath
+
+    static filePath(saveName) {
+        return `${this.fileDirectoryPath()}${saveName}.rmmzsave`;
+    } // filePath
+
+    static forageKey(saveName) {
+        return `rmmzsave.${$dataSystem.advanced.gameId}.${saveName}`;
+    } // forageKey
+
+    static forageTestKey() { return "rmmzsave.test"; }
+
+    /**
+     * Nullipotent
+     * @author DoubleX @since 0.9.5 @version 0.9.5
+     * @param {json} json - The json string save data to the compressed
+     * @returns {Uint8Array|Array} The compressed zip from the json string data
+     */
+    static _zipFromJson(json) {
+        return pako.deflate(json, { to: "string", level: 1 });
+    } // _zipFromJson
+
+    /**
+     * Checks whether the compressed save data size's okay
+     * Idempotent
+     * @author DoubleX @since 0.9.5 @version 0.9.5
+     * @param {Uint8Array|Array} zip - Zipped save data to have its size checked
+     */
+    static _checkSaveDataSize(zip) {
+        /** @todo Figures out where does 50000 come from */
+        if (zip.length >= 50000) console.warn("Save data is too big.");
+    } // _checkSaveDataSize
+
+    /**
+     * Nullipotent
+     * @author DoubleX @since 0.9.5 @version 0.9.5
+     * @param {Uint8Array|Array} zip - The zipped save data to be decompressed
+     * @returns {json} The decompressed json string from the compressed zip
+     */
+    static _jsonFromZip(zip) { return pako.inflate(zip, { to: "string" }) }
+
+    /**
+     * Prepares to save the compressed local file with the test counterpart
+     * Idempotent
+     * @author DoubleX @since 0.9.5 @version 0.9.5
+     * @param {string} filePath - The real file path of the local save file
+     * @param {string} backupFilePath - The test file path of the save file
+     */
+    static _onPrepareSaveToLocalFile(filePath, backupFilePath) {
+        // It's almost immediately called after saveToLocalFile so it's ok here
+        this.fsMkdir(this.fileDirectoryPath());
+        //
+        this.fsUnlink(backupFilePath);
+        this.fsRename(filePath, backupFilePath);
+    } // _onPrepareSaveToLocalFile
+
+    /**
+     * This function shouldn't be called without a try and catch
+     * Idempotent
+     * @author DoubleX @since 0.9.5 @version 0.9.5
+     * @param {Uint8Array|Array} zip - The zipped save data to be saved locally
+     * @param {string} filePath - The real file path of the local save file
+     * @param {string} backupFilePath - The test file path of the save file
+     */
+    static _onSaveToLocalFileWithoutRescue(zip, filePath, backupFilePath) {
+        this.fsWriteFile(filePath, zip);
+        this.fsUnlink(backupFilePath);
+    } // _onSaveToLocalFileWithoutRescue
+
+    /**
+     * Tries to rollback the failed local file save attempt
+     * Idempotent
+     * @author DoubleX @since 0.9.5 @version 0.9.5
+     * @param {string} filePath - The real file path of the local save file
+     * @param {string} backupFilePath - The test file path of the save file
+     */
+    static _onTryRollbackFailedLocalFileSave(filePath, backupFilePath) {
+        /** @todo Thinks of if at least logging the catch will be better */
+        try {
+            this._onRollbackFailedLocalFileSaveWithouRescue(filePath, backupFilePath);
+        } catch (e2) {}
+        //
+    } // _onTryRollbackFailedLocalFileSave
+
+    /**
+     * This function shouldn't be called without a try and catch
+     * Idempotent
+     * @author DoubleX @since 0.9.5 @version 0.9.5
+     * @param {string} filePath - The real file path of the local save file
+     * @param {string} backupFilePath - The test file path of the save file
+     */
+    static _onRollbackFailedLocalFileSaveWithouRescue(filePath, backupFilePath) {
+        this.fsUnlink(filePath);
+        this.fsRename(backupFilePath, filePath);
+    } // _onRollbackFailedLocalFileSaveWithouRescue
+
+    /**
+     * Triggers events to happen upon successfully updating the forage key
+     * Idempotent
+     * @author DoubleX @since 0.9.5 @version 0.9.5
+     * @param {[string]} keys - The updated forage key list with updated keys
+     */
+    static _onUpdateForageKeySuc(keys) {
+        [this._forageKeys, this._forageKeysUpdated] = [keys, true];
+    } // _onUpdateForageKeySuc
+    
+    // RMMV static functions not present in the default RMMZ codebase
+    static localFileBackupExists(savefileId) {
+        var fs = require('fs');
+        return fs.existsSync(this.localFilePath(savefileId) + ".bak");
+    }
+
+    static webStorageBackupExists(savefileId) {
+        var key = this.webStorageKey(savefileId) + "bak";
+        return !!localStorage.getItem(key);
+    }
+
+    static webStorageExists(savefileId) {
+        var key = this.webStorageKey(savefileId);
+        return !!localStorage.getItem(key);
+    }
+
+    static removeWebStorage(savefileId) {
+        var key = this.webStorageKey(savefileId);
+        localStorage.removeItem(key);
+    }
+
+    static localFileDirectoryPath() {
+        var path = require('path');
+    
+        var base = path.dirname(process.mainModule.filename);
+        return path.join(base, 'save/');
+    }
+
+    static localFilePath(savefileId) {
+        var name;
+        if (savefileId < 0) {
+            name = 'config.rpgsave';
+        } else if (savefileId === 0) {
+            name = 'global.rpgsave';
+        } else {
+            name = 'file%1.rpgsave'.format(savefileId);
+        }
+        return this.localFileDirectoryPath() + name;
+    }
+
+    static webStorageKey(savefileId) {
+        if (savefileId < 0) {
+            return 'RPG Config';
+        } else if (savefileId === 0) {
+            return 'RPG Global';
+        } else {
+            return 'RPG File%1'.format(savefileId);
+        }
+    }
+    //
+
+} // StorageManager
+
+/*----------------------------------------------------------------------------
  *    # Rewritten class: FontManager
  *      - Rewrites it into the ES6 standard
  *----------------------------------------------------------------------------*/
@@ -9488,7 +9841,7 @@ class ImageManager {
             this._imageCache.add('empty', empty);
             this._imageCache.reserve('empty', empty, this._systemReservationId);
         }
-    
+
         return empty;
     }
 
@@ -9577,7 +9930,7 @@ class ImageManager {
     static reserveNormalBitmap(path, hue, reservationId) {
         var bitmap = this.loadNormalBitmap(path, hue);
         this._imageCache.reserve(this._generateCacheKey(path, hue), bitmap, reservationId);
-    
+
         return bitmap;
     }
 
@@ -9669,7 +10022,7 @@ class ImageManager {
         }else{
             this._requestQueue.raisePriority(key);
         }
-    
+
         return bitmap;
     }
 
@@ -9714,7 +10067,7 @@ class EffectManager {
         this._cache[url] = effect;
         return effect;
     } // startLoading
-    
+
     static clear() {
         for (const url in this._cache) {
             Graphics.effekseer.releaseEffect(this._cache[url]);
@@ -10358,6 +10711,211 @@ class AudioManager {
 } // AudioManager
 
 /*----------------------------------------------------------------------------
+ *    # Rewritten class: SoundManager
+ *      - Rewrites it into the ES6 standard
+ *----------------------------------------------------------------------------*/
+
+//-----------------------------------------------------------------------------
+// SoundManager
+//
+// The static class that plays sound effects defined in the database.
+class SoundManager {
+
+    constructor() { throw new Error("This is a static class"); }
+
+    static preloadImportantSounds() {
+        this.loadSystemSound(0);
+        this.loadSystemSound(1);
+        this.loadSystemSound(2);
+        this.loadSystemSound(3);
+    } // preloadImportantSounds
+
+    static loadSystemSound(n) {
+        if ($dataSystem) AudioManager.loadStaticSe($dataSystem.sounds[n]);
+    } // loadSystemSound
+
+    static playSystemSound(n) {
+        if ($dataSystem) AudioManager.playStaticSe($dataSystem.sounds[n]);
+    } // playSystemSound
+
+    static playCursor() { this.playSystemSound(0); }
+
+    static playOk() { this.playSystemSound(1); }
+
+    static playCancel() { this.playSystemSound(2); }
+
+    static playBuzzer() { this.playSystemSound(3); }
+
+    static playEquip() { this.playSystemSound(4); }
+
+    static playSave() { this.playSystemSound(5); }
+
+    static playLoad() { this.playSystemSound(6); }
+
+    static playBattleStart() { this.playSystemSound(7); }
+
+    static playEscape() { this.playSystemSound(8); }
+
+    static playEnemyAttack() { this.playSystemSound(9); }
+
+    static playEnemyDamage() { this.playSystemSound(10); }
+
+    static playEnemyCollapse() { this.playSystemSound(11); }
+
+    static playBossCollapse1() { this.playSystemSound(12); }
+
+    static playBossCollapse2() { this.playSystemSound(13); }
+
+    static playActorDamage() { this.playSystemSound(14); }
+
+    static playActorCollapse() { this.playSystemSound(15); }
+
+    static playRecovery() { this.playSystemSound(16); }
+
+    static playMiss() { this.playSystemSound(17); }
+
+    static playEvasion() { this.playSystemSound(18); }
+
+    static playMagicEvasion() { this.playSystemSound(19); }
+
+    static playReflection() { this.playSystemSound(20); }
+
+    static playShop() { this.playSystemSound(21); }
+
+    static playUseItem() { this.playSystemSound(22); }
+
+    static playUseSkill() { this.playSystemSound(23); }
+
+} // SoundManager
+
+/*----------------------------------------------------------------------------
+ *    # Rewritten class: TextManager
+ *      - Rewrites it into the ES6 standard
+ *----------------------------------------------------------------------------*/
+
+//-----------------------------------------------------------------------------
+// TextManager
+//
+// The static class that handles terms and messages.
+class TextManager {
+
+    constructor() { throw new Error("This is a static class"); }
+
+    static basic(basicId) {
+        return $dataSystem.terms.basic[basicId] || "";
+    } // basic
+
+    static param(paramId) {
+        return $dataSystem.terms.params[paramId] || "";
+    } // param
+
+    static command(commandId) {
+        return $dataSystem.terms.commands[commandId] || "";
+    } // command
+
+    static message(messageId) {
+        return $dataSystem.terms.messages[messageId] || "";
+    } // message
+
+    static getter(method, param) {
+        return {
+            get: function() { return this[method](param); },
+            configurable: true
+        };
+    } // getter
+
+    get currencyUnit() { return $dataSystem.currencyUnit; }
+    get level() { return this.basic(0); }
+    get levelA() { return this.basic(1); }
+    get hp() { return this.basic(2); }
+    get hpA() { return this.basic(3); }
+    get mp() { return this.basic(4); }
+    get mpA() { return this.basic(5); }
+    get tp() { return this.basic(6); }
+    get tpA() { return this.basic(7); }
+    get exp() { return this.basic(8); }
+    get expA() { return this.basic(9); }
+    get fight() { return this.command(0); }
+    get escape() { return this.command(1); }
+    get attack() { return this.command(2); }
+    get guard() { return this.command(3); }
+    get item() { return this.command(4); }
+    get skill() { return this.command(5); }
+    get equip() { return this.command(6); }
+    get status() { return this.command(7); }
+    get formation() { return this.command(8); }
+    get save() { return this.command(9); }
+    get gameEnd() { return this.command(10); }
+    get options() { return this.command(11); }
+    get weapon() { return this.command(12); }
+    get armor() { return this.command(13); }
+    get keyItem() { return this.command(14); }
+    get equip2() { return this.command(15); }
+    get optimize() { return this.command(16); }
+    get clear() { return this.command(17); }
+    get newGame() { return this.command(18); }
+    get continue_() { return this.command(19); }
+    get toTitle() { return this.command(21); }
+    get cancel() { return this.command(22); }
+    get buy() { return this.command(24); }
+    get sell() { return this.command(25); }
+    get alwaysDash() { return this.message("alwaysDash"); }
+    get commandRemember() { return this.message("commandRemember"); }
+    get touchUI() { return this.message("touchUI"); }
+    get bgmVolume() { return this.message("bgmVolume"); }
+    get bgsVolume() { return this.message("bgsVolume"); }
+    get meVolume() { return this.message("meVolume"); }
+    get seVolume() { return this.message("seVolume"); }
+    get possession() { return this.message("possession"); }
+    get expTotal() { return this.message("expTotal"); }
+    get expNext() { return this.message("expNext"); }
+    get saveMessage() { return this.message("saveMessage"); }
+    get loadMessage() { return this.message("loadMessage"); }
+    get file() { return this.message("file"); }
+    get autosave() { return this.message("autosave"); }
+    get partyName() { return this.message("partyName"); }
+    get emerge() { return this.message("emerge"); }
+    get preemptive() { return this.message("preemptive"); }
+    get surprise() { return this.message("surprise"); }
+    get escapeStart() { return this.message("escapeStart"); }
+    get escapeFailure() { return this.message("escapeFailure"); }
+    get victory() { return this.message("victory"); }
+    get defeat() { return this.message("defeat"); }
+    get obtainExp() { return this.message("obtainExp"); }
+    get obtainGold() { return this.message("obtainGold"); }
+    get obtainItem() { return this.message("obtainItem"); }
+    get levelUp() { return this.message("levelUp"); }
+    get obtainSkill() { return this.message("obtainSkill"); }
+    get useItem() { return this.message("useItem"); }
+    get criticalToEnemy() { return this.message("criticalToEnemy"); }
+    get criticalToActor() { return this.message("criticalToActor"); }
+    get actorDamage() { return this.message("actorDamage"); }
+    get actorRecovery() { return this.message("actorRecovery"); }
+    get actorGain() { return this.message("actorGain"); }
+    get actorLoss() { return this.message("actorLoss"); }
+    get actorDrain() { return this.message("actorDrain"); }
+    get actorNoDamage() { return this.message("actorNoDamage"); }
+    get actorNoHit() { return this.message("actorNoHit"); }
+    get enemyDamage() { return this.message("enemyDamage"); }
+    get enemyRecovery() { return this.message("enemyRecovery"); }
+    get enemyGain() { return this.message("enemyGain"); }
+    get enemyLoss() { return this.message("enemyLoss"); }
+    get enemyDrain() { return this.message("enemyDrain"); }
+    get enemyNoDamage() { return this.message("enemyNoDamage"); }
+    get enemyNoHit() { return this.message("enemyNoHit"); }
+    get evasion() { return this.message("evasion"); }
+    get magicEvasion() { return this.message("magicEvasion"); }
+    get magicReflection() { return this.message("magicReflection"); }
+    get counterAttack() { return this.message("counterAttack"); }
+    get substitute() { return this.message("substitute"); }
+    get buffAdd() { return this.message("buffAdd"); }
+    get debuffAdd() { return this.message("debuffAdd"); }
+    get buffRemove() { return this.message("buffRemove"); }
+    get actionFailure() { return this.message("actionFailure"); }
+
+} // TextManager
+
+/*----------------------------------------------------------------------------
  *    # Rewritten class: ColorManager
  *      - Rewrites it into the ES6 standard
  *----------------------------------------------------------------------------*/
@@ -10454,6 +11012,534 @@ class ColorManager {
     static itemBackColor2() { return "rgba(0, 0, 0, 0.5)"; }
 
 } // ColorManager
+
+/*----------------------------------------------------------------------------
+ *    # Rewritten class: SceneManager
+ *      - Rewrites it into the ES6 standard
+ *----------------------------------------------------------------------------*/
+
+//-----------------------------------------------------------------------------
+// SceneManager
+//
+// The static class that manages scene transitions.
+class SceneManager {
+
+    constructor() { throw new Error("This is a static class"); }
+
+    static _scene = null;
+    static _nextScene = null;
+    static _stack = [];
+    static _exiting = false;
+    static _previousScene = null;
+    static _previousClass = null;
+    static _backgroundBitmap = null;
+    static _smoothDeltaTime = 1;
+    static _elapsedTime = 0;
+
+    static run(sceneClass) {
+        try {
+            // Edited to help plugins alter run behaviors in better ways
+            this._runWithoutRescue(sceneClass);
+            //
+        } catch (e) { this.catchException(e); }
+    } // run
+
+    static initialize() {
+        this.checkBrowser();
+        this.checkPluginErrors();
+        this.initGraphics();
+        this.initAudio();
+        this.initVideo();
+        this.initInput();
+        this.setupEventHandlers();
+        // Added to help plugins alter key events in better ways
+        this._initKeyEvents();
+        //
+    } // initialize
+
+    static checkBrowser() {
+        if (!Utils.canUseWebGL()) {
+            throw new Error("Your browser does not support WebGL.");
+        }
+        if (!Utils.canUseWebAudioAPI()) {
+            throw new Error("Your browser does not support Web Audio API.");
+        }
+        if (!Utils.canUseCssFontLoading()) {
+            throw new Error("Your browser does not support CSS Font Loading.");
+        }
+        if (!Utils.canUseIndexedDB()) {
+            throw new Error("Your browser does not support IndexedDB.");
+        }
+    } // checkBrowser
+
+    static checkPluginErrors() { PluginManager.checkErrors(); }
+
+    static initGraphics() {
+        if (!Graphics.initialize()) {
+            throw new Error("Failed to initialize graphics.");
+        }
+        Graphics.setTickHandler(this.update.bind(this));
+    } // initGraphics
+
+    static initAudio() { WebAudio.initialize(); }
+
+    static initVideo() { Video.initialize(Graphics.width, Graphics.height); }
+
+    static initInput() {
+        Input.initialize();
+        TouchInput.initialize();
+    } // initInput
+
+    static setupEventHandlers() {
+        window.addEventListener("error", this.onError.bind(this));
+        window.addEventListener("unhandledrejection", this.onReject.bind(this));
+        window.addEventListener("unload", this.onUnload.bind(this));
+        document.addEventListener("keydown", this.onKeyDown.bind(this));
+    } // setupEventHandlers
+
+    static update(deltaTime) {
+        try {
+            // Edited to help plugins alter update behaviors in better ways
+            this._updateWithoutRescue(deltaTime);
+            //
+        } catch (e) { this.catchException(e); }
+    } // update
+
+    static determineRepeatNumber(deltaTime) {
+        // [Note] We consider environments where the refresh rate is higher than
+        //   60Hz, but ignore sudden irregular deltaTime.
+        // Edited to help plugins alter determine repeat number in better ways
+        this._updateSmoothDeltaTime(deltaTime);
+        //
+        /** @todo Extracts these codes into well-named functions */
+        if (this._smoothDeltaTime >= 0.9) {
+            this._elapsedTime = 0;
+            return Math.round(this._smoothDeltaTime);
+        } else {
+            this._elapsedTime += deltaTime;
+            if (this._elapsedTime >= 1) {
+                this._elapsedTime -= 1;
+                return 1;
+            }
+            return 0;
+        }
+        //
+    } // determineRepeatNumber
+
+    static terminate() { window.close(); }
+
+    static onError(event) {
+        // Edited to help plugins alter on error behaviors in better ways
+        this._logError(event);
+        //
+        /** @todo Thinks of if at least logging the catch will be better */
+        try {
+            // Edited to help plugins alter on error behaviors in better ways
+            this._onErrorWithoutRescue(event);
+            //
+        } catch (e) {}
+        //
+    } // onError
+
+    static onReject(event) {
+        // Catch uncaught exception in Promise
+        event.message = event.reason;
+        this.onError(event);
+    } // onReject
+
+    static onUnload() {
+        ImageManager.clear();
+        EffectManager.clear();
+        AudioManager.stopAll();
+    } // onUnload
+
+    static onKeyDown(event) {
+        // Edited to help plugins alter key events in better ways
+        if (this._hasNoKeyEvent(event)) return;
+        const { keyCode } = event;
+        for (const [keyCodeFunc, eventFunc] of this._keyEvents) {
+            if (keyCodeFunc() === keyCode) return eventFunc();
+        }
+        //
+    } // onKeyDown
+
+    static reloadGame() { if (Utils.isNwjs()) chrome.runtime.reload(); }
+
+    static showDevTools() {
+        if (!Utils.isNwjs() || !Utils.isOptionValid("test")) return;
+        nw.Window.get().showDevTools();
+    } // showDevTools
+
+    static catchException(e) {
+        // Edited to help plugins alter catch exception behaviors in better ways
+        this._catchError(e);
+        //
+        this.stop();
+    } // catchException
+
+    static catchNormalError(e) {
+        Graphics.printError(e.name, e.message, e);
+        AudioManager.stopAll();
+        console.error(e.stack);
+    } // catchNormalError
+
+    static catchLoadError(e) {
+        const [url, retry] = [e[1], e[2]];
+        Graphics.printError("Failed to load", url);
+        // Edited to help plugins alter catch load error in better ways
+        if (retry) return Graphics.showRetryButton(() => this._onRetry(retry));
+        //
+        AudioManager.stopAll();
+    } // catchLoadError
+
+    static catchUnknownError(e) {
+        Graphics.printError("UnknownError", String(e));
+        AudioManager.stopAll();
+    } // catchUnknownError
+
+    static updateMain() {
+        this.updateInputData();
+        this.updateEffekseer();
+        this.changeScene();
+        this.updateScene();
+    } // updateMain
+
+    static updateInputData() {
+        Input.update();
+        TouchInput.update();
+    } // updateInputData
+
+    static updateEffekseer() {
+        if (Graphics.effekseer) Graphics.effekseer.update();
+    } // updateEffekseer
+
+    static changeScene() {
+        // Edited to help plugins alter change scene behaviors in better ways
+        if (this._isChangeToNextScene()) this._changeToNextScene();
+        //
+    } // changeScene
+
+    // Edited to help plugins alter update scene behaviors in better ways
+    static updateScene() { if (this._scene) this._updateExistingScene(); }
+    //
+
+    static isGameActive() {
+        /** @todo Thinks of if at least logging the catch will be better */
+        // [Note] We use "window.top" to support an iframe.
+        try {
+            return window.top.document.hasFocus();
+        } catch (e) { /* SecurityError */ return true; }
+        //
+    } // isGameActive
+
+    static onSceneTerminate() {
+        this._previousScene = this._scene;
+        this._previousClass = this._scene.constructor;
+        Graphics.setStage(null);
+    } // onSceneTerminate
+
+    static onSceneCreate() { Graphics.startLoading(); }
+
+    static onBeforeSceneStart() {
+        // Edited to help plugins alter before scene start in better ways
+        this._onDestroyPrevScene();
+        //
+        if (Graphics.effekseer) Graphics.effekseer.stopAll();
+    } // onBeforeSceneStart
+
+    static onSceneStart() {
+        Graphics.endLoading();
+        Graphics.setStage(this._scene);
+    } // onSceneStart
+
+    static isSceneChanging() { return this._exiting || !!this._nextScene; }
+
+    static isCurrentSceneBusy() { return this._scene && this._scene.isBusy(); }
+
+    static isNextScene(sceneClass) {
+        return this._nextScene && this._nextScene.constructor === sceneClass;
+    } // isNextScene
+
+    static isPreviousScene(sceneClass) {
+        return this._previousClass === sceneClass;
+    } // isPreviousScene
+
+    static goto(sceneClass) {
+        if (sceneClass) this._nextScene = new sceneClass();
+        if (this._scene) this._scene.stop();
+    } // goto
+
+    static push(sceneClass) {
+        this._stack.push(this._scene.constructor);
+        this.goto(sceneClass);
+    } // push
+
+    static pop() {
+        this._stack.isEmpty() ? this.exit() : this.goto(this._stack.pop());
+    } // pop
+
+    static exit() {
+        this.goto(null);
+        this._exiting = true;
+    } // exit
+
+    static clearStack() { this._stack = []; }
+
+    static stop() { Graphics.stopGameLoop(); }
+
+    static prepareNextScene() { this._nextScene.prepare(...arguments); }
+
+    static snap() { return Bitmap.snap(this._scene); }
+
+    static snapForBackground() {
+        if (this._backgroundBitmap) this._backgroundBitmap.destroy();
+        this._backgroundBitmap = this.snap();
+    } // snapForBackground
+
+    static backgroundBitmap() { return this._backgroundBitmap; }
+
+    static resume() {
+        TouchInput.update();
+        Graphics.startGameLoop();
+    } // resume
+
+    // Added to help plugins alter key events in better ways
+    static _keyEvents = new Map();
+    //
+
+    /**
+     * This function shouldn't be called without a try and catch
+     * Idempotent
+     * @author DoubleX @since 0.9.5 @version 0.9.5
+     * @param {Klass} sceneClass - The class of the scene to be run
+     */
+    static _runWithoutRescue(sceneClass) {
+        this.initialize();
+        this.goto(sceneClass);
+        Graphics.startGameLoop();
+    } // _runWithoutRescue
+
+    /**
+     * Adds a new private variable to help plugins alter key events
+     * Idempotent
+     * @author DoubleX @since 0.9.5 @version 0.9.5
+     */
+    static _initKeyEvents() {
+        this._keyEvents.clear();
+        const reloadGameKeyFunc = this._reloadGameKey.bind(this);
+        this._keyEvents.set(reloadGameKeyFunc, this.reloadGame.bind(this));
+        const showDevToolsKeyFunc = this._showDevToolsKey.bind(this);
+        this._keyEvents.set(showDevToolsKeyFunc, this.showDevTools.bind(this));
+    } // _initKeyEvents
+
+    /**
+     * Nullipotent
+     * @author DoubleX @since 0.9.5 @version 0.9.5
+     * @enum @returns {number} - The code of the reload game key
+     */
+    static _reloadGameKey() { return 116; /* F5 */ }
+
+    /**
+     * Nullipotent
+     * @author DoubleX @since 0.9.5 @version 0.9.5
+     * @enum @returns {number} - The code of the show dev tools key
+     */
+    static _showDevToolsKey() { return 119; /* F8 */ }
+
+    /**
+     * This function shouldn't be called without a try and catch
+     * Idempotent
+     * @author DoubleX @since 0.9.5 @version 0.9.5
+     * @param {number} deltaTime - The time elapsed for each game loop
+     */
+    static _updateWithoutRescue(deltaTime) {
+        const n = this.determineRepeatNumber(deltaTime);
+        for (let i = 0; i < n; i++) this.updateMain();
+    } // _updateWithoutRescue
+
+    /**
+     * Updates the smooth delta time when determining the repeat number
+     * Idempotent
+     * @author DoubleX @since 0.9.5 @version 0.9.5
+     * @param {number} deltaTime - The time elapsed for each game loop
+     */
+    static _updateSmoothDeltaTime(deltaTime) {
+        // [Note] We consider environments where the refresh rate is higher than
+        //   60Hz, but ignore sudden irregular deltaTime.
+        /** @todo Figures out where do 0.8 and 0.2 come from */
+        this._smoothDeltaTime *= 0.8;
+        this._smoothDeltaTime += Math.min(deltaTime, 2) * 0.2;
+        //
+    } // _updateSmoothDeltaTime
+
+    /**
+     * Shows the error event details onto the console
+     * Idempotent
+     * @author DoubleX @since 0.9.5 @version 0.9.5
+     * @param {ErrorEvent} event - The event having the error to be shown
+     */
+    static _logError(event) {
+        console.error(event.message);
+        console.error(event.filename, event.lineno);
+    } // _logError
+
+    /**
+     * This function shouldn't be called without a try and catch
+     * Idempotent
+     * @author DoubleX @since 0.9.5 @version 0.9.5
+     * @param {ErrorEvent} event - The event having the error to be shown
+     */
+    static _onErrorWithoutRescue(event) {
+        this.stop();
+        Graphics.printError("Error", event.message, event);
+        AudioManager.stopAll();
+    } // _onErrorWithoutRescue
+
+    /**
+     * Nullipotent
+     * @author DoubleX @since 0.9.5 @version 0.9.5
+     * @param {Event} event - The onkeydown event to be checked against
+     * @returns {boolean} If the event might trigger functions to be called
+     */
+    static _hasNoKeyEvent(event) { return event.ctrlKey || event.altKey; }
+
+    /**
+     * Catches the error being thrown when the game crashes
+     * Idempotent
+     * @author DoubleX @since 0.9.5 @version 0.9.5
+     * @param {*} e - The exception being catched as the error
+     */
+    static _catchError(e) {
+        if (e instanceof Error) return this.catchNormalError(e);
+        if (e instanceof Array && e[0] === "LoadError") {
+            this.catchLoadError(e);
+        } else this.catchUnknownError(e);
+    } // _catchError
+
+    /**
+     * Triggers events to happen upon retrying the game after throwing an error
+     * Idempotent
+     * @author DoubleX @since 0.9.5 @version 0.9.5
+     * @param {()} retry - The function to be called upon retrying the game
+     */
+    static _onRetry(retry) {
+        retry();
+        this.resume();
+    } // _onRetry
+
+    /**
+     * Nullipotent
+     * @author DoubleX @since 0.9.5 @version 0.9.5
+     * @returns {boolean} Whether the current scene can be changed to the next
+     */
+    static _isChangeToNextScene() {
+        return this.isSceneChanging() && !this.isCurrentSceneBusy();
+    } // _isChangeToNextScene
+
+    /**
+     * Changes the scene from the current to the next one
+     * Idempotent
+     * @author DoubleX @since 0.9.5 @version 0.9.5
+     */
+    static _changeToNextScene() {
+        if (this._scene) this._terminateCurrentScene();
+        this._scene = this._nextScene, this._nextScene = null;
+        if (this._scene) this._createCurrentScene();
+        if (this._exiting) this.terminate();
+    } // _changeToNextScene
+
+    /**
+     * This function shouldn't be called without the current scene
+     * Idempotent
+     * @author DoubleX @since 0.9.5 @version 0.9.5
+     */
+    static _terminateCurrentScene() {
+        this._scene.terminate();
+        this.onSceneTerminate();
+    } // _terminateCurrentScene
+
+    /**
+     * This function shouldn't be called without the current scene
+     * Idempotent
+     * @author DoubleX @since 0.9.5 @version 0.9.5
+     */
+    static _createCurrentScene() {
+        this._scene.create();
+        this.onSceneCreate();
+    } // _createCurrentScene
+
+    /**
+     * This function shouldn't be called without the current scene
+     * Idempotent
+     * @author DoubleX @since 0.9.5 @version 0.9.5
+     */
+    static _updateExistingScene() {
+        if (this._scene.isStarted()) return this._updateStartedScene();
+        if (this._scene.isReady()) this._updateReadyScene();
+    } // _updateExistingScene
+
+    /**
+     * This function shouldn't be called without the current scene being started
+     * Idempotent
+     * @author DoubleX @since 0.9.5 @version 0.9.5
+     */
+    static _updateStartedScene() {
+        if (this.isGameActive()) this._scene.update();
+    } // _updateStartedScene
+
+    /**
+     * This function shouldn't be called without the current scene being ready
+     * Idempotent
+     * @author DoubleX @since 0.9.5 @version 0.9.5
+     */
+    static _updateReadyScene() {
+        this.onBeforeSceneStart();
+        this._scene.start();
+        this.onSceneStart();
+    } // _updateReadyScene
+
+    /**
+     * Triggers events to happen upon destroying the previous scene
+     * Idempotent
+     * @author DoubleX @since 0.9.5 @version 0.9.5
+     */
+    static _onDestroyPrevScene() {
+        if (!this._previousScene) return;
+        this._previousScene.destroy();
+        this._previousScene = null;
+    } // _onDestroyPrevScene
+
+    // RMMV static functions not present in the default RMMZ codebase
+    static _getTimeInMsWithoutMobileSafari() {
+        return performance.now();
+    }
+
+    static checkFileAccess() {
+        if (!Utils.canReadGameFiles()) {
+            throw new Error('Your browser does not allow to read local files.');
+        }
+    }
+
+    static initNwjs() {
+        if (Utils.isNwjs()) {
+            var gui = require('nw.gui');
+            var win = gui.Window.get();
+            if (process.platform === 'darwin' && !win.menu) {
+                var menubar = new gui.Menu({ type: 'menubar' });
+                var option = { hideEdit: true, hideWindow: true };
+                menubar.createMacBuiltin('Game', option);
+                win.menu = menubar;
+            }
+        }
+    }
+
+    static setupErrorHandlers() {
+        window.addEventListener('error', this.onError.bind(this));
+        document.addEventListener('keydown', this.onKeyDown.bind(this));
+    }
+    //
+
+} // SceneManager
 
 /*----------------------------------------------------------------------------
  *    # Rewritten class: BattleManager
