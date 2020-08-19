@@ -145,9 +145,6 @@
  *      classes, so those in children classes should use
  *      ParentClass.staticFunc.call(this) instead of super.staticFunc()
  *   # New public APIs
- *     Input
- *     1. isJustReleased(keyName)
- *        Returns if the specified key's just released right on this frame
  *     Array.prototype
  *     1. fastMap(mapCallback, mapThis_)
  *        The same as map but is tested to be noticeably faster
@@ -185,6 +182,16 @@
  *         Returns if this array doesn't include the specified element
  *     16. clear()
  *         Empties the whole array
+ *     Graphics
+ *     1. fps
+ *        Returns the current game fps
+ *     2. fps = newFps
+ *        Sets the current game fps to be newFps
+ *     Input
+ *     1. isJustReleased(keyName)
+ *        Returns if the specified key's just released right on this frame
+ *   # New private functions/methods/variables
+ *     Search "ed to help plugins" for such additions in the plugin
  *   # Core MV functions/methods/variables not in MZ added by this plugin
  *     1. Utils
  *        Static Functions
@@ -348,6 +355,13 @@
  *        - checkFileAccess
  *        - initNwjs
  *        - setupErrorHandlers
+ *   # Objects MV functions/methods/variables not in MZ added by this plugin
+ *     1. Game_Temp
+ *        Instance Method
+ *        - clearCommonEvent
+ *     2. Game_Picture
+ *        Instance Method
+ *        - erase
  *============================================================================
  */
 
@@ -1506,6 +1520,11 @@ class Graphics {
         //
     } // _createEffekseerContext
 
+    // Added to help plugins alter fps in better ways
+    get fps() { return this._fps; }
+    set fps(fps) { [this._fps, this._app.deltaMs] = [fps, 1000.0 / fps]; }
+    //
+
     /**
      * Initializes all graphics private variables
      * Idempotent
@@ -1519,6 +1538,9 @@ class Graphics {
         this._stretchEnabled = this._defaultStretchMode();
         this._app = this._effekseer = null;
         this._wasLoading = false;
+        // Added to help plugins alter fps in better ways
+        this._fps = 60;
+        //
         // Added to help plugins alter key events in better ways
         this._initKeyEvents();
         //
@@ -1847,6 +1869,7 @@ class Graphics {
         });
         app.ticker.remove(app.render, app);
         app.ticker.add(this._onTick, this);
+        app.deltaMs = 1000.0 / this._fps;
         return app;
     } // _pixiApp
 
@@ -7381,7 +7404,7 @@ class Input {
         15: "right" // D-pad right
     }; // gamepadMapper
 
-    // Added to support the isJustReleased static function
+    // Added to help plugins support the isJustReleased static function
     static _isJustReleased = new Map();
     //
 
@@ -7393,7 +7416,7 @@ class Input {
         [this._gamepadStates, this._latestButton] = [[], null];
         this._pressedTime = this._dir4 = this._dir8 = 0;
         [this._preferredAxis, this._date, this._virtualButton] = ["", 0, null];
-        // Added to support the isJustReleased static function
+        // Added to help plugins support the isJustReleased static function
         this._isJustReleased.clear();
         //
     } // clear
@@ -7618,7 +7641,7 @@ class Input {
      */
     static _updateLatestState(keyName) {
         if (this._isJustPressed(keyName)) return this._onStartPress(keyName);
-        // Added to support the isJustReleased static function
+        // Added to help plugins support the isJustReleased static function
         if (this._isKeyJustReleased(keyName)) {
             this._isJustReleased.set(keyName, true);
         } else this._isJustReleased.delete(keyName);
@@ -11576,7 +11599,7 @@ class BattleManager {
         this._logWindow = this._spriteset = null;
         [this._escapeRatio, this._escaped, this._rewards] = [0, false, {}];
         this._tpbNeedsPartyCommand = true;
-        // Added _isBattleEnd to help plugins check if the battle should end
+        // Added to help plugins check if the battle should end
         this._isBattleEnd = false;
         //
         // Added to help plugins check if the event main's updated
@@ -12466,3 +12489,1182 @@ class BattleManager {
 } // BattleManager
 
 /*----------------------------------------------------------------------------*/
+
+/*----------------------------------------------------------------------------
+ *    ## Objects
+ *----------------------------------------------------------------------------*/
+
+/*----------------------------------------------------------------------------
+ *    # Rewritten class: Game_Temp
+ *      - Rewrites it into the ES6 standard
+ *----------------------------------------------------------------------------*/
+
+//-----------------------------------------------------------------------------
+// Game_Temp
+//
+// The game object class for temporary data that is not included in save data.
+class Game_Temp {
+
+    constructor() {
+        this._isPlaytest = Utils.isOptionValid("test");
+        /** @todo Considers using clearDestination, clearTouchState, etc */
+        this._destinationX = this._destinationY = null;
+        [this._touchTarget, this._touchState] = [null, ""];
+        this._needsBattleRefresh = false;
+        //
+        [this._commonEventQueue, this._animationQueue] = [[], []];
+        [this._balloonQueue, this._lastActionData] = [[], [0, 0, 0, 0, 0, 0]];
+    } // constructor
+
+    isPlaytest() { return this._isPlaytest; }
+
+    setDestination(x, y) { [this._destinationX, this._destinationY] = [x, y]; }
+
+    clearDestination() { this._destinationX = this._destinationY = null; }
+
+    isDestinationValid() { return this._destinationX !== null; }
+
+    destinationX() { return this._destinationX; }
+
+    destinationY() { return this._destinationY; }
+
+    setTouchState(target, state) {
+        [this._touchTarget, this._touchState] = [target, state];
+    } // setTouchState
+
+    clearTouchState() { [this._touchTarget, this._touchState] = [null, ""]; }
+
+    touchTarget() { return this._touchTarget; }
+
+    touchState() { return this._touchState; }
+
+    requestBattleRefresh() {
+        if ($gameParty.inBattle()) this._needsBattleRefresh = true;
+    }
+
+    clearBattleRefreshRequest() { this._needsBattleRefresh = false; }
+
+    isBattleRefreshRequested() { return this._needsBattleRefresh; }
+
+    reserveCommonEvent(commonEventId) {
+        this._commonEventQueue.push(commonEventId);
+    } // reserveCommonEvent
+
+    retrieveCommonEvent() {
+        return $dataCommonEvents[this._commonEventQueue.shift()];
+    } // retrieveCommonEvent
+
+    isCommonEventReserved() { return !this._commonEventQueue.empty(); }
+
+    // prettier-ignore
+    requestAnimation(targets, animationId, mirror = false) {
+        if (!$dataAnimations[animationId]) return;
+        // Edited to help plugins alter request animation in better ways
+        this._requestExistingAnimation(targets, animationId, mirror);
+        //
+    } // requestAnimation
+
+    retrieveAnimation() { return this._animationQueue.shift(); }
+
+    requestBalloon(target, balloonId) {
+        this._balloonQueue.push({ target, balloonId });
+        if (target.startBalloon) target.startBalloon();
+    } // requestBalloon
+
+    retrieveBalloon() { return this._balloonQueue.shift(); }
+
+    lastActionData(type) { return this._lastActionData[type] || 0; }
+
+    setLastActionData(type, value) { this._lastActionData[type] = value; }
+
+    setLastUsedSkillId(skillID) { this.setLastActionData(0, skillID); }
+
+    setLastUsedItemId(itemID) { this.setLastActionData(1, itemID); }
+
+    setLastSubjectActorId(actorID) { this.setLastActionData(2, actorID); }
+
+    setLastSubjectEnemyIndex(enemyIndex) {
+        this.setLastActionData(3, enemyIndex);
+    } // setLastSubjectEnemyIndex
+
+    setLastTargetActorId(actorID) { this.setLastActionData(4, actorID); }
+
+    setLastTargetEnemyIndex(enemyIndex) {
+        this.setLastActionData(5, enemyIndex);
+    } // setLastTargetEnemyIndex
+
+    /**
+     * This method shouldn't be called without a valid animation id
+     * @author DoubleX @since 0.9.5 @version 0.9.5
+     * @param {[Game_Character]} targets - The list of targets to have animation
+     * @param {id} animationId - The id of the animation to be requested
+     * @param {boolean} mirror - 
+     */
+    _requestExistingAnimation(targets, animationId, mirror) {
+        this._animationQueue.push({ targets, animationId, mirror });
+        this._startTargetAnimations(targets);
+    } // _requestExistingAnimation
+
+    /**
+     * Starts the animations of all targets if available
+     * @author DoubleX @since 0.9.5 @version 0.9.5
+     * @param {[Game_Character]} targets - The list of targets to have animation
+     */
+    _startTargetAnimations(targets) {
+        targets.forEach(target => {
+            if (target.startAnimation) target.startAnimation();
+        });
+    } // _startTargetAnimations
+
+    // RMMV instance method not present in the default RMMZ codebase
+    clearCommonEvent() {
+        this._commonEventQueue.length = 0;
+    }
+
+} // Game_Temp
+
+/*----------------------------------------------------------------------------
+ *    # Rewritten class: Game_System
+ *      - Rewrites it into the ES6 standard
+ *----------------------------------------------------------------------------*/
+
+//-----------------------------------------------------------------------------
+// Game_System
+//
+// The game object class for the system data.
+class Game_System {
+
+    constructor() {
+        this._saveEnabled = this._menuEnabled = true;
+        this._encounterEnabled = this._formationEnabled = true;
+        this._battleCount = this._winCount = this._escapeCount = 0;
+        this._saveCount = 0;
+        this._versionId = this._savefileId = 0;
+        this._framesOnSave = 0;
+        this._bgmOnSave = this._bgsOnSave = null;
+        this._windowTone = this._battleBgm = null;
+        this._victoryMe = this._defeatMe = null;
+        this._savedBgm = this._walkingBgm = null;
+    } // constructor
+
+    isJapanese() { return $dataSystem.locale.match(/^ja/); }
+
+    isChinese() { return $dataSystem.locale.match(/^zh/); }
+
+    isKorean() { return $dataSystem.locale.match(/^ko/); }
+
+    isCJK() { return $dataSystem.locale.match(/^(ja|zh|ko)/); }
+
+    isRussian() { return $dataSystem.locale.match(/^ru/); }
+
+    isSideView() { return $dataSystem.optSideView; }
+
+    isAutosaveEnabled() { return $dataSystem.optAutosave; }
+
+    isSaveEnabled() { return this._saveEnabled; }
+
+    disableSave() { this._saveEnabled = false; }
+
+    enableSave() { this._saveEnabled = true; }
+
+    isMenuEnabled() { return this._menuEnabled; }
+
+    disableMenu() { this._menuEnabled = false; }
+
+    enableMenu() { this._menuEnabled = true; }
+
+    isEncounterEnabled() { return this._encounterEnabled; }
+
+    disableEncounter() { this._encounterEnabled = false; }
+
+    enableEncounter() { this._encounterEnabled = true; }
+
+    isFormationEnabled() { return this._formationEnabled; }
+
+    disableFormation() { this._formationEnabled = false; }
+
+    enableFormation() { this._formationEnabled = true; }
+
+    battleCount() { return this._battleCount; }
+
+    winCount() { return this._winCount; }
+
+    escapeCount() { return this._escapeCount; }
+
+    saveCount() { return this._saveCount; }
+
+    versionId() { return this._versionId; }
+
+    savefileId() { return this._savefileId || 0; }
+
+    setSavefileId(savefileId) { this._savefileId = savefileId; }
+
+    windowTone() { return this._windowTone || $dataSystem.windowTone; }
+
+    setWindowTone(value) { this._windowTone = value; }
+
+    battleBgm() { return this._battleBgm || $dataSystem.battleBgm; }
+
+    setBattleBgm(value) { this._battleBgm = value; }
+
+    victoryMe() { return this._victoryMe || $dataSystem.victoryMe; }
+
+    setVictoryMe(value) { this._victoryMe = value; }
+
+    defeatMe() { return this._defeatMe || $dataSystem.defeatMe; }
+
+    setDefeatMe(value) { this._defeatMe = value; }
+
+    onBattleStart() { this._battleCount++; }
+
+    onBattleWin() { this._winCount++; }
+
+    onBattleEscape() { this._escapeCount++; }
+
+    onBeforeSave() {
+        this._saveCount++;
+        this._versionId = $dataSystem.versionId;
+        this._framesOnSave = Graphics.frameCount;
+        this._bgmOnSave = AudioManager.saveBgm();
+        this._bgsOnSave = AudioManager.saveBgs();
+    } // onBeforeSave
+
+    onAfterLoad() {
+        Graphics.frameCount = this._framesOnSave;
+        AudioManager.playBgm(this._bgmOnSave);
+        AudioManager.playBgs(this._bgsOnSave);
+    } // onAfterLoad
+
+    // Edited to help plugins alter the fps in better ways
+    playtime() { return Math.floor(Graphics.frameCount / Graphics.fps); }
+    //
+
+    playtimeText() {
+        const playTime = this.playtime(), playMin = playTime / 60;
+        const hour = Math.floor(playMin / 60);
+        const [min, sec] = [Math.floor(playMin) % 60, playTime % 60];
+        return `${hour.padZero(2)}:${min.padZero(2)}:${sec.padZero(2)}`;
+    } // playtimeText
+
+    saveBgm() { this._savedBgm = AudioManager.saveBgm(); }
+
+    replayBgm() { if (this._savedBgm) AudioManager.replayBgm(this._savedBgm); }
+
+    saveWalkingBgm() { this._walkingBgm = AudioManager.saveBgm(); }
+
+    replayWalkingBgm() {
+        if (this._walkingBgm) AudioManager.playBgm(this._walkingBgm);
+    } // replayWalkingBgm
+
+    saveWalkingBgm2() { this._walkingBgm = $dataMap.bgm; }
+
+    mainFontFace() {
+        return `rmmz-mainfont, ${$dataSystem.advanced.fallbackFonts}`;
+    } // mainFontFace
+
+    numberFontFace() { return "rmmz-numberfont, " + this.mainFontFace(); }
+
+    mainFontSize() { return $dataSystem.advanced.fontSize; }
+
+    windowPadding() { return 12; }
+
+} // Game_System
+
+/*----------------------------------------------------------------------------
+ *    # Rewritten class: Game_Timer
+ *      - Rewrites it into the ES6 standard
+ *----------------------------------------------------------------------------*/
+
+//-----------------------------------------------------------------------------
+// Game_Timer
+//
+// The game object class for the timer.
+class Game_Timer {
+
+    constructor() { [this._frames, this._working] = [0, false]; }
+
+    update(sceneActive) {
+        // Edited to help plugins alter the update behaviors in better ways
+        if (this._isActive(sceneActive)) this._updateWhenActive();
+        //
+    } // update
+
+    start(count) { [this._frames, this._working] = [count, true]; }
+
+    stop() { this._working = false; }
+
+    isWorking() { return this._working; }
+
+    // Edited to help plugins alter the fps in better ways
+    seconds() { return Math.floor(this._frames / Graphics.fps); }
+    //
+
+    onExpire() { BattleManager.abort(); }
+
+    /**
+     * Hotspot/Nullipotent
+     * @author DoubleX @since 0.9.5 @version 0.9.5
+     * @returns {boolean} Whether the timer's still active
+     */
+    _isActive(sceneActive) {
+        return sceneActive && this._working && this._frames > 0;
+    } // _isActive
+
+    /**
+     * Updates the timer when it's still active
+     * Hotspot
+     * @author DoubleX @since 0.9.5 @version 0.9.5
+     */
+    _updateWhenActive() {
+        this._frames--;
+        if (this._frames === 0) this.onExpire();
+    } // _updateWhenActive
+
+} // Game_Timer
+
+/*----------------------------------------------------------------------------
+ *    # Rewritten class: Game_Message
+ *      - Rewrites it into the ES6 standard
+ *----------------------------------------------------------------------------*/
+
+//-----------------------------------------------------------------------------
+// Game_Message
+//
+// The game object class for the state of the message window that displays text
+// or selections, etc.
+class Game_Message {
+
+    constructor() { this.clear(); }
+
+    clear() {
+        [this._texts, this._choices] = [[], []];
+        this._speakerName = this._faceName = "";
+        this._faceIndex = this._background = 0;
+        this._positionType = 2;
+        this._choiceDefaultType = this._choiceCancelType = 0;
+        this._choiceBackground = 0;
+        this._choicePositionType = 2;
+        this._numInputVariableId = this._numInputMaxDigits = 0;
+        this._itemChoiceVariableId = this._itemChoiceItypeId = 0;
+        [this._scrollMode, this._scrollSpeed] = [false, 2];
+        [this._scrollNoFast, this._choiceCallback] = [false, null];
+    } // clear
+
+    choices() { return this._choices; }
+
+    speakerName() { return this._speakerName; }
+
+    faceName() { return this._faceName; }
+
+    faceIndex() { return this._faceIndex; }
+
+    background() { return this._background; }
+
+    positionType() { return this._positionType; }
+
+    choiceDefaultType() { return this._choiceDefaultType; }
+
+    choiceCancelType() { return this._choiceCancelType; }
+
+    choiceBackground() { return this._choiceBackground; }
+
+    choicePositionType() { return this._choicePositionType; }
+
+    numInputVariableId() { return this._numInputVariableId; }
+
+    numInputMaxDigits() { return this._numInputMaxDigits; }
+
+    itemChoiceVariableId() { return this._itemChoiceVariableId; }
+
+    itemChoiceItypeId() { return this._itemChoiceItypeId; }
+
+    scrollMode() { return this._scrollMode; }
+
+    scrollSpeed() { return this._scrollSpeed; }
+
+    scrollNoFast() { return this._scrollNoFast; }
+
+    add(text) { this._texts.push(text); }
+
+    setSpeakerName(speakerName) { this._speakerName = speakerName || ""; }
+
+    setFaceImage(faceName, faceIndex) {
+        [this._faceName, this._faceIndex] = [faceName, faceIndex];
+    } // setFaceImage
+
+    setBackground(background) { this._background = background; }
+
+    setPositionType(positionType) { this._positionType = positionType; }
+
+    setChoices(choices, defaultType, cancelType) {
+        this._choices = choices;
+        this._choiceDefaultType = defaultType;
+        this._choiceCancelType = cancelType;
+    } // setChoices
+
+    setChoiceBackground(background) { this._choiceBackground = background; }
+
+    setChoicePositionType(positionType) {
+        this._choicePositionType = positionType;
+    } // setChoicePositionType
+
+    setNumberInput(variableId, maxDigits) {
+        this._numInputVariableId = variableId;
+        this._numInputMaxDigits = maxDigits;
+    } // setNumberInput
+
+    setItemChoice(variableId, itemType) {
+        this._itemChoiceVariableId = variableId;
+        this._itemChoiceItypeId = itemType;
+    } // setItemChoice
+
+    setScroll(speed, noFast) {
+        this._scrollMode = true;
+        [this._scrollSpeed, this._scrollNoFast] = [speed, noFast];
+    } // setScroll
+
+    setChoiceCallback(callback) { this._choiceCallback = callback; }
+
+    onChoice(n) {
+        if (!this._choiceCallback) return;
+        this._choiceCallback(n);
+        this._choiceCallback = null;
+    } // onChoice
+
+    hasText() { return !this._texts.isEmpty(); }
+
+    isChoice() { return !this._choices.isEmpty(); }
+
+    isNumberInput() { return this._numInputVariableId > 0; }
+
+    isItemChoice() { return this._itemChoiceVariableId > 0; }
+
+    isBusy() {
+        if (this.hasText() || this.isChoice()) return true;
+        return this.isNumberInput() || this.isItemChoice();
+    } // isBusy
+
+    newPage() {
+        if (this.hasText()) this._texts[this._texts.length - 1] += "\f";
+    } // newPage
+
+    allText() { return this._texts.join("\n"); }
+
+    isRTL() { return Utils.containsArabic(this.allText()); }
+
+} // Game_Message
+
+/*----------------------------------------------------------------------------
+ *    # Rewritten class: Game_Switches
+ *      - Rewrites it into the ES6 standard
+ *----------------------------------------------------------------------------*/
+
+//-----------------------------------------------------------------------------
+// Game_Switches
+//
+// The game object class for switches.
+class Game_Switches {
+
+    constructor() { this.clear(); }
+
+    clear() { this._data = []; }
+
+    value(switchId) { return !!this._data[switchId]; }
+
+    setValue(switchId, value) {
+        // Edited to help plugins alter set value behaviors in better ways
+        if (!this._isValidSwitchId(switchId)) return;
+        this._setValidSwitchVal(switchId, value);
+        //
+    } // setValue
+
+    onChange() { $gameMap.requestRefresh(); }
+
+    /**
+     * Nullipotent
+     * @author DoubleX @since 0.9.5 @version 0.9.5
+     * @param {id} switchId - The switch id to be checked against
+     * @returns {boolean} Whether the specified switch id's valid
+     */
+    _isValidSwitchId(switchId) {
+        return switchId > 0 && switchId < $dataSystem.switches.length;
+    } // _isValidSwitchId
+
+    /**
+     * Updates the timer when it's still active
+     * Idempotent
+     * @author DoubleX @since 0.9.5 @version 0.9.5
+     * @param {id} switchId - The id of the specified game switch
+     * @param {boolean} val - The new state of the specified game switch
+     */
+    _setValidSwitchVal(switchId, val) {
+        this._data[switchId] = val;
+        this.onChange();
+    } // _setValidSwitchVal
+
+} // Game_Switches
+
+/*----------------------------------------------------------------------------
+ *    # Rewritten class: Game_Variables
+ *      - Rewrites it into the ES6 standard
+ *----------------------------------------------------------------------------*/
+
+//-----------------------------------------------------------------------------
+// Game_Variables
+//
+// The game object class for variables.
+class Game_Variables {
+
+    constructor() { this.clear(); }
+
+    clear() { this._data = []; }
+
+    value(variableId) { return this._data[variableId] || 0; }
+
+    setValue(variableId, value) {
+        // Edited to help plugins alter set value behaviors in better ways
+        if (!this._isValidVarId(variableId)) return;
+        this._setValidVarVal(variableId, value);
+        //
+    } // setValue
+
+    onChange() { $gameMap.requestRefresh(); }
+
+    /**
+     * Nullipotent
+     * @author DoubleX @since 0.9.5 @version 0.9.5
+     * @param {id} varId - The variable id to be checked against
+     * @returns {boolean} Whether the specified variable id's valid
+     */
+    _isValidVarId(varId) {
+        return varId > 0 && varId < $dataSystem.variables.length;
+    } // _isValidVarId
+
+    /**
+     * Updates the timer when it's still active
+     * Idempotent
+     * @author DoubleX @since 0.9.5 @version 0.9.5
+     * @param {id} varId - The id of the specified game variable
+     * @param {*} val - The new value of the specified game variable
+     */
+    _setValidVarVal(varId, val) {
+        /** @todo Figures out why numbers are supposed to be integers */
+        this._data[varId] = Number.isNaN(val) ? val : Math.floor(val);
+        //
+        this.onChange();
+    } // _setValidVarVal
+
+} // Game_Variables
+
+/*----------------------------------------------------------------------------
+ *    # Rewritten class: Game_SelfSwitches
+ *      - Rewrites it into the ES6 standard
+ *----------------------------------------------------------------------------*/
+
+//-----------------------------------------------------------------------------
+// Game_SelfSwitches
+//
+// The game object class for self switches.
+class Game_SelfSwitches {
+
+    constructor() { this.clear(); }
+
+    clear() { this._data = {}; }
+
+    value(key) { return !!this._data[key]; }
+
+    setValue(key, value) {
+        value ? this._data[key] = true : delete this._data[key];
+        this.onChange();
+    } // setValue
+
+    onChange() { $gameMap.requestRefresh(); }
+
+} // Game_SelfSwitches
+
+/*----------------------------------------------------------------------------
+ *    # Rewritten class: Game_Screen
+ *      - Rewrites it into the ES6 standard
+ *----------------------------------------------------------------------------*/
+
+//-----------------------------------------------------------------------------
+// Game_Screen
+//
+// The game object class for screen effect data, such as changes in color tone
+// and flashes.
+class Game_Screen {
+
+    constructor() { this.clear(); }
+
+    clear() {
+        this.clearFade();
+        this.clearTone();
+        this.clearFlash();
+        this.clearShake();
+        this.clearZoom();
+        this.clearWeather();
+        this.clearPictures();
+    } // clear
+
+    onBattleStart() {
+        this.clearFade();
+        this.clearFlash();
+        this.clearShake();
+        this.clearZoom();
+        this.eraseBattlePictures();
+    } // onBattleStart
+
+    brightness() { return this._brightness; }
+
+    tone() { return this._tone; }
+
+    flashColor() { return this._flashColor; }
+
+    shake() { return this._shake; }
+
+    zoomX() { return this._zoomX; }
+
+    zoomY() { return this._zoomY; }
+
+    zoomScale() { return this._zoomScale; }
+
+    weatherType() { return this._weatherType; }
+
+    weatherPower() { return this._weatherPower; }
+
+    picture(pictureId) { return this._pictures[this.realPictureId(pictureId)]; }
+
+    realPictureId(pictureId) {
+        if ($gameParty.inBattle()) return pictureId + this.maxPictures();
+        return pictureId;
+    } // realPictureId
+
+    clearFade() {
+        this._brightness = 255;
+        this._fadeOutDuration = this._fadeInDuration = 0;
+    } // clearFade
+
+    clearTone() {
+        [this._tone, this._toneTarget] = [[0, 0, 0, 0], [0, 0, 0, 0]];
+        this._toneDuration = 0;
+    } // clearTone
+
+    clearFlash() {
+        [this._flashColor, this._flashDuration] = [[0, 0, 0, 0], 0];
+    } // clearFlash
+
+    clearShake() {
+        this._shakePower = this._shakeSpeed = this._shakeDuration = 0;
+        [this._shakeDirection, this._shake] = [1, 0];
+    } // clearShake
+
+    clearZoom() {
+        this._zoomX = this._zoomY = 0;
+        this._zoomScale = this._zoomScaleTarget = 1;
+        this._zoomDuration = 0;
+    } // clearZoom
+
+    clearWeather() {
+        this._weatherType = "none";
+        this._weatherPower = this._weatherPowerTarget = 0;
+        this._weatherDuration = 0;
+    } // clearWeather
+
+    clearPictures() { this._pictures = []; }
+
+    eraseBattlePictures() {
+        this._pictures = this._pictures.slice(0, this.maxPictures() + 1);
+    } // eraseBattlePictures
+
+    maxPictures() { return 100; }
+
+    startFadeOut(duration) {
+        [this._fadeOutDuration, this._fadeInDuration] = [duration, 0];
+    } // startFadeOut
+
+    startFadeIn(duration) {
+        [this._fadeInDuration, this._fadeOutDuration] = [duration, 0];
+    } // startFadeIn
+
+    startTint(tone, duration) {
+        [this._toneTarget, this._toneDuration] = [tone.clone(), duration];
+        if (this._toneDuration === 0) this._tone = this._toneTarget.clone();
+    } // startTint
+
+    startFlash(color, duration) {
+        [this._flashColor, this._flashDuration] = [color.clone(), duration];
+    } // startFlash
+
+    startShake(power, speed, duration) {
+        [this._shakePower, this._shakeSpeed] = [power, speed];
+        this._shakeDuration = duration;
+    } // startShake
+
+    startZoom(x, y, scale, duration) {
+        // Edited to dry up codes essentially being the identical knowledge
+        this.setZoom(x, y, scale);
+        //
+        this._zoomDuration = duration;
+    } // startZoom
+
+    setZoom(x, y, scale) {
+        [this._zoomX, this._zoomY, this._zoomScale] = [x, y, scale];
+    } // setZoom
+
+    changeWeather(type, power, duration) {
+        if (type !== "none" || duration === 0) this._weatherType = type;
+        this._weatherPowerTarget = type === "none" ? 0 : power;
+        this._weatherDuration = duration;
+        if (duration === 0) this._weatherPower = this._weatherPowerTarget;
+    } // changeWeather
+
+    update() {
+        this.updateFadeOut();
+        this.updateFadeIn();
+        this.updateTone();
+        this.updateFlash();
+        this.updateShake();
+        this.updateZoom();
+        this.updateWeather();
+        this.updatePictures();
+    } // update
+
+    // Edited to help plugins alter update fade out behaviors in better ways
+    updateFadeOut() { if (this._isFadingOut()) this._updateFadingOut(); }
+    //
+
+    // Edited to help plugins alter update fade in behaviors in better ways
+    updateFadeIn() { if (this._isFadingIn()) this._updateFadingIn(); }
+    //
+
+    // Edited to help plugins alter update tone behaviors in better ways
+    updateTone() { if (this._isTintingTone()) this._updateTintingTone(); }
+    //
+
+    // Edited to help plugins alter update flash behaviors in better ways
+    updateFlash() { if (this._isFlashing()) this._updateFlashing(); }
+    //
+
+    updateShake() {
+        /** @todo Extracts these codes into well-named functions */
+        if (this._shakeDuration <= 0 && this._shake === 0) return;
+        const delta = (this._shakePower * this._shakeSpeed * this._shakeDirection) / 10;
+        if (this._shakeDuration <= 1 && this._shake * (this._shake + delta) < 0) {
+            this._shake = 0;
+        } else this._shake += delta;
+        if (this._shake > this._shakePower * 2) this._shakeDirection = -1;
+        if (this._shake < -this._shakePower * 2) this._shakeDirection = 1;
+        this._shakeDuration--;
+        //
+    } // updateShake
+
+    // Edited to help plugins alter update zoom behaviors in better ways
+    updateZoom() { if (this._isZooming()) this._updateZooming(); }
+
+    updateWeather() {
+        // Edited to help plugins alter update weather behaviors in better ways
+        if (this._isChangingWeather()) this._updateChangingWeather();
+        //
+    } // updateWeather
+
+    updatePictures() {
+        this._pictures.forEach(picture => { if (picture) picture.update(); });
+    } // updatePictures
+
+    startFlashForDamage() { this.startFlash([255, 0, 0, 128], 8); }
+
+    // prettier-ignore
+    showPicture(pictureId, name, origin, x, y, scaleX, scaleY, opacity, blendMode) {
+        const picture = new Game_Picture();
+        picture.show(name, origin, x, y, scaleX, scaleY, opacity, blendMode);
+        this._pictures[this.realPictureId(pictureId)] = picture;
+    } // showPicture
+
+    // prettier-ignore
+    movePicture(pictureId, origin, x, y, scaleX, scaleY, opacity, blendMode, duration, easingType) {
+        const picture = this.picture(pictureId);
+        // prettier-ignore
+        if (picture) picture.move(origin, x, y, scaleX, scaleY, opacity, 
+                blendMode, duration, easingType);
+    } // movePicture
+
+    rotatePicture(pictureId, speed) {
+        const picture = this.picture(pictureId);
+        if (picture) picture.rotate(speed);
+    } // rotatePicture
+
+    tintPicture(pictureId, tone, duration) {
+        const picture = this.picture(pictureId);
+        if (picture) picture.tint(tone, duration);
+    } // tintPicture
+
+    erasePicture(pictureId) {
+        this._pictures[this.realPictureId(pictureId)] = null;
+    } // erasePicture
+
+    /**
+     * Hotspot/Nullipotent
+     * @author DoubleX @since 0.9.5 @version 0.9.5
+     * @returns {boolean} Whether the current game screen's fading out
+     */
+    _isFadingOut() { return this._fadeOutDuration > 0; }
+
+    /**
+     * This method shouldn't be called without a positive fade out duration
+     * Hotspot/Idempotent
+     * @author DoubleX @since 0.9.5 @version 0.9.5
+     */
+    _updateFadingOut() {
+        const d = this._fadeOutDuration;
+        this._brightness = (this._brightness * (d - 1)) / d;
+        this._fadeOutDuration--;
+    } // _updateFadingOut
+
+    /**
+     * Hotspot/Nullipotent
+     * @author DoubleX @since 0.9.5 @version 0.9.5
+     * @returns {boolean} Whether the current game screen's fading in
+     */
+    _isFadingIn() { return this._fadeInDuration > 0; }
+
+    /**
+     * This method shouldn't be called without a positive fade in duration
+     * Hotspot/Idempotent
+     * @author DoubleX @since 0.9.5 @version 0.9.5
+     */
+    _updateFadingIn() {
+        const d = this._fadeInDuration;
+        this._brightness = (this._brightness * (d - 1) + 255) / d;
+        this._fadeInDuration--;
+    } // _updateFadingIn
+
+    /**
+     * Hotspot/Nullipotent
+     * @author DoubleX @since 0.9.5 @version 0.9.5
+     * @returns {boolean} Whether the current game screen's tinting its tones
+     */
+    _isTintingTone() { return this._toneDuration > 0; }
+
+    /**
+     * This method shouldn't be called without a positive tone duration
+     * Hotspot/Idempotent
+     * @author DoubleX @since 0.9.5 @version 0.9.5
+     */
+    _updateTintingTone() {
+        const d = this._toneDuration;
+        for (let i = 0; i < 4; i++) {
+            this._tone[i] = (this._tone[i] * (d - 1) + this._toneTarget[i]) / d;
+        }
+        this._toneDuration--;
+    } // _updateTintingTone
+
+    /**
+     * Hotspot/Nullipotent
+     * @author DoubleX @since 0.9.5 @version 0.9.5
+     * @returns {boolean} Whether the current game screen's flashing
+     */
+    _isFlashing() { return this._flashDuration > 0; }
+
+    /**
+     * This method shouldn't be called without a positive flash duration
+     * Hotspot/Idempotent
+     * @author DoubleX @since 0.9.5 @version 0.9.5
+     */
+    _updateFlashing() {
+        const d = this._flashDuration;
+        this._flashColor[3] *= (d - 1) / d;
+        this._flashDuration--;
+    } // _updateFlashing
+
+    /**
+     * Hotspot/Nullipotent
+     * @author DoubleX @since 0.9.5 @version 0.9.5
+     * @returns {boolean} Whether the current game screen's zooming
+     */
+    _isZooming() { return this._zoomDuration > 0; }
+
+    /**
+     * This method shouldn't be called without a positive zoom duration
+     * Hotspot/Idempotent
+     * @author DoubleX @since 0.9.5 @version 0.9.5
+     */
+    _updateZooming() {
+        const [d, t] = [this._zoomDuration, this._zoomScaleTarget];
+        this._zoomScale = (this._zoomScale * (d - 1) + t) / d;
+        this._zoomDuration--;
+    } // _updateZooming
+
+    /**
+     * Hotspot/Nullipotent
+     * @author DoubleX @since 0.9.5 @version 0.9.5
+     * @returns {boolean} Whether the current game screen's changing weather
+     */
+    _isChangingWeather() { return this._weatherDuration > 0; }
+
+    /**
+     * This method shouldn't be called without a positive weather duration
+     * Hotspot/Idempotent
+     * @author DoubleX @since 0.9.5 @version 0.9.5
+     */
+    _updateChangingWeather() {
+        const [d, t] = [this._weatherDuration, this._weatherPowerTarget];
+        this._weatherPower = (this._weatherPower * (d - 1) + t) / d;
+        this._weatherDuration--;
+        if (this._weatherDuration === 0 && this._weatherPowerTarget === 0) {
+            this._weatherType = "none";
+        }
+    } // _updateChangingWeather
+
+} // Game_Screen
+
+/*----------------------------------------------------------------------------
+ *    # Rewritten class: Game_Picture
+ *      - Rewrites it into the ES6 standard
+ *----------------------------------------------------------------------------*/
+
+//-----------------------------------------------------------------------------
+// Game_Picture
+//
+// The game object class for a picture.
+class Game_Picture {
+
+    constructor() {
+        this.initBasic();
+        this.initTarget();
+        this.initTone();
+        this.initRotation();
+    } // constructor
+
+    name() { return this._name; }
+
+    origin() { return this._origin; }
+
+    x() { return this._x; }
+
+    y() { return this._y; }
+
+    scaleX() { return this._scaleX; }
+
+    scaleY() { return this._scaleY; }
+
+    opacity() { return this._opacity; }
+
+    blendMode() { return this._blendMode; }
+
+    tone() { return this._tone; }
+
+    angle() { return this._angle; }
+
+    initBasic() {
+        this._name = "";
+        this._origin = this._x = this._y = 0;
+        this._scaleX = this._scaleY = 100;
+        [this._opacity, this._blendMode] = [255, 0];
+    } // initBasic
+
+    initTarget() {
+        [this._targetX, this._targetY] = [this._x, this._y];
+        [this._targetScaleX, this._targetScaleY] = [this._scaleX, this._scaleY];
+        this._targetOpacity = this._opacity;
+        this._duration = this._wholeDuration = 0;
+        this._easingType = this._easingExponent = 0;
+    } // initTarget
+
+    initTone() {
+        this._tone = this._toneTarget = null;
+        this._toneDuration = 0;
+    } // initTone
+
+    initRotation() { this._angle = this._rotationSpeed = 0; }
+
+    // prettier-ignore
+    show(name, origin, x, y, scaleX, scaleY, opacity, blendMode) {
+        [this._name, this._origin] = [name, origin];
+        [this._x, this._y, this._scaleX, this._scaleY] = [x, y, scaleX, scaleY];
+        [this._opacity, this._blendMode] = [opacity, blendMode];
+        this.initTarget();
+        this.initTone();
+        this.initRotation();
+    } // show
+
+    // prettier-ignore
+    move(origin, x, y, scaleX, scaleY, opacity, blendMode, duration, easingType) {
+        [this._origin, this._targetX, this._targetY] = [origin, x, y];
+        [this._targetScaleX, this._targetScaleY] = [scaleX, scaleY];
+        [this._targetOpacity, this._blendMode] = [opacity, blendMode];
+        this._duration = this._wholeDuration = duration;
+        [this._easingType, this._easingExponent] = [easingType, 2];
+    } // move
+
+    rotate(speed) { this._rotationSpeed = speed; }
+
+    tint(tone, duration) {
+        this._tone = this._tone || [0, 0, 0, 0];
+        [this._toneTarget, this._toneDuration] = [tone.clone(), duration];
+        if (this._toneDuration === 0) this._tone = this._toneTarget.clone();
+    } // tint
+
+    update() {
+        this.updateMove();
+        this.updateTone();
+        this.updateRotation();
+    } // update
+
+    // Edited to help plugins alter update move behaviors in better ways
+    updateMove() { if (this._isMoving()) this._updateMoving(); }
+    //
+
+    // Edited to help plugins alter update tone behaviors in better ways
+    updateTone() { if (this._isTintingTone()) this._updateTintingTone(); }
+    //
+
+    updateRotation() {
+        if (this._rotationSpeed !== 0) this._angle += this._rotationSpeed / 2;
+    } // updateRotation
+
+    applyEasing(current, target) {
+        const [d, wd] = [this._duration, this._wholeDuration];
+        const lt = this.calcEasing((wd - d) / wd);
+        const t = this.calcEasing((wd - d + 1) / wd);
+        const start = (current - target * lt) / (1 - lt);
+        return start + (target - start) * t;
+    } // applyEasing
+
+    calcEasing(t) {
+        const exponent = this._easingExponent;
+        switch (this._easingType) {
+            case 1: /* Slow start */ return this.easeIn(t, exponent);
+            case 2: /* Slow end */ return this.easeOut(t, exponent);
+            case 3: /* Slow start and end */ return this.easeInOut(t, exponent);
+            default: return t;
+        }
+    } // calcEasing
+
+    easeIn(t, exponent) { return Math.pow(t, exponent); }
+
+    easeOut(t, exponent) { return 1 - Math.pow(1 - t, exponent); }
+
+    easeInOut(t, exponent) {
+        if (t < 0.5) return this.easeIn(t * 2, exponent) / 2;
+        return this.easeOut(t * 2 - 1, exponent) / 2 + 0.5;
+    } // easeInOut
+
+    /**
+     * Hotspot/Nullipotent
+     * @author DoubleX @since 0.9.5 @version 0.9.5
+     * @returns {boolean} Whether the current game picture's moving
+     */
+    _isMoving() { return this._duration > 0; }
+
+    /**
+     * This method shouldn't be called without a positive duration
+     * Hotspot/Idempotent
+     * @author DoubleX @since 0.9.5 @version 0.9.5
+     */
+    _updateMoving() {
+        this._x = this.applyEasing(this._x, this._targetX);
+        this._y = this.applyEasing(this._y, this._targetY);
+        this._scaleX = this.applyEasing(this._scaleX, this._targetScaleX);
+        this._scaleY = this.applyEasing(this._scaleY, this._targetScaleY);
+        this._opacity = this.applyEasing(this._opacity, this._targetOpacity);
+        this._duration--;
+    } // _updateMoving
+
+    /**
+     * Hotspot/Nullipotent
+     * @author DoubleX @since 0.9.5 @version 0.9.5
+     * @returns {boolean} Whether the current game screen's tinting its tones
+     */
+    _isTintingTone() { return this._toneDuration > 0; }
+
+    /**
+     * This method shouldn't be called without a positive tone duration
+     * Hotspot/Idempotent
+     * @author DoubleX @since 0.9.5 @version 0.9.5
+     */
+    _updateTintingTone() {
+        const d = this._toneDuration;
+        for (let i = 0; i < 4; i++) {
+            this._tone[i] = (this._tone[i] * (d - 1) + this._toneTarget[i]) / d;
+        }
+        this._toneDuration--;
+    } // _updateTintingTone
+
+    // RMMV instance method not present in the default RMMZ codebase
+    erase() {
+        this._name = '';
+        this._origin = 0;
+        this.initTarget();
+        this.initTone();
+        this.initRotation();
+    }
+    //
+
+} // Game_Picture
+
+/*----------------------------------------------------------------------------
+ *    # Rewritten class: Game_Item
+ *      - Rewrites it into the ES6 standard
+ *----------------------------------------------------------------------------*/
+
+//-----------------------------------------------------------------------------
+// Game_Item
+//
+// The game object class for handling skills, items, weapons, and armor. It is
+// required because save data should not include the database object itself.
+class Game_Item {
+
+    constructor(item) {
+        [this._dataClass, this._itemId] = ["", 0];
+        if (item) this.setObject(item);
+    } // constructor
+
+    isSkill() { return this._dataClass === "skill"; }
+
+    isItem() { return this._dataClass === "item"; }
+
+    isUsableItem() { return this.isSkill() || this.isItem(); }
+
+    isWeapon() { return this._dataClass === "weapon"; }
+
+    isArmor() { return this._dataClass === "armor"; }
+
+    isEquipItem() { return this.isWeapon() || this.isArmor(); }
+
+    isNull() { return this._dataClass === ""; }
+
+    itemId() { return this._itemId; }
+
+    object() {
+        if (this.isSkill()) return $dataSkills[this._itemId];
+        if (this.isItem()) return $dataItems[this._itemId];
+        if (this.isWeapon()) return $dataWeapons[this._itemId];
+        return this.isArmor() ? $dataArmors[this._itemId] : null;
+    } // object
+
+    setObject(item) {
+        // Edited to help plugins alter set object behaviors in better ways
+        this._dataClass = this._newDataClass(item);
+        //
+        this._itemId = item ? item.id : 0;
+    } // setObject
+
+    setEquip(isWeapon, itemId) {
+        this._dataClass = isWeapon ? "weapon" : "armor";
+        this._itemId = itemId;
+    } // setEquip
+
+    /**
+     * Nullipotent
+     * @author DoubleX @since 0.9.5 @version 0.9.5
+     * @param {Data} item - The database item being set as this item object
+     * @returns {string} The data class of the object to be set with the item
+     */
+    _newDataClass(item) {
+        if (DataManager.isSkill(item)) return "skill";
+        if (DataManager.isItem(item)) return "item";
+        if (DataManager.isWeapon(item)) return "weapon";
+        return DataManager.isArmor(item) ? "armor" : "";
+    } // _newDataClass
+
+} // Game_Item
