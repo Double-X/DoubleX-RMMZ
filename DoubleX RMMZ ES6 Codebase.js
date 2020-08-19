@@ -145,53 +145,73 @@
  *      classes, so those in children classes should use
  *      ParentClass.staticFunc.call(this) instead of super.staticFunc()
  *   # New public APIs
- *     Array.prototype
- *     1. fastMap(mapCallback, mapThis_)
- *        The same as map but is tested to be noticeably faster
- *     2. fastMerge(arr)
- *        The same as concat except that fastMerge alters the original array
- *        instead of returning a new one
- *     3. filterMap(filterCallback, mapCallback, filterThis_, mapThis_)
- *        The same as chaining filter with map except that the new array
- *        returned by filter will be mapped in place(.filter().map())
- *     4. mapFilter(mapCallback, filterCallback, mapThis_, filterThis_)
- *        The same as chaining map with filter except that the new array
- *        returned by map will be filtered in place(.map().filter())
- *     5. mapReduce(mapCallback, reduceCallback, initVal_, mapThis_, reduceThis_)
- *        The same as chaining map with reduce but is tested to be noticeably
- *        faster(.map().reduce())
- *     6. isProperSubsetOf(arr)
- *        Returns if this array's a proper subset of the specified array
- *     7. isProperSupersetOf(arr)
- *        Returns if this array's a proper superset of the specified array
- *     8. isSupersetOf(arr)
- *        Returns if this array's a superset of the specified array
- *     9. isSubsetOf(arr)
- *        Returns if this array's a subset of the specified array
- *     10. isEmpty()
- *         Returns if this array's empty
- *     11. symmetricDifference(arr)
- *         Returns the symmetric difference of this and the specified array
- *     12. union(arr)
- *         Returns the union of this and the specified array
- *     13. difference(arr)
- *         Returns the difference of this and the specified array
- *     14. intersection(arr)
- *         Returns the intersection of this and the specified array
- *     15. excludes(elem, fromI)
- *         Returns if this array doesn't include the specified element
- *     16. clear()
- *         Empties the whole array
+ *     Array
+ *     - Instance methods
+ *       1. fastMap(mapCallback, mapThis_)
+ *          The same as map but is tested to be noticeably faster
+ *       2. fastMerge(arr)
+ *          The same as concat except that fastMerge alters the original array
+ *          instead of returning a new one
+ *       3. filterMap(filterCallback, mapCallback, filterThis_, mapThis_)
+ *          The same as chaining filter with map except that the new array
+ *          returned by filter will be mapped in place(.filter().map())
+ *       4. mapFilter(mapCallback, filterCallback, mapThis_, filterThis_)
+ *          The same as chaining map with filter except that the new array
+ *          returned by map will be filtered in place(.map().filter())
+ *       5. mapReduce(mapCallback, reduceCallback, initVal_, mapThis_, reduceThis_)
+ *          The same as chaining map with reduce but is tested to be
+ *          noticeably faster(.map().reduce())
+ *       6. isProperSubsetOf(arr)
+ *          Returns if this array's a proper subset of the specified array
+ *       7. isProperSupersetOf(arr)
+ *          Returns if this array's a proper superset of the specified array
+ *       8. isSupersetOf(arr)
+ *          Returns if this array's a superset of the specified array
+ *       9. isSubsetOf(arr)
+ *          Returns if this array's a subset of the specified array
+ *       10. isEmpty()
+ *           Returns if this array's empty
+ *       11. symmetricDifference(arr)
+ *           Returns the symmetric difference of this and the specified array
+ *       12. union(arr)
+ *           Returns the union of this and the specified array
+ *       13. difference(arr)
+ *           Returns the difference of this and the specified array
+ *       14. intersection(arr)
+ *           Returns the intersection of this and the specified array
+ *       15. excludes(elem, fromI)
+ *           Returns if this array doesn't include the specified element
+ *       16. clear()
+ *           Empties the whole array
  *     Graphics
- *     1. fps
- *        Returns the current game fps
- *     2. fps = newFps
- *        Sets the current game fps to be newFps
+ *     - Static Accessor
+ *       1. fps
+ *          Returns the current game fps
+ *       2. fps = newFps
+ *          Sets the current game fps to be newFps
  *     Input
- *     1. isJustReleased(keyName)
- *        Returns if the specified key's just released right on this frame
+ *     - Static Function
+ *       1. isJustReleased(keyName)
+ *          Returns if the specified key's just released right on this frame
+ *     Game_Action
+ *     - Static Variable
+ *       1. IS_SHOW_DAMAGE_FORMULA_ERRS
+ *          Controls whether the damage formula error will be reported on the
+ *          console to let users know whether they've some faulty damage
+ *          formulae
+ *       2. NO_SIDE_EFFECT_DAMAGE_FORMULA_REGEX
+ *          Stores the regular expressions to temporarily remove the parts of
+ *          the damage formula leaking side effects when evaluating the damage
+ *          among all actions of autobattle actors to fix the side effect
+ *          leaking bug when those actor input actions
+ *     Game_BattlerBase
+ *     - Instance Method
+ *       1. _onUnrestrict
+ *          Triggers events to happen when a battler becomes no longer
+ *          restricted
  *   # New private functions/methods/variables
- *     Search "ed to help plugins" for such additions in the plugin
+ *     Search "ed to help plugins" for such additions in the plugin(too many
+ *     to be listed here)
  *   # Core MV functions/methods/variables not in MZ added by this plugin
  *     1. Utils
  *        Static Functions
@@ -1500,12 +1520,10 @@ class Graphics {
     } // _cancelFullScreen
 
     static _createPixiApp() {
-        /** @todo Thinks of if at least logging the catch will be better */
-        try {
-            // Edited to help plugins creating pixi app in better ways
-            this._createPixiAppWithoutRescue();
-            //
-        } catch (e) { this._app = null; }
+        // Edited to help plugins creating pixi app in better ways
+        try { this._createPixiAppWithoutRescue(); } catch (e) {
+            this._onCreatePixiAppErr(e);
+        }
         //
     } // _createPixiApp
 
@@ -1874,6 +1892,14 @@ class Graphics {
     } // _pixiApp
 
     /**
+     * Triggers events to happen upon failing to create the pixi app
+     * Idempotent
+     * @author DoubleX @since 0.9.5 @version 0.9.5
+     * @param {Error} e - The error occured when trying to create the pixi app
+     */
+    static _onCreatePixiAppErr(e) { this._app = null; }
+
+    /**
      * Nullipotent
      * @author DoubleX @since 0.9.5 @version 0.9.5
      * @returns {boolean} If the effekseer context can be created
@@ -1886,11 +1912,9 @@ class Graphics {
      * @author DoubleX @since 0.9.5 @version 0.9.5
      */
     static _tryCreateEffekseerContext() {
-        /** @todo Thinks of if at least logging the catch will be better */
         try {
             this._effekseer = this._effekseerContextWithoutRescue();
-        } catch (e) { this._app = null; }
-        //
+        } catch (e) { this._onCreateEffekseerContextErr(e); }
     } // _tryCreateEffekseerContext
 
     /**
@@ -1904,6 +1928,14 @@ class Graphics {
         if (context) context.init(this._app.renderer.gl);
         return context;
     } // _effekseerContextWithoutRescue
+
+    /**
+     * Triggers events to happen upon failing to create the effekseer context
+     * Idempotent
+     * @author DoubleX @since 0.9.5 @version 0.9.5
+     * @param {Error} e - The error when failing to create the effekseer context
+     */
+    static _onCreateEffekseerContextErr(e) { this._app = null; }
 
     // RMMV static variables not present in the default RMMZ codebase
     static _cssFontLoading =  document.fonts && document.fonts.ready;
@@ -2188,7 +2220,7 @@ Graphics.FPSCounter = class {
         return numberDiv;
     } // _newNumberDiv
 
-}; // Graphics.FPSCounter
+} // Graphics.FPSCounter
 
 /*----------------------------------------------------------------------------
  *    # Rewritten class: Point
@@ -2460,12 +2492,10 @@ class Bitmap {
      * @param {number} [dh=sh] The height to draw the image in the destination.
      */
     blt(source, sx, sy, sw, sh, dx, dy, dw, dh) {
-        /** @todo Thinks of if at least logging the catch will be better */
+        // Edited to help plugins alter the blt behaviors in better ways
         try {
-            // Edited to help plugins alter the blt behaviors in better ways
             this._bltWithoutRescue(source, sx, sy, sw, sh, dx, dy, dw, dh);
-            //
-        } catch (e) {}
+        } catch (e) { this._onBltError(e); }
         //
     } // blt
 
@@ -2855,6 +2885,14 @@ class Bitmap {
         this.context.drawImage(image, sx, sy, sw, sh, dx, dy, dw, dh);
         this._baseTexture.update();
     } // _bltWithoutRescue
+
+    /**
+     * Triggers events to happen upon failing to perform the bit block transfer
+     * Potential Hotspot/Idempotent
+     * @author DoubleX @since 0.9.5 @version 0.9.5
+     * @param {Error} e - The error when failing to perform bit block transfer
+     */
+    _onBltError(e) {}
 
     /**
      * Potential Hotspot/Nullipotent
@@ -3482,12 +3520,18 @@ class Sprite extends PIXI.Sprite {
     _refreshWithBaseTexture(baseTexture, frame) {
         const { texture } = this;
         texture.baseTexture = baseTexture;
-        /** @todo Thinks of if at least logging the catch will be better */
-        try {
-            texture.frame = frame;
-        } catch (e) { texture.frame = new Rectangle(); }
-        //
+        try { texture.frame = frame; } catch (e) {
+            this._onRefreshWithBaseTextureErr(e);
+        }
     } // _refreshWithBaseTexture
+
+    /**
+     * Triggers events to happen upon failing to refresh with the base texture
+     * Idempotent
+     * @author DoubleX @since 0.9.5 @version 0.9.5
+     * @param {Error} e - The error when failing to refresh with base texture
+     */
+    _onRefreshWithBaseTextureErr(e) { this.texture.frame = new Rectangle(); }
 
     // RMMV instance methods not present in the default RMMZ codebase
     _isInBitmapRect(x, y, w, h) {
@@ -4368,7 +4412,7 @@ Tilemap.Layer = class extends PIXI.Container {
     } // destroy
 
     setBitmaps(bitmaps) {
-        this._images = bitmaps.map(bitmap => bitmap.image || bitmap.canvas);
+        this._images = bitmaps.fastMap(bitmap => bitmap.image || bitmap.canvas);
         this._needsTexturesUpdate = true;
     } // setBitmaps
 
@@ -4548,7 +4592,7 @@ Tilemap.Layer = class extends PIXI.Container {
                 .addAttribute("aDest", vb, 2, false, type, stride, 7 * 4);
     } // _newVao
 
-}; // Tilemap.Layer
+} // Tilemap.Layer
 // It's just to play safe in case of any plugin extending PIXI.Container in ES6
 ES6ExtendedClassAlias.inherit(Tilemap.Layer);
 //
@@ -4727,7 +4771,7 @@ Tilemap.Renderer = class extends PIXI.ObjectRenderer {
         gl.texSubImage2D(gl.TEXTURE_2D, 0, x, y, format, type, image);
     } // _updateTextureImage
 
-}; // Tilemap.Renderer
+} // Tilemap.Renderer
 PIXI.Renderer.registerPlugin("rpgtilemap", Tilemap.Renderer);
 // It's just to play safe in case of any plugin extending PIXI.ObjectRenderer
 ES6ExtendedClassAlias.inherit(Tilemap.Renderer);
@@ -4900,11 +4944,9 @@ class TilingSprite extends PIXI.TilingSprite {
      * @author DoubleX @since 0.9.5 @version 0.9.5
      */
     _refreshWithBaseTexture() {
-        /** @todo Thinks of if at least logging the catch will be better */
-        try {
-            this.texture.frame = this._refreshedTextureFrame();
-        } catch (e) { this.texture.frame = new Rectangle(); }
-        //
+        try { this.texture.frame = this._refreshedTextureFrame(); } catch (e) {
+            this._onRefreshWithBaseTextureErr(e);
+        }
     } // _refreshWithBaseTexture
 
     /**
@@ -4922,6 +4964,16 @@ class TilingSprite extends PIXI.TilingSprite {
         //
         return frame;
     } // _refreshedTextureFrame
+
+    /**
+     * Triggers events to happen upon failing to refresh with the base texture
+     * Idempotent
+     * @author DoubleX @since 0.9.5 @version 0.9.5
+     * @param {Error} e - The error occured when failing to refresh base texture
+     */
+    static _onRefreshWithBaseTextureErr(e) {
+        this.texture.frame = new Rectangle();
+    } // _onRefreshWithBaseTextureErr
 
 } // TilingSprite
 // It's just to play safe in case of any plugin extending PIXI.TilingSprite
@@ -5010,7 +5062,7 @@ class ScreenSprite extends PIXI.Container {
      */
     _setNewColor(r = 0, g = 0, b = 0) {
         // They shouldn't be "", false, null, NaN or other defined falsy values
-        [this._red, this._green, this._blue] = [r, g, b].map(component => {
+        [this._red, this._green, this._blue] = [r, g, b].fastMap(component => {
             return Math.round(component).clamp(0, 255);
         });
         //
@@ -6280,10 +6332,12 @@ class WebAudio {
     } // setMasterVolume
 
     static _createContext() {
+        // Edited to help plugins alter create context behaviors in better ways
         try {
             const AudioContext = window.AudioContext || window.webkitAudioContext;
             this._context = new AudioContext();
-        } catch (e) { this._context = null; }
+        } catch (e) { this._onCreateContextErr(e); }
+        //
     } // _createContext
 
     static _currentTime() {
@@ -6662,7 +6716,13 @@ class WebAudio {
     } // _startSourceNode
 
     // Ignore InvalidStateError
-    _stopSourceNode() { try { this._sourceNode.stop(); } catch (e) {} }
+    _stopSourceNode() {
+        // Edited to help plugins alter stop source node in better ways
+        try { this._sourceNode.stop(); } catch (e) {
+            this._onStopSourceNodeErr(e);
+        }
+        //
+    } // _stopSourceNode
 
     _createPannerNode() {
         this._pannerNode = WebAudio._context.createPanner();
@@ -6777,6 +6837,14 @@ class WebAudio {
         }
         return string;
     } // _readFourCharacters
+
+    /**
+     * Triggers events to happen upon failing to create the audio context
+     * Idempotent
+     * @author DoubleX @since 0.9.5 @version 0.9.5
+     * @param {Error} e - The error when failing to create the audio context
+     */
+    static _onCreateContextErr(e) { this._context = null; }
 
     /**
      * Creates the master gain node with the global web audio context
@@ -6981,6 +7049,14 @@ class WebAudio {
         while (playingOffset >= loopEnd) playingOffset -= this._loopLengthTime;
         return playingOffset;
     } // _startPlayingOffset
+
+    /**
+     * Triggers events to happen upon failing to stop the source node
+     * Idempotent
+     * @author DoubleX @since 0.9.5 @version 0.9.5
+     * @param {Error} e - The error when failing to stop the source node
+     */
+    _onStopSourceNodeErr(e) {}
 
     /**
      * This method shouldn't be called without an existing source node
@@ -8924,8 +9000,9 @@ class DataManager {
     static latestSavefileId() {
         /** @todo Dries up these codes representing identical knowledge */
         const globalInfo = this._globalInfo;
-        const validInfo = globalInfo.slice(1).filter(x => x);
-        const latest = Math.max(...validInfo.map(x => x.timestamp));
+        const latest = Math.max(...globalInfo.slice(1).filterMap(x => x, x => {
+            return x.timestamp;
+        }));
         const i = globalInfo.findIndex(x => x && x.timestamp === latest);
         return i > 0 ? i : 0;
         //
@@ -8934,8 +9011,9 @@ class DataManager {
     static earliestSavefileId() {
         /** @todo Dries up these codes representing identical knowledge */
         const globalInfo = this._globalInfo;
-        const validInfo = globalInfo.slice(1).filter(x => x);
-        const earliest = Math.min(...validInfo.map(x => x.timestamp));
+        const earliest = Math.min(...globalInfo.slice(1).filterMap(x => {
+            return x;
+        }, x => x.timestamp));
         const i = globalInfo.findIndex(x => x && x.timestamp === earliest);
         return i > 0 ? i : 0;
         //
@@ -9352,9 +9430,7 @@ class StorageManager {
                 if (zip) return resolve(this._jsonFromZip(zip));
                 //
                 resolve("null");
-            } catch (e) {
-                reject(e);
-            }
+            } catch (e) { reject(e); }
         });
     } // zipToJson
 
@@ -9547,12 +9623,18 @@ class StorageManager {
      * @param {string} backupFilePath - The test file path of the save file
      */
     static _onTryRollbackFailedLocalFileSave(filePath, backupFilePath) {
-        /** @todo Thinks of if at least logging the catch will be better */
         try {
             this._onRollbackFailedLocalFileSaveWithouRescue(filePath, backupFilePath);
-        } catch (e2) {}
-        //
+        } catch (e2) { this._onRollbackFailedLocalFileSaveErr(e2); }
     } // _onTryRollbackFailedLocalFileSave
+
+    /**
+     * Triggers events to happen upon failing to rollback failed local file save
+     * Idempotent
+     * @author DoubleX @since 0.9.5 @version 0.9.5
+     * @param {Error} e - Error when failing to rollback failed local file save
+     */
+    static _onRollbackFailedLocalFileSaveErr(e) {}
 
     /**
      * This function shouldn't be called without a try and catch
@@ -11935,7 +12017,7 @@ class BattleManager {
     } // getNextSubject
 
     static allBattleMembers() {
-        return $gameParty.battleMembers().concat($gameTroop.members());
+        return $gameParty.battleMembers().fastMerge($gameTroop.members());
     } // allBattleMembers
      
     // Edited to help plugins alter make action orders in better ways
@@ -13049,7 +13131,7 @@ class Game_Variables {
      */
     _setValidVarVal(varId, val) {
         /** @todo Figures out why numbers are supposed to be integers */
-        this._data[varId] = Number.isNaN(val) ? val : Math.floor(val);
+        this._data[varId] = isNaN(val) ? val : Math.floor(val);
         //
         this.onChange();
     } // _setValidVarVal
@@ -13668,3 +13750,1780 @@ class Game_Item {
     } // _newDataClass
 
 } // Game_Item
+
+/*----------------------------------------------------------------------------
+ *    # Rewritten class: Game_Action
+ *      - Rewrites it into the ES6 standard
+ *----------------------------------------------------------------------------*/
+
+//-----------------------------------------------------------------------------
+// Game_Action
+//
+// The game object class for a battle action.
+class Game_Action {
+
+    static EFFECT_RECOVER_HP = 11;
+    static EFFECT_RECOVER_MP = 12;
+    static EFFECT_GAIN_TP = 13;
+    static EFFECT_ADD_STATE = 21;
+    static EFFECT_REMOVE_STATE = 22;
+    static EFFECT_ADD_BUFF = 31;
+    static EFFECT_ADD_DEBUFF = 32;
+    static EFFECT_REMOVE_BUFF = 33;
+    static EFFECT_REMOVE_DEBUFF = 34;
+    static EFFECT_SPECIAL = 41;
+    static EFFECT_GROW = 42;
+    static EFFECT_LEARN_SKILL = 43;
+    static EFFECT_COMMON_EVENT = 44;
+    static SPECIAL_EFFECT_ESCAPE = 0;
+    static HITTYPE_CERTAIN = 0;
+    static HITTYPE_PHYSICAL = 1;
+    static HITTYPE_MAGICAL = 2;
+
+    constructor(subject, forcing) {
+        [this._subjectActorId, this._subjectEnemyIndex] = [0, -1];
+        this._forcing = forcing || false;
+        this.setSubject(subject);
+        this.clear();
+    } // constructor
+
+    clear() { [this._item, this._targetIndex] = [new Game_Item(), -1]; }
+
+    setSubject(subject) {
+        // Edited to help plugins alter set subject behaviors in better ways
+        if (subject.isActor()) return this._setActorSubject(subject);
+        this._setEnemySubject(subject);
+        //
+    } // setSubject
+
+    subject() {
+        if (this._subjectActorId > 0) {
+            return $gameActors.actor(this._subjectActorId);
+        } else return $gameTroop.members()[this._subjectEnemyIndex];
+    } // subject
+
+    friendsUnit() { return this.subject().friendsUnit(); }
+
+    opponentsUnit() { return this.subject().opponentsUnit(); }
+
+    setEnemyAction(action) {
+        action ? this.setSkill(action.skillId) : this.clear();
+    } // setEnemyAction
+
+    setAttack() { this.setSkill(this.subject().attackSkillId()); }
+
+    setGuard() { this.setSkill(this.subject().guardSkillId()); }
+
+    setSkill(skillId) { this._item.setObject($dataSkills[skillId]); }
+
+    setItem(itemId) { this._item.setObject($dataItems[itemId]); }
+
+    setItemObject(object) { this._item.setObject(object); }
+
+    setTarget(targetIndex) { this._targetIndex = targetIndex; }
+
+    item() { return this._item.object(); }
+
+    isSkill() { return this._item.isSkill(); }
+
+    isItem() { return this._item.isItem(); }
+
+    numRepeats() {
+        let repeats = this.item().repeats;
+        if (this.isAttack()) repeats += this.subject().attackTimesAdd();
+        return Math.floor(repeats);
+    } // numRepeats
+
+    checkItemScope(list) { return list.includes(this.item().scope); }
+
+    isForOpponent() { return this.checkItemScope([1, 2, 3, 4, 5, 6, 14]); }
+
+    isForFriend() { return this.checkItemScope([7, 8, 9, 10, 11, 12, 13, 14]); }
+
+    isForEveryone() { return this.checkItemScope([14]); }
+
+    isForAliveFriend() { return this.checkItemScope([7, 8, 11, 14]); }
+
+    isForDeadFriend() { return this.checkItemScope([9, 10]); }
+
+    isForUser() { return this.checkItemScope([11]); }
+
+    isForOne() { return this.checkItemScope([1, 3, 7, 9, 11, 12]); }
+
+    isForRandom() { return this.checkItemScope([3, 4, 5, 6]); }
+
+    isForAll() { return this.checkItemScope([2, 8, 10, 13, 14]); }
+
+    needsSelection() { return this.checkItemScope([1, 7, 9, 12]); }
+
+    numTargets() { return this.isForRandom() ? this.item().scope - 2 : 0; }
+
+    checkDamageType(list) { return list.includes(this.item().damage.type); }
+
+    isHpEffect() { return this.checkDamageType([1, 3, 5]); }
+
+    isMpEffect() { return this.checkDamageType([2, 4, 6]); }
+
+    isDamage() { return this.checkDamageType([1, 2]); }
+
+    isRecover() { return this.checkDamageType([3, 4]); }
+
+    isDrain() { return this.checkDamageType([5, 6]); }
+
+    isHpRecover() { return this.checkDamageType([3]); }
+
+    isMpRecover() { return this.checkDamageType([4]); }
+
+    isCertainHit() {
+        return this.item().hitType === Game_Action.HITTYPE_CERTAIN;
+    } // isCertainHit
+
+    isPhysical() {
+        return this.item().hitType === Game_Action.HITTYPE_PHYSICAL;
+    } // isPhysical
+
+    isMagical() { return this.item().hitType === Game_Action.HITTYPE_MAGICAL; }
+
+    isAttack() {
+        return this.item() === $dataSkills[this.subject().attackSkillId()];
+    } // isAttack
+
+    isGuard() {
+        return this.item() === $dataSkills[this.subject().guardSkillId()];
+    } // isGuard
+
+    isMagicSkill() {
+        if (!this.isSkill()) return false;
+        return $dataSystem.magicSkills.includes(this.item().stypeId);
+    } // isMagicSkill
+
+    decideRandomTarget() {
+        // Edited to help plugins alter decide random target in better ways
+        const target = this._randomTarget();
+        //
+        target ? this._targetIndex = target.index() : this.clear();
+    } // decideRandomTarget
+
+    setConfusion() { this.setAttack(); }
+
+    prepare() {
+        if (this.subject().isConfused() && !this._forcing) this.setConfusion();
+    } // prepare
+
+    isValid() {
+        if (this._forcing && this.item()) return true;
+        return this.subject().canUse(this.item());
+    } // isValid
+
+    speed() {
+        // Edited to help plugins alter speed behaviors in better ways
+        let speed = this._baseSpeed();
+        //
+        if (this.item()) speed += this.item().speed;
+        if (this.isAttack()) speed += this.subject().attackSpeed();
+        return speed;
+    } // speed
+
+    // Edited to help plugins alter make targets in better ways
+    makeTargets() { return this.repeatTargets(this._madeRawTargets()); }
+    //
+
+    repeatTargets(targets) {
+        const repeats = this.numRepeats();
+        return targets.reduce((ts, target) => {
+            if (target) for (let i = 0; i < repeats; i++) ts.push(target);
+            return ts;
+        }, []);
+    } // repeatTargets
+
+    confusionTarget() {
+        switch (this.subject().confusionLevel()) {
+            case 1: return this.opponentsUnit().randomTarget();
+            // Edited to help plugins to alter confusion target in better ways
+            case 2: return this._confusionAnyTarget();
+            //
+            default: return this.friendsUnit().randomTarget();
+        }
+    } // confusionTarget
+
+    targetsForEveryone() {
+        const opponentMembers = this.opponentsUnit().aliveMembers();
+        const friendMembers = this.friendsUnit().aliveMembers();
+        return opponentMembers.fastMerge(friendMembers);
+    } // targetsForEveryone
+
+    targetsForOpponents() {
+        const unit = this.opponentsUnit();
+        if (this.isForRandom()) return this.randomTargets(unit);
+        return this.targetsForAlive(unit);
+    } // targetsForOpponents
+
+    targetsForFriends() {
+        const unit = this.friendsUnit();
+        if (this.isForUser()) return [this.subject()];
+        if (this.isForDeadFriend()) return this.targetsForDead(unit);
+        if (this.isForAliveFriend()) return this.targetsForAlive(unit);
+        return this.targetsForDeadAndAlive(unit);
+    } // targetsForFriends
+
+    randomTargets(unit) {
+        const targets = [];
+        for (let i = 0; i < this.numTargets(); i++) {
+            targets.push(unit.randomTarget());
+        }
+        return targets;
+    } // randomTargets
+
+    targetsForDead(unit) {
+        if (this.isForOne()) return [unit.smoothDeadTarget(this._targetIndex)];
+        return unit.deadMembers();
+    } // targetsForDead
+
+    targetsForAlive(unit) {
+        if (!this.isForOne()) return unit.aliveMembers();
+        if (this._targetIndex < 0) return [unit.randomTarget()];
+        return [unit.smoothTarget(this._targetIndex)];
+    } // targetsForAlive
+
+    targetsForDeadAndAlive(unit) {
+        if (this.isForOne()) return [unit.members()[this._targetIndex]];
+        return unit.members();
+    } // targetsForDeadAndAlive
+
+    evaluate() {
+        let value = 0;
+        this.itemTargetCandidates().forEach(target => {
+            const targetValue = this.evaluateWithTarget(target);
+            if (this.isForAll()) return value += targetValue;
+            if (targetValue <= value) return;
+            value = targetValue;
+            this._targetIndex = target.index();
+        });
+        value *= this.numRepeats();
+        return value > 0 ? value + Math.random() : value;
+    } // evaluate
+
+    itemTargetCandidates() {
+        if (!this.isValid()) return [];
+        if (this.isForOpponent()) return this.opponentsUnit().aliveMembers();
+        if (this.isForUser()) return [this.subject()];
+        if (this.isForDeadFriend()) return this.friendsUnit().deadMembers();
+        return this.friendsUnit().aliveMembers();
+    } // itemTargetCandidates
+
+    evaluateWithTarget(target) {
+        /** @todo Figures out whther returning undefined's intentional here */
+        if (!this.isHpEffect()) return;
+        //
+        // Edited to help plugins fix autobattle leak damage formula side effect
+        const value = this._evalDamageWithoutCri(target);
+        //
+        if (this.isForOpponent()) return value / Math.max(target.hp, 1);
+        return Math.min(-value, target.mhp - target.hp) / target.mhp;
+    } // evaluateWithTarget
+
+    testApply(target) {
+        if (!this.testLifeAndDeath(target)) return false;
+        if ($gameParty.inBattle()) return true;
+        if (this.isHpRecover() && target.hp < target.mhp) return true;
+        if (this.isMpRecover() && target.mp < target.mmp) return true;
+        return this.hasItemAnyValidEffects(target);
+    } // testApply
+
+    testLifeAndDeath(target) {
+        if (this.isForOpponent() || this.isForAliveFriend()) {
+            return target.isAlive();
+        } else return !this.isForDeadFriend() || target.isDead();
+    } // testLifeAndDeath
+
+    hasItemAnyValidEffects(target) {
+        return this.item().effects.some(effect => {
+            return this.testItemEffect(target, effect);
+        });
+    } // hasItemAnyValidEffects
+
+    testItemEffect(target, effect) {
+        switch (effect.code) {
+            case Game_Action.EFFECT_RECOVER_HP:
+                /** @todo Extracts these codes into a well-named function */
+                return target.hp < target.mhp || effect.value1 < 0 || effect.value2 < 0;
+                //
+            case Game_Action.EFFECT_RECOVER_MP:
+                /** @todo Extracts these codes into a well-named function */
+                return target.mp < target.mmp || effect.value1 < 0 || effect.value2 < 0;
+                //
+            case Game_Action.EFFECT_ADD_STATE:
+                return !target.isStateAffected(effect.dataId);
+            case Game_Action.EFFECT_REMOVE_STATE:
+                return target.isStateAffected(effect.dataId);
+            case Game_Action.EFFECT_ADD_BUFF:
+                return !target.isMaxBuffAffected(effect.dataId);
+            case Game_Action.EFFECT_ADD_DEBUFF:
+                return !target.isMaxDebuffAffected(effect.dataId);
+            case Game_Action.EFFECT_REMOVE_BUFF:
+                return target.isBuffAffected(effect.dataId);
+            case Game_Action.EFFECT_REMOVE_DEBUFF:
+                return target.isDebuffAffected(effect.dataId);
+            case Game_Action.EFFECT_LEARN_SKILL:
+                /** @todo Extracts these codes into a well-named function */
+                return target.isActor() && !target.isLearnedSkill(effect.dataId);
+                //
+            default: return true;
+        }
+    } // testItemEffect
+
+    itemCnt(target) {
+        return this.isPhysical() && target.canMove() ? target.cnt : 0;
+    } // itemCnt
+
+    itemMrf(target) { return this.isMagical() ? target.mrf : 0; }
+
+    itemHit(/*target*/) {
+        const successRate = this.item().successRate;
+        if (this.isPhysical()) return successRate * 0.01 * this.subject().hit;
+        return successRate * 0.01;
+    } // itemHit
+
+    itemEva(target) {
+        if (this.isPhysical()) return target.eva;
+        return this.isMagical() ? target.mev : 0;
+    } // itemEva
+
+    itemCri(target) {
+        if (!this.item().damage.critical) return 0;
+        return this.subject().cri * (1 - target.cev);
+    } // itemCri
+
+    apply(target) {
+        const result = target.result();
+        this.subject().clearResult();
+        result.clear();
+        result.used = this.testApply(target);
+        // Edited to help plugins alter apply behaviors in better ways
+        result.missed = this._isMissed(target);
+        result.evaded = this._isEvaded(target);
+        //
+        [result.physical, result.drain] = [this.isPhysical(), this.isDrain()];
+        // Edited to help plugins alter apply behaviors in better ways
+        if (result.isHit()) this._applyHit(target);
+        //
+        this.updateLastTarget(target);
+    } // apply
+
+    makeDamageValue(target, critical) {
+        const baseValue = this.evalDamageFormula(target);
+        // Edited to try up codes essentially being the identical knowledge
+        return this._execDamageVal(target, critical, baseValue);
+        //
+    } // makeDamageValue
+
+    evalDamageFormula(target) {
+        // Edited to help plugins alter eval damage formula in better ways
+        try { return this._evalDamageFormulaWithoutRescue(target); } catch (e) {
+            this._onEvalDamageFormulaErr(e);
+            return 0;
+        }
+        //
+    } // evalDamageFormula
+
+    calcElementRate(target) {
+        if (this.item().damage.elementId < 0) {
+            return this.elementsMaxRate(target, this.subject().attackElements());
+        } else return target.elementRate(this.item().damage.elementId);
+    } // calcElementRate
+
+    elementsMaxRate(target, elements) {
+        if (!elements.isEmpty()) return Math.max(...elements.map(elementId => {
+            return target.elementRate(elementId);
+        }));
+        return 1;
+    } // elementsMaxRate
+
+    applyCritical(damage) {
+        // Edited to help plugins alter apply critical behaviors in better ways
+        return damage * this._appliedCriticalMultiplier(damage);
+        //
+    } // applyCritical
+
+    applyVariance(damage, variance) {
+        // Edited to help plugins alter apply variance behaviors in better ways
+        return damage + this._appliedVarAddend(damage, variance);
+        //
+    } // applyVariance
+
+    applyGuard(damage, target) {
+        // Edited to help plugins alter apply guard behaviors in better ways
+        return damage / this._appliedGrdDivisor(damage, target);
+        //
+    } // applyGuard
+
+    executeDamage(target, value) {
+        const result = target.result();
+        if (value === 0) result.critical = false;
+        if (this.isHpEffect()) this.executeHpDamage(target, value);
+        if (this.isMpEffect()) this.executeMpDamage(target, value);
+    } // executeDamage
+
+    executeHpDamage(target, value) {
+        if (this.isDrain()) value = Math.min(target.hp, value);
+        this.makeSuccess(target);
+        target.gainHp(-value);
+        if (value > 0) target.onDamage(value);
+        this.gainDrainedHp(value);
+    } // executeHpDamage
+
+    executeMpDamage(target, value) {
+        if (!this.isMpRecover()) value = Math.min(target.mp, value);
+        if (value !== 0) this.makeSuccess(target);
+        target.gainMp(-value);
+        this.gainDrainedMp(value);
+    } // executeMpDamage
+
+    gainDrainedHp(value) {
+        if (!this.isDrain()) return;
+        (this._reflectionTarget || this.subject()).gainHp(value);
+    } // gainDrainedHp
+
+    gainDrainedMp(value) {
+        if (!this.isDrain()) return;
+        (this._reflectionTarget || this.subject()).gainMp(value);
+    } // gainDrainedMp
+
+    applyItemEffect(target, effect) {
+        switch (effect.code) {
+            case Game_Action.EFFECT_RECOVER_HP:
+                return this.itemEffectRecoverHp(target, effect);
+            case Game_Action.EFFECT_RECOVER_MP:
+                return this.itemEffectRecoverMp(target, effect);
+            case Game_Action.EFFECT_GAIN_TP:
+                return this.itemEffectGainTp(target, effect);
+            case Game_Action.EFFECT_ADD_STATE:
+                return this.itemEffectAddState(target, effect);
+            case Game_Action.EFFECT_REMOVE_STATE:
+                return this.itemEffectRemoveState(target, effect);
+            case Game_Action.EFFECT_ADD_BUFF:
+                return this.itemEffectAddBuff(target, effect);
+            case Game_Action.EFFECT_ADD_DEBUFF:
+                return this.itemEffectAddDebuff(target, effect);
+            case Game_Action.EFFECT_REMOVE_BUFF:
+                return this.itemEffectRemoveBuff(target, effect);
+            case Game_Action.EFFECT_REMOVE_DEBUFF:
+                return this.itemEffectRemoveDebuff(target, effect);
+            case Game_Action.EFFECT_SPECIAL:
+                return this.itemEffectSpecial(target, effect);
+            case Game_Action.EFFECT_GROW:
+                return this.itemEffectGrow(target, effect);
+            case Game_Action.EFFECT_LEARN_SKILL:
+                return this.itemEffectLearnSkill(target, effect);
+            case Game_Action.EFFECT_COMMON_EVENT:
+                return this.itemEffectCommonEvent(target, effect);
+        }
+    } // applyItemEffect
+
+    itemEffectRecoverHp(target, effect) {
+        // Edited to help plugins alter item effect recover hp in better ways
+        const value = this._recoveredHp(target, effect);
+        //
+        if (value === 0) return;
+        target.gainHp(value);
+        this.makeSuccess(target);
+    } // itemEffectRecoverHp
+
+    itemEffectRecoverMp(target, effect) {
+        // Edited to help plugins alter item effect recover mp in better ways
+        const value = this._recoveredMp(target, effect);
+        //
+        if (value === 0) return;
+        target.gainMp(value);
+        this.makeSuccess(target);
+    } // itemEffectRecoverMp
+
+    itemEffectGainTp(target, effect) {
+        // Edited to help plugins alter item effect gain tp in better ways
+        const value = this._gainedTp(target, effect);
+        //
+        if (value === 0) return;
+        target.gainTp(value);
+        this.makeSuccess(target);
+    } // itemEffectGainTp
+
+    itemEffectAddState(target, effect) {
+        if (effect.dataId === 0) {
+            this.itemEffectAddAttackState(target, effect);
+        } else this.itemEffectAddNormalState(target, effect);
+    } // itemEffectAddState
+
+    itemEffectAddAttackState(target, effect) {
+        this.subject().attackStates().forEach(stateId => {
+            // Edited to help plugins alter item effect add state in better ways
+            if (!this._isAddAtkState(target, effect, stateId)) return;
+            //
+            target.addState(stateId);
+            this.makeSuccess(target);
+        });
+    } // itemEffectAddAttackState
+
+    itemEffectAddNormalState(target, effect) {
+        // Edited to help plugins alter item effect add state in better ways
+        if (!this._isAddNormState(target, effect)) return;
+        //
+        target.addState(effect.dataId);
+        this.makeSuccess(target);
+    } // itemEffectAddNormalState
+
+    itemEffectRemoveState(target, effect) {
+        // Edited to help plugins alter item effect add debuff in better ways
+        if (!this._isRemoveState(target, effect)) return;
+        //
+        target.removeState(effect.dataId);
+        this.makeSuccess(target);
+    } // itemEffectRemoveState
+
+    itemEffectAddBuff(target, effect) {
+        target.addBuff(effect.dataId, effect.value1);
+        this.makeSuccess(target);
+    } // itemEffectAddBuff
+
+    itemEffectAddDebuff(target, effect) {
+        // Edited to help plugins alter item effect add debuff in better ways
+        if (!this._isAddDebuff(target, effect)) return;
+        //
+        target.addDebuff(effect.dataId, effect.value1);
+        this.makeSuccess(target);
+    } // itemEffectAddDebuff
+
+    itemEffectRemoveBuff(target, effect) {
+        if (!target.isBuffAffected(effect.dataId)) return;
+        /** @todo Dries up these codes representing identical knowledge */
+        target.removeBuff(effect.dataId);
+        this.makeSuccess(target);
+        //
+    } // itemEffectRemoveBuff
+
+    itemEffectRemoveDebuff(target, effect) {
+        if (!target.isDebuffAffected(effect.dataId)) return;
+        /** @todo Dries up these codes representing identical knowledge */
+        target.removeBuff(effect.dataId);
+        this.makeSuccess(target);
+        //
+    } // itemEffectRemoveDebuff
+
+    itemEffectSpecial(target, effect) {
+        // Edited to help plugins alter item effect special in better ways
+        if (this._isItemEffectEsc(effect)) this._itemEffectEsc(target);
+        //
+    } // itemEffectSpecial
+
+    itemEffectGrow(target, effect) {
+        target.addParam(effect.dataId, Math.floor(effect.value1));
+        this.makeSuccess(target);
+    } // itemEffectGrow
+
+    itemEffectLearnSkill(target, effect) {
+        // Edited to help plugins alter item effect learn skill in better ways
+        if (target.isActor()) this._itemEffectActorLearnSkill(target, effect);
+        //
+    } // itemEffectLearnSkill
+
+    itemEffectCommonEvent(/*target, effect*/) {}
+
+    makeSuccess(target) { target.result().success = true; }
+
+    applyItemUserEffect(/*target*/) {
+        // Edited to help plugins alter apply item user effect in better ways
+        this.subject().gainSilentTp(this._gainedSilentTp());
+        //
+    } // applyItemUserEffect
+
+    lukEffectRate(target) {
+        return Math.max(1.0 + (this.subject().luk - target.luk) * 0.001, 0.0);
+    } // lukEffectRate
+
+    applyGlobal() {
+        // Edited to help plugins alter apply global behaviors in better ways
+        this.item().effects.forEach(this._applyGlobalItemEffect, this);
+        //
+        this.updateLastUsed();
+        this.updateLastSubject();
+    } // applyGlobal
+
+    updateLastUsed() {
+        const item = this.item();
+        if (DataManager.isSkill(item)) {
+            $gameTemp.setLastUsedSkillId(item.id);
+        } else if (!DataManager.isItem(item)) return;
+        $gameTemp.setLastUsedItemId(item.id);
+    } // updateLastUsed
+
+    updateLastSubject() {
+        const subject = this.subject();
+        if (subject.isActor()) {
+            $gameTemp.setLastSubjectActorId(subject.actorId());
+        } else $gameTemp.setLastSubjectEnemyIndex(subject.index() + 1);
+    } // updateLastSubject
+
+    updateLastTarget(target) {
+        if (target.isActor()) {
+            $gameTemp.setLastTargetActorId(target.actorId());
+        } else $gameTemp.setLastTargetEnemyIndex(target.index() + 1);
+    } // updateLastTarget
+
+    // Added to help RM users detect and fix damage formula errors
+    static IS_SHOW_DAMAGE_FORMULA_ERRS = false;
+    //
+    // Added to help plugins fix autobattle leaking damage formula side effects
+    static NO_SIDE_EFFECT_DAMAGE_FORMULA_REGEX = new RegExp(".*[};] *", "gim");
+    //
+
+    /**
+     * Sets the specified actor as the execution subject of this action
+     * @author DoubleX @since 0.9.5 @version 0.9.5
+     * @param {Game_Actor} subject - The actor as the action execution subject
+     */
+    _setActorSubject(subject) {
+        this._subjectActorId = subject.actorId();
+        this._subjectEnemyIndex = -1;
+    } // _setActorSubject
+
+    /**
+     * Sets the specified enemy as the execution subject of this action
+     * @author DoubleX @since 0.9.5 @version 0.9.5
+     * @param {Game_Enemy} subject - The enemy as the action execution subject
+     */
+    _setEnemySubject() {
+        [this._subjectEnemyIndex, this._subjectActorId] = [subject.index(), 0];
+    } // _setEnemySubject
+
+    /**
+     * Nullipotent
+     * @author DoubleX @since 0.9.5 @version 0.9.5
+     * @returns {Game_Battler} The randomnly decided target for this action
+     */
+    _randomTarget() {
+        if (this.isForDeadFriend()) return this.friendsUnit().randomDeadTarget();
+        if (this.isForFriend()) return this.friendsUnit().randomTarget();
+        return this.opponentsUnit().randomTarget();
+    } // _randomTarget
+
+    /**
+     * Nullipotent
+     * @author DoubleX @since 0.9.5 @version 0.9.5
+     * @returns {number} The base speed of this action without speed bonuses
+     */
+    _baseSpeed() {
+        const agi = this.subject().agi;
+        return agi + Math.randomInt(Math.floor(5 + agi / 4));
+    } // _baseSpeed
+
+    /**
+     * Nullipotent
+     * @author DoubleX @since 0.9.5 @version 0.9.5
+     */
+    _madeRawTargets() {
+        if (this._isForConfused()) return [this.confusionTarget()];
+        if (this.isForEveryone()) return this.targetsForEveryone();
+        if (this.isForOpponent()) return this.targetsForOpponents();
+        if (this.isForFriend()) return this.targetsForFriends();
+        return [];
+    } // _madeRawTargets
+
+    /**
+     * Nullipotent
+     * @author DoubleX @since 0.9.5 @version 0.9.5
+     * @returns {boolean} Whether the action's for confused targets
+     */
+    _isForConfused() { return !this._forcing && this.subject().isConfused(); }
+
+    /**
+     * Nullipotent
+     * @author DoubleX @since 0.9.5 @version 0.9.5
+     * @param {Game_Battler} target - The target of the action to be evaluated
+     * @returns {number} The evaluated damage from applying the action to target
+     */
+    _evalDamageWithoutCri(target) {
+        const baseValue = this._tryEvalDamageFormulaWithoutSideEffects(target);
+        return this._execDamageVal(target, false, baseValue);
+    } // _evalDamageWithoutCri
+
+    /**
+     * Nullipotent
+     * @author DoubleX @since 0.9.5 @version 0.9.5
+     * @param {Game_Battler} target - The target of the action to be evaluated
+     * @returns {number} The evaluated damage from applying the action to target
+     */
+    _tryEvalDamageFormulaWithoutSideEffects(target) {
+        // Edited to help plugins alter eval damage formula in better ways
+        try {
+            return this._evalDamageFormulaWithoutSideEffectsRescue(target);
+        } catch (e) {
+            this._onEvalDamageFormulaErr(e);
+            return 0;
+        }
+        //
+    } // _tryEvalDamageFormulaWithoutSideEffects
+
+    /**
+     * This method shouldn't be called without a try-catch
+     * Nullipotent
+     * @author DoubleX @since 0.9.5 @version 0.9.5
+     * @param {Game_Battler} target - The target of the action to be evaluated
+     * @returns {number} The evaluated damage from applying the action to target
+     */
+    _evalDamageFormulaWithoutSideEffectsRescue(target) {
+        const item = this.item();
+        // eslint-disable-line no-unused-vars
+        const [a, b, v] = [this.subject(), target, $gameVariables._data];
+        //
+        /** @todo Figures out if anyone will use sign in damage formula */
+        const sign = [3, 4].includes(item.damage.type) ? -1 : 1;
+        //
+        const damageFormula = this._damageFormulaWithoutSideEffects();
+        const value = eval(damageFormula);
+        if (!isNaN(value)) return Math.max(value, 0) * sign;
+        // Edited to help RM users detect and fix damage formula errors
+        throw new Error(`${damageFormula} doesn't return a number!`);
+        //
+    } // _evalDamageFormulaWithoutSideEffectsRescue
+
+    /**
+     * This method can be overriden by plugins to give users greater control
+     * Nullipotent
+     * @author DoubleX @since 0.9.5 @version 0.9.5
+     * @param {Game_Battler} target - The target of the action to be evaluated
+     * @returns {number} The evaluated damage from applying the action to target
+     */
+    _damageFormulaWithoutSideEffects() {
+        const regex = Game_Action.NO_SIDE_EFFECT_DAMAGE_FORMULA_REGEX;
+        return this.item().damage.formula.replace(regex, "");
+    } // _damageFormulaWithoutSideEffects
+
+    /**
+     * Nullipotent
+     * @author DoubleX @since 0.9.5 @version 0.9.5
+     * @returns {[Game_Battler]} The list of confusion targets
+     */
+    _confusionAnyTarget() {
+        if (Math.randomInt(2) === 0) return this.opponentsUnit().randomTarget();
+        return this.friendsUnit().randomTarget();
+    } // _confusionAnyTarget
+
+    /**
+     * Nullipotent
+     * @author DoubleX @since 0.9.5 @version 0.9.5
+     * @returns {boolean} Whether the action's missed the target
+     */
+    _isMissed(target) {
+        return target.result().used && Math.random() >= this.itemHit(target);
+    } // _isMissed
+
+    /**
+     * Nullipotent
+     * @author DoubleX @since 0.9.5 @version 0.9.5
+     * @returns {boolean} Whether the action's evaded by the target
+     */
+    _isEvaded(target) {
+        return !target.result().missed && Math.random() < this.itemEva(target);
+    } // _isEvaded
+
+    /**
+     * Applies this action when it hits the specified target
+     * @author DoubleX @since 0.9.5 @version 0.9.5
+     * @param {Game_Battler} target - The target to be hit by the applied action
+     */
+    _applyHit(target) {
+        if (this._isApplyDamage()) this._applyDamage(target);
+        this.item().effects.forEach(effect => {
+            this.applyItemEffect(target, effect);
+        });
+        this.applyItemUserEffect(target);
+    } // _applyHit
+
+    /**
+     * Nullipotent
+     * @author DoubleX @since 0.9.5 @version 0.9.5
+     * @param {Game_Battler} target - The target to be hit by the applied action
+     * @returns {boolean} Whether the applied action has damages
+     */
+    _isApplyDamage() { return this.item().damage.type > 0; }
+
+    /**
+     * Applies this action damage when it hits the specified target
+     * @author DoubleX @since 0.9.5 @version 0.9.5
+     * @param {Game_Battler} target - The target to be hit by the applied action
+     */
+    _applyDamage(target) {
+        const result = target.result();
+        result.critical = this._isCritical(target);
+        const value = this.makeDamageValue(target, result.critical);
+        this.executeDamage(target, value);
+    } // _applyDamage
+
+    /**
+     * Nullipotent
+     * @author DoubleX @since 0.9.5 @version 0.9.5
+     * @param {Game_Battler} target - The target to be hit by the applied action
+     * @returns {boolean} Whether the applied action damage's critical
+     */
+    _isCritical(target) { return Math.random() < this.itemCri(target); }
+
+    /**
+     * This method shouldn't be called without a try-catch
+     * @author DoubleX @since 0.9.5 @version 0.9.5
+     * @param {Game_Battler} target - The target to have damage formula applied
+     */
+    _evalDamageFormulaWithoutRescue(target) {
+        const item = this.item();
+        // eslint-disable-line no-unused-vars
+        const [a, b, v] = [this.subject(), target, $gameVariables._data];
+        //
+        /** @todo Figures out if anyone will use sign in damage formula */
+        const sign = [3, 4].includes(item.damage.type) ? -1 : 1;
+        //
+        const value = eval(item.damage.formula);
+        if (!isNaN(value)) return Math.max(value, 0) * sign;
+        // Edited to help RM users detect and fix damage formula errors
+        throw new Error(`${item.damage.formula} doesn't return a number!`);
+        //
+    } // _evalDamageFormulaWithoutRescue
+
+    /**
+     * Triggers events to happen upon failing to evaluate the damage formula
+     * @author DoubleX @since 0.9.5 @version 0.9.5
+     * @param {Error} e - The error when failing to evaluate the damage formula
+     */
+    _onEvalDamageFormulaErr(e) {
+        // Edited to help RM users detect and fix damage formula errors
+        if (!Game_Action.IS_SHOW_DAMAGE_FORMULA_ERRS) return;
+        const item = this.item();
+        console.warn(`${item._dataClass} id`, item.object().id);
+        console.warn("damage formula", item.damage.formula);
+        console.warn("error", e.toString());
+        //
+    } // _onEvalDamageFormulaErr
+
+    /**
+     * Nullipotent
+     * @author DoubleX @since 0.9.5 @version 0.9.5
+     * @param {Game_Battler} target - The target of the action to be evaluated
+     * @param {boolean} critical - Whether the target takes a critical hit
+     * @param {number} baseValue - Base damage from applying action to target
+     * @returns {number} The executed damage from applying the action to target
+     */
+    _execDamageVal(target, critical, baseValue) {
+        let value = baseValue * this.calcElementRate(target);
+        if (this.isPhysical()) value *= target.pdr;
+        if (this.isMagical()) value *= target.mdr;
+        if (baseValue < 0) value *= target.rec;
+        if (critical) value = this.applyCritical(value);
+        value = this.applyVariance(value, this.item().damage.variance);
+        return Math.round(this.applyGuard(value, target));
+    } // _execDamageVal
+
+    /**
+     * Nullipotent
+     * @author DoubleX @since 0.9.5 @version 0.9.5
+     * @param {number} damage - Amount of damage right before applying critical
+     * @returns {number} The damage multiplier when applying critical
+     */
+    _appliedCriticalMultiplier(damage) { return 3; }
+
+    /**
+     * Nullipotent
+     * @author DoubleX @since 0.9.5 @version 0.9.5
+     * @param {number} damage - Amount of damage right before applying variance
+     * @param {number} variance - The specified variance applied to the damage
+     * @returns {number} The damage addend when applying variance
+     */
+    _appliedVarAddend(damage, variance) {
+        const amp = Math.floor(Math.max((Math.abs(damage) * variance) / 100, 0));
+        const v = Math.randomInt(amp + 1) + Math.randomInt(amp + 1) - amp;
+        return damage >= 0 ? v : -v;
+    } // _appliedVarAddend
+
+    /**
+     * Nullipotent
+     * @author DoubleX @since 0.9.5 @version 0.9.5
+     * @param {number} damage - The amount of damage right before applying guard
+     * @param {Game_Battler} target - The specified target to have guard applied
+     * @returns {number} The damage divisor when applying guard
+     */
+    _appliedGrdDivisor(damage, target) {
+        return damage > 0 && target.isGuard() ? 2 * target.grd : 1;
+    } // _appliedGrdDivisor
+
+    /**
+     * Nullipotent
+     * @author DoubleX @since 0.9.5 @version 0.9.5
+     * @param {Game_Battler} target - The specified target to have hp recovered
+     * @param {ItemEffect} effect - The specified item effect applied to target
+     * @returns {number} Amount of hp recovery applied to the specified target
+     */
+    _recoveredHp(target, effect) {
+        const value = (target.mhp * effect.value1 + effect.value2) * target.rec;
+        return Math.floor(this.isItem() ? value * this.subject().pha : value);
+    } // _recoveredHp
+
+    /**
+     * Nullipotent
+     * @author DoubleX @since 0.9.5 @version 0.9.5
+     * @param {Game_Battler} target - The specified target to have mp recovered
+     * @param {ItemEffect} effect - The specified item effect applied to target
+     * @returns {number} Amount of mp recovery applied to the specified target
+     */
+    _recoveredMp(target, effect) {
+        const value = (target.mmp * effect.value1 + effect.value2) * target.rec;
+        return Math.floor(this.isItem() ? value * this.subject().pha : value);
+    } // _recoveredMp
+
+    /**
+     * Nullipotent
+     * @author DoubleX @since 0.9.5 @version 0.9.5
+     * @param {Game_Battler} target - The specified target to have tp gained
+     * @param {ItemEffect} effect - The specified item effect applied to target
+     * @returns {number} The amount of tp gain applied to the specified target
+     */
+    _gainedTp(target, effect) { return Math.floor(effect.value1); }
+
+    /**
+     * Nullipotent
+     * @author DoubleX @since 0.9.5 @version 0.9.5
+     * @param {Game_Battler} target - The specified target to have state added
+     * @param {ItemEffect} effect - The specified item effect applied to target
+     * @param {id} stateId - The id of the specified attack state to be added
+     * @returns {boolean} Whether the attack state should be added to the target
+     */
+    _isAddAtkState(target, effect, stateId) {
+        /** @todo Figures out whether it's still right for certain hit attack */
+        const chance = effect.value1 * target.stateRate(stateId);
+        //
+        const atkStatesRate = this.subject().attackStatesRate(stateId);
+        const lukEffectRate = this.lukEffectRate(target);
+        return Math.random() < chance * atkStatesRate * lukEffectRate;
+    } // _isAddAtkState
+
+    /**
+     * Nullipotent
+     * @author DoubleX @since 0.9.5 @version 0.9.5
+     * @param {Game_Battler} target - The specified target to have state added
+     * @param {ItemEffect} effect - The specified item effect applied to target
+     * @returns {boolean} Whether the normal state should be added to the target
+     */
+    _isAddNormState(target, effect) {
+        return Math.random() < this._addNormStateChance(target, effect);
+    } // _isAddNormState
+
+    /**
+     * Nullipotent
+     * @author DoubleX @since 0.9.5 @version 0.9.5
+     * @param {Game_Battler} target - The specified target to have state added
+     * @param {ItemEffect} effect - The specified item effect applied to target
+     * @returns {number} Chance of the normal state to be added to the target
+     */
+    _addNormStateChance(target, effect) {
+        const chance = effect.value1;
+        if (this.isCertainHit()) return chance;
+        const stateRate = target.stateRate(effect.dataId);
+        const lukEffectRate = this.lukEffectRate(target);
+        return chance * stateRate * lukEffectRate;
+    } // _addNormStateChance
+
+    /**
+     * Nullipotent
+     * @author DoubleX @since 0.9.5 @version 0.9.5
+     * @param {Game_Battler} target - The specified target to have state removed
+     * @param {ItemEffect} effect - The specified item effect applied to target
+     * @returns {boolean} Whether the state should be removed from the target
+     */
+    _isRemoveState(target, effect) { return Math.random() < effect.value1; }
+
+    /**
+     * Nullipotent
+     * @author DoubleX @since 0.9.5 @version 0.9.5
+     * @param {Game_Battler} target - The specified target to have debuff added
+     * @param {ItemEffect} effect - The specified item effect applied to target
+     * @returns {boolean} Whether the debuff should be added to the target
+     */
+    _isAddDebuff(target, effect) {
+        const lukEffectRate = this.lukEffectRate(target);
+        Math.random() < target.debuffRate(effect.dataId) * lukEffectRate;
+    } // _isAddDebuff
+
+    /**
+     * Nullipotent
+     * @author DoubleX @since 0.9.5 @version 0.9.5
+     * @param {ItemEffect} effect - The specified item effect applied to target
+     * @returns {boolean} Whether the specified item effect's escape
+     */
+    _isItemEffectEsc(effect) {
+        return effect.dataId === Game_Action.SPECIAL_EFFECT_ESCAPE;
+    } // _isItemEffectEsc
+
+    /**
+     * Forces the specified target to escape and notifies the effect's applied
+     * Idempotent
+     * @author DoubleX @since 0.9.5 @version 0.9.5
+     * @param {Game_Battler} target - The specified target to have skill learnt
+     */
+    _itemEffectEsc(target) {
+        target.escape();
+        this.makeSuccess(target);
+    } // _itemEffectEsc
+
+    /**
+     * This method shouldn't be called without the target being an actor
+     * Idempotent
+     * @author DoubleX @since 0.9.5 @version 0.9.5
+     * @param {Game_Actor} target - The specified target to have skill learnt
+     * @param {ItemEffect} effect - The specified item effect applied to target
+     */
+    _itemEffectActorLearnSkill(target, effect) {
+        target.learnSkill(effect.dataId);
+        this.makeSuccess(target);
+    } // _itemEffectActorLearnSkill
+
+    /**
+     * Nullipotent
+     * @author DoubleX @since 0.9.5 @version 0.9.5
+     * @returns {number} The new silent tp applied to this action subject
+     */
+    _gainedSilentTp() {
+        return Math.floor(this.item().tpGain * this.subject().tcr);
+    } // _gainedSilentTp
+
+    /**
+     * Applies each specified item effect if it's indeed a global effect
+     * @author DoubleX @since 0.9.5 @version 0.9.5
+     * @param {ItemEffect} effect - The specified item effect to be applied
+     */
+    _applyGlobalItemEffect(effect) {
+        if (effect.code !== Game_Action.EFFECT_COMMON_EVENT) return;
+        $gameTemp.reserveCommonEvent(effect.dataId);
+    } // _applyGlobalItemEffect
+
+} // Game_Action
+
+/*----------------------------------------------------------------------------
+ *    # Rewritten class: Game_ActionResult
+ *      - Rewrites it into the ES6 standard
+ *----------------------------------------------------------------------------*/
+
+//-----------------------------------------------------------------------------
+// Game_ActionResult
+//
+// The game object class for a result of a battle action. For convinience, all
+// member variables in this class are public.
+class Game_ActionResult {
+
+    constructor() { this.clear(); }
+
+    clear() {
+        this.used = this.missed = this.evaded = this.physical = false;
+        this.drain = this.critical = this.success = this.hpAffected = false;
+        this.hpDamage = this.mpDamage = this.tpDamage = 0;
+        [this.addedStates, this.removedStates] = [[], []];
+        [this.addedBuffs, this.addedDebuffs, this.removedBuffs] = [[], [], []];
+    } // clear
+
+    addedStateObjects() {
+        return this.addedStates.fastMap(id => $dataStates[id]);
+    } // addedStateObjects
+
+    removedStateObjects() {
+        return this.removedStates.fastMap(id => $dataStates[id]);
+    } // removedStateObjects
+
+    isStatusAffected() {
+        if (!this.addedStates.isEmpty()) return true;
+        if (!this.removedStates.isEmpty()) return true;
+        if (!this.addedBuffs.isEmpty()) return true;
+        return !this.addedDebuffs.isEmpty() || !this.removedBuffs.isEmpty();
+    } // isStatusAffected
+
+    isHit() { return this.used && !this.missed && !this.evaded; }
+
+    isStateAdded(stateId) { return this.addedStates.includes(stateId); }
+
+    pushAddedState(stateId) {
+        if (!this.isStateAdded(stateId)) this.addedStates.push(stateId);
+    } // pushAddedState
+
+    isStateRemoved(stateId) { return this.removedStates.includes(stateId); }
+
+    pushRemovedState(stateId) {
+        if (!this.isStateRemoved(stateId)) this.removedStates.push(stateId);
+    } // pushRemovedState
+
+    isBuffAdded(paramId) { return this.addedBuffs.includes(paramId); }
+
+    pushAddedBuff(paramId) {
+        if (!this.isBuffAdded(paramId)) this.addedBuffs.push(paramId);
+    } // pushAddedBuff
+
+    isDebuffAdded(paramId) { return this.addedDebuffs.includes(paramId); }
+
+    pushAddedDebuff(paramId) {
+        if (!this.isDebuffAdded(paramId)) this.addedDebuffs.push(paramId);
+    } // pushAddedDebuff
+
+    isBuffRemoved(paramId) { return this.removedBuffs.includes(paramId); }
+
+    pushRemovedBuff(paramId) {
+        if (!this.isBuffRemoved(paramId)) this.removedBuffs.push(paramId);
+    } // pushRemovedBuff
+
+} // Game_ActionResult
+
+/*----------------------------------------------------------------------------
+ *    # Rewritten class: Game_BattlerBase
+ *      - Rewrites it into the ES6 standard
+ *----------------------------------------------------------------------------*/
+
+//-----------------------------------------------------------------------------
+// Game_BattlerBase
+//
+// The superclass of Game_Battler. It mainly contains parameters calculation.
+class Game_BattlerBase {
+
+    static TRAIT_ELEMENT_RATE = 11;
+    static TRAIT_DEBUFF_RATE = 12;
+    static TRAIT_STATE_RATE = 13;
+    static TRAIT_STATE_RESIST = 14;
+    static TRAIT_PARAM = 21;
+    static TRAIT_XPARAM = 22;
+    static TRAIT_SPARAM = 23;
+    static TRAIT_ATTACK_ELEMENT = 31;
+    static TRAIT_ATTACK_STATE = 32;
+    static TRAIT_ATTACK_SPEED = 33;
+    static TRAIT_ATTACK_TIMES = 34;
+    static TRAIT_ATTACK_SKILL = 35;
+    static TRAIT_STYPE_ADD = 41;
+    static TRAIT_STYPE_SEAL = 42;
+    static TRAIT_SKILL_ADD = 43;
+    static TRAIT_SKILL_SEAL = 44;
+    static TRAIT_EQUIP_WTYPE = 51;
+    static TRAIT_EQUIP_ATYPE = 52;
+    static TRAIT_EQUIP_LOCK = 53;
+    static TRAIT_EQUIP_SEAL = 54;
+    static TRAIT_SLOT_TYPE = 55;
+    static TRAIT_ACTION_PLUS = 61;
+    static TRAIT_SPECIAL_FLAG = 62;
+    static TRAIT_COLLAPSE_TYPE = 63;
+    static TRAIT_PARTY_ABILITY = 64;
+    static FLAG_ID_AUTO_BATTLE = 0;
+    static FLAG_ID_GUARD = 1;
+    static FLAG_ID_SUBSTITUTE = 2;
+    static FLAG_ID_PRESERVE_TP = 3;
+    static ICON_BUFF_START = 32;
+    static ICON_DEBUFF_START = 48;
+
+    get hp() { return this._hp; } // Hit Points
+    get mp() { return this._mp; } // Magic Points
+    get tp() { return this._tp; } // Tactical Points
+    get mhp() { return this.param(0); } // Maximum Hit Points
+    get mmp() { return this.param(1); } // Maximum Magic Points
+    get atk() { return this.param(2); } // ATtacK power
+    get def() { return this.param(3); } // DEFense power
+    get mat() { return this.param(4); } // Magic ATtack power
+    get mdf() { return this.param(5); } // Magic DeFense power
+    get agi() { return this.param(6); } // AGIlity
+    get luk() { return this.param(7); } // LUcK
+    get hit() { return this.xparam(0); } // HIT rate
+    get eva() { return this.xparam(1); } // EVAsion rate
+    get cri() { return this.xparam(2); } // CRItical rate
+    get cev() { return this.xparam(3); } // Critical EVasion rate
+    get mev() { return this.xparam(4); } // Magic EVasion rate
+    get mrf() { return this.xparam(5); } // Magic ReFlection rate
+    get cnt() { return this.xparam(6); } // CouNTer attack rate
+    get hrg() { return this.xparam(7); } // Hp ReGeneration rate
+    get mrg() { return this.xparam(8); } // Mp ReGeneration rate
+    get trg() { return this.xparam(9); } // Tp ReGeneration rate
+    get tgr() { return this.sparam(0); } // TarGet Rate
+    get grd() { return this.sparam(1); } // GuaRD effect rate
+    get rec() { return this.sparam(2); } // RECovery effect rate
+    get pha() { return this.sparam(3); } // PHArmacology
+    get mcr() { return this.sparam(4); } // Mp Cost Rate
+    get tcr() { return this.sparam(5); } // Tp Charge Rate
+    get pdr() { return this.sparam(6); } // Physical Damage Rate
+    get mdr() { return this.sparam(7); } // Magic Damage Rate
+    get fdr() { return this.sparam(8); } // Floor Damage Rate
+    get exr() { return this.sparam(9); } // EXperience Rate
+
+    constructor() { this.initMembers(); }
+
+    initMembers() {
+        this._hp = 1;
+        this._mp = this._tp = 0;
+        this._hidden = false;
+        this.clearParamPlus();
+        this.clearStates();
+        this.clearBuffs();
+    } // initMembers
+
+    clearParamPlus() { this._paramPlus = [0, 0, 0, 0, 0, 0, 0, 0]; }
+
+    clearStates() { [this._states, this._stateTurns] = [[], {}]; }
+
+    eraseState(stateId) {
+        this._states.remove(stateId);
+        delete this._stateTurns[stateId];
+    } // eraseState
+
+    isStateAffected(stateId) { return this._states.includes(stateId); }
+
+    isDeathStateAffected() { return this.isStateAffected(this.deathStateId()); }
+
+    deathStateId() { return 1; }
+
+    resetStateCounts(stateId) {
+        // Edited to help plugins alter reset state counts in better ways
+        this._stateTurns[stateId] = this._newStateCounts(stateId);
+        //
+    } // resetStateCounts
+
+    isStateExpired(stateId) { return this._stateTurns[stateId] === 0; }
+
+    // Edited to help plugins alter update state turns behaviors in better ways
+    updateStateTurns() { this._states.forEach(this._updateStateTurn, this); }
+    //
+
+    clearBuffs() {
+        this._buffs = [0, 0, 0, 0, 0, 0, 0, 0];
+        this._buffTurns = [0, 0, 0, 0, 0, 0, 0, 0];
+    } // clearBuffs
+
+    eraseBuff(paramId) { this._buffs[paramId] = this._buffTurns[paramId] = 0; }
+
+    buffLength() { return this._buffs.length; }
+
+    buff(paramId) { return this._buffs[paramId]; }
+
+    isBuffAffected(paramId) { return this._buffs[paramId] > 0; }
+
+    isDebuffAffected(paramId) { return this._buffs[paramId] < 0; }
+
+    isBuffOrDebuffAffected(paramId) { return this._buffs[paramId] !== 0; }
+
+    isMaxBuffAffected(paramId) { return this._buffs[paramId] === 2; }
+
+    isMaxDebuffAffected(paramId) { return this._buffs[paramId] === -2; }
+
+    increaseBuff(paramId) {
+        if (!this.isMaxBuffAffected(paramId)) this._buffs[paramId]++;
+    } // increaseBuff
+
+    decreaseBuff(paramId) {
+        if (!this.isMaxDebuffAffected(paramId)) this._buffs[paramId]--;
+    } // decreaseBuff
+
+    overwriteBuffTurns(paramId, turns) {
+        if (this._buffTurns[paramId] < turns) this._buffTurns[paramId] = turns;
+    } // overwriteBuffTurns
+
+    isBuffExpired(paramId) { return this._buffTurns[paramId] === 0; }
+
+    updateBuffTurns() {
+        // Edited to help plugins alter update buff turns in better ways
+        this._buffTurns.forEach((buffTurn, i) => this._updateBuffTurn(i));
+        //
+    } // updateBuffTurns
+
+    die() {
+        this._hp = 0;
+        this.clearStates();
+        this.clearBuffs();
+    } // die
+
+    revive() { if (this._hp === 0) this._hp = 1; }
+
+    states() { return this._states.fastMap(id => $dataStates[id]); }
+
+    stateIcons() {
+        return this.states().mapFilter(state => state.iconIndex, iconIndex => {
+            return iconIndex > 0;
+        });
+    } // stateIcons
+
+    buffIcons() {
+        return this._buffs.reduce((icons, buff, i) => {
+            if (buff !== 0) icons.push(this.buffIconIndex(buff, i));
+            return icons;
+        }, []);
+    } // buffIcons
+
+    buffIconIndex(buffLevel, paramId) {
+        // Edited to help plugins alter buff incon index in better ways
+        if (buffLevel > 0) {
+            return this._positiveBuffIconIndex(buffLevel, paramId);
+        } else if (buffLevel < 0) {
+            return this._negativeBuffIconIndex(buffLevel, paramId);
+        } else return 0;
+        //
+    } // buffIconIndex
+
+    allIcons() { return this.stateIcons().fastMerge(this.buffIcons()); }
+    
+    // Returns an array of the all objects having traits. States only here.
+    traitObjects() { return this.states(); }
+
+    allTraits() {
+        return this.traitObjects().reduce((r, obj) => {
+            return r.fastMerge(obj.traits);
+        }, []);
+    } // allTraits
+
+    traits(code) {
+        return this.allTraits().filter(trait => trait.code === code);
+    } // traits
+
+    traitsWithId(code, id) {
+        return this.allTraits().filter(trait => {
+            return trait.code === code && trait.dataId === id;
+        });
+    } // traitsWithId
+
+    traitsPi(code, id) {
+        return this.traitsWithId(code, id).reduce((r, { value }) => {
+            return r * value;
+        }, 1);
+    } // traitsPi
+
+    traitsSum(code, id) {
+        return this.traitsWithId(code, id).reduce((r, { value }) => {
+            return r + value;
+        }, 0);
+    } // traitsSum
+
+    traitsSumAll(code) {
+        return this.traits(code).reduce((r, { value }) => r + value, 0);
+    } // traitsSumAll
+
+    traitsSet(code) {
+        return this.traits(code).reduce((r, { dataId }) => {
+            return r.fastMerge(dataId);
+        }, []);
+    } // traitsSet
+
+    paramBase(/*paramId*/) { return 0; }
+
+    paramPlus(paramId) { return this._paramPlus[paramId]; }
+
+    paramBasePlus(paramId) {
+        return Math.max(0, this.paramBase(paramId) + this.paramPlus(paramId));
+    } // paramBasePlus
+
+    paramMin(paramId) { return paramId === 0 ? 1 /* MHP */ : 0; }
+
+    paramMax(/*paramId*/) { return Infinity; }
+
+    paramRate(paramId) {
+        return this.traitsPi(Game_BattlerBase.TRAIT_PARAM, paramId);
+    } // paramRate
+
+    paramBuffRate(paramId) { return this._buffs[paramId] * 0.25 + 1.0; }
+
+    param(paramId) {
+        const paramBasePlus = this.paramBasePlus(paramId);
+        const paramRate = this.paramRate(paramId);
+        const value = paramBasePlus * paramRate * this.paramBuffRate(paramId);
+        const minValue = this.paramMin(paramId);
+        return Math.round(value.clamp(minValue, this.paramMax(paramId)));
+    } // param
+
+    xparam(xparamId) {
+        return this.traitsSum(Game_BattlerBase.TRAIT_XPARAM, xparamId);
+    } // xparam
+
+    sparam(sparamId) {
+        return this.traitsPi(Game_BattlerBase.TRAIT_SPARAM, sparamId);
+    } // sparam
+
+    elementRate(elementId) {
+        return this.traitsPi(Game_BattlerBase.TRAIT_ELEMENT_RATE, elementId);
+    } // elementRate
+
+    debuffRate(paramId) {
+        return this.traitsPi(Game_BattlerBase.TRAIT_DEBUFF_RATE, paramId);
+    } // debuffRate
+
+    stateRate(stateId) {
+        return this.traitsPi(Game_BattlerBase.TRAIT_STATE_RATE, stateId);
+    } // stateRate
+
+    stateResistSet() {
+        return this.traitsSet(Game_BattlerBase.TRAIT_STATE_RESIST);
+    } // stateResistSet
+
+    isStateResist(stateId) { return this.stateResistSet().includes(stateId); }
+
+    attackElements() {
+        return this.traitsSet(Game_BattlerBase.TRAIT_ATTACK_ELEMENT);
+    } // attackElements
+
+    attackStates() {
+        return this.traitsSet(Game_BattlerBase.TRAIT_ATTACK_STATE);
+    } // attackStates
+
+    attackStatesRate(stateId) {
+        return this.traitsSum(Game_BattlerBase.TRAIT_ATTACK_STATE, stateId);
+    } // attackStatesRate
+
+    attackSpeed() {
+        return this.traitsSumAll(Game_BattlerBase.TRAIT_ATTACK_SPEED);
+    } // attackSpeed
+
+    attackTimesAdd() {
+        return Math.max(this.traitsSumAll(Game_BattlerBase.TRAIT_ATTACK_TIMES), 0);
+    } // attackTimesAdd
+
+    attackSkillId() {
+        /** @todo Dries up these codes representing identical knowledge */
+        const set = this.traitsSet(Game_BattlerBase.TRAIT_ATTACK_SKILL);
+        return set.length > 0 ? Math.max(...set) : 1;
+        //
+    } // attackSkillId
+
+    addedSkillTypes() {
+        return this.traitsSet(Game_BattlerBase.TRAIT_STYPE_ADD);
+    } // addedSkillTypes
+
+    isSkillTypeSealed(stypeId) {
+        return this.traitsSet(Game_BattlerBase.TRAIT_STYPE_SEAL).includes(stypeId);
+    } // isSkillTypeSealed
+
+    addedSkills() { return this.traitsSet(Game_BattlerBase.TRAIT_SKILL_ADD); }
+
+    isSkillSealed(skillId) {
+        return this.traitsSet(Game_BattlerBase.TRAIT_SKILL_SEAL).includes(skillId);
+    } // isSkillSealed
+
+    isEquipWtypeOk(wtypeId) {
+        return this.traitsSet(Game_BattlerBase.TRAIT_EQUIP_WTYPE).includes(wtypeId);
+    } // isEquipWtypeOk
+
+    isEquipAtypeOk(atypeId) {
+        return this.traitsSet(Game_BattlerBase.TRAIT_EQUIP_ATYPE).includes(atypeId);
+    } // isEquipAtypeOk
+
+    isEquipTypeLocked(etypeId) {
+        return this.traitsSet(Game_BattlerBase.TRAIT_EQUIP_LOCK).includes(etypeId);
+    } // isEquipTypeLocked
+
+    isEquipTypeSealed(etypeId) {
+        return this.traitsSet(Game_BattlerBase.TRAIT_EQUIP_SEAL).includes(etypeId);
+    } // isEquipTypeSealed
+
+    slotType() {
+        /** @todo Dries up these codes representing identical knowledge */
+        const set = this.traitsSet(Game_BattlerBase.TRAIT_SLOT_TYPE);
+        return set.length > 0 ? Math.max(...set) : 0;
+        //
+    } // slotType
+
+    isDualWield() { return this.slotType() === 1; }
+
+    actionPlusSet() {
+        return this.traits(Game_BattlerBase.TRAIT_ACTION_PLUS).fastMap(trait => {
+            return trait.value;
+        });
+    } // actionPlusSet
+
+    specialFlag(flagId) {
+        return this.traits(Game_BattlerBase.TRAIT_SPECIAL_FLAG).some(trait => {
+            return trait.dataId === flagId;
+        });
+    } // specialFlag
+
+    collapseType() {
+        /** @todo Dries up these codes representing identical knowledge */
+        const set = this.traitsSet(Game_BattlerBase.TRAIT_COLLAPSE_TYPE);
+        return set.length > 0 ? Math.max(...set) : 0;
+        //
+    } // collapseType
+
+    partyAbility(abilityId) {
+        return this.traits(Game_BattlerBase.TRAIT_PARTY_ABILITY).some(trait => {
+            return trait.dataId === abilityId;
+        });
+    } // partyAbility
+
+    isAutoBattle() {
+        return this.specialFlag(Game_BattlerBase.FLAG_ID_AUTO_BATTLE);
+    } // isAutoBattle
+
+    isGuard() {
+        if (!this.specialFlag(Game_BattlerBase.FLAG_ID_GUARD)) return false;
+        return this.canMove();
+    } // isGuard
+
+    isSubstitute() {
+        if (!this.specialFlag(Game_BattlerBase.FLAG_ID_SUBSTITUTE)) {
+            return false;
+        } else return this.canMove();
+    } // isSubstitute
+
+    isPreserveTp() {
+        return this.specialFlag(Game_BattlerBase.FLAG_ID_PRESERVE_TP);
+    } // isPreserveTp
+
+    addParam(paramId, value) {
+        this._paramPlus[paramId] += value;
+        this.refresh();
+    } // addParam
+
+    setHp(hp) {
+        this._hp = hp;
+        this.refresh();
+    } // setHp
+
+    setMp(mp) {
+        this._mp = mp;
+        this.refresh();
+    } // setMp
+
+    setTp(tp) {
+        this._tp = tp;
+        this.refresh();
+    } // setTp
+
+    maxTp() { return 100; }
+
+    refresh() {
+        this.stateResistSet().forEach(this.eraseState, this);
+        this._hp = this._hp.clamp(0, this.mhp);
+        this._mp = this._mp.clamp(0, this.mmp);
+        this._tp = this._tp.clamp(0, this.maxTp());
+    } // refresh
+
+    recoverAll() {
+        this.clearStates();
+        [this._hp, this._mp] = [this.mhp, this.mmp];
+    } // recoverAll
+
+    hpRate() { return this.hp / this.mhp; }
+
+    mpRate() { return this.mmp > 0 ? this.mp / this.mmp : 0; }
+
+    tpRate() { return this.tp / this.maxTp(); }
+
+    hide() { this._hidden = true; }
+
+    appear() { this._hidden = false; }
+
+    isHidden() { return this._hidden; }
+
+    isAppeared() { return !this.isHidden(); }
+
+    isDead() { return this.isAppeared() && this.isDeathStateAffected(); }
+
+    isAlive() { return this.isAppeared() && !this.isDeathStateAffected(); }
+
+    // Edited to help plugins alter is dying behaviors in better ways
+    isDying() { return this.isAlive() && this._isLowHp(); }
+    //
+
+    isRestricted() { return this.isAppeared() && this.restriction() > 0; }
+
+    canInput() {
+        if (!this.isAppeared() || !this.isActor()) return false;
+        return !this.isRestricted() && !this.isAutoBattle();
+    } // canInput
+
+    canMove() { return this.isAppeared() && this.restriction() < 4; }
+
+    isConfused() {
+        if (!this.isAppeared()) return false;
+        return this.restriction() >= 1 && this.restriction() <= 3;
+    } // isConfused
+
+    confusionLevel() { return this.isConfused() ? this.restriction() : 0; }
+
+    isActor() { return false; }
+
+    isEnemy() { return false; }
+
+    // Edited to help plugins alter sort states behaviors in better ways
+    sortStates() { this._states.sort(this._sortState, this); }
+    //
+
+    restriction() {
+        const restrictions = this.states().fastMap(state => state.restriction);
+        return Math.max(0, ...restrictions);
+    } // restriction
+
+    addNewState(stateId) {
+        if (stateId === this.deathStateId()) this.die();
+        const wasRestricted = this.isRestricted();
+        this._states.push(stateId);
+        this.sortStates();
+        const isRestricted = this.isRestricted();
+        if (!wasRestricted && isRestricted) this.onRestrict();
+        // Added to help plugins listen to the unrestrict events
+        if (wasRestricted && !isRestricted) this._onUnrestrict();
+        //
+    } // addNewState
+
+    onRestrict() {}
+
+    mostImportantStateText() {
+        const importantState_ = this.states().find(({ message3 }) => message3);
+        return importantState_ ? importantState_.message3 : "";
+    } // mostImportantStateText
+
+    stateMotionIndex() {
+        /** @todo Dries up these codes representing identical knowledge */
+        const firstState_ = this.states()[0];
+        return firstState_ ? firstState_.motion : 0;
+        //
+    } // stateMotionIndex
+
+    stateOverlayIndex() {
+        /** @todo Dries up these codes representing identical knowledge */
+        const firstState_ = this.states()[0];
+        return firstState_ ? firstState_.overlay : 0;
+        //
+    } // stateOverlayIndex
+
+    isSkillWtypeOk(/*skill*/) { return true; }
+
+    skillMpCost(skill) { return Math.floor(skill.mpCost * this.mcr); }
+
+    skillTpCost(skill) { return skill.tpCost; }
+
+    canPaySkillCost(skill) {
+        if (this._tp < this.skillTpCost(skill)) return false;
+        return this._mp >= this.skillMpCost(skill);
+    } // canPaySkillCost
+
+    paySkillCost(skill) {
+        this._mp -= this.skillMpCost(skill);
+        this._tp -= this.skillTpCost(skill);
+    } // paySkillCost
+
+    isOccasionOk(item) {
+        const { occasion } = item;
+        if ($gameParty.inBattle()) return occasion === 0 || occasion === 1;
+        return occasion === 0 || occasion === 2;
+    } // isOccasionOk
+
+    meetsUsableItemConditions(item) {
+        return this.canMove() && this.isOccasionOk(item);
+    } // meetsUsableItemConditions
+
+    meetsSkillConditions(skill) {
+        if (!this.meetsUsableItemConditions(skill)) return false;
+        if (!this.isSkillWtypeOk(skill)) return false;
+        if (!this.canPaySkillCost(skill)) return false;
+        if (this.isSkillSealed(skill.id)) return false;
+        return !this.isSkillTypeSealed(skill.stypeId);
+    } // meetsSkillConditions
+
+    meetsItemConditions(item) {
+        return this.meetsUsableItemConditions(item) && $gameParty.hasItem(item);
+    } // meetsItemConditions
+
+    canUse(item) {
+        if (!item) return false;
+        if (DataManager.isSkill(item)) return this.meetsSkillConditions(item);
+        return DataManager.isItem(item) && this.meetsItemConditions(item);
+    } // canUse
+
+    canEquip(item) {
+        if (!item) return false;
+        if (DataManager.isWeapon(item)) return this.canEquipWeapon(item);
+        return DataManager.isArmor(item) && this.canEquipArmor(item);
+    } // canEquip
+
+    canEquipWeapon(item) {
+        if (!this.isEquipWtypeOk(item.wtypeId)) return false;
+        return !this.isEquipTypeSealed(item.etypeId);
+    } // canEquipWeapon
+
+    canEquipArmor(item) {
+        if (!this.isEquipAtypeOk(item.atypeId)) return false;
+        return !this.isEquipTypeSealed(item.etypeId);
+    } // canEquipArmor
+
+    guardSkillId() { return 2; }
+
+    canAttack() { return this.canUse($dataSkills[this.attackSkillId()]); }
+
+    canGuard() { return this.canUse($dataSkills[this.guardSkillId()]); }
+
+    /**
+     * Nullipotent
+     * @author DoubleX @since 0.9.5 @version 0.9.5
+     * @param {id} stateId - The id of the state to have its turn count reset
+     * @returns {number} The reset state count of the state with the state id
+     */
+    _newStateCount(stateId) {
+        const { maxTurns, minTurns } = $dataStates[stateId];
+        return minTurns + Math.randomInt(1 + Math.max(maxTurns - minTurns, 0));
+    } // _newStateCount
+
+    /**
+     * Updates the turn counter of the state with the specified state id
+     * @author DoubleX @since 0.9.5 @version 0.9.5
+     * @param {id} stateId - The id of the state to have its turn count updated
+     */
+    _updateStateTurn(stateId) {
+        if (this._stateTurns[stateId] > 0) this._stateTurns[stateId]--;
+    } // _updateStateTurn
+
+    /**
+     * Updates the turn counter of the buff with the specified parameter id
+     * @author DoubleX @since 0.9.5 @version 0.9.5
+     * @param {index} paramId - Param id of the buff to have its turn updated
+     */
+    _updateBuffTurn(paramId) {
+        if (this._buffTurns[paramId] > 0) this._buffTurns[paramId]--;
+    } // _updateBuffTurn
+
+    /**
+     * Nullipotent
+     * @author DoubleX @since 0.9.5 @version 0.9.5
+     * @param {number} bufflevel - The current buff level of this battler
+     * @param {index} paramId - The param id of the current buff of this battler
+     * @returns {index} The icon index of the current buff of this battler
+     */
+    _positiveBuffIconIndex(buffLevel, paramId) {
+        const iconStart = Game_BattlerBase.ICON_BUFF_START;
+        return iconStart + (buffLevel - 1) * 8 + paramId;
+    } // _positiveBuffIconIndex
+
+    /**
+     * Nullipotent
+     * @author DoubleX @since 0.9.5 @version 0.9.5
+     * @param {number} bufflevel - The current debuff level of this battler
+     * @param {index} paramId - Param id of the current debuff of this battler
+     * @returns {index} The icon index of the current debuff of this battler
+     */
+    _negativeBuffIconIndex(buffLevel, paramId) {
+        const iconStart = Game_BattlerBase.ICON_DEBUFF_START;
+        return iconStart + (-buffLevel - 1) * 8 + paramId;
+    } // _negativeBuffIconIndex
+
+    /**
+     * Nullipotent
+     * @author DoubleX @since 0.9.5 @version 0.9.5
+     * @returns {boolean} Whether the battler's current hp's considered as low
+     */
+    _isLowHp() { return this._hp < this.mhp / 4; }
+
+    /**
+     * Nullipotent
+     * @author DoubleX @since 0.9.5 @version 0.9.5
+     * @param {id} damage - Amount of damage right before applying critical
+     * @returns {number} State sorting direction(-ve: ascending/+ve: descending)
+     */
+    _sortState(a, b) {
+        const [p1, p2] = [$dataStates[a].priority, $dataStates[b].priority];
+        return p1 !== p2 ? p2 - p1 : a - b;
+    } // _sortState
+
+    /**
+     * Triggers events to happen upon becoming no longer restricted
+     * @author DoubleX @since 0.9.5 @version 0.9.5
+     */
+    _onUnrestrict() {}
+
+} // Game_BattlerBase
