@@ -16,10 +16,12 @@
  *       further facilitate more effective and efficient plugin development by
  *       making the default RMMZ codebase quality improvements even more
  *       drastic
- *    4. This plugin also helps converting RMMV plugins into RMMZ counterparts
+ *    4. This plugin also fixed some bugs and further improved performance in
+ *       the default RMMZ codebase
+ *    5. This plugin also helps converting RMMV plugins into RMMZ counterparts
  *       by porting default MV classes/functions/methodsvariables/ not present
  *       in the default RMMZ codebase
- *    5. THIS PLUGIN'S INTENDED TO GIVES AN EXTRA OPTION TO PLUGIN DEVELOPERS
+ *    6. THIS PLUGIN'S INTENDED TO GIVES AN EXTRA OPTION TO PLUGIN DEVELOPERS
  *       RATHER THAN REPLACING THE DEFAULT RMMZ CODEBASE
  *----------------------------------------------------------------------------
  *    # Terms Of Use
@@ -125,6 +127,47 @@
  *
  * @help
  *============================================================================
+ *    ## Plugin Users Info
+ *----------------------------------------------------------------------------
+ *    # Fixed bugs
+ *      1. The RMMZ hardcodes the game loop fps to be 60, and can be
+ *         problematic when targeting players with low end mobiles
+ *         - This plugin lets you change the game loop fps by this script call:
+ *           Graphics.fps = newFps
+ *           Where newFps is the game loop fps
+ *         - This can be useful as a performance stress test by raising the
+ *           game loop fps to 120, or when targeting low end mobiles by
+ *           capping the game loop fps to 30
+ *      2. The faulty damage formula will just silently return 0 damage
+ *         instead of informing you what faults are in which damage formula
+ *         - This plugin lets you know them by this script call:
+ *           Game_Action.IS_SHOW_DAMAGE_FORMULA_ERRS = true
+ *           Which is useful when testing the damage formulae
+ *         - Alternatively, if you don't want your players to know anything
+ *           about the damage formula, you can use this script call:
+ *           Game_Action.IS_SHOW_DAMAGE_FORMULA_ERRS = false
+ *           Which is useful when the game's about to be published
+ *      3. Any damage formula having side effects will have those side effects
+ *         leaked out in the battle when some autobattle actors having those
+ *         skills/items input actions
+ *         - This plugin temporarily removes the side effect parts of all
+ *           damage formulae of skills/items of autobattle actors when they
+ *           input actions, but those side effects will still be there when
+ *           the inputted actions are actually executed
+ *         - It's done by replacing the damage formula string with the regular
+ *           expression stored in
+ *           Game_Action.NO_SIDE_EFFECT_DAMAGE_FORMULA_REGEX, and its default
+ *           value is new RegExp(".*[};] *", "gim"), meaning that anything
+ *           before the last } or ; will be temporarily removed from the
+ *           damage formula
+ *         - If that default regular expression doesn't suit your needs, you
+ *           can change Game_Action.NO_SIDE_EFFECT_DAMAGE_FORMULA_REGEX to be
+ *           a suitable counterpart
+ *         - Regardless of how the regular expression's written, you should
+ *           standardize your damage formula so the side effect parts can
+ *           always be reliably removed with an easy, simple and small regular
+ *           expression
+ *============================================================================
  *    ## Plugin Developers Info
  *----------------------------------------------------------------------------
  *    # Aliasing functions/methods without prototyping on your side
@@ -206,9 +249,26 @@
  *          leaking bug when those actor input actions
  *     Game_BattlerBase
  *     - Instance Method
- *       1. _onUnrestrict
+ *       1. onUnrestrict
  *          Triggers events to happen when a battler becomes no longer
  *          restricted
+ *     Game_Battler
+ *     - Instance Method
+ *       1. isTpbActing
+ *          Returns whether the battler's executing tpb actions
+ *       2. isTpbCharging
+ *          Returns whether the battler's charging the tpb bar
+ *       3. isTpbCasting
+ *          Returns whether the battler's casting tpb actions
+ *       4. onTpbReady
+ *          Triggers events to happen when the battler just finished casting
+ *          tpb actions
+ *       5. isEndTpbCharging
+ *          Returns whether the tpb battler's just ended charging the tpb bar
+ *       6. isEndTpbCasting
+ *          Returns whether the tpb battler's just ended casting actions
+ *       7. isTpbIdle
+ *          Returns whether the battler tpb bar's idle(not doing anything)
  *   # New private functions/methods/variables
  *     Search "ed to help plugins" for such additions in the plugin(too many
  *     to be listed here)
@@ -382,6 +442,14 @@
  *     2. Game_Picture
  *        Instance Method
  *        - erase
+ *     3. Game_Battler
+ *        Instance Methods
+ *        - clearAnimations
+ *        - isAnimationRequested
+ *        - shiftAnimation
+ *        - startAnimation
+ *        Instance Variables
+ *        - _animations
  *============================================================================
  */
 
@@ -9657,7 +9725,7 @@ class StorageManager {
     static _onUpdateForageKeySuc(keys) {
         [this._forageKeys, this._forageKeysUpdated] = [keys, true];
     } // _onUpdateForageKeySuc
-    
+
     // RMMV static functions not present in the default RMMZ codebase
     static localFileBackupExists(savefileId) {
         var fs = require('fs');
@@ -9681,7 +9749,7 @@ class StorageManager {
 
     static localFileDirectoryPath() {
         var path = require('path');
-    
+
         var base = path.dirname(process.mainModule.filename);
         return path.join(base, 'save/');
     }
@@ -11780,7 +11848,7 @@ class BattleManager {
             return this._isUpdateEventMain = true;
         }
         $gameTroop.setupBattleEvent();
-        return this._isUpdateEventMain = 
+        return this._isUpdateEventMain =
                 $gameTroop.isEventRunning() || SceneManager.isSceneChanging();
         //
     } // updateEventMain
@@ -12019,7 +12087,7 @@ class BattleManager {
     static allBattleMembers() {
         return $gameParty.battleMembers().fastMerge($gameTroop.members());
     } // allBattleMembers
-     
+
     // Edited to help plugins alter make action orders in better ways
     static makeActionOrders() { this._actionBattlers = this._newActBattlers(); }
     //
@@ -12680,7 +12748,7 @@ class Game_Temp {
      * @author DoubleX @since 0.9.5 @version 0.9.5
      * @param {[Game_Character]} targets - The list of targets to have animation
      * @param {id} animationId - The id of the animation to be requested
-     * @param {boolean} mirror - 
+     * @param {boolean} mirror -
      */
     _requestExistingAnimation(targets, animationId, mirror) {
         this._animationQueue.push({ targets, animationId, mirror });
@@ -13366,7 +13434,7 @@ class Game_Screen {
     movePicture(pictureId, origin, x, y, scaleX, scaleY, opacity, blendMode, duration, easingType) {
         const picture = this.picture(pictureId);
         // prettier-ignore
-        if (picture) picture.move(origin, x, y, scaleX, scaleY, opacity, 
+        if (picture) picture.move(origin, x, y, scaleX, scaleY, opacity,
                 blendMode, duration, easingType);
     } // movePicture
 
@@ -15061,7 +15129,7 @@ class Game_BattlerBase {
     } // buffIconIndex
 
     allIcons() { return this.stateIcons().fastMerge(this.buffIcons()); }
-    
+
     // Returns an array of the all objects having traits. States only here.
     traitObjects() { return this.states(); }
 
@@ -15358,7 +15426,7 @@ class Game_BattlerBase {
         const isRestricted = this.isRestricted();
         if (!wasRestricted && isRestricted) this.onRestrict();
         // Added to help plugins listen to the unrestrict events
-        if (wasRestricted && !isRestricted) this._onUnrestrict();
+        if (wasRestricted && !isRestricted) this.onUnrestrict();
         //
     } // addNewState
 
@@ -15450,6 +15518,12 @@ class Game_BattlerBase {
     canGuard() { return this.canUse($dataSkills[this.guardSkillId()]); }
 
     /**
+     * Triggers events to happen upon becoming no longer restricted
+     * @author DoubleX @interface @since 0.9.5 @version 0.9.5
+     */
+    onUnrestrict() {}
+
+    /**
      * Nullipotent
      * @author DoubleX @since 0.9.5 @version 0.9.5
      * @param {id} stateId - The id of the state to have its turn count reset
@@ -15520,10 +15594,899 @@ class Game_BattlerBase {
         return p1 !== p2 ? p2 - p1 : a - b;
     } // _sortState
 
+} // Game_BattlerBase
+
+/*----------------------------------------------------------------------------
+ *    # Rewritten class: Game_Battler
+ *      - Rewrites it into the ES6 standard
+ *----------------------------------------------------------------------------*/
+
+//-----------------------------------------------------------------------------
+// Game_Battler
+//
+// The superclass of Game_Actor and Game_Enemy. It contains methods for sprites
+// and actions.
+class Game_Battler extends Game_BattlerBase {
+
+    initMembers() {
+        super();
+        [this._actions, this._speed] = [[], 0];
+        [this._result, this._actionState] = [new Game_ActionResult(), ""];
+        [this._lastTargetIndex, this._damagePopup] = [0, false];
+        this._effectType = this._motionType = null;
+        this._weaponImageId = 0;
+        this._motionRefresh = this._selected = false;
+        this._tpbState = "";
+        this._tpbChargeTime = this._tpbCastTime = this._tpbIdleTime = 0;
+        [this._tpbTurnCount, this._tpbTurnEnd] = [0, false];
+        // RMMV instance variable not present in the default RMMZ codebase
+        this._animations = [];
+        //
+    } // initMembers
+
+    clearDamagePopup() { this._damagePopup = false; }
+
+    clearWeaponAnimation() { this._weaponImageId = 0; }
+
+    clearEffect() { this._effectType = null; }
+
+    clearMotion() { [this._motionType, this._motionRefresh] = [null, false]; }
+
+    requestEffect(effectType) { this._effectType = effectType; }
+
+    requestMotion(motionType) { this._motionType = motionType; }
+
+    requestMotionRefresh() { this._motionRefresh = true; }
+
+    select() { this._selected = true; }
+
+    deselect() { this._selected = false; }
+
+    isDamagePopupRequested() { return this._damagePopup; }
+
+    isEffectRequested() { return !!this._effectType; }
+
+    isMotionRequested() { return !!this._motionType; }
+
+    isWeaponAnimationRequested() { return this._weaponImageId > 0; }
+
+    isMotionRefreshRequested() { return this._motionRefresh; }
+
+    isSelected() { return this._selected; }
+
+    effectType() { return this._effectType; }
+
+    motionType() { return this._motionType; }
+
+    weaponImageId() { return this._weaponImageId; }
+
+    startDamagePopup() { this._damagePopup = true; }
+
+    shouldPopupDamage() {
+        const result = this._result;
+        if (result.missed || result.evaded || result.hpAffected) return true;
+        return result.mpDamage !== 0;
+    } // shouldPopupDamage
+
+    startWeaponAnimation(weaponImageId) { this._weaponImageId = weaponImageId; }
+
+    action(index) { return this._actions[index]; }
+
+    setAction(index, action) { this._actions[index] = action; }
+
+    numActions() { return this._actions.length; }
+
+    clearActions() { this._actions = []; }
+
+    result() { return this._result; }
+
+    clearResult() { this._result.clear(); }
+
+    clearTpbChargeTime() {
+        [this._tpbState, this._tpbChargeTime] = ["charging", 0];
+    } // clearTpbChargeTime
+
+    applyTpbPenalty() {
+        this._tpbState = "charging";
+        this._tpbChargeTime -= 1;
+    } // applyTpbPenalty
+
+    initTpbChargeTime(advantageous) {
+        this._tpbState = "charging";
+        // Edited to help plugins alter init tpb charge time in better ways
+        this._tpbChargeTime = this._initializedTpbChargeTime(advantageous);
+        //
+    } // initTpbChargeTime
+
+    tpbChargeTime() { return this._tpbChargeTime; }
+
+    startTpbCasting() { [this._tpbState, this._tpbCastTime] = ["casting", 0]; }
+
+    startTpbAction() { this._tpbState = "acting"; }
+
+    isTpbCharged() { return this._tpbState === "charged"; }
+
+    isTpbReady() { return this._tpbState === "ready"; }
+
+    isTpbTimeout() { return this._tpbIdleTime >= 1; }
+
+    updateTpb() {
+        // Edited to help plugins alter update tpb behaviors in better ways
+        if (this.canMove()) this._updateTpbWhenMovable();
+        //
+        if (this.isAlive()) this.updateTpbIdleTime();
+    } // updateTpb
+
+    updateTpbChargeTime() {
+        // Edited to help plugins alter update tpb charge time in better ways
+        if (this.isTpbCharging()) this._onUpdateTpbChargeTime();
+        //
+    } // updateTpbChargeTime
+
+    updateTpbCastTime() {
+        // Edited to help plugins alter update tpb cast time in better ways
+        if (this.isTpbCasting()) this._onUpdateTpbCastTime();
+        //
+    } // updateTpbCastTime
+
+    updateTpbAutoBattle() {
+        // Edited to help plugins alter update tpb auto battle in better ways
+        if (this._isMakeAutoTpbActs()) this.makeTpbActions();
+        //
+    } // updateTpbAutoBattle
+
+    // Edited to help plugins alter update tpb idle time in better ways
+    updateTpbIdleTime() { if (this.isTpbIdle()) this._onUpdateTpbIdleTime(); }
+    //
+
+    tpbAcceleration() {
+        return this.tpbRelativeSpeed() / $gameParty.tpbReferenceTime();
+    } // tpbAcceleration
+
+    tpbRelativeSpeed() { return this.tpbSpeed() / $gameParty.tpbBaseSpeed(); }
+
+    tpbSpeed() { return Math.sqrt(this.agi) + 1; }
+
+    tpbBaseSpeed() { return Math.sqrt(this.paramBasePlus(6)) + 1; }
+
+    tpbRequiredCastTime() {
+        // Edited to help plugins alter tpb required case time in better ways
+        return Math.sqrt(this._castDelay()) / this.tpbSpeed();
+        //
+    } // tpbRequiredCaseTime
+
+    onTpbCharged() { if (!this.shouldDelayTpbCharge()) this.finishTpbCharge(); }
+
+    shouldDelayTpbCharge() {
+        return !BattleManager.isActiveTpb() && $gameParty.canInput();
+    } // shouldDelayTpbCharge
+
+    finishTpbCharge() {
+        this._tpbState = "charged";
+        [this._tpbTurnEnd, this._tpbIdleTime] = [true, 0];
+    } // finishTpbCharge
+
+    isTpbTurnEnd() { return this._tpbTurnEnd; }
+
+    initTpbTurn() {
+        this._tpbTurnEnd = false;
+        this._tpbTurnCount = this._tpbIdleTime = 0;
+    } // initTpbTurn
+
+    startTpbTurn() {
+        this._tpbTurnEnd = false;
+        this._tpbTurnCount++;
+        this._tpbIdleTime = 0;
+        if (this.numActions() === 0) this.makeTpbActions();
+    } // startTpbTurn
+
+    makeTpbActions() {
+        this.makeActions();
+        if (this.canInput()) return this.setActionState("undecided");
+        // Edited to help plugins alter make tpb actions in better ways
+        this._onAutoInputTpbActs();
+        //
+    } // makeTpbActions
+
+    onTpbTimeout() {
+        this.onAllActionsEnd();
+        [this._tpbTurnEnd, this._tpbIdleTime] = [true, 0];
+    } // onTpbTimeout
+
+    turnCount() {
+        if (BattleManager.isTpb()) return this._tpbTurnCount;
+        return $gameTroop.turnCount() + 1;
+    } // turnCount
+
+    canInput() {
+        if (BattleManager.isTpb() && !this.isTpbCharged()) return false;
+        return super.canInput();
+    } // canInput
+
+    refresh() {
+        super.refresh();
+        if (this.hp === 0) return this.addState(this.deathStateId());
+        this.removeState(this.deathStateId());
+    } // refresh
+
+    addState(stateId) {
+        // Edited to help plugins alter add state behaviors in better ways
+        if (this.isStateAddable(stateId)) this._onAddState(stateId);
+        //
+    } // addState
+
+    isStateAddable(stateId) {
+        if (!this.isAlive() || !$dataStates[stateId]) return false;
+        return !this.isStateResist(stateId) && !this.isStateRestrict(stateId);
+    } // isStateAddable
+
+    isStateRestrict(stateId) {
+        return $dataStates[stateId].removeByRestriction && this.isRestricted();
+    } // isStateRestrict
+
+    onRestrict() {
+        super.onRestrict();
+        this.clearTpbChargeTime();
+        this.clearActions();
+        // Edited to help plugins alter on restrict behaviors in better ways
+        this.states().forEach(this._removeStateByRestriction, this);
+        //
+    } // onRestrict
+
+    removeState(stateId) {
+        // Edited to help plugins alter remove state behaviors in better ways
+        if (this.isStateAffected(stateId)) this._onRemoveState(stateId);
+        //
+    } // removeState
+
+    escape() {
+        if ($gameParty.inBattle()) this.hide();
+        this.clearActions();
+        this.clearStates();
+        SoundManager.playEscape();
+    } // escape
+
+    addBuff(paramId, turns) {
+        // Edited to help plugins alter add buff behaviors in better ways
+        if (this.isAlive()) this._onAddBuff(paramId, turns);
+        //
+    } // addBuff
+
+    addDebuff(paramId, turns) {
+        // Edited to help plugins alter add debuff behaviors in better ways
+        if (this.isAlive()) this._onAddDebuff(paramId, turns);
+        //
+    } // addDebuff
+
+    removeBuff(paramId) {
+        // Edited to help plugins alter remove buff behaviors in better ways
+        if (this._isRemoveBuff(paramId)) this._onRemoveBuff(paramId);
+        //
+    } // removeBuff
+
+    removeBattleStates() {
+        // Edited to help plugins alter remove battle states in better ways
+        this.states().forEach(this._removeBattleState, this);
+        //
+    } // removeBattleStates
+
+    removeAllBuffs() {
+        for (let i = 0, l = this.buffLength(); i < l; i++) this.removeBuff(i);
+    } // removeAllBuffs
+
+    removeStatesAuto(timing) {
+        // Edited to help plugins alter remove states auto in better ways
+        this.states().forEach(state => this._removeStateAuto(timing, state));
+        //
+    } // removeStatesAuto
+
+    removeBuffsAuto() {
+        for (let i = 0, l = this.buffLength(); i < l; i++) {
+            // Edited to help plugins alter remove buffs auto in better ways
+            this._removeBuffAuto(i);
+            //
+        }
+    } // removeBuffsAuto
+
+    removeStatesByDamage() {
+        // Edited to help plugins remove states by damage in better ways
+        this.states().forEach(this._removeStateByDamage, this);
+        //
+    } // removeStatesByDamage
+
+    makeActionTimes() {
+        return this.actionPlusSet().reduce((r, p) => {
+            return Math.random() < p ? r + 1 : r;
+        }, 1);
+    } // makeActionTimes
+
+    makeActions() {
+        this.clearActions();
+        // Edited to help plugins alter make actions behaviors in better ways
+        if (this.canMove()) this._makeActsWhenMovable();
+        //
+    } // makeActions
+
+    speed() { return this._speed; }
+
+    makeSpeed() {
+        this._speed = Math.min(...this._actions.fastMap(action => {
+            return action.speed();
+        })) || 0;
+    } // makeSpeed
+
+    currentAction() { return this._actions[0]; }
+
+    removeCurrentAction() { this._actions.shift(); }
+
+    setLastTarget(target) {
+        this._lastTargetIndex = target ? target.index() : 0;
+    } // setLastTarget
+
+    forceAction(skillId, targetIndex) {
+        this.clearActions();
+        // Edited to help plugins alter force action behaviors in better ways
+        this._actions.push(this._forcedAct(skillId, targetIndex));
+        //
+    } // forceAction
+
+    useItem(item) {
+        if (DataManager.isSkill(item)) return this.paySkillCost(item);
+        if (DataManager.isItem(item)) this.consumeItem(item);
+    } // useItem
+
+    consumeItem(item) { $gameParty.consumeItem(item); }
+
+    gainHp(value) {
+        [this._result.hpDamage, this._result.hpAffected] = [-value, true];
+        this.setHp(this.hp + value);
+    } // gainHp
+
+    gainMp(value) {
+        this._result.mpDamage = -value;
+        this.setMp(this.mp + value);
+    } // gainMp
+
+    gainTp(value) {
+        this._result.tpDamage = -value;
+        this.setTp(this.tp + value);
+    } // gainTp
+
+    gainSilentTp(value) { this.setTp(this.tp + value); }
+
+    // Edited to help plugins alter init tp behaviors in better ways
+    initTp() { this.setTp(this._initializedTp()); }
+    //
+
+    clearTp() { this.setTp(0); }
+
+    chargeTpByDamage(damageRate) {
+        // Edited to help plugins alter charge tp by damage in better ways
+        this.gainSilentTp(this._chargedTpByDamage(damageRate));
+        //
+    } // chargeTpByDamage
+
+    regenerateHp() {
+        // Edited to help plugins alter regenerate hp behaviors in better ways
+        const value = this._regeneratedHp();
+        //
+        if (value !== 0) this.gainHp(value);
+    } // regenerateHp
+
+    maxSlipDamage() {
+        return $dataSystem.optSlipDeath ? this.hp : Math.max(this.hp - 1, 0);
+    } // maxSlipDamage
+
+    regenerateMp() {
+        // Edited to help plugins alter regenerate mp behaviors in better ways
+        const value = this._regeneratedMp();
+        //
+        if (value !== 0) this.gainMp(value);
+    } // regenerateMp
+
+    // Edited to help plugins alter regenerate tp behaviors in better ways
+    regenerateTp() { this.gainSilentTp(this._regeneratedTp()); }
+    //
+
+    // Edited to help plugins alter regenerate all behaviors in better ways
+    regenerateAll() { if (this.isAlive()) this._regenerateAlive(); }
+    //
+
+    onBattleStart(advantageous) {
+        this.setActionState("undecided");
+        this.clearMotion();
+        this.initTpbChargeTime(advantageous);
+        this.initTpbTurn();
+        if (!this.isPreserveTp()) this.initTp();
+    } // onBattleStart
+
+    onAllActionsEnd() {
+        this.clearResult();
+        this.removeStatesAuto(1);
+        this.removeBuffsAuto();
+    } // onAllActionsEnd
+
+    onTurnEnd() {
+        this.clearResult();
+        this.regenerateAll();
+        this.updateStateTurns();
+        this.updateBuffTurns();
+        this.removeStatesAuto(2);
+    } // onTurnEnd
+
+    onBattleEnd() {
+        this.clearResult();
+        this.removeBattleStates();
+        this.removeAllBuffs();
+        this.clearActions();
+        if (!this.isPreserveTp()) this.clearTp();
+        this.appear();
+    } // onBattleEnd
+
+    onDamage(value) {
+        this.removeStatesByDamage();
+        this.chargeTpByDamage(value / this.mhp);
+    } // onDamage
+
+    setActionState(actionState) {
+        this._actionState = actionState;
+        this.requestMotionRefresh();
+    } // setActionState
+
+    isUndecided() { return this._actionState === "undecided"; }
+
+    isInputting() { return this._actionState === "inputting"; }
+
+    isWaiting() { return this._actionState === "waiting"; }
+
+    isActing() { return this._actionState === "acting"; }
+
+    isChanting() {
+        return this.isWaiting() && this._actions.some(action => {
+            return action.isMagicSkill();
+        });
+    } // isChanting
+
+    isGuardWaiting() {
+        return this.isWaiting() && this._actions.some(action => {
+            return action.isGuard();
+        });
+    } // isGuardWaiting
+
+    performActionStart(action) {
+        if (!action.isGuard()) this.setActionState("acting");
+    } // performActionStart
+
+    performAction(/*action*/) {}
+
+    performActionEnd() {}
+
+    performDamage() {}
+
+    performMiss() { SoundManager.playMiss(); }
+
+    performRecovery() { SoundManager.playRecovery(); }
+
+    performEvasion() { SoundManager.playEvasion(); }
+
+    performMagicEvasion() { SoundManager.playMagicEvasion(); }
+
+    performCounter() { SoundManager.playEvasion(); }
+
+    performReflection() { SoundManager.playReflection(); }
+
+    performSubstitute(/*target*/) {}
+
+    performCollapse() {}
+
     /**
-     * Triggers events to happen upon becoming no longer restricted
+     * Hotspot/Nullipotent
+     * @author DoubleX @interface @since 0.9.5 @version 0.9.5
+     * @returns {boolean} Whether the tpb battler's executing actions
+     */
+    isTpbActing() { return this._tpbState === "acting"; }
+
+    /**
+     * Hotspot/Nullipotent
+     * @author DoubleX @interface @since 0.9.5 @version 0.9.5
+     * @returns {boolean} Whether the tpb battler's charging the tpb bar
+     */
+    isTpbCharging() { return this._tpbState === "charging"; }
+
+    /**
+     * Hotspot/Nullipotent
+     * @author DoubleX @interface @since 0.9.5 @version 0.9.5
+     * @returns {boolean} Whether the tpb battler's casting tpb actions
+     */
+    isTpbCasting() { return this._tpbState === "casting"; }
+
+    /**
+     * Triggers events to happen when the battler just finished casting actions
+     * Idempotent
+     * @author DoubleX @interface @since 0.9.5 @version 0.9.5
+     */
+    onTpbReady() { this._tpbState = "ready"; }
+
+    /**
+     * Hotspot/Nullipotent
+     * @author DoubleX @interface @since 0.9.5 @version 0.9.5
+     * @returns {boolean} Whether the tpb battler's just ended charging tpb bar
+     */
+    isEndTpbCharging() { return this._tpbChargeTime >= 1; }
+
+    /**
+     * Hotspot/Nullipotent
+     * @author DoubleX @interface @since 0.9.5 @version 0.9.5
+     * @returns {boolean} Whether the tpb battler's just ended casting actions
+     */
+    isEndTpbCasting() {
+        return this._tpbCastTime >= this.tpbRequiredCastTime();
+    } // isEndTpbCasting
+
+    /**
+     * Hotspot/Nullipotent
+     * @author DoubleX @interface @since 0.9.5 @version 0.9.5
+     * @returns {boolean} Whether the tpb battler's in the idle state
+     */
+    isTpbIdle() { return !this.canMove() || this.isTpbCharged(); }
+
+    /**
+     * Nullipotent
+     * @author DoubleX @since 0.9.5 @version 0.9.5
+     * @param {boolean} advantageous - Whether battler has advantageous start
+     * @returns {number} The starting tpb bar charged proportion for the battler
+     */
+    _initializedTpbChargeTime(advantageous) {
+        if (this.isRestricted()) return 0;
+        return advantageous ? 1 : this._initializedNormTpbChargeTime();
+    } // _initializedTpbChargeTime
+
+    /**
+     * Nullipotent
+     * @author DoubleX @since 0.9.5 @version 0.9.5
+     * @returns {number} The starting tpb bar charged proportion for the battler
+     */
+    _initializedNormTpbChargeTime() {
+        return this.tpbRelativeSpeed() * Math.random() * 0.5;
+    } // _initializedNormTpbChargeTime
+
+    /**
+     * Updates all tpb states of this movable battler
+     * Hotspot/Idempotent
      * @author DoubleX @since 0.9.5 @version 0.9.5
      */
-    _onUnrestrict() {}
+    _updateTpbWhenMovable() {
+        this.updateTpbChargeTime();
+        this.updateTpbCastTime();
+        this.updateTpbAutoBattle();
+    } // _updateTpbWhenMovable
 
-} // Game_BattlerBase
+    /**
+     * Triggers events to happen when the battler's charging the tpb bar
+     * Hotspot/Idempotent
+     * @author DoubleX @since 0.9.5 @version 0.9.5
+     */
+    _onUpdateTpbChargeTime() {
+        this._tpbChargeTime += this.tpbAcceleration();
+        if (!this.isEndTpbCharging()) return;
+        this._tpbChargeTime = 1;
+        this.onTpbCharged();
+    } // _onUpdateTpbChargeTime
+
+    /**
+     * Triggers events to happen when the battler's casting tpb actions
+     * Hotspot/Idempotent
+     * @author DoubleX @interface @since 0.9.5 @version 0.9.5
+     */
+    _onUpdateTpbCastTime() {
+        this._tpbCastTime += this.tpbAcceleration();
+        if (!this.isEndTpbCasting()) return;
+        this._tpbCastTime = this.tpbRequiredCastTime();
+        this.onTpbReady();
+    } // _onUpdateTpbCastTime
+
+    /**
+     * Hotspot/Nullipotent
+     * @author DoubleX @since 0.9.5 @version 0.9.5
+     * @returns {boolean} Whether the autobattle battlers will make tpb actions
+     */
+    _isMakeAutoTpbActs() {
+        if (!this.isTpbCharged() || this.isTpbTurnEnd()) return false;
+        return this.isAutoBattle();
+    } // _isMakeAutoTpbActs
+
+    /**
+     * Triggers events to happen when the battler's tpb's idling
+     * Hotspot/Idempotent
+     * @author DoubleX @since 0.9.5 @version 0.9.5
+     * @todo Figures out why isTpbTimeout and onTpbTimeout aren't called here
+     */
+    _onUpdateTpbIdleTime() { this._tpbIdleTime += this.tpbAcceleration(); }
+
+    /**
+     * Hotspot/Nullipotent
+     * @author DoubleX @since 0.9.5 @version 0.9.5
+     * @returns {number} The casting delay of the action to be executed
+     */
+    _castDelay() {
+        /** @todo Uses filterMapReduce if it's faster than filterMap.reduce */
+        return this._actions.filterMap(action => action.isValid(), action => {
+            return action.item();
+        }).reduce((r, { speed }) => r + Math.max(0, -speed), 0);
+        //
+    } // _castDelay
+
+    /**
+     * Immediately casts all automatically inputted actions for this battler
+     * Idempotent
+     * @author DoubleX @since 0.9.5 @version 0.9.5
+     */
+    _onAutoInputTpbActs() {
+        this.startTpbCasting();
+        this.setActionState("waiting");
+    } // _onAutoInputTpbActs
+
+    /**
+     * Adds the state with the specified state id to this battler
+     * Idempotent
+     * @author DoubleX @since 0.9.5 @version 0.9.5
+     * @param {id} stateId - The id of the state to be added to this battler
+     */
+    _onAddState(stateId) {
+        if (!this.isStateAffected(stateId)) this._onAddNewState(stateId);
+        this.resetStateCounts(stateId);
+        this._result.pushAddedState(stateId);
+    } // _onAddState
+
+    /**
+     * Adds the new state with the specified state id to this battler
+     * Idempotent
+     * @author DoubleX @since 0.9.5 @version 0.9.5
+     * @param {id} stateId - The id of the new state to be added to this battler
+     */
+    _onAddNewState(stateId) {
+        this.addNewState(stateId);
+        this.refresh();
+    } // _onAddNewState
+
+    /**
+     * Removes specified state upon restriction if it's to be removed that way
+     * Idempotent
+     * @author DoubleX @since 0.9.5 @version 0.9.5
+     * @param {DataState} state - The state to be removed upon restriction
+     */
+    _removeStateByRestriction(state) {
+        if (state.removeByRestriction) this.removeState(state.id);
+    } // _removeStateByRestriction
+
+    /**
+     * Removes the state with the specified state id from this battler
+     * Idempotent
+     * @author DoubleX @since 0.9.5 @version 0.9.5
+     * @param {id} stateId - The id of the state to be removed from this battler
+     */
+    _onRemoveState(stateId) {
+        if (stateId === this.deathStateId()) this.revive();
+        this.eraseState(stateId);
+        this.refresh();
+        this._result.pushRemovedState(stateId);
+    } // _onRemoveState
+
+    /**
+     * Adds the buff with the specified parameter id and number of turns
+     * @author DoubleX @since 0.9.5 @version 0.9.5
+     * @param {index} paramId - The parameter id of the buff to be added
+     * @param {number} turns - The number of turns of the buff to be added
+     */
+    _onAddBuff(paramId, turns) {
+        this.increaseBuff(paramId);
+        if (this.isBuffAffected(paramId)) {
+            this.overwriteBuffTurns(paramId, turns);
+        }
+        this._result.pushAddedBuff(paramId);
+        this.refresh();
+    } // _onAddBuff
+
+    /**
+     * Adds the debuff with the specified parameter id and number of turns
+     * @author DoubleX @since 0.9.5 @version 0.9.5
+     * @param {index} paramId - The parameter id of the debuff to be added
+     * @param {number} turns - The number of turns of the debuff to be added
+     */
+    _onAddDebuff(paramId, turns) {
+        this.decreaseBuff(paramId);
+        if (this.isDebuffAffected(paramId)) {
+            this.overwriteBuffTurns(paramId, turns);
+        }
+        this._result.pushAddedDebuff(paramId);
+        this.refresh();
+    } // _onAddDebuff
+
+    /**
+     * Nullipotent
+     * @author DoubleX @since 0.9.5 @version 0.9.5
+     * @param {index} paramId - The parameter id of the buff to be removed
+     * @returns {boolean} Whether the specified buff's to be removed
+     */
+    _isRemoveBuff(paramId) {
+        return this.isAlive() && this.isBuffOrDebuffAffected(paramId);
+    } // _isRemoveBuff
+
+    /**
+     * Removes the buff with the specified parameter id
+     * Idempotent
+     * @author DoubleX @since 0.9.5 @version 0.9.5
+     * @param {index} paramId - The parameter id of the buff to be removed
+     */
+    _onRemoveBuff(paramId) {
+        this.eraseBuff(paramId);
+        this._result.pushRemovedBuff(paramId);
+        this.refresh();
+    } // _onRemoveBuff
+
+    /**
+     * Removes the specified battle state upon battle end for this battler
+     * Idempotent
+     * @author DoubleX @since 0.9.5 @version 0.9.5
+     * @param {DataState} state - Data of the state to be removed on battle end
+     */
+    _removeBattleState(state) {
+        if (state.removeAtBattleEnd) this.removeState(state.id);
+    } // _removeBattleState
+
+    /**
+     * Automatically removes the specified state with the specified timing
+     * Idempotent
+     * @author DoubleX @since 0.9.5 @version 0.9.5
+     * @enum @param {number} timing - 1 is action end and 2 is turn end
+     * @param {DataState} state - Data of the state to be removed automatically
+     */
+    _removeStateAuto(timing, state) {
+        if (this._isRemoveStateAuto(timing, state)) this.removeState(state.id);
+    } // _removeStateAuto
+
+    /**
+     * Nullipotent
+     * @author DoubleX @since 0.9.5 @version 0.9.5
+     * @enum @param {number} timing - 1 is action end and 2 is turn end
+     * @param {DataState} state - Data of the state to be removed automatically
+     * @returns {boolean} Whether the state's automatically removed from battler
+     */
+    _isRemoveStateAuto(timing, state) {
+        if (!this.isStateExpired(state.id)) return;
+        return state.autoRemovalTiming === timing;
+    } // _isRemoveStateAuto
+
+    /**
+     * Automatically removes the buff with the specified parameter id
+     * Idempotent
+     * @author DoubleX @since 0.9.5 @version 0.9.5
+     * @param {index} paramId - The parameter id of the buff to be removed
+     */
+    _removeBuffAuto(paramId) {
+        if (this.isBuffExpired(paramId)) this.removeBuff(paramId);
+    } // _removeBuffAuto
+
+    /**
+     * Removes the specified state by damages applied to this battler
+     * Idempotent
+     * @author DoubleX @since 0.9.5 @version 0.9.5
+     * @param {DataState} state - The data of the state to be removed by damage
+     */
+    _removeStateByDamage(state) {
+        if (this._isRemoveStateByDamage(state)) this.removeState(state.id);
+    } // _removeStateByDamage
+
+    /**
+     * Nullipotent
+     * @author DoubleX @since 0.9.5 @version 0.9.5
+     * @param {DataState} state - The data of the state to be removed by damage
+     * @returns {boolean} Whether the state's to be removed by daamge
+     */
+    _isRemoveStateByDamage(state) {
+        if (!state.removeByDamage) return false;
+        return Math.randomInt(100) < state.chanceByDamage;
+    } // _isRemoveStateByDamage
+
+    /**
+     * Allocated the amount of action slots dictated by the Action Times+
+     * @author DoubleX @since 0.9.5 @version 0.9.5
+     */
+    _makeActsWhenMovable() {
+        /** @todo Figures out why it's needed when clearActions is called */
+        this._actions = [];
+        //
+        const actionTimes = this.makeActionTimes();
+        for (let i = 0; i < actionTimes; i++) {
+          this._actions.push(new Game_Action(this));
+        }
+    } // _makeActsWhenMovable
+
+    /**
+     * Nullipotent
+     * @author DoubleX @since 0.9.5 @version 0.9.5
+     * @param {id} skillId - The id of the skill as this new forced action
+     * @param {index} targetIndex - The index of the target of the forced action
+     * @returns {Game_Action} The newly creted forced action of this battler
+     */
+    _forcedAct(skillId, targetIndex) {
+        const action = new Game_Action(this, true);
+        action.setSkill(skillId);
+        if (targetIndex === -2) {
+            action.setTarget(this._lastTargetIndex);
+        } else if (targetIndex === -1) {
+            action.decideRandomTarget();
+        } else action.setTarget(targetIndex);
+        return action;
+    } // _forcedAct
+
+    /**
+     * Nullipotent
+     * @author DoubleX @since 0.9.5 @version 0.9.5
+     * @returns {number} The amount of tp intiialized for this battler
+     */
+    _initializedTp() { return Math.randomInt(25); }
+
+    /**
+     * Nullipotent
+     * @author DoubleX @since 0.9.5 @version 0.9.5
+     * @returns {number} damageRate - The proportion of the battler hp damaged
+     * @returns {number} The amount of tp charged by damage for this battler
+     */
+    _chargedTpByDamage(damageRate) {
+        return Math.floor(50 * damageRate * this.tcr);
+    } // _chargedTpByDamage
+
+    /**
+     * Nullipotent
+     * @author DoubleX @since 0.9.5 @version 0.9.5
+     * @returns {number} The amount of hp regenerated for this battler
+     */
+    _regeneratedHp() {
+        return Math.max(Math.floor(this.mhp * this.hrg), -this.maxSlipDamage());
+    } // _regeneratedHp
+
+    /**
+     * Nullipotent
+     * @author DoubleX @since 0.9.5 @version 0.9.5
+     * @returns {number} The amount of mp regenerated for this battler
+     */
+    _regeneratedMp() { return Math.floor(this.mmp * this.mrg); }
+
+    /**
+     * Nullipotent
+     * @author DoubleX @since 0.9.5 @version 0.9.5
+     * @returns {number} The amount of tp regenerated for this battler
+     */
+    _regeneratedTp() { return Math.floor(this.maxTp() * this.trg); }
+
+    /**
+     * Regenerates everything that can be regenerated for this alive battler
+     * @author DoubleX @since 0.9.5 @version 0.9.5
+     */
+    _regenerateAlive() {
+        this.regenerateHp();
+        this.regenerateMp();
+        this.regenerateTp();
+    } // _regenerateAlive
+
+    // RMMV instance methods not present in the default RMMZ codebase
+    clearAnimations() {
+        this._animations = [];
+    }
+
+    isAnimationRequested() {
+        return this._animations.length > 0;
+    }
+
+    shiftAnimation() {
+        return this._animations.shift();
+    }
+
+    startAnimation(animationId, mirror, delay) {
+        var data = { animationId: animationId, mirror: mirror, delay: delay };
+        this._animations.push(data);
+    }
+    //
+
+} // Game_Battler
