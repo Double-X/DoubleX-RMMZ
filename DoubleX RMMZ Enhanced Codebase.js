@@ -617,14 +617,15 @@ Utils.checkRMVersion(DoubleX_RMMZ.Enhanced_Codebase.VERSIONS.codebase);
     }; // MZ_EC.onLoadDataNotetags
 
     // The this pointer is that of the caller
-    MZ_EC.returnedEntryWithSuffix = function(notePairs, notetagType, suffix, entry, count) {
+    MZ_EC.returnedEntryWithSuffix = function(notePairs, notetagType, suffix, entry, count, argObj = {}) {
         switch (suffix) {
             case "val": return CORE._RETURNED_ENTRY_VAL(
                     notePairs, notetagType, entry, count);
             case "switch": return $gameSwitches.value(+entry);
             case "var": return $gameVariables.value(+entry);
             case "script": {
-                return new Function($gameVariables.value(+entry)).call(this);
+                const script = $gameVariables.value(+entry);
+                return new Function("argObj", script).call(this, argObj);
             }
             // There's not enough context to throw errors meaningfully
             default: return entry;
@@ -2547,6 +2548,13 @@ Utils.checkRMVersion(DoubleX_RMMZ.Enhanced_Codebase.VERSIONS.codebase);
         rewriteFunc
     } = MZ_EC.setKlassContainer("Game_Action", proto, MZ_EC);
 
+    rewriteFunc("decideRandomTarget", function() {
+        // Edited to help plugins alter decide random target in better ways
+        const target = NEW._randomTarget.call(this);
+        //
+        target ? this._targetIndex = target.index() : this.clear();
+    }); // v0.00a - v0.00a
+
     rewriteFunc("makeTargets", function() {
         // Edited to help plugins alter make targets in better ways
         return this.repeatTargets(NEW._madeRawTargets.call(this));
@@ -2555,12 +2563,34 @@ Utils.checkRMVersion(DoubleX_RMMZ.Enhanced_Codebase.VERSIONS.codebase);
 
     rewriteFunc("confusionTarget", function() {
         switch (this.subject().confusionLevel()) {
-            case 1: return this.opponentsUnit().randomTarget();
             // Edited to help plugins to alter confusion target in better ways
+            case 1: return NEW._randomOpponentTarget.call(this);
             case 2: return NEW._confusionAnyTarget.call(this);
+            default: return NEW._randomFriendTarget.call(this);
             //
-            default: return this.friendsUnit().randomTarget();
         }
+    }); // v0.00a - v0.00a
+
+    rewriteFunc("targetsForDead", function(unit) {
+        // Edited to help plugins alter targets for dead behaviors in better way
+        if (this.isForOne()) return NEW._targetForOneDead.call(this, unit);
+        //
+        return unit.deadMembers();
+    }); // v0.00a - v0.00a
+
+    rewriteFunc("targetsForAlive", function(unit) {
+        // Edited to help plugins alter targets for alive in better ways
+        if (this.isForOne()) return NEW._targetForOneAlive.call(this, unit);
+        //
+        return unit.aliveMembers();
+    }); // v0.00a - v0.00a
+
+    rewriteFunc("targetsForDeadAndAlive", function(unit) {
+        // Edited to help plugins alter targets for dead and alive in better way
+        if (this.isForOne()) {
+            return NEW._targetForOneDeadAndAlive.call(this, unit);
+        } else return unit.members();
+        //
     }); // v0.00a - v0.00a
 
     rewriteFunc("evaluateWithTarget", function(target) {
@@ -2692,6 +2722,50 @@ Utils.checkRMVersion(DoubleX_RMMZ.Enhanced_Codebase.VERSIONS.codebase);
     /**
      * The this pointer is Game_Action.prototype
      * Nullipotent
+     * @author DoubleX @since 0.9.5 @version 0.9.5
+     * @returns {Game_Battler} The randomnly decided target for this action
+     */
+    NEW._randomTarget = function() {
+        if (this.isForDeadFriend()) {
+            return NEW._randomDeadFriendTarget.call(this);
+        } else if (this.isForFriend()) {
+            return NEW._randomFriendTarget.call(this);
+        } return NEW._randomOpponentTarget.call(this);
+    }; // NEW._randomTarget
+
+    /**
+     * The this pointer is Game_Action.prototype
+     * Nullipotent
+     * @author DoubleX @since 0.9.5 @version 0.9.5
+     * @returns {Game_Battler} The randomnly decided target for this action
+     */
+    NEW._randomDeadFriendTarget = function() {
+        return this.friendsUnit().randomDeadTarget();
+    }; // NEW._randomDeadFriendTarget
+
+    /**
+     * The this pointer is Game_Action.prototype
+     * Nullipotent
+     * @author DoubleX @since 0.9.5 @version 0.9.5
+     * @returns {Game_Battler} The randomnly decided target for this action
+     */
+    NEW._randomFriendTarget = function() {
+        return this.friendsUnit().randomTarget();
+    }; // NEW._randomFriendTarget
+
+    /**
+     * The this pointer is Game_Action.prototype
+     * Nullipotent
+     * @author DoubleX @since 0.9.5 @version 0.9.5
+     * @returns {Game_Battler} The randomnly decided target for this action
+     */
+    NEW._randomOpponentTarget = function() {
+        return this.opponentsUnit().randomTarget();
+    }; // NEW._randomOpponentTarget
+
+    /**
+     * The this pointer is Game_Action.prototype
+     * Nullipotent
      * @author DoubleX @since v0.00a @version v0.00a
      */
     NEW._madeRawTargets = function() {
@@ -2711,6 +2785,53 @@ Utils.checkRMVersion(DoubleX_RMMZ.Enhanced_Codebase.VERSIONS.codebase);
     NEW._isForConfused = function() {
         return !this._forcing && this.subject().isConfused();
     }; // NEW._isForConfused
+
+    NEW._IS_CONFUSION_OPPONENTS_TARGET = () => Math.randomInt(2) === 0;
+    /**
+     * The this pointer is Game_Action.prototype
+     * Nullipotent/Random
+     * @author DoubleX @since v0.00a @version v0.00a
+     * @returns {[Game_Battler]} The list of confusion targets
+     */
+    NEW._confusionAnyTarget = function() {
+        if (NEW._IS_CONFUSION_OPPONENTS_TARGET()) {
+            return NEW._randomOpponentTarget.call(this);
+        } else return NEW._randomFriendTarget.call(this);
+    }; // NEW._confusionAnyTarget
+
+    /**
+     * The this pointer is Game_Action.prototype
+     * Nullipotent
+     * @author DoubleX @since v0.00a @version v0.00a
+     * @param {Game_Unit} unit - The list of battlers on the same side
+     * @returns {[Game_Battler]} The list of dead targets
+     */
+    NEW._targetForOneDead = function(unit) {
+        return [unit.smoothDeadTarget(this._targetIndex)];
+    }; // NEW._targetForOneDead
+
+    /**
+     * The this pointer is Game_Action.prototype
+     * Nullipotent/Random
+     * @author DoubleX @since v0.00a @version v0.00a
+     * @param {Game_Unit} unit - The list of battlers on the same side
+     * @returns {[Game_Battler]} The list of alive targets
+     */
+    NEW._targetForOneAlive = function(unit) {
+        if (this._targetIndex < 0) return [unit.randomTarget()];
+        return [unit.smoothTarget(this._targetIndex)];
+    }; // NEW._targetForOneAlive
+
+    /**
+     * The this pointer is Game_Action.prototype
+     * Nullipotent
+     * @author DoubleX @since v0.00a @version v0.00a
+     * @param {Game_Unit} unit - The list of battlers on the same side
+     * @returns {[Game_Battler]} The list of dead and alive targets
+     */
+    NEW._targetForOneDeadAndAlive = function(unit) {
+        return [unit.members()[this._targetIndex]];
+    }; // NEW._targetForOneDeadAndAlive
 
     /**
      * The this pointer is Game_Action.prototype
@@ -2766,17 +2887,6 @@ Utils.checkRMVersion(DoubleX_RMMZ.Enhanced_Codebase.VERSIONS.codebase);
         throw new Error(`${damageFormula} doesn't return a number!`);
         //
     }; // NEW._evalDamageFormulaWithoutSideEffectsRescue
-
-    /**
-     * The this pointer is Game_Action.prototype
-     * Nullipotent/Random
-     * @author DoubleX @since v0.00a @version v0.00a
-     * @returns {[Game_Battler]} The list of confusion targets
-     */
-    NEW._confusionAnyTarget = function() {
-        if (Math.randomInt(2) === 0) return this.opponentsUnit().randomTarget();
-        return this.friendsUnit().randomTarget();
-    }; // NEW._confusionAnyTarget
 
     /**
      * The this pointer is Game_Action.prototype
