@@ -342,7 +342,7 @@
  *           parameters/ex-parameters/sp-parameters included by stats, which
  *           is a list of names of corresponding
  *           parameters/ex-parameters/sp-parameters, include those being the
- *           highest among the caller, among all battlers included by mems, 
+ *           highest among the caller, among all battlers included by mems,
  *           which is a list of battlers
  *         - The return value should be an Array of Game_Battler
  *         - stats must be an Array of strings as names of Game_Battler
@@ -411,7 +411,7 @@
  *           parameters/ex-parameters/sp-parameters included by stats, which
  *           is a list of names of corresponding
  *           parameters/ex-parameters/sp-parameters, include those being the
- *           lowest among the caller, among all battlers included by mems, 
+ *           lowest among the caller, among all battlers included by mems,
  *           which is a list of battlers
  *         - The return value should be an Array of Game_Battler
  *         - stats must be an Array of strings as names of Game_Battler
@@ -445,7 +445,7 @@
  *           parameters/ex-parameters/sp-parameters included by stats, which
  *           is a list of names of corresponding
  *           parameters/ex-parameters/sp-parameters, don't include those being
- *           the lowest among the caller, among all battlers included by mems, 
+ *           the lowest among the caller, among all battlers included by mems,
  *           which is a list of battlers
  *         - The return value should be an Array of Game_Battler
  *         - stats must be an Array of strings as names of Game_Battler
@@ -479,7 +479,7 @@
  *         - Returns the list of members whose values of
  *           parameters/ex-parameters/sp-parameters included by stats, which
  *           is a list of names of corresponding
- *           parameters/ex-parameters/sp-parameters, include those above val, 
+ *           parameters/ex-parameters/sp-parameters, include those above val,
  *           among all battlers included by mems, which is a list of battlers
  *         - The return value should be an Array of Game_Battler
  *         - stats must be an Array of strings as names of Game_Battler
@@ -512,7 +512,7 @@
  *         - Returns the list of members whose values of
  *           parameters/ex-parameters/sp-parameters included by stats, which
  *           is a list of names of corresponding
- *           parameters/ex-parameters/sp-parameters, include those below val, 
+ *           parameters/ex-parameters/sp-parameters, include those below val,
  *           among all battlers included by mems, which is a list of battlers
  *         - The return value should be an Array of Game_Battler
  *         - stats must be an Array of strings as names of Game_Battler
@@ -679,7 +679,7 @@ Utils.checkRMVersion(DoubleX_RMMZ.Unit_Filters.VERSIONS.codebase);
     }; // $.hasAnySkill
 
     /**
-     * Script call/Nullipotent     
+     * Script call/Nullipotent
      * @author DoubleX @interface @override @since v1.00a @version v1.00a
      * @param {[number]} skillIds - The list of id of skills involved
      * @returns {boolean} Whether this actor has all of the specified skills
@@ -767,213 +767,252 @@ Utils.checkRMVersion(DoubleX_RMMZ.Unit_Filters.VERSIONS.codebase);
     NEW._DESCENDING_SORT = (a, b) => b - a;
     [NEW._EQUALS, NEW._NOT_EQUALS] = [(a, b) => a === b, (a, b) => a !== b];
     NEW._IS_GREATER_THAN = (a, b) => a > b, NEW._IS_LESS_THAN = (a, b) => a < b;
+    NEW._FILTERED_MEMS = (mems, isEditMems, filterFunc) => {
+        if (!isEditMems) return mems.filter(filterFunc);
+        for (let i = 0; ; i++) {
+            if (!mems[i]) return mems;
+            while (!filterFunc[mems[i]]) mems.remove(mems[i]);
+        }
+    }; // NEW._FILTERED_MEMS
 
-    NEW._MEM_WITH_ANY_STATE = 
+    NEW._MEM_WITH_ANY_STATE =
             NEW._MEM_WITH_COND.bind(undefined, "isAnyStateAffected");
     /**
      * Script call/Nullipotent
      * @author DoubleX @interface @since v1.00a @version v1.00a
      * @param {[id]} stateIds - The list of id of states involved
      * @param {[Game_Battler]} mems - The list of battlers to be filtered
+     * @param {boolean} isEditMems - Whether the mems argument will be mutated
      * @returns {[Game_Batler]} The list of requested unit members
      */
-    $.memWithAnyState = function(stateIds, mems = this.members()) {
-        return mems.filter(mem => NEW._MEM_WITH_ANY_STATE(stateIds, mem));
+    $.memWithAnyState = function(stateIds, mems = this.members(), isEditMems = false) {
+        const filterFunc = mem => NEW._MEM_WITH_ANY_STATE(stateIds, mem);
+        return NEW._FILTERED_MEMS(mems, isEditMems, filterFunc);
     }; // $.memWithAnyState
 
-    NEW._MEM_WITH_ALL_STATES = 
+    NEW._MEM_WITH_ALL_STATES =
             NEW._MEM_WITH_COND.bind(undefined, "isAllStatesAffected");
     /**
      * Script call/Nullipotent
      * @author DoubleX @interface @since v1.00a @version v1.00a
      * @param {[id]} stateIds - The list of id of states involved
      * @param {[Game_Battler]} mems - The list of battlers to be filtered
+     * @param {boolean} isEditMems - Whether the mems argument will be mutated
      * @returns {[Game_Batler]} The list of requested unit members
      */
-    $.memWithAllStates = function(stateIds, mems = this.members()) {
-        return mems.filter(mem => NEW._MEM_WITH_ALL_STATES(stateIds, mem));
+    $.memWithAllStates = function(stateIds, mems = this.members(), isEditMems = false) {
+        const filterFunc = mem => NEW._MEM_WITH_ALL_STATES(stateIds, mem);
+        return NEW._FILTERED_MEMS(mems, isEditMems, filterFunc);
     }; // $.memWithAllStates
 
-    NEW._MEM_WITHOUT_ANY_STATE = 
+    NEW._MEM_WITHOUT_ANY_STATE =
             NEW._MEM_WTHOUT_COND.bind(undefined, "isAnyStateAffected");
     /**
      * Script call/Nullipotent
      * @author DoubleX @interface @since v1.00a @version v1.00a
      * @param {[id]} stateIds - The list of id of states involved
      * @param {[Game_Battler]} mems - The list of battlers to be filtered
+     * @param {boolean} isEditMems - Whether the mems argument will be mutated
      * @returns {[Game_Batler]} The list of requested unit members
      */
-    $.memWithoutAnyState = function(stateIds, mems = this.members()) {
-        return mems.filter(mem => NEW._MEM_WITHOUT_ANY_STATE(stateIds, mem));
+    $.memWithoutAnyState = function(stateIds, mems = this.members(), isEditMems = false) {
+        const filterFunc = mem => NEW._MEM_WITHOUT_ANY_STATE(stateIds, mem);
+        return NEW._FILTERED_MEMS(mems, isEditMems, filterFunc);
     }; // $.memWithoutAnyState
 
-    NEW._MEM_WITHOUT_ALL_STATES = 
+    NEW._MEM_WITHOUT_ALL_STATES =
             NEW._MEM_WTHOUT_COND.bind(undefined, "isAllStatesAffected");
     /**
      * Script call/Nullipotent
      * @author DoubleX @interface @since v1.00a @version v1.00a
      * @param {[id]} stateIds - The list of id of states involved
      * @param {[Game_Battler]} mems - The list of battlers to be filtered
+     * @param {boolean} isEditMems - Whether the mems argument will be mutated
      * @returns {[Game_Batler]} The list of requested unit members
      */
-    $.memWithoutAllStates = function(stateIds, mems = this.members()) {
-        return mems.filter(mem => NEW._MEM_WITHOUT_ALL_STATES(stateIds, mem));
+    $.memWithoutAllStates = function(stateIds, mems = this.members(), isEditMems = false) {
+        const filterFunc = mem => NEW._MEM_WITHOUT_ALL_STATES(stateIds, mem);
+        return NEW._FILTERED_MEMS(mems, isEditMems, filterFunc);
     }; // $.memWithoutAllStates
 
-    NEW._MEM_WITH_ANY_BUFF = 
+    NEW._MEM_WITH_ANY_BUFF =
             NEW._MEM_WITH_COND.bind(undefined, "isAnyBuffAffected");
     /**
      * Script call/Nullipotent
      * @author DoubleX @interface @since v1.00a @version v1.00a
      * @param {[index]} paramIds - The list of id of parameters involved
      * @param {[Game_Battler]} mems - The list of battlers to be filtered
+     * @param {boolean} isEditMems - Whether the mems argument will be mutated
      * @returns {[Game_Batler]} The list of requested unit members
      */
-    $.memWithAnyBuff = function(paramIds, mems = this.members()) {
-        return mems.filter(mem => NEW._MEM_WITH_ANY_BUFF(paramIds, mem));
+    $.memWithAnyBuff = function(paramIds, mems = this.members(), isEditMems = false) {
+        const filterFunc = mem => NEW._MEM_WITH_ANY_BUFF(paramIds, mem);
+        return NEW._FILTERED_MEMS(mems, isEditMems, filterFunc);
     }; // $.memWithAnyBuff
 
-    NEW._MEM_WITH_ALL_BUFFS = 
+    NEW._MEM_WITH_ALL_BUFFS =
             NEW._MEM_WITH_COND.bind(undefined, "isAllBuffsAffected");
     /**
      * Script call/Nullipotent
      * @author DoubleX @interface @since v1.00a @version v1.00a
      * @param {[index]} paramIds - The list of id of parameters involved
      * @param {[Game_Battler]} mems - The list of battlers to be filtered
+     * @param {boolean} isEditMems - Whether the mems argument will be mutated
      * @returns {[Game_Batler]} The list of requested unit members
      */
-    $.memWithAllBuffs = function(paramIds, mems = this.members()) {
-        return mems.filter(mem => NEW._MEM_WITH_ALL_BUFFS(paramIds, mem));
+    $.memWithAllBuffs = function(paramIds, mems = this.members(), isEditMems = false) {
+        const filterFunc = mem => NEW._MEM_WITH_ALL_BUFFS(paramIds, mem);
+        return NEW._FILTERED_MEMS(mems, isEditMems, filterFunc);
     }; // $.memWithAllBuffs
 
-    NEW._MEM_WITHOUT_ANY_BUFF = 
+    NEW._MEM_WITHOUT_ANY_BUFF =
             NEW._MEM_WTHOUT_COND.bind(undefined, "isAnyBuffAffected");
     /**
      * Script call/Nullipotent
      * @author DoubleX @interface @since v1.00a @version v1.00a
      * @param {[index]} paramIds - The list of id of parameters involved
      * @param {[Game_Battler]} mems - The list of battlers to be filtered
+     * @param {boolean} isEditMems - Whether the mems argument will be mutated
      * @returns {[Game_Batler]} The list of requested unit members
      */
-    $.memWithoutAnyBuff = function(paramIds, mems = this.members()) {
-        return mems.filter(mem => NEW._MEM_WITHOUT_ANY_BUFF(paramIds, mem));
+    $.memWithoutAnyBuff = function(paramIds, mems = this.members(), isEditMems = false) {
+        const filterFunc = mem => NEW._MEM_WITHOUT_ANY_BUFF(paramIds, mem);
+        return NEW._FILTERED_MEMS(mems, isEditMems, filterFunc);
     }; // $.memWithoutAnyBuff
 
-    NEW._MEM_WITHOUT_ALL_BUFFS = 
+    NEW._MEM_WITHOUT_ALL_BUFFS =
             NEW._MEM_WTHOUT_COND.bind(undefined, "isAllBuffsAffected");
     /**
      * Script call/Nullipotent
      * @author DoubleX @interface @since v1.00a @version v1.00a
      * @param {[index]} paramIds - The list of id of parameters involved
      * @param {[Game_Battler]} mems - The list of battlers to be filtered
+     * @param {boolean} isEditMems - Whether the mems argument will be mutated
      * @returns {[Game_Batler]} The list of requested unit members
      */
-    $.memWithoutAllBuffs = function(paramIds, mems = this.members()) {
-        return mems.filter(mem => NEW._MEM_WITHOUT_ALL_BUFFS(paramIds, mem));
+    $.memWithoutAllBuffs = function(paramIds, mems = this.members(), isEditMems = false) {
+        const filterFunc = mem => NEW._MEM_WITHOUT_ALL_BUFFS(paramIds, mem);
+        return NEW._FILTERED_MEMS(mems, isEditMems, filterFunc);
     }; // $.memWithoutAllBuffs
 
-    NEW._MEM_WITH_ANY_DEBUFF = 
+    NEW._MEM_WITH_ANY_DEBUFF =
             NEW._MEM_WITH_COND.bind(undefined, "isAnyDebuffAffected");
     /**
      * Script call/Nullipotent
      * @author DoubleX @interface @since v1.00a @version v1.00a
      * @param {[index]} paramIds - The list of id of parameters involved
      * @param {[Game_Battler]} mems - The list of battlers to be filtered
+     * @param {boolean} isEditMems - Whether the mems argument will be mutated
      * @returns {[Game_Batler]} The list of requested unit members
      */
-    $.memWithAnyDebuff = function(paramIds, mems = this.members()) {
-        return mems.filter(mem => NEW._MEM_WITH_ANY_DEBUFF(paramIds, mem));
+    $.memWithAnyDebuff = function(paramIds, mems = this.members(), isEditMems = false) {
+        const filterFunc = mem => NEW._MEM_WITH_ANY_DEBUFF(paramIds, mem);
+        return NEW._FILTERED_MEMS(mems, isEditMems, filterFunc);
     }; // $.memWithAnyDebuff
 
-    NEW._MEM_WITH_ALL_DEBUFFS = 
+    NEW._MEM_WITH_ALL_DEBUFFS =
             NEW._MEM_WITH_COND.bind(undefined, "isAllDebuffsAffected");
     /**
      * Script call/Nullipotent
      * @author DoubleX @interface @since v1.00a @version v1.00a
      * @param {[index]} paramIds - The list of id of parameters involved
      * @param {[Game_Battler]} mems - The list of battlers to be filtered
+     * @param {boolean} isEditMems - Whether the mems argument will be mutated
      * @returns {[Game_Batler]} The list of requested unit members
      */
-    $.memWithAllDebuffs = function(paramIds, mems = this.members()) {
-        return mems.filter(mem => NEW._MEM_WITH_ALL_DEBUFFS(paramIds, mem));
+    $.memWithAllDebuffs = function(paramIds, mems = this.members(), isEditMems = false) {
+        const filterFunc = mem => NEW._MEM_WITH_ALL_DEBUFFS(paramIds, mem);
+        return NEW._FILTERED_MEMS(mems, isEditMems, filterFunc);
     }; // $.memWithAllDebuffs
 
-    NEW._MEM_WITHOUT_ANY_DEBUFF = 
+    NEW._MEM_WITHOUT_ANY_DEBUFF =
             NEW._MEM_WTHOUT_COND.bind(undefined, "isAnyDebuffAffected");
     /**
      * Script call/Nullipotent
      * @author DoubleX @interface @since v1.00a @version v1.00a
      * @param {[index]} paramIds - The list of id of parameters involved
      * @param {[Game_Battler]} mems - The list of battlers to be filtered
+     * @param {boolean} isEditMems - Whether the mems argument will be mutated
      * @returns {[Game_Batler]} The list of requested unit members
      */
-    $.memWithoutAnyDebuff = function(paramIds, mems = this.members()) {
-        return mems.filter(mem => NEW._MEM_WITHOUT_ANY_DEBUFF(paramIds, mem));
+    $.memWithoutAnyDebuff = function(paramIds, mems = this.members(), isEditMems = false) {
+        const filterFunc = mem => NEW._MEM_WITHOUT_ANY_DEBUFF(paramIds, mem);
+        return NEW._FILTERED_MEMS(mems, isEditMems, filterFunc);
     }; // $.memWithoutAnyDebuff
 
-    NEW._MEM_WITHOUT_ALL_DEBUFFS = 
+    NEW._MEM_WITHOUT_ALL_DEBUFFS =
             NEW._MEM_WTHOUT_COND.bind(undefined, "isAllDebuffsAffected");
     /**
      * Script call/Nullipotent
      * @author DoubleX @interface @since v1.00a @version v1.00a
      * @param {[index]} paramIds - The list of id of parameters involved
      * @param {[Game_Battler]} mems - The list of battlers to be filtered
+     * @param {boolean} isEditMems - Whether the mems argument will be mutated
      * @returns {[Game_Batler]} The list of requested unit members
      */
-    $.memWithoutAllDebuffs = function(paramIds, mems = this.members()) {
-        return mems.filter(mem => NEW._MEM_WITHOUT_ALL_DEBUFFS(paramIds, mem));
+    $.memWithoutAllDebuffs = function(paramIds, mems = this.members(), isEditMems = false) {
+        const filterFunc = mem => NEW._MEM_WITHOUT_ALL_DEBUFFS(paramIds, mem);
+        return NEW._FILTERED_MEMS(mems, isEditMems, filterFunc);
     }; // $.memWithoutAllDebuffs
 
-    NEW._MEM_WITH_ANY_SKILL = 
+    NEW._MEM_WITH_ANY_SKILL =
             NEW._MEM_WITH_COND.bind(undefined, "hasAnySkill");
     /**
      * Script call/Nullipotent
      * @author DoubleX @interface @since v1.00a @version v1.00a
      * @param {[id]} skillIds - The list of id of skills involved
      * @param {[Game_Battler]} mems - The list of battlers to be filtered
+     * @param {boolean} isEditMems - Whether the mems argument will be mutated
      * @returns {[Game_Batler]} The list of requested unit members
      */
-    $.memWithAnySkill = function(skillIds, mems = this.members()) {
-        return mems.filter(mem => NEW._MEM_WITH_ANY_SKILL(skillIds, mem));
+    $.memWithAnySkill = function(skillIds, mems = this.members(), isEditMems = false) {
+        const filterFunc = mem => NEW._MEM_WITH_ANY_SKILL(skillIds, mem);
+        return NEW._FILTERED_MEMS(mems, isEditMems, filterFunc);
     }; // $.memWithAnySkill
 
-    NEW._MEM_WITH_ALL_SKILLS = 
+    NEW._MEM_WITH_ALL_SKILLS =
             NEW._MEM_WITH_COND.bind(undefined, "hasAllSkills");
     /**
      * Script call/Nullipotent
      * @author DoubleX @interface @since v1.00a @version v1.00a
      * @param {[id]} skillIds - The list of id of skills involved
      * @param {[Game_Battler]} mems - The list of battlers to be filtered
+     * @param {boolean} isEditMems - Whether the mems argument will be mutated
      * @returns {[Game_Batler]} The list of requested unit members
      */
-    $.memWithAllSkills = function(skillIds, mems = this.members()) {
-        return mems.filter(mem => NEW._MEM_WITH_ALL_SKILLS(skillIds, mem));
+    $.memWithAllSkills = function(skillIds, mems = this.members(), isEditMems = false) {
+        const filterFunc = mem => NEW._MEM_WITH_ALL_SKILLS(skillIds, mem);
+        return NEW._FILTERED_MEMS(mems, isEditMems, filterFunc);
     }; // $.memWithAllSkills
 
-    NEW._MEM_WITHOUT_ANY_SKILL = 
+    NEW._MEM_WITHOUT_ANY_SKILL =
             NEW._MEM_WTHOUT_COND.bind(undefined, "hasAnySkill");
     /**
      * Script call/Nullipotent
      * @author DoubleX @interface @since v1.00a @version v1.00a
      * @param {[id]} skillIds - The list of id of skills involved
      * @param {[Game_Battler]} mems - The list of battlers to be filtered
+     * @param {boolean} isEditMems - Whether the mems argument will be mutated
      * @returns {[Game_Batler]} The list of requested unit members
      */
-    $.memWithoutAnySkill = function(skillIds, mems = this.members()) {
-        return mems.filter(mem => NEW._MEM_WITHOUT_ANY_SKILL(skillIds, mem));
+    $.memWithoutAnySkill = function(skillIds, mems = this.members(), isEditMems = false) {
+        const filterFunc = mem => NEW._MEM_WITHOUT_ANY_SKILL(skillIds, mem);
+        return NEW._FILTERED_MEMS(mems, isEditMems, filterFunc);
     }; // $.memWithoutAnySkill
 
-    NEW._MEM_WITHOUT_ALL_SKILLS = 
+    NEW._MEM_WITHOUT_ALL_SKILLS =
             NEW._MEM_WTHOUT_COND.bind(undefined, "hasAllSkills");
     /**
      * Script call/Nullipotent
      * @author DoubleX @interface @since v1.00a @version v1.00a
      * @param {[id]} skillIds - The list of id of skills involved
      * @param {[Game_Battler]} mems - The list of battlers to be filtered
+     * @param {boolean} isEditMems - Whether the mems argument will be mutated
      * @returns {[Game_Batler]} The list of requested unit members
      */
-    $.memWithoutAllSkills = function(skillIds, mems = this.members()) {
-        return mems.filter(mem => NEW._MEM_WITHOUT_ALL_SKILLS(skillIds, mem));
+    $.memWithoutAllSkills = function(skillIds, mems = this.members(), isEditMems = false) {
+        const filterFunc = mem => NEW._MEM_WITHOUT_ALL_SKILLS(skillIds, mem);
+        return NEW._FILTERED_MEMS(mems, isEditMems, filterFunc);
     }; // $.memWithoutAllSkills
 
     /**
@@ -981,11 +1020,12 @@ Utils.checkRMVersion(DoubleX_RMMZ.Unit_Filters.VERSIONS.codebase);
      * @author DoubleX @interface @since v1.00a @version v1.00a
      * @param {[string]} stats - The list of names of stats involved
      * @param {[Game_Battler]} mems - The list of battlers to be filtered
+     * @param {boolean} isEditMems - Whether the mems argument will be mutated
      * @returns {[Game_Batler]} The list of requested unit members
      */
-    $.anyHighestStatMem = function(stats) {
+    $.anyHighestStatMem = function(stats, mems = this.members(), isEditMems = false) {
         return NEW._statFilteredMem.call(
-                this, NEW._DESCENDING_SORT, NEW._EQUALS, "some", stats);
+                this, NEW._DESCENDING_SORT, NEW._EQUALS, "some", stats, mems, isEditMems);
     }; // $.anyHighestStatMem
 
     /**
@@ -993,11 +1033,12 @@ Utils.checkRMVersion(DoubleX_RMMZ.Unit_Filters.VERSIONS.codebase);
      * @author DoubleX @interface @since v1.00a @version v1.00a
      * @param {[string]} stats - The list of names of stats involved
      * @param {[Game_Battler]} mems - The list of battlers to be filtered
+     * @param {boolean} isEditMems - Whether the mems argument will be mutated
      * @returns {[Game_Batler]} The list of requested unit members
      */
-    $.allHighestStatsMem = function(stats) {
+    $.allHighestStatsMem = function(stats, mems = this.members(), isEditMems = false) {
         return NEW._statFilteredMem.call(
-                this, NEW._DESCENDING_SORT, NEW._EQUALS, "every", stats);
+                this, NEW._DESCENDING_SORT, NEW._EQUALS, "every", stats, mems, isEditMems);
     }; // $.allHighestStatsMem
 
     /**
@@ -1005,11 +1046,12 @@ Utils.checkRMVersion(DoubleX_RMMZ.Unit_Filters.VERSIONS.codebase);
      * @author DoubleX @interface @since v1.00a @version v1.00a
      * @param {[string]} stats - The list of names of stats involved
      * @param {[Game_Battler]} mems - The list of battlers to be filtered
+     * @param {boolean} isEditMems - Whether the mems argument will be mutated
      * @returns {[Game_Batler]} The list of requested unit members
      */
-    $.notAnyHighestStatMem = function(stats) {
+    $.notAnyHighestStatMem = function(stats, mems = this.members(), isEditMems = false) {
         return NEW._statFilteredMem.call(
-                this, NEW._DESCENDING_SORT, NEW._NOT_EQUALS, "every", stats);
+                this, NEW._DESCENDING_SORT, NEW._NOT_EQUALS, "every", stats, mems, isEditMems);
     }; // $.notAnyHighestStatMem
 
     /**
@@ -1017,11 +1059,12 @@ Utils.checkRMVersion(DoubleX_RMMZ.Unit_Filters.VERSIONS.codebase);
      * @author DoubleX @interface @since v1.00a @version v1.00a
      * @param {[string]} stats - The list of names of stats involved
      * @param {[Game_Battler]} mems - The list of battlers to be filtered
+     * @param {boolean} isEditMems - Whether the mems argument will be mutated
      * @returns {[Game_Batler]} The list of requested unit members
      */
-    $.notAllHighestStatsMem = function(stats) {
+    $.notAllHighestStatsMem = function(stats, mems = this.members(), isEditMems = false) {
         return NEW._statFilteredMem.call(
-                this, NEW._DESCENDING_SORT, NEW._NOT_EQUALS, "some", stats);
+                this, NEW._DESCENDING_SORT, NEW._NOT_EQUALS, "some", stats, mems, isEditMems);
     }; // $.notAllHighestStatsMem
 
     /**
@@ -1029,11 +1072,12 @@ Utils.checkRMVersion(DoubleX_RMMZ.Unit_Filters.VERSIONS.codebase);
      * @author DoubleX @interface @since v1.00a @version v1.00a
      * @param {[string]} stats - The list of names of stats involved
      * @param {[Game_Battler]} mems - The list of battlers to be filtered
+     * @param {boolean} isEditMems - Whether the mems argument will be mutated
      * @returns {[Game_Batler]} The list of requested unit members
      */
-    $.anyLowestStatMem = function(stats) {
+    $.anyLowestStatMem = function(stats, mems = this.members(), isEditMems = false) {
         return NEW._statFilteredMem.call(
-                this, NEW._ASCENDING_SORT, NEW._EQUALS, "some", stats);
+                this, NEW._ASCENDING_SORT, NEW._EQUALS, "some", stats, mems, isEditMems);
     }; // $.anyLowestStatMem
 
     /**
@@ -1041,11 +1085,12 @@ Utils.checkRMVersion(DoubleX_RMMZ.Unit_Filters.VERSIONS.codebase);
      * @author DoubleX @interface @since v1.00a @version v1.00a
      * @param {[string]} stats - The list of names of stats involved
      * @param {[Game_Battler]} mems - The list of battlers to be filtered
+     * @param {boolean} isEditMems - Whether the mems argument will be mutated
      * @returns {[Game_Batler]} The list of requested unit members
      */
-    $.allLowestStatsMem = function(stats) {
+    $.allLowestStatsMem = function(stats, mems = this.members(), isEditMems = false) {
         return NEW._statFilteredMem.call(
-                this, NEW._ASCENDING_SORT, NEW._EQUALS, "every", stats);
+                this, NEW._ASCENDING_SORT, NEW._EQUALS, "every", stats, mems, isEditMems);
     }; // $.allLowestStatsMem
 
     /**
@@ -1053,11 +1098,12 @@ Utils.checkRMVersion(DoubleX_RMMZ.Unit_Filters.VERSIONS.codebase);
      * @author DoubleX @interface @since v1.00a @version v1.00a
      * @param {[string]} stats - The list of names of stats involved
      * @param {[Game_Battler]} mems - The list of battlers to be filtered
+     * @param {boolean} isEditMems - Whether the mems argument will be mutated
      * @returns {[Game_Batler]} The list of requested unit members
      */
-    $.notAnyLowestStatMem = function(stats) {
+    $.notAnyLowestStatMem = function(stats, mems = this.members(), isEditMems = false) {
         return NEW._statFilteredMem.call(
-                this, NEW._ASCENDING_SORT, NEW._NOT_EQUALS, "every", stats);
+                this, NEW._ASCENDING_SORT, NEW._NOT_EQUALS, "every", stats, mems, isEditMems);
     }; // $.notAnyLowestStatMem
 
     /**
@@ -1065,11 +1111,12 @@ Utils.checkRMVersion(DoubleX_RMMZ.Unit_Filters.VERSIONS.codebase);
      * @author DoubleX @interface @since v1.00a @version v1.00a
      * @param {[string]} stats - The list of names of stats involved
      * @param {[Game_Battler]} mems - The list of battlers to be filtered
+     * @param {boolean} isEditMems - Whether the mems argument will be mutated
      * @returns {[Game_Batler]} The list of requested unit members
      */
-    $.notAllLowestStatsMem = function(stats) {
+    $.notAllLowestStatsMem = function(stats, mems = this.members(), isEditMems = false) {
         return NEW._statFilteredMem.call(
-                this, NEW._ASCENDING_SORT, NEW._NOT_EQUALS, "some", stats);
+                this, NEW._ASCENDING_SORT, NEW._NOT_EQUALS, "some", stats, mems, isEditMems);
     }; // $.notAllLowestStatsMem
 
     /**
@@ -1078,11 +1125,12 @@ Utils.checkRMVersion(DoubleX_RMMZ.Unit_Filters.VERSIONS.codebase);
      * @param {[string]} stats - The list of names of stats involved
      * @param {number} val - The value to be checked against
      * @param {[Game_Battler]} mems - The list of battlers to be filtered
+     * @param {boolean} isEditMems - Whether the mems argument will be mutated
      * @returns {[Game_Batler]} The list of requested unit members
      */
-    $.anyAboveStatMem = function(stats, val) {
+    $.anyAboveStatMem = function(stats, val, mems = this.members(), isEditMems = false) {
         const func = NEW._IS_GREATER_THAN;
-        return NEW._statValFilteredMem.call(this, func, "some", stats, val);
+        return NEW._statValFilteredMem.call(this, func, "some", stats, val, mems, isEditMems);
     }; // $.anyAboveStatMem
 
     /**
@@ -1091,11 +1139,12 @@ Utils.checkRMVersion(DoubleX_RMMZ.Unit_Filters.VERSIONS.codebase);
      * @param {[string]} stats - The list of names of stats involved
      * @param {number} val - The value to be checked against
      * @param {[Game_Battler]} mems - The list of battlers to be filtered
+     * @param {boolean} isEditMems - Whether the mems argument will be mutated
      * @returns {[Game_Batler]} The list of requested unit members
      */
-    $.allAboveStatMem = function(stats, val) {
+    $.allAboveStatMem = function(stats, val, mems = this.members(), isEditMems = false) {
         const func = NEW._IS_GREATER_THAN;
-        return NEW._statValFilteredMem.call(this, func, "every", stats, val);
+        return NEW._statValFilteredMem.call(this, func, "every", stats, val, mems, isEditMems);
     }; // $.allAboveStatMem
 
     /**
@@ -1104,11 +1153,12 @@ Utils.checkRMVersion(DoubleX_RMMZ.Unit_Filters.VERSIONS.codebase);
      * @param {[string]} stats - The list of names of stats involved
      * @param {number} val - The value to be checked against
      * @param {[Game_Battler]} mems - The list of battlers to be filtered
+     * @param {boolean} isEditMems - Whether the mems argument will be mutated
      * @returns {[Game_Batler]} The list of requested unit members
      */
-    $.anyBelowStatMem = function(stats, val) {
+    $.anyBelowStatMem = function(stats, val, mems = this.members(), isEditMems = false) {
         const func = NEW._IS_LESS_THAN;
-        return NEW._statValFilteredMem.call(this, func, "some", stats, val);
+        return NEW._statValFilteredMem.call(this, func, "some", stats, val, mems, isEditMems);
     }; // $.anyBelowStatMem
 
     /**
@@ -1117,11 +1167,12 @@ Utils.checkRMVersion(DoubleX_RMMZ.Unit_Filters.VERSIONS.codebase);
      * @param {[string]} stats - The list of names of stats involved
      * @param {number} val - The value to be checked against
      * @param {[Game_Battler]} mems - The list of battlers to be filtered
+     * @param {boolean} isEditMems - Whether the mems argument will be mutated
      * @returns {[Game_Batler]} The list of requested unit members
      */
-    $.allBelowStatMem = function(stats, val) {
+    $.allBelowStatMem = function(stats, val, mems = this.members(), isEditMems = false) {
         const func = NEW._IS_LESS_THAN;
-        return NEW._statValFilteredMem.call(this, func, "every", stats, val);
+        return NEW._statValFilteredMem.call(this, func, "every", stats, val, mems, isEditMems);
     }; // $.allBelowStatMem
 
     NEW._SORTED_STATS = (stats, mems, compareFunc) => {
@@ -1135,13 +1186,16 @@ Utils.checkRMVersion(DoubleX_RMMZ.Unit_Filters.VERSIONS.codebase);
      * @enum @param {string} quantifier - some for any skill/every for all stat
      * @param {[string]} stats - The list of names of stats involved
      * @param {[Game_Battler]} mems - The list of battlers to be filtered
+     * @param {boolean} isEditMems - Whether the mems argument will be mutated
      * @returns {[Game_Batler]} The list of requested unit members
      */
-    NEW._statFilteredMem = function(compareFunc, filterFunc, quantifier, stats, mems = this.members()) {
+    NEW._statFilteredMem = function(compareFunc, filterFunc, quantifier, stats, mems = this.members(), isEditMems = false) {
         const sortedStats = NEW._SORTED_STATS(stats, mems, compareFunc);
-        return mems.filter(mem => stats[quantifier]((stat, i) => {
-            return filterFunc(mem[stat], sortedStats[i][0]);
-        }));
+        return NEW._FILTERED_MEMS(mems, isEditMems, mem => {
+            return stats[quantifier]((stat, i) => {
+                return filterFunc(mem[stat], sortedStats[i][0]);
+            });
+        });
     }; // NEW._statFilteredMem
 
     /**
@@ -1152,10 +1206,11 @@ Utils.checkRMVersion(DoubleX_RMMZ.Unit_Filters.VERSIONS.codebase);
      * @param {[string]} stats - The list of names of stats involved
      * @param {number} val - The value to be checked against
      * @param {[Game_Battler]} mems - The list of battlers to be filtered
+     * @param {boolean} isEditMems - Whether the mems argument will be mutated
      * @returns {[Game_Batler]} The list of requested unit members
      */
-    NEW._statValFilteredMem = function(filterFunc, quantifier, stats, val, mems = this.members()) {
-        return mems.filter(mem => {
+    NEW._statValFilteredMem = function(filterFunc, quantifier, stats, val, mems = this.members(), isEditMems = false) {
+        return NEW._FILTERED_MEMS(mems, isEditMems, mem => {
             return stats[quantifier](stat => filterFunc(mem[stat], val));
         });
     }; // NEW._statValFilteredMem
