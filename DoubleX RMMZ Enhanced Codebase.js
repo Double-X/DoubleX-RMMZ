@@ -48,7 +48,7 @@
  *----------------------------------------------------------------------------
  *    # Links
  *      This Plugin:
- *      1.
+ *      1. https://github.com/Double-X/DoubleX-RMMZ/blob/master/DoubleX%20RMMZ%20Enhanced%20Codebase.js
  *      Posts:
  *      1.
  *      2.
@@ -371,6 +371,11 @@
  *       10. _isEscCompatibleJustReleased
  *     - Static Variable
  *       1. _isJustReleased
+ *     DoubleX_RMMZ.Enhanced_Codebase.DataManager.new(NEW in DataManager)
+ *     - Static Functions
+ *       Their contexts are supposed to be DataManager
+ *       1. loadDataNotetags
+ *       2. _onXhrLoadSuc
  *     DoubleX_RMMZ.Enhanced_Codebase.StorageManager.new(NEW in
  *     StorageManager)
  *     - Static Functions
@@ -541,7 +546,7 @@
  *============================================================================
  */
 
-var DoubleX_RMMZ = DoubleX_RMMZ || {};
+var DoubleX_RMMZ = DoubleX_RMMZ || {}; // var must be used or game will crash
 // Separates the version numbers with the rest to make the former more clear
 DoubleX_RMMZ.Enhanced_Codebase = {
     VERSIONS: { codebase: "1.0.0", plugin: "v0.00a" }
@@ -587,12 +592,59 @@ Utils.checkRMVersion(DoubleX_RMMZ.Enhanced_Codebase.VERSIONS.codebase);
             rewriteAccessor: CORE._rewriteAccessor.bind(undefined, origKlass),
             rewriteGetter: CORE._rewriteGetter.bind(undefined, origKlass),
             rewriteSetter: CORE._rewriteSetter.bind(undefined, origKlass),
-            extendFunc: CORE._extendFunc.bind(undefined, origKlass, container),
-            rewriteFunc: CORE._rewriteFunc.bind(undefined, origKlass, container)
+            extendFunc: MZ_EC.extendFunc.bind(undefined, origKlass, container),
+            rewriteFunc: MZ_EC.rewriteFunc.bind(undefined, origKlass, container)
         };
     }; // MZ_EC.makeKlassContainer
 
+    // Search tag: Enhanced_Codebase_Extend_Rewrite_Funcs
+    MZ_EC.extendFunc = (origKlass, pluginContainer, funcName, func) => {
+        pluginContainer.orig[funcName] = origKlass[funcName];
+        pluginContainer.new[funcName] = origKlass[funcName] = func;
+    }; // MZ_EC.extendFunc
+    //
+    // It has the same implementations but different meanings on the callers
+    MZ_EC.rewriteFunc = MZ_EC.extendFunc;
+    //
+
+    MZ_EC.onLoadDataNotetags = (obj, datumType, containerName, baseRegex, notePairs) => {
+        obj.forEach(datum_ => {
+        if (!datum_) return;
+        const fullRegex = CORE._FULL_REG_EXP(baseRegex);
+        CORE._ON_LOAD_DATUM_NOTETAGS(
+                datumType, datum_, containerName, fullRegex, notePairs);
+        });
+    }; // MZ_EC.onLoadDataNotetags
+
+    // The this pointer is that of the caller
+    MZ_EC.returnedEntryWithSuffix = function(notePairs, notetagType, suffix, entry, count) {
+        switch (suffix) {
+            case "val": return CORE._RETURNED_ENTRY_VAL(
+                    notePairs, notetagType, entry, count);
+            case "switch": return $gameSwitches.value(+entry);
+            case "var": return $gameVariables.value(+entry);
+            case "script": {
+                return new Function($gameVariables.value(+entry)).call(this);
+            }
+            // There's not enough context to throw errors meaningfully
+            default: return entry;
+            //
+        }
+    }; // MZ_EC.returnedEntryWithSuffix
+    //
+
+    MZ_EC.BOOL_SUFFIXES = ["val", "switch", "script"];
+    MZ_EC.VAL_SUFFIXES = ["val", "var", "script"];
+    MZ_EC.EVENT_SUFFIXES = ["event", "script"];
+    MZ_EC.BOOL_ENTRY = "bool";
+    MZ_EC.BOOL_ARRAY_ENTRY = "boolArray";
+    MZ_EC.NUM_ENTRY = "num";
+    MZ_EC.NUM_ARRAY_ENTRY = "numArray";
+    MZ_EC.STRING_ENTRY = "string";
+    MZ_EC.STRING_ARRAY_ENTRY = "stringArray";
+
     const CORE = MZ_EC.CORE = {};
+
     // Search tag: Enhanced_Codebase_Add_Accessors
     CORE._addAccessor = (origKlass, accessorName, getFunc, setFunc) => {
         Object.defineProperty(origKlass, accessorName, {
@@ -617,19 +669,119 @@ Utils.checkRMVersion(DoubleX_RMMZ.Enhanced_Codebase.VERSIONS.codebase);
         });
     }; // CORE._addSetter
 
-    // Search tag: Enhanced_Codebase_Extend_Rewrite_Funcs
-    CORE._extendFunc = (origKlass, pluginContainer, funcName, func) => {
-        pluginContainer.orig[funcName] = origKlass[funcName];
-        pluginContainer.new[funcName] = origKlass[funcName] = func;
-    }; // CORE._extendFunc
-    //
-
     // They've the same implementations but different meanings on the callers
     CORE._rewriteAccessor = CORE._addAccessor;
     CORE._rewriteGetter = CORE._addGetter;
     CORE._rewriteSetter = CORE._addSetter;
-    CORE._rewriteFunc = CORE._extendFunc;
     //
+
+    CORE._REG_EXP_SUFFIX_SEPARATOR = " +", CORE._REG_EXP_SUFFIXES =
+            " +(\\w+(?:" + CORE._REG_EXP_SUFFIX_SEPARATOR + "\\w+)*) *";
+    // So alphanumeric characters as well as numbers with decimals are captured
+    CORE.REG_EXP_ENTRY_VAL = "[\/A-Za-z\\d_\.-]+";
+    // The / is captured as well to support filepath strings
+    CORE._REG_EXP_ENTRY_SEPARATOR = " *, +";
+    CORE._REG_EXP_ENTRIES = " *(" + CORE.REG_EXP_ENTRY_VAL + "(?:" +
+            CORE._REG_EXP_ENTRY_SEPARATOR + CORE.REG_EXP_ENTRY_VAL + ")*) *";
+    CORE._FULL_REG_EXP = baseRegex => new RegExp("<" + baseRegex +
+            CORE._REG_EXP_SUFFIXES + ":" + CORE._REG_EXP_ENTRIES + ">", "gim");
+    CORE._REG_EXP_SPLIT_NOTES = /[\r\n]+/;
+    CORE._ON_LOAD_DATUM_NOTETAGS = (datumType, datum, containerName, fullRegex, notePairs) => {
+        // Storing datumType is to streamline the notetag datum type reading
+        const container = datum.meta[containerName] = {
+            id: datum.id,
+            datumType,
+            notetags: []
+        }, lines = datum.note.split(CORE._REG_EXP_SPLIT_NOTES);
+        //
+        lines.forEach(line => {
+            CORE._ON_LOAD_DATUM_NOTETAG(container, fullRegex, notePairs, line);
+        });
+    }; // CORE._ON_LOAD_DATUM_NOTETAGS
+    CORE._SHOW_INVALID_NOTE_TYPE = (datumType, id, noteType, line) => {
+        console.warn(`A ${datumType} data with id ${id}
+                     has the invalid type ${noteType} in notetag ${line}`);
+    CORE._REG_EXP_SUFFIX_SEPARATOR_OBJ =
+            new RegExp(CORE._REG_EXP_SUFFIX_SEPARATOR);
+    CORE._REG_EXP_ENTRY_SEPARATOR_OBJ =
+            new RegExp(CORE._REG_EXP_ENTRY_SEPARATOR);
+    CORE._ON_LOAD_DATUM_NOTETAG = (container, fullRegex, notePairs, line) => {
+        if (!line.match(fullRegex)) return;
+        const notetagType = RegExp.$1;
+        if (!notePairs.has(notetagType)) return CORE._SHOW_INVALID_NOTE_TYPE(
+                container.datumType, container.id, notetagType, line);
+        // Otherwise split would corrupt RegExp.$2 and RegExp.$3
+        const rawSuffixes = RegExp.$2, rawEntries = RegExp.$3;
+        const suffixes = rawSuffixes.split(CORE._REG_EXP_SUFFIX_SEPARATOR_OBJ);
+        const entries = rawEntries.split(CORE._REG_EXP_ENTRY_SEPARATOR_OBJ);
+        //
+        CORE._ON_LOAD_NOTETAG_PAIRS(
+                container, notePairs, line, notetagType, suffixes, entries);
+        //
+    }; //  CORE._onLoadDatumNotetag
+    }; // CORE._SHOW_INVALID_NOTE_TYPE
+    CORE._ON_LOAD_NOTETAG_PAIRS = (container, notePairs, line, notetagType, suffixes, entries) => {
+        const pairs = CORE._NOTETAG_PAIRS(
+                container, notePairs, line, notetagType, suffixes, entries);
+        // push is much faster than concat and pairs isn't an array
+        container.notetags.push({ notetagType, pairs });
+        //
+    }; // CORE._ON_LOAD_NOTETAG_PAIRS
+    CORE._IS_VALID_SUFFIX = (notePairs, notetagType, suffix, count) => {
+        const notetagTypePairs = notePairs.get(notetagType);
+        const suffixName = `suffix${count}`;
+        if (!notetagTypePairs.has(suffixName)) return false;
+        return notetagTypePairs.get(suffixName).includes(suffix);
+    }; // CORE._IS_VALID_SUFFIX
+    CORE._SHOW_INVALID_NOTE_SUFFIX = (datumType, id, count, suffix, line) => {
+        console.warn(`A ${datumType} data with id ${id}
+                     has the invalid ${count}th suffix ${suffix}
+                     in notetag ${line}`);
+    }; // CORE._SHOW_INVALID_NOTE_SUFFIX
+    CORE._NOTETAG_PAIRS = (container, notePairs, line, notetagType, suffixes, entries) => {
+        // So those excessive suffixes/entries will be discarded right here
+        const pairs = new Map(), l = Math.min(suffixes.length, entries.length);
+        //
+        let i = 0;
+        // It's tolerable and more performant than any declarative counterpart
+        while (i < l) { // while is at least slightly faster than for in general
+            const suffix = suffixes[i], entry = entries[i], count = i + 1;
+            if (CORE._IS_VALID_SUFFIX(notePairs, notetagType, suffix, count)) {
+                pairs.set(`suffix${count}`, suffix);
+                pairs.set(`entry${count}`, entry);
+            } else CORE._SHOW_INVALID_NOTE_SUFFIX(
+                    container.datumType, container.id, count, suffix, line);
+            i++;
+        }
+        return pairs;
+        //
+    }; // CORE._NOTETAG_PAIRS
+
+    CORE._ARRAY_VAL_SEPARATOR = "|", CORE._BOOL_ARRAY_VAL = entry => {
+        return entry.split(CORE._ARRAY_VAL_SEPARATOR).map(CORE._BOOL_VAL);
+    }; // CORE._BOOL_ARRAY_VAL
+    CORE._BOOL_VAL = entry => entry === "true" || entry !== "false";
+    CORE._NUM_ARRAY_VAL = entry => {
+        return entry.split(CORE._ARRAY_VAL_SEPARATOR).map(e => +e);
+    }; // CORE._NUM_ARRAY_VAL
+    CORE._RETURNED_ENTRY_VAL = (notePairs, notetagType, entry, count) => {
+        // There's not enough context to throw errors meaningfully
+        if (!notePairs.has(notetagType)) return entry;
+        //CORE.BOOL_ENTRY = "bool";
+        switch (notePairs.get(notetagType).get(`entry${count}`)) {
+            case CORE.BOOL_ENTRY: return CORE._BOOL_VAL(entry);
+            case CORE.BOOL_ARRAY_ENTRY: return CORE._BOOL_ARRAY_VAL(entry);
+            case CORE.NUM_ENTRY: return +entry;
+            case CORE.NUM_ARRAY_ENTRY: return CORE._NUM_ARRAY_VAL(entry);
+            case CORE.STRING_ENTRY: return entry;
+            case CORE.STRING_ARRAY_ENTRY: {
+                return entry.split(CORE._ARRAY_VAL_SEPARATOR);
+            }
+            // There's not enough context to throw errors meaningfully
+            default: return entry;
+            //
+        }
+    }; // CORE._RETURNED_ENTRY_VAL
 
 })(DoubleX_RMMZ.Enhanced_Codebase);
 
@@ -748,7 +900,7 @@ Utils.checkRMVersion(DoubleX_RMMZ.Enhanced_Codebase.VERSIONS.codebase);
         // forEach is tested to be the fastest among sandboxes including NW.js
         this.forEach((elem, i) => {
             // It's ok to call undefined context with previously bound callbacks
-            var mappedElem = mapCallback.call(mapThis_, elem, i, this);
+            const mappedElem = mapCallback.call(mapThis_, elem, i, this);
             if (!filterCallback.call(filterThis_, mappedElem, i)) return;
             //
             newArray.push(mappedElem);
@@ -787,7 +939,7 @@ Utils.checkRMVersion(DoubleX_RMMZ.Enhanced_Codebase.VERSIONS.codebase);
             // forEach is tested to be fastest among sandboxes including NW.js
             this.forEach((elem, i) => {
                 // It's ok to call undefined context with already bound callback
-                var mappedElem = mapCallback.call(mapThis_, elem, i, this);
+                const mappedElem = mapCallback.call(mapThis_, elem, i, this);
                 val = reduceCallback.call(reduceThis_, val, mappedElem, i);
                 //
             });
@@ -798,7 +950,7 @@ Utils.checkRMVersion(DoubleX_RMMZ.Enhanced_Codebase.VERSIONS.codebase);
         let val = this[0], i = 1;
         while (i < l) {
             // It's ok to call undefined context with already bound callback
-            var mappedElem = mapCallback.call(mapThis_, this[i], i, this);
+            const mappedElem = mapCallback.call(mapThis_, this[i], i, this);
             val = reduceCallback.call(reduceThis_, val, mappedElem, i);
             //
             i++;
@@ -936,7 +1088,7 @@ Utils.checkRMVersion(DoubleX_RMMZ.Enhanced_Codebase.VERSIONS.codebase);
     } = MZ_EC.setKlassContainer("Graphics", $, MZ_EC);
 
     extendFunc("initialize", function() {
-        var init = ORIG.initialize.apply(this, arguments);
+        const init = ORIG.initialize.apply(this, arguments);
         // Added to help plugins alter initialize behaviors in better ways
         NEW._initKeyEvents.call(this);
         //
@@ -1810,6 +1962,59 @@ Utils.checkRMVersion(DoubleX_RMMZ.Enhanced_Codebase.VERSIONS.codebase);
 /*----------------------------------------------------------------------------
  *    ## Managers
  *----------------------------------------------------------------------------*/
+
+/*----------------------------------------------------------------------------
+ *    # Edited class: DataManager
+ *      - Impproves code quality
+ *----------------------------------------------------------------------------*/
+
+(($, MZ_EC) => {
+
+    "use strict";
+
+    const {
+        NEW,
+        ORIG,
+        extendFunc,
+        rewriteFunc,
+    } = MZ_EC.setKlassContainer("DataManager", $, MZ_EC);
+
+    extendFunc("onLoad", function(obj, objName) {
+        ORIG.onLoad.apply(this, arguments);
+        // Added to help plugins load notetags with known data container type
+        NEW.loadDataNotetags.call(this, obj, objName);
+        //
+    }); // v0.00a - v0.00a
+
+    rewriteFunc("onXhrLoad", function(xhr, name, src, url) {
+        // Edited to help plugins alter on xhr load behaviors in better ways
+        if (xhr.status < 400) return NEW._onXhrLoadSuc.call(this, xhr, name);
+        //
+        this.onXhrError(name, src, url);
+    }); // v0.00a - v0.00a
+
+    /**
+     * The this pointer is DataManager
+     * Idempotent
+     * @author DoubleX @interface @since v0.00a @version v0.00a
+     * @param {[Datum]} obj - The data container having notetags to be loaded
+     * @param {string} objName - The name of the data container having notetags
+     */
+    NEW.loadDataNotetags = function(obj, objName) {};
+
+    /**
+     * The this pointer is DataManager
+     * Idempotent
+     * @author DoubleX @since v0.00a @version v0.00a
+     * @param {XMLHttpRequest} xhr - The xhr successfully loading the data
+     * @param {string} name - The name of the successfully loaded data container
+     */
+    NEW._onXhrLoadSuc = function(xhr, name) {
+        window[name] = JSON.parse(xhr.responseText);
+        this.onLoad(window[name], name);
+    }; // NEW._onXhrLoadSuc
+
+})(DataManager, DoubleX_RMMZ.Enhanced_Codebase);
 
 /*----------------------------------------------------------------------------
  *    # Edited class: StorageManager
@@ -3787,7 +3992,7 @@ Utils.checkRMVersion(DoubleX_RMMZ.Enhanced_Codebase.VERSIONS.codebase);
      * The this pointer is Game_Actor.prototype
      * Nullipotent
      * @author DoubleX @since v0.00a @version v0.00a
-     * @param {[DataEquip]} equips - List of data of equipments to initialize
+     * @param {[DatumEquip]} equips - List of data of equipments to initialize
      * @returns {[Game_Item]} The list of initialized equipments of this actor
      */
     NEW._initializedEquips = function(equips) {
@@ -3892,7 +4097,7 @@ Utils.checkRMVersion(DoubleX_RMMZ.Enhanced_Codebase.VERSIONS.codebase);
      * The this pointer is Game_Actor.prototype
      * Nullipotent
      * @author DoubleX @since v0.00a @version v0.00a
-     * @param {[DataTrait]} set - The set of base attack elements of this actor
+     * @param {[DatumTrait]} set - The set of base attack elements of this actor
      * @returns {boolean} Whether attack elements should include barehand ones
      */
     NEW._isIncludeBareHandElem = function(set) {
@@ -4128,9 +4333,9 @@ Utils.checkRMVersion(DoubleX_RMMZ.Enhanced_Codebase.VERSIONS.codebase);
      * The this pointer is Game_Enemy.prototype
      * Nullipotent/Random
      * @author DoubleX @since v0.00a @version v0.00a
-     * @param {[DataDropItem]} dropItems - The items to be dropped by the enemy
+     * @param {[DatumDropItem]} dropItems - The items to be dropped by the enemy
      * @param {DataDropItem} dropItem - The item to be dropped by the enemy
-     * @returns {[DataDropItem]} The accumulated items to be dropped by enemy
+     * @returns {[DatumDropItem]} The accumulated items to be dropped by enemy
      */
     NEW._accumDropItems = function(dropItems, dropItem) {
         if (!NEW._isDropItem.call(this, dropItem)) return dropItems;
@@ -4162,6 +4367,26 @@ Utils.checkRMVersion(DoubleX_RMMZ.Enhanced_Codebase.VERSIONS.codebase);
     }; // NEW._ratingZero
 
 })(Game_Enemy.prototype, DoubleX_RMMZ.Enhanced_Codebase);
+
+/*----------------------------------------------------------------------------
+ *    # Edited class: Game_Unit
+ *      - Uses the configurable Graphics fps instead of the constant 60
+ *----------------------------------------------------------------------------*/
+
+(($, MZ_EC) => {
+
+    "use strict";
+
+    const { rewriteFunc } = MZ_EC.setKlassContainer("Game_Unit", $, MZ_EC);
+
+    rewriteFunc("tpbReferenceTime", function() {
+        // Edited to help plugins alte the fps in better ways
+        const fps = Graphics.gameFps;
+        return BattleManager.isActiveTpb() ? 4 * fps : fps;
+        //
+    }); // v0.00a - v0.00a
+
+})(Game_Unit.prototype, DoubleX_RMMZ.Enhanced_Codebase);
 
 /*----------------------------------------------------------------------------
  *    # Edited class: Game_Party
