@@ -159,8 +159,9 @@
  *         - If mems isn't specified, it'll be default to all members outside
  *           battles and battle members inside battles respectively
  *         - E.g.:
- *           $gameTroop.memWithAllStates([1, 2]) returns the list of troop
- *           members with all states with id 1 or 2
+ *           $gameTroop.memWithAllStates([1, 2], $gameTroop.memWithAnyState([3, 4]))
+ *           returns the list of troop members with all states with id 1 or 2
+ *           among those with any state with id 3 or 4
  *      3. memWithoutAnyState(stateIds, mems)
  *         - Returns the list of members without any state included by
  *           stateIds, which is a list of id of states, among all battlers
@@ -183,8 +184,9 @@
  *         - If mems isn't specified, it'll be default to all members outside
  *           battles and battle members inside battles respectively
  *         - E.g.:
- *           $gameTroop.memWithoutAllStates([1, 2]) returns the list of troop
- *           members without all states with id 1 or 2
+ *           $gameTroop.memWithoutAllStates([1, 2], $gameTroop.memWithoutAnyState([3, 4]))
+ *           returns the list of troop members without all states with id 1 or
+ *           2 among those without any state with id 1 or 2
  *      5. memWithAnyBuff(paramIds, mems)
  *         - Returns the list of members with any buff included by paramIds,
  *           which is a list of id of corresponding parameters, among all
@@ -196,7 +198,7 @@
  *           battles and battle members inside battles respectively
  *         - E.g.:
  *           $gameParty.memWithAnyBuff([0, 1]) returns the list of party
- *           members with any hp or mp buff
+ *           members with any mhp or mmp buff
  *      6. memWithAllBuffs(paramIds, mems)
  *         - Returns the list of members with all buffs included by paramIds,
  *           which is a list of id of corresponding parameters, among all
@@ -207,8 +209,9 @@
  *         - If mems isn't specified, it'll be default to all members outside
  *           battles and battle members inside battles respectively
  *         - E.g.:
- *           $gameTroop.memWithAllBuffs([0, 1]) returns the list of troop
- *           members with all hp and mp buffs
+ *           $gameTroop.memWithAllBuffs([0, 1], $gameTroop.memWithAnyBuff([2, 3]))
+ *           returns the list of troop members with all mhp and mmp buffs
+ *           among those with any atk or def buff
  *      7. memWithoutAnyBuff(paramIds, mems)
  *         - Returns the list of members without any buff included by
  *           paramIds, which is a list of id of corresponding parameters,
@@ -220,7 +223,7 @@
  *           battles and battle members inside battles respectively
  *         - E.g.:
  *           $gameParty.memWithoutAnyBuff([0, 1]) returns the list of party
- *           members without any hp or mp buff
+ *           members without any mhp or mmp buff
  *      8. memWithoutAllBuffs(paramIds, mems)
  *         - Returns the list of members without all buffs included by
  *           paramIds, which is a list of id of corresponding parameters,
@@ -231,8 +234,9 @@
  *         - If mems isn't specified, it'll be default to all members outside
  *           battles and battle members inside battles respectively
  *         - E.g.:
- *           $gameTroop.memWithoutAllBuffs([0, 1]) returns the list of troop
- *           members without all hp and mp buffs
+ *           $gameTroop.memWithoutAllBuffs([0, 1], $gameTroop.memWithoutAnyBuff([2, 3]))
+ *           returns the list of troop members without all mhp and mmp buffs
+ *           among those without any atk or def buff
  *      9. memWithAnyDebuff(paramIds, mems)
  *         - Returns the list of members with any debuff included by paramIds,
  *           which is a list of id of corresponding parameters, among all
@@ -244,7 +248,7 @@
  *           battles and battle members inside battles respectively
  *         - E.g.:
  *           $gameParty.memWithAnyDebuff([0, 1]) returns the list of party
- *           members with any hp or mp debuff
+ *           members with any mhp or mmp debuff
  *      10. memWithAllDebuffs(paramIds, mems)
  *         - Returns the list of members with all debuffs included by
  *           paramIds, which is a list of id of corresponding parameters,
@@ -255,8 +259,9 @@
  *         - If mems isn't specified, it'll be default to all members outside
  *           battles and battle members inside battles respectively
  *         - E.g.:
- *           $gameTroop.memWithAllDebuffs([0, 1]) returns the list of troop
- *           members with all hp and mp debuffs
+ *           $gameTroop.memWithAllDebuffs([0, 1], $gameTroop.memWithAnyDebuff([2, 3]))
+ *           returns the list of troop members with all mhp and mmp debuffs
+ *           among those with any atk or def debuff
  *      11. memWithoutAnyDebuff(paramIds, mems)
  *         - Returns the list of members without any debuff included by
  *           paramIds, which is a list of id of corresponding parameters,
@@ -268,7 +273,7 @@
  *           battles and battle members inside battles respectively
  *         - E.g.:
  *           $gameParty.memWithoutAnyDebuff([0, 1]) returns the list of party
- *           members without any hp or mp debuff
+ *           members without any mhp or mmp debuff
  *      12. memWithoutAllDebuffs(paramIds, mems)
  *         - Returns the list of members without all debuffs included by
  *           paramIds, which is a list of id of corresponding parameters,
@@ -279,8 +284,9 @@
  *         - If mems isn't specified, it'll be default to all members outside
  *           battles and battle members inside battles respectively
  *         - E.g.:
- *           $gameTroop.memWithoutAllDebuffs([0, 1]) returns the list of troop
- *           members without all hp and mp debuffs
+ *           $gameTroop.memWithoutAllDebuffs([0, 1], $gameTroop.memWithoutAnyDebuff([2, 3]))
+ *           returns the list of troop members without all mhp and mmp debuffs
+ *           among those without any atk or def debuff
  *      13. memWithAnySkill(skillIds, mems)
  *         - Returns the list of members with any skill included by skillIds,
  *           which is a list of id of corresponding skills, among all battlers
@@ -303,8 +309,9 @@
  *         - If mems isn't specified, it'll be default to all members outside
  *           battles and battle members inside battles respectively
  *         - E.g.:
- *           $gameTroop.memWithAllSkills([1, 2]) returns the list of troop
- *           members with skills having id 1 and 2
+ *           $gameTroop.memWithAllSkills([1, 2], $gameParty.memWithAnySkill([3, 4]))
+ *           returns the list of troop members with skills having id 1 and 2
+ *           among those with skill having id 3 or 4
  *      15. memWithoutAnySkill(skillIds, mems)
  *         - Returns the list of members without any skill included by
  *           skillIds, which is a list of id of corresponding skills, among
@@ -327,8 +334,9 @@
  *         - If mems isn't specified, it'll be default to all members outside
  *           battles and battle members inside battles respectively
  *         - E.g.:
- *           $gameTroop.memWithoutAllSkills([1, 2]) returns the list of troop
- *           members without skills having id 1 and 2
+ *           $gameTroop.memWithoutAllSkills([1, 2], $gameParty.memWithoutAnySkill([3, 4]))
+ *           returns the list of troop members without skills having id 1 and
+ *           2 among those without skill having id 3 or 4
  *      17. anyHighestStatMem(stats, mems)
  *         - Returns the list of members whose values of
  *           parameters/ex-parameters/sp-parameters included by stats, which
@@ -359,9 +367,10 @@
  *         - If mems isn't specified, it'll be default to all members outside
  *           battles and battle members inside battles respectively
  *         - E.g.:
- *           $gameTroop.allHighestStatsMem(["hp", "mp"]) returns the list of
- *           troop members with the highest amount of hp and mp among the
- *           troop
+ *           $gameTroop.allHighestStatsMem(["hp", "mp"], $gameTroop.anyHighestStatMem(["mhp", "mmp"]))
+ *           returns the list of troop members with the highest amount of hp
+ *           and mp among those with the highest amount of mhp or mmp among
+ *           the troop
  *      19. notAnyHighestStatMem(stats, mems)
  *         - Returns the list of members whose values of
  *           parameters/ex-parameters/sp-parameters included by stats, which
@@ -393,9 +402,10 @@
  *         - If mems isn't specified, it'll be default to all members outside
  *           battles and battle members inside battles respectively
  *         - E.g.:
- *           $gameTroop.notAllHighestStatsMem(["hp", "mp"]) returns the list
- *           of troop members without the highest amount of both hp and mp
- *           among the troop
+ *           $gameTroop.notAllHighestStatsMem(["hp", "mp"], $gameTroop.notAnyHighestStatMem(["mhp", "mmp"]))
+ *           returns the list of troop members without the highest amount of
+ *           both hp and mp among those with neither the highest amount of mhp
+ *           nor mmp among the troop
  *      21. anyLowestStatMem(stats, mems)
  *         - Returns the list of members whose values of
  *           parameters/ex-parameters/sp-parameters included by stats, which
@@ -426,8 +436,10 @@
  *         - If mems isn't specified, it'll be default to all members outside
  *           battles and battle members inside battles respectively
  *         - E.g.:
- *           $gameTroop.allLowestStatsMem(["hp", "mp"]) returns the list of
- *           troop members with the lowest amount of hp and mp among the party
+ *           $gameTroop.allLowestStatsMem(["hp", "mp"], $gameTroop.anyLowestStatMem(["mhp", "mmp"]))
+ *           returns the list of troop members with the lowest amount of hp
+ *           and mp among those with the lowest amount of mhp or mmp among the
+ *           troop
  *      23. notAnyLowestStatMem(stats, mems)
  *         - Returns the list of members whose values of
  *           parameters/ex-parameters/sp-parameters included by stats, which
@@ -459,9 +471,10 @@
  *         - If mems isn't specified, it'll be default to all members outside
  *           battles and battle members inside battles respectively
  *         - E.g.:
- *           $gameTroop.notAllLowestStatsMem(["hp", "mp"]) returns the list of
- *           troop members without the lowest amount of both hp and mp among
- *           the troop
+ *           $gameTroop.notAllLowestStatsMem(["hp", "mp"], $gameParty.notAnyLowestStatMem(["mhp", "mmp"]))
+ *           returns the list of troop members without the lowest amount of
+ *           both hp and mp among those with neither the lowest amount of mhp
+ *           nor mmp among the troop
  *      25. anyAboveStatMem(stats, val, mems)
  *         - Returns the list of members whose values of
  *           parameters/ex-parameters/sp-parameters included by stats, which
@@ -492,8 +505,9 @@
  *         - If mems isn't specified, it'll be default to all members outside
  *           battles and battle members inside battles respectively
  *         - E.g.:
- *           $gameTroop.allAboveStatMem(["hp", "mp"], 100) returns the list of
- *           troop members with the value of hp and mp above 100
+ *           $gameTroop.allAboveStatMem(["hp", "mp"], 100, $gameTroop.anyAboveStatMem(["mhp", "mmp"], 1000))
+ *           returns the list of troop members with the value of hp and mp
+ *           above 100 among those with the value of mhp or mmp above 1000
  *      27. anyBelowStatMem(stats, val, mems)
  *         - Returns the list of members whose values of
  *           parameters/ex-parameters/sp-parameters included by stats, which
@@ -524,8 +538,9 @@
  *         - If mems isn't specified, it'll be default to all members outside
  *           battles and battle members inside battles respectively
  *         - E.g.:
- *           $gameTroop.allBelowStatMem(["hp", "mp"], 100) returns the list of
- *           troop members with the value of hp and mp below 100
+ *           $gameTroop.allBelowStatMem(["hp", "mp"], 100, $gameTroop.anyBelowStatMem(["mhp", "mmp"], 1000))
+ *           returns the list of troop members with the value of hp and mp
+ *           below 100 among those with the value of mhp or mmp below 1000
  *============================================================================
  */
 
