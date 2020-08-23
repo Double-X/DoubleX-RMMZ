@@ -42,9 +42,16 @@
  *----------------------------------------------------------------------------
  *    # Links
  *      This Plugin:
- *      1.
+ *      1. https://github.com/Double-X/DoubleX-RMMZ/blob/master/DoubleX%20RMMZ%20Unit%20Filters.js
  *      Posts:
- *      1.
+ *      1. https://forums.rpgmakerweb.com/index.php?threads/doublex-rmmz-unit-filters.125807/
+ *      2. https://www.rpgmakercentral.com/topic/42539-doublex-rmmz-unit-filters/
+ *      3. https://www.save-point.org/thread-8144.html
+ *      4. https://gdu.one/forums/topic/13614-doublex-rmmz-unit-filters/
+ *      5. http://www.hbgames.org/forums/viewtopic.php?f=332&t=80282
+ *      6. https://www.makerdevs.com/plugin/doublex-rmmz-unit-filters
+ *      7. https://doublexrpgmaker.wordpress.com/2020/08/23/doublex-rmmz-unit-filters/
+ *      8. https://www.patreon.com/posts/40758313
  *----------------------------------------------------------------------------
  *    # Contributors
  *      Authors:
@@ -65,7 +72,7 @@
 /*:
  * @url https://www.patreon.com/doublex
  * @target MZ
- * @plugindesc Versions: ({ codebase: "1.0.0", plugin: "v1.00a" })
+ * @plugindesc Versions: { codebase: "1.0.0", plugin: "v1.00a" }
  * Lets you use script calls to filter unit members with less codes and eventing
  *
  * @help
