@@ -78,8 +78,6 @@
  * @help
  *============================================================================
  *    ## Script Call Info
- *       Members refer to all members outside battles and battle members
- *       inside battles respectively
  *----------------------------------------------------------------------------
  *    # Battler manipulations
  *      1. isAnyStateAffected(stateIds)
@@ -139,280 +137,392 @@
  *           $gameActors.actor(1).hasAllSkills([1, 2]) returns whether the
  *           actor with id 1 has all skills with id 1 and 2
  *    # Unit manipulations
- *      1. memWithAnyState(stateIds)
+ *      1. memWithAnyState(stateIds, mems)
  *         - Returns the list of members with any state included by stateIds,
- *           which is a list of id of states
+ *           which is a list of id of states, among all battlers included by
+ *           mems, which is a list of battlers
  *         - The return value should be an Array of Game_Battler
  *         - stateIds must be an Array of natural numbers
+ *         - mems must be an Array of Game_Battler
+ *         - If mems isn't specified, it'll be default to all members outside
+ *           battles and battle members inside battles respectively
  *         - E.g.:
  *           $gameParty.memWithAnyState([1, 2]) returns the list of party
  *           members with any state with id 1 or 2
- *      2. memWithAllStates(stateIds)
+ *      2. memWithAllStates(stateIds, mems)
  *         - Returns the list of members with all states included by
- *           stateIds, which is a list of id of states
+ *           stateIds, which is a list of id of states, among all battlers
+ *           included by mems, which is a list of battlers
  *         - The return value should be an Array of Game_Battler
  *         - stateIds must be an Array of natural numbers
+ *         - mems must be an Array of Game_Battler
+ *         - If mems isn't specified, it'll be default to all members outside
+ *           battles and battle members inside battles respectively
  *         - E.g.:
  *           $gameTroop.memWithAllStates([1, 2]) returns the list of troop
  *           members with all states with id 1 or 2
- *      3. memWithoutAnyState(stateIds)
+ *      3. memWithoutAnyState(stateIds, mems)
  *         - Returns the list of members without any state included by
- *           stateIds, which is a list of id of states
+ *           stateIds, which is a list of id of states, among all battlers
+ *           included by mems, which is a list of battlers
  *         - The return value should be an Array of Game_Battler
  *         - stateIds must be an Array of natural numbers
+ *         - mems must be an Array of Game_Battler
+ *         - If mems isn't specified, it'll be default to all members outside
+ *           battles and battle members inside battles respectively
  *         - E.g.:
  *           $gameParty.memWithoutAnyState([1, 2]) returns the list of party
  *           members without any state with id 1 or 2
- *      4. memWithoutAllStates(stateIds)
+ *      4. memWithoutAllStates(stateIds, mems)
  *         - Returns the list of members without all states included by
- *           stateIds, which is a list of id of states
+ *           stateIds, which is a list of id of states, among all battlers
+ *           included by mems, which is a list of battlers
  *         - The return value should be an Array of Game_Battler
  *         - stateIds must be an Array of natural numbers
+ *         - mems must be an Array of Game_Battler
+ *         - If mems isn't specified, it'll be default to all members outside
+ *           battles and battle members inside battles respectively
  *         - E.g.:
  *           $gameTroop.memWithoutAllStates([1, 2]) returns the list of troop
  *           members without all states with id 1 or 2
- *      5. memWithAnyBuff(paramIds)
+ *      5. memWithAnyBuff(paramIds, mems)
  *         - Returns the list of members with any buff included by paramIds,
- *           which is a list of id of corresponding parameters
+ *           which is a list of id of corresponding parameters, among all
+ *           battlers included by mems, which is a list of battlers
  *         - The return value should be an Array of Game_Battler
  *         - paramIds must be an Array of non negative numbers
+ *         - mems must be an Array of Game_Battler
+ *         - If mems isn't specified, it'll be default to all members outside
+ *           battles and battle members inside battles respectively
  *         - E.g.:
  *           $gameParty.memWithAnyBuff([0, 1]) returns the list of party
  *           members with any hp or mp buff
- *      6. memWithAllBuffs(paramIds)
+ *      6. memWithAllBuffs(paramIds, mems)
  *         - Returns the list of members with all buffs included by paramIds,
- *           which is a list of id of corresponding parameters
+ *           which is a list of id of corresponding parameters, among all
+ *           battlers included by mems, which is a list of battlers
  *         - The return value should be an Array of Game_Battler
  *         - paramIds must be an Array of non negative numbers
+ *         - mems must be an Array of Game_Battler
+ *         - If mems isn't specified, it'll be default to all members outside
+ *           battles and battle members inside battles respectively
  *         - E.g.:
  *           $gameTroop.memWithAllBuffs([0, 1]) returns the list of troop
  *           members with all hp and mp buffs
- *      7. memWithoutAnyBuff(paramIds)
+ *      7. memWithoutAnyBuff(paramIds, mems)
  *         - Returns the list of members without any buff included by
- *           paramIds, which is a list of id of corresponding parameters
+ *           paramIds, which is a list of id of corresponding parameters,
+ *           among all battlers included by mems, which is a list of battlers
  *         - The return value should be an Array of Game_Battler
  *         - paramIds must be an Array of non negative numbers
+ *         - mems must be an Array of Game_Battler
+ *         - If mems isn't specified, it'll be default to all members outside
+ *           battles and battle members inside battles respectively
  *         - E.g.:
  *           $gameParty.memWithoutAnyBuff([0, 1]) returns the list of party
  *           members without any hp or mp buff
- *      8. memWithoutAllBuffs(paramIds)
+ *      8. memWithoutAllBuffs(paramIds, mems)
  *         - Returns the list of members without all buffs included by
- *           paramIds, which is a list of id of corresponding parameters
+ *           paramIds, which is a list of id of corresponding parameters,
+ *           among all battlers included by mems, which is a list of battlers
  *         - The return value should be an Array of Game_Battler
  *         - paramIds must be an Array of non negative numbers
+ *         - mems must be an Array of Game_Battler
+ *         - If mems isn't specified, it'll be default to all members outside
+ *           battles and battle members inside battles respectively
  *         - E.g.:
  *           $gameTroop.memWithoutAllBuffs([0, 1]) returns the list of troop
  *           members without all hp and mp buffs
- *      9. memWithAnyDebuff(paramIds)
+ *      9. memWithAnyDebuff(paramIds, mems)
  *         - Returns the list of members with any debuff included by paramIds,
- *           which is a list of id of corresponding parameters
+ *           which is a list of id of corresponding parameters, among all
+ *           battlers included by mems, which is a list of battlers
  *         - The return value should be an Array of Game_Battler
  *         - paramIds must be an Array of non negative numbers
+ *         - mems must be an Array of Game_Battler
+ *         - If mems isn't specified, it'll be default to all members outside
+ *           battles and battle members inside battles respectively
  *         - E.g.:
  *           $gameParty.memWithAnyDebuff([0, 1]) returns the list of party
  *           members with any hp or mp debuff
- *      10. memWithAllDebuffs(paramIds)
+ *      10. memWithAllDebuffs(paramIds, mems)
  *         - Returns the list of members with all debuffs included by
- *           paramIds, which is a list of id of corresponding parameters
+ *           paramIds, which is a list of id of corresponding parameters,
+ *           among all battlers included by mems, which is a list of battlers
  *         - The return value should be an Array of Game_Battler
  *         - paramIds must be an Array of non negative numbers
+ *         - mems must be an Array of Game_Battler
+ *         - If mems isn't specified, it'll be default to all members outside
+ *           battles and battle members inside battles respectively
  *         - E.g.:
  *           $gameTroop.memWithAllDebuffs([0, 1]) returns the list of troop
  *           members with all hp and mp debuffs
- *      11. memWithoutAnyDebuff(paramIds)
+ *      11. memWithoutAnyDebuff(paramIds, mems)
  *         - Returns the list of members without any debuff included by
- *           paramIds, which is a list of id of corresponding parameters
+ *           paramIds, which is a list of id of corresponding parameters,
+ *           among all battlers included by mems, which is a list of battlers
  *         - The return value should be an Array of Game_Battler
  *         - paramIds must be an Array of non negative numbers
+ *         - mems must be an Array of Game_Battler
+ *         - If mems isn't specified, it'll be default to all members outside
+ *           battles and battle members inside battles respectively
  *         - E.g.:
  *           $gameParty.memWithoutAnyDebuff([0, 1]) returns the list of party
  *           members without any hp or mp debuff
- *      12. memWithoutAllDebuffs(paramIds)
+ *      12. memWithoutAllDebuffs(paramIds, mems)
  *         - Returns the list of members without all debuffs included by
- *           paramIds, which is a list of id of corresponding parameters
+ *           paramIds, which is a list of id of corresponding parameters,
+ *           among all battlers included by mems, which is a list of battlers
  *         - The return value should be an Array of Game_Battler
  *         - paramIds must be an Array of non negative numbers
+ *         - mems must be an Array of Game_Battler
+ *         - If mems isn't specified, it'll be default to all members outside
+ *           battles and battle members inside battles respectively
  *         - E.g.:
  *           $gameTroop.memWithoutAllDebuffs([0, 1]) returns the list of troop
  *           members without all hp and mp debuffs
- *      13. memWithAnySkill(skillIds)
+ *      13. memWithAnySkill(skillIds, mems)
  *         - Returns the list of members with any skill included by skillIds,
- *           which is a list of id of corresponding skills
+ *           which is a list of id of corresponding skills, among all battlers
+ *           included by mems, which is a list of battlers
  *         - The return value should be an Array of Game_Battler
  *         - skillIds must be an Array of natural numbers
+ *         - mems must be an Array of Game_Battler
+ *         - If mems isn't specified, it'll be default to all members outside
+ *           battles and battle members inside battles respectively
  *         - E.g.:
  *           $gameParty.memWithAnySkill([1, 2]) returns the list of party
  *           members with skill having id 1 or 2
- *      14. memWithAllSkills(skillIds)
+ *      14. memWithAllSkills(skillIds, mems)
  *         - Returns the list of members with all skills included by skillIds,
- *           which is a list of id of corresponding skills
+ *           which is a list of id of corresponding skills, among all battlers
+ *           included by mems, which is a list of battlers
  *         - The return value should be an Array of Game_Battler
  *         - skillIds must be an Array of natural numbers
+ *         - mems must be an Array of Game_Battler
+ *         - If mems isn't specified, it'll be default to all members outside
+ *           battles and battle members inside battles respectively
  *         - E.g.:
  *           $gameTroop.memWithAllSkills([1, 2]) returns the list of troop
  *           members with skills having id 1 and 2
- *      15. memWithoutAnySkill(skillIds)
+ *      15. memWithoutAnySkill(skillIds, mems)
  *         - Returns the list of members without any skill included by
- *           skillIds, which is a list of id of corresponding skills
+ *           skillIds, which is a list of id of corresponding skills, among
+ *           all battlers included by mems, which is a list of battlers
  *         - The return value should be an Array of Game_Battler
  *         - skillIds must be an Array of natural numbers
+ *         - mems must be an Array of Game_Battler
+ *         - If mems isn't specified, it'll be default to all members outside
+ *           battles and battle members inside battles respectively
  *         - E.g.:
  *           $gameParty.memWithoutAnySkill([1, 2]) returns the list of party
  *           members without skills having id 1 nor 2
- *      16. memWithoutAllSkills(skillIds)
+ *      16. memWithoutAllSkills(skillIds, mems)
  *         - Returns the list of members without all skills included by
- *           skillIds, which is a list of id of corresponding skills
+ *           skillIds, which is a list of id of corresponding skills, among
+ *           all battlers included by mems, which is a list of battlers
  *         - The return value should be an Array of Game_Battler
  *         - skillIds must be an Array of natural numbers
+ *         - mems must be an Array of Game_Battler
+ *         - If mems isn't specified, it'll be default to all members outside
+ *           battles and battle members inside battles respectively
  *         - E.g.:
  *           $gameTroop.memWithoutAllSkills([1, 2]) returns the list of troop
  *           members without skills having id 1 and 2
- *      17. anyHighestStatMem(stats)
+ *      17. anyHighestStatMem(stats, mems)
  *         - Returns the list of members whose values of
  *           parameters/ex-parameters/sp-parameters included by stats, which
  *           is a list of names of corresponding
  *           parameters/ex-parameters/sp-parameters, include those being the
- *           highest among the caller
+ *           highest among the caller, among all battlers included by mems, 
+ *           which is a list of battlers
  *         - The return value should be an Array of Game_Battler
  *         - stats must be an Array of strings as names of Game_Battler
  *           properties with the get function
+ *         - mems must be an Array of Game_Battler
+ *         - If mems isn't specified, it'll be default to all members outside
+ *           battles and battle members inside battles respectively
  *         - E.g.:
  *           $gameParty.anyHighestStatMem(["hp", "mp"]) returns the list of
  *           party members with the highest amount of hp or mp among the party
- *      18. allHighestStatsMem(stats)
+ *      18. allHighestStatsMem(stats, mems)
  *         - Returns the list of members whose values of
  *           parameters/ex-parameters/sp-parameters included by stats, which
  *           is a list of names of corresponding
  *           parameters/ex-parameters/sp-parameters, are all the highest among
- *           the caller
+ *           the caller, among all battlers included by mems, which is a list
+ *           of battlers
  *         - The return value should be an Array of Game_Battler
  *         - stats must be an Array of strings as names of Game_Battler
  *           properties with the get function
+ *         - mems must be an Array of Game_Battler
+ *         - If mems isn't specified, it'll be default to all members outside
+ *           battles and battle members inside battles respectively
  *         - E.g.:
  *           $gameTroop.allHighestStatsMem(["hp", "mp"]) returns the list of
  *           troop members with the highest amount of hp and mp among the
  *           troop
- *      19. notAnyHighestStatMem(stats)
+ *      19. notAnyHighestStatMem(stats, mems)
  *         - Returns the list of members whose values of
  *           parameters/ex-parameters/sp-parameters included by stats, which
  *           is a list of names of corresponding
  *           parameters/ex-parameters/sp-parameters, don't include those being
- *           the highest among the caller
+ *           the highest among the caller, among all battlers included by
+ *           mems, which is a list of battlers
  *         - The return value should be an Array of Game_Battler
  *         - stats must be an Array of strings as names of Game_Battler
  *           properties with the get function
+ *         - mems must be an Array of Game_Battler
+ *         - If mems isn't specified, it'll be default to all members outside
+ *           battles and battle members inside battles respectively
  *         - E.g.:
  *           $gameParty.notAnyHighestStatMem(["hp", "mp"]) returns the list of
  *           party members with neither the highest amount of hp nor mp among
  *           the party
- *      20. notAllHighestStatsMem(stats)
+ *      20. notAllHighestStatsMem(stats, mems)
  *         - Returns the list of members whose values of
  *           parameters/ex-parameters/sp-parameters included by stats, which
  *           is a list of names of corresponding
  *           parameters/ex-parameters/sp-parameters, aren't all the highest
- *           among the caller
+ *           among the caller, among all battlers included by mems, which is
+ *           a list of battlers
  *         - The return value should be an Array of Game_Battler
  *         - stats must be an Array of strings as names of Game_Battler
  *           properties with the get function
+ *         - mems must be an Array of Game_Battler
+ *         - If mems isn't specified, it'll be default to all members outside
+ *           battles and battle members inside battles respectively
  *         - E.g.:
  *           $gameTroop.notAllHighestStatsMem(["hp", "mp"]) returns the list
  *           of troop members without the highest amount of both hp and mp
  *           among the troop
- *      21. anyLowestStatMem(stats)
+ *      21. anyLowestStatMem(stats, mems)
  *         - Returns the list of members whose values of
  *           parameters/ex-parameters/sp-parameters included by stats, which
  *           is a list of names of corresponding
  *           parameters/ex-parameters/sp-parameters, include those being the
- *           lowest among the caller
+ *           lowest among the caller, among all battlers included by mems, 
+ *           which is a list of battlers
  *         - The return value should be an Array of Game_Battler
  *         - stats must be an Array of strings as names of Game_Battler
  *           properties with the get function
+ *         - mems must be an Array of Game_Battler
+ *         - If mems isn't specified, it'll be default to all members outside
+ *           battles and battle members inside battles respectively
  *         - E.g.:
  *           $gameParty.anyLowestStatMem(["hp", "mp"]) returns the list of
  *           party members with the lowest amount of hp or mp among the party
- *      22. allLowestStatsMem(stats)
+ *      22. allLowestStatsMem(stats, mems)
  *         - Returns the list of members whose values of
  *           parameters/ex-parameters/sp-parameters included by stats, which
  *           is a list of names of corresponding
  *           parameters/ex-parameters/sp-parameters, are all the lowest among
- *           the caller
+ *           the caller, among all battlers included by mems, which is a list
+ *           of battlers
  *         - The return value should be an Array of Game_Battler
  *         - stats must be an Array of strings as names of Game_Battler
  *           properties with the get function
+ *         - mems must be an Array of Game_Battler
+ *         - If mems isn't specified, it'll be default to all members outside
+ *           battles and battle members inside battles respectively
  *         - E.g.:
  *           $gameTroop.allLowestStatsMem(["hp", "mp"]) returns the list of
  *           troop members with the lowest amount of hp and mp among the party
- *      23. notAnyLowestStatMem(stats)
+ *      23. notAnyLowestStatMem(stats, mems)
  *         - Returns the list of members whose values of
  *           parameters/ex-parameters/sp-parameters included by stats, which
  *           is a list of names of corresponding
  *           parameters/ex-parameters/sp-parameters, don't include those being
- *           the lowest among the caller
+ *           the lowest among the caller, among all battlers included by mems, 
+ *           which is a list of battlers
  *         - The return value should be an Array of Game_Battler
  *         - stats must be an Array of strings as names of Game_Battler
  *           properties with the get function
+ *         - mems must be an Array of Game_Battler
+ *         - If mems isn't specified, it'll be default to all members outside
+ *           battles and battle members inside battles respectively
  *         - E.g.:
  *           $gameParty.notAnyLowestStatMem(["hp", "mp"]) returns the list of
  *           party members with neither the lowest amount of hp nor mp among
  *           the party
- *      24. notAllLowestStatsMem(stats)
+ *      24. notAllLowestStatsMem(stats, mems)
  *         - Returns the list of members whose values of
  *           parameters/ex-parameters/sp-parameters included by stats, which
  *           is a list of names of corresponding
  *           parameters/ex-parameters/sp-parameters, aren't all the lowest
- *           among the caller
+ *           among the caller, among all battlers included by mems, which is a
+ *           list of battlers
  *         - The return value should be an Array of Game_Battler
  *         - stats must be an Array of strings as names of Game_Battler
  *           properties with the get function
+ *         - mems must be an Array of Game_Battler
+ *         - If mems isn't specified, it'll be default to all members outside
+ *           battles and battle members inside battles respectively
  *         - E.g.:
  *           $gameTroop.notAllLowestStatsMem(["hp", "mp"]) returns the list of
  *           troop members without the lowest amount of both hp and mp among
  *           the troop
- *      25. anyAboveStatMem(stats, val)
+ *      25. anyAboveStatMem(stats, val, mems)
  *         - Returns the list of members whose values of
  *           parameters/ex-parameters/sp-parameters included by stats, which
  *           is a list of names of corresponding
- *           parameters/ex-parameters/sp-parameters, include those above val
+ *           parameters/ex-parameters/sp-parameters, include those above val, 
+ *           among all battlers included by mems, which is a list of battlers
  *         - The return value should be an Array of Game_Battler
  *         - stats must be an Array of strings as names of Game_Battler
  *           properties with the get function
  *         - val must be a number
+ *         - mems must be an Array of Game_Battler
+ *         - If mems isn't specified, it'll be default to all members outside
+ *           battles and battle members inside battles respectively
  *         - E.g.:
  *           $gameParty.anyAboveStatMem(["hp", "mp"], 100) returns the list of
  *           party members with the value of hp or mp above 100
- *      26. allAboveStatMem(stats, val)
+ *      26. allAboveStatMem(stats, val, mems)
  *         - Returns the list of members whose values of
  *           parameters/ex-parameters/sp-parameters included by stats, which
  *           is a list of names of corresponding
- *           parameters/ex-parameters/sp-parameters, are all above val
+ *           parameters/ex-parameters/sp-parameters, are all above val, among
+ *           all battlers included by mems, which is a list of battlers
  *         - The return value should be an Array of Game_Battler
  *         - stats must be an Array of strings as names of Game_Battler
  *           properties with the get function
  *         - val must be a number
+ *         - mems must be an Array of Game_Battler
+ *         - If mems isn't specified, it'll be default to all members outside
+ *           battles and battle members inside battles respectively
  *         - E.g.:
  *           $gameTroop.allAboveStatMem(["hp", "mp"], 100) returns the list of
  *           troop members with the value of hp and mp above 100
- *      27. anyBelowStatMem(stats, val)
+ *      27. anyBelowStatMem(stats, val, mems)
  *         - Returns the list of members whose values of
  *           parameters/ex-parameters/sp-parameters included by stats, which
  *           is a list of names of corresponding
- *           parameters/ex-parameters/sp-parameters, include those below val
+ *           parameters/ex-parameters/sp-parameters, include those below val, 
+ *           among all battlers included by mems, which is a list of battlers
  *         - The return value should be an Array of Game_Battler
  *         - stats must be an Array of strings as names of Game_Battler
  *           properties with the get function
  *         - val must be a number
+ *         - mems must be an Array of Game_Battler
+ *         - If mems isn't specified, it'll be default to all members outside
+ *           battles and battle members inside battles respectively
  *         - E.g.:
  *           $gameParty.anyBelowStatMem(["hp", "mp"], 100) returns the list of
  *           party members with the value of hp or mp below 100
- *      28. allBelowStatMem(stats, val)
+ *      28. allBelowStatMem(stats, val, mems)
  *         - Returns the list of members whose values of
  *           parameters/ex-parameters/sp-parameters included by stats, which
  *           is a list of names of corresponding
- *           parameters/ex-parameters/sp-parameters, are all below val
+ *           parameters/ex-parameters/sp-parameters, are all below val, among
+ *           all battlers included by mems, which is a list of battlers
  *         - The return value should be an Array of Game_Battler
  *         - stats must be an Array of strings as names of Game_Battler
  *           properties with the get function
  *         - val must be a number
+ *         - mems must be an Array of Game_Battler
+ *         - If mems isn't specified, it'll be default to all members outside
+ *           battles and battle members inside battles respectively
  *         - E.g.:
  *           $gameTroop.allBelowStatMem(["hp", "mp"], 100) returns the list of
  *           troop members with the value of hp and mp below 100
@@ -649,12 +759,11 @@ Utils.checkRMVersion(DoubleX_RMMZ.Unit_Filters.VERSIONS.codebase);
      * Script call/Nullipotent
      * @author DoubleX @interface @since v1.00a @version v1.00a
      * @param {[id]} stateIds - The list of id of states involved
+     * @param {[Game_Battler]} mems - The list of battlers to be filtered
      * @returns {[Game_Batler]} The list of requested unit members
      */
-    $.memWithAnyState = function(stateIds) {
-        return NEW._filteredMems.call(this, mem => {
-            return NEW._MEM_WITH_ANY_STATE(stateIds, mem);
-        });
+    $.memWithAnyState = function(stateIds, mems = this.members()) {
+        return mems.filter(mem => NEW._MEM_WITH_ANY_STATE(stateIds, mem));
     }; // $.memWithAnyState
 
     NEW._MEM_WITH_ALL_STATES = 
@@ -663,12 +772,11 @@ Utils.checkRMVersion(DoubleX_RMMZ.Unit_Filters.VERSIONS.codebase);
      * Script call/Nullipotent
      * @author DoubleX @interface @since v1.00a @version v1.00a
      * @param {[id]} stateIds - The list of id of states involved
+     * @param {[Game_Battler]} mems - The list of battlers to be filtered
      * @returns {[Game_Batler]} The list of requested unit members
      */
-    $.memWithAllStates = function(stateIds) {
-        return NEW._filteredMems.call(this, mem => {
-            return NEW._MEM_WITH_ALL_STATES(stateIds, mem);
-        });
+    $.memWithAllStates = function(stateIds, mems = this.members()) {
+        return mems.filter(mem => NEW._MEM_WITH_ALL_STATES(stateIds, mem));
     }; // $.memWithAllStates
 
     NEW._MEM_WITHOUT_ANY_STATE = 
@@ -677,12 +785,11 @@ Utils.checkRMVersion(DoubleX_RMMZ.Unit_Filters.VERSIONS.codebase);
      * Script call/Nullipotent
      * @author DoubleX @interface @since v1.00a @version v1.00a
      * @param {[id]} stateIds - The list of id of states involved
+     * @param {[Game_Battler]} mems - The list of battlers to be filtered
      * @returns {[Game_Batler]} The list of requested unit members
      */
-    $.memWithoutAnyState = function(stateIds) {
-        return NEW._filteredMems.call(this, mem => {
-            return NEW._MEM_WITHOUT_ANY_STATE(stateIds, mem);
-        });
+    $.memWithoutAnyState = function(stateIds, mems = this.members()) {
+        return mems.filter(mem => NEW._MEM_WITHOUT_ANY_STATE(stateIds, mem));
     }; // $.memWithoutAnyState
 
     NEW._MEM_WITHOUT_ALL_STATES = 
@@ -691,12 +798,11 @@ Utils.checkRMVersion(DoubleX_RMMZ.Unit_Filters.VERSIONS.codebase);
      * Script call/Nullipotent
      * @author DoubleX @interface @since v1.00a @version v1.00a
      * @param {[id]} stateIds - The list of id of states involved
+     * @param {[Game_Battler]} mems - The list of battlers to be filtered
      * @returns {[Game_Batler]} The list of requested unit members
      */
-    $.memWithoutAllStates = function(stateIds) {
-        return NEW._filteredMems.call(this, mem => {
-            return NEW._MEM_WITHOUT_ALL_STATES(stateIds, mem);
-        });
+    $.memWithoutAllStates = function(stateIds, mems = this.members()) {
+        return mems.filter(mem => NEW._MEM_WITHOUT_ALL_STATES(stateIds, mem));
     }; // $.memWithoutAllStates
 
     NEW._MEM_WITH_ANY_BUFF = 
@@ -705,12 +811,11 @@ Utils.checkRMVersion(DoubleX_RMMZ.Unit_Filters.VERSIONS.codebase);
      * Script call/Nullipotent
      * @author DoubleX @interface @since v1.00a @version v1.00a
      * @param {[index]} paramIds - The list of id of parameters involved
+     * @param {[Game_Battler]} mems - The list of battlers to be filtered
      * @returns {[Game_Batler]} The list of requested unit members
      */
-    $.memWithAnyBuff = function(paramIds) {
-        return NEW._filteredMems.call(this, mem => {
-            return NEW._MEM_WITH_ANY_BUFF(paramIds, mem);
-        });
+    $.memWithAnyBuff = function(paramIds, mems = this.members()) {
+        return mems.filter(mem => NEW._MEM_WITH_ANY_BUFF(paramIds, mem));
     }; // $.memWithAnyBuff
 
     NEW._MEM_WITH_ALL_BUFFS = 
@@ -719,12 +824,11 @@ Utils.checkRMVersion(DoubleX_RMMZ.Unit_Filters.VERSIONS.codebase);
      * Script call/Nullipotent
      * @author DoubleX @interface @since v1.00a @version v1.00a
      * @param {[index]} paramIds - The list of id of parameters involved
+     * @param {[Game_Battler]} mems - The list of battlers to be filtered
      * @returns {[Game_Batler]} The list of requested unit members
      */
-    $.memWithAllBuffs = function(paramIds) {
-        return NEW._filteredMems.call(this, mem => {
-            return NEW._MEM_WITH_ALL_BUFFS(paramIds, mem);
-        });
+    $.memWithAllBuffs = function(paramIds, mems = this.members()) {
+        return mems.filter(mem => NEW._MEM_WITH_ALL_BUFFS(paramIds, mem));
     }; // $.memWithAllBuffs
 
     NEW._MEM_WITHOUT_ANY_BUFF = 
@@ -733,12 +837,11 @@ Utils.checkRMVersion(DoubleX_RMMZ.Unit_Filters.VERSIONS.codebase);
      * Script call/Nullipotent
      * @author DoubleX @interface @since v1.00a @version v1.00a
      * @param {[index]} paramIds - The list of id of parameters involved
+     * @param {[Game_Battler]} mems - The list of battlers to be filtered
      * @returns {[Game_Batler]} The list of requested unit members
      */
-    $.memWithoutAnyBuff = function(paramIds) {
-        return NEW._filteredMems.call(this, mem => {
-            return NEW._MEM_WITHOUT_ANY_BUFF(paramIds, mem);
-        });
+    $.memWithoutAnyBuff = function(paramIds, mems = this.members()) {
+        return mems.filter(mem => NEW._MEM_WITHOUT_ANY_BUFF(paramIds, mem));
     }; // $.memWithoutAnyBuff
 
     NEW._MEM_WITHOUT_ALL_BUFFS = 
@@ -747,12 +850,11 @@ Utils.checkRMVersion(DoubleX_RMMZ.Unit_Filters.VERSIONS.codebase);
      * Script call/Nullipotent
      * @author DoubleX @interface @since v1.00a @version v1.00a
      * @param {[index]} paramIds - The list of id of parameters involved
+     * @param {[Game_Battler]} mems - The list of battlers to be filtered
      * @returns {[Game_Batler]} The list of requested unit members
      */
-    $.memWithoutAllBuffs = function(paramIds) {
-        return NEW._filteredMems.call(this, mem => {
-            return NEW._MEM_WITHOUT_ALL_BUFFS(paramIds, mem);
-        });
+    $.memWithoutAllBuffs = function(paramIds, mems = this.members()) {
+        return mems.filter(mem => NEW._MEM_WITHOUT_ALL_BUFFS(paramIds, mem));
     }; // $.memWithoutAllBuffs
 
     NEW._MEM_WITH_ANY_DEBUFF = 
@@ -761,12 +863,11 @@ Utils.checkRMVersion(DoubleX_RMMZ.Unit_Filters.VERSIONS.codebase);
      * Script call/Nullipotent
      * @author DoubleX @interface @since v1.00a @version v1.00a
      * @param {[index]} paramIds - The list of id of parameters involved
+     * @param {[Game_Battler]} mems - The list of battlers to be filtered
      * @returns {[Game_Batler]} The list of requested unit members
      */
-    $.memWithAnyDebuff = function(paramIds) {
-        return NEW._filteredMems.call(this, mem => {
-            return NEW._MEM_WITH_ANY_DEBUFF(paramIds, mem);
-        });
+    $.memWithAnyDebuff = function(paramIds, mems = this.members()) {
+        return mems.filter(mem => NEW._MEM_WITH_ANY_DEBUFF(paramIds, mem));
     }; // $.memWithAnyDebuff
 
     NEW._MEM_WITH_ALL_DEBUFFS = 
@@ -775,12 +876,11 @@ Utils.checkRMVersion(DoubleX_RMMZ.Unit_Filters.VERSIONS.codebase);
      * Script call/Nullipotent
      * @author DoubleX @interface @since v1.00a @version v1.00a
      * @param {[index]} paramIds - The list of id of parameters involved
+     * @param {[Game_Battler]} mems - The list of battlers to be filtered
      * @returns {[Game_Batler]} The list of requested unit members
      */
-    $.memWithAllDebuffs = function(paramIds) {
-        return NEW._filteredMems.call(this, mem => {
-            return NEW._MEM_WITH_ALL_DEBUFFS(paramIds, mem);
-        });
+    $.memWithAllDebuffs = function(paramIds, mems = this.members()) {
+        return mems.filter(mem => NEW._MEM_WITH_ALL_DEBUFFS(paramIds, mem));
     }; // $.memWithAllDebuffs
 
     NEW._MEM_WITHOUT_ANY_DEBUFF = 
@@ -789,12 +889,11 @@ Utils.checkRMVersion(DoubleX_RMMZ.Unit_Filters.VERSIONS.codebase);
      * Script call/Nullipotent
      * @author DoubleX @interface @since v1.00a @version v1.00a
      * @param {[index]} paramIds - The list of id of parameters involved
+     * @param {[Game_Battler]} mems - The list of battlers to be filtered
      * @returns {[Game_Batler]} The list of requested unit members
      */
-    $.memWithoutAnyDebuff = function(paramIds) {
-        return NEW._filteredMems.call(this, mem => {
-            return NEW._MEM_WITHOUT_ANY_DEBUFF(paramIds, mem);
-        });
+    $.memWithoutAnyDebuff = function(paramIds, mems = this.members()) {
+        return mems.filter(mem => NEW._MEM_WITHOUT_ANY_DEBUFF(paramIds, mem));
     }; // $.memWithoutAnyDebuff
 
     NEW._MEM_WITHOUT_ALL_DEBUFFS = 
@@ -803,12 +902,11 @@ Utils.checkRMVersion(DoubleX_RMMZ.Unit_Filters.VERSIONS.codebase);
      * Script call/Nullipotent
      * @author DoubleX @interface @since v1.00a @version v1.00a
      * @param {[index]} paramIds - The list of id of parameters involved
+     * @param {[Game_Battler]} mems - The list of battlers to be filtered
      * @returns {[Game_Batler]} The list of requested unit members
      */
-    $.memWithoutAllDebuffs = function(paramIds) {
-        return NEW._filteredMems.call(this, mem => {
-            return NEW._MEM_WITHOUT_ALL_DEBUFFS(paramIds, mem);
-        });
+    $.memWithoutAllDebuffs = function(paramIds, mems = this.members()) {
+        return mems.filter(mem => NEW._MEM_WITHOUT_ALL_DEBUFFS(paramIds, mem));
     }; // $.memWithoutAllDebuffs
 
     NEW._MEM_WITH_ANY_SKILL = 
@@ -817,12 +915,11 @@ Utils.checkRMVersion(DoubleX_RMMZ.Unit_Filters.VERSIONS.codebase);
      * Script call/Nullipotent
      * @author DoubleX @interface @since v1.00a @version v1.00a
      * @param {[id]} skillIds - The list of id of skills involved
+     * @param {[Game_Battler]} mems - The list of battlers to be filtered
      * @returns {[Game_Batler]} The list of requested unit members
      */
-    $.memWithAnySkill = function(skillIds) {
-        return NEW._filteredMems.call(this, mem => {
-            return NEW._MEM_WITH_ANY_SKILL(skillIds, mem);
-        });
+    $.memWithAnySkill = function(skillIds, mems = this.members()) {
+        return mems.filter(mem => NEW._MEM_WITH_ANY_SKILL(skillIds, mem));
     }; // $.memWithAnySkill
 
     NEW._MEM_WITH_ALL_SKILLS = 
@@ -831,12 +928,11 @@ Utils.checkRMVersion(DoubleX_RMMZ.Unit_Filters.VERSIONS.codebase);
      * Script call/Nullipotent
      * @author DoubleX @interface @since v1.00a @version v1.00a
      * @param {[id]} skillIds - The list of id of skills involved
+     * @param {[Game_Battler]} mems - The list of battlers to be filtered
      * @returns {[Game_Batler]} The list of requested unit members
      */
-    $.memWithAllSkills = function(skillIds) {
-        return NEW._filteredMems.call(this, mem => {
-            return NEW._MEM_WITH_ALL_SKILLS(skillIds, mem);
-        });
+    $.memWithAllSkills = function(skillIds, mems = this.members()) {
+        return mems.filter(mem => NEW._MEM_WITH_ALL_SKILLS(skillIds, mem));
     }; // $.memWithAllSkills
 
     NEW._MEM_WITHOUT_ANY_SKILL = 
@@ -845,12 +941,11 @@ Utils.checkRMVersion(DoubleX_RMMZ.Unit_Filters.VERSIONS.codebase);
      * Script call/Nullipotent
      * @author DoubleX @interface @since v1.00a @version v1.00a
      * @param {[id]} skillIds - The list of id of skills involved
+     * @param {[Game_Battler]} mems - The list of battlers to be filtered
      * @returns {[Game_Batler]} The list of requested unit members
      */
-    $.memWithoutAnySkill = function(skillIds) {
-        return NEW._filteredMems.call(this, mem => {
-            return NEW._MEM_WITHOUT_ANY_SKILL(skillIds, mem);
-        });
+    $.memWithoutAnySkill = function(skillIds, mems = this.members()) {
+        return mems.filter(mem => NEW._MEM_WITHOUT_ANY_SKILL(skillIds, mem));
     }; // $.memWithoutAnySkill
 
     NEW._MEM_WITHOUT_ALL_SKILLS = 
@@ -859,18 +954,18 @@ Utils.checkRMVersion(DoubleX_RMMZ.Unit_Filters.VERSIONS.codebase);
      * Script call/Nullipotent
      * @author DoubleX @interface @since v1.00a @version v1.00a
      * @param {[id]} skillIds - The list of id of skills involved
+     * @param {[Game_Battler]} mems - The list of battlers to be filtered
      * @returns {[Game_Batler]} The list of requested unit members
      */
-    $.memWithoutAllSkills = function(skillIds) {
-        return NEW._filteredMems.call(this, mem => {
-            return NEW._MEM_WITHOUT_ALL_SKILLS(skillIds, mem);
-        });
+    $.memWithoutAllSkills = function(skillIds, mems = this.members()) {
+        return mems.filter(mem => NEW._MEM_WITHOUT_ALL_SKILLS(skillIds, mem));
     }; // $.memWithoutAllSkills
 
     /**
      * Script call/Nullipotent
      * @author DoubleX @interface @since v1.00a @version v1.00a
      * @param {[string]} stats - The list of names of stats involved
+     * @param {[Game_Battler]} mems - The list of battlers to be filtered
      * @returns {[Game_Batler]} The list of requested unit members
      */
     $.anyHighestStatMem = function(stats) {
@@ -882,6 +977,7 @@ Utils.checkRMVersion(DoubleX_RMMZ.Unit_Filters.VERSIONS.codebase);
      * Script call/Nullipotent
      * @author DoubleX @interface @since v1.00a @version v1.00a
      * @param {[string]} stats - The list of names of stats involved
+     * @param {[Game_Battler]} mems - The list of battlers to be filtered
      * @returns {[Game_Batler]} The list of requested unit members
      */
     $.allHighestStatsMem = function(stats) {
@@ -893,6 +989,7 @@ Utils.checkRMVersion(DoubleX_RMMZ.Unit_Filters.VERSIONS.codebase);
      * Script call/Nullipotent
      * @author DoubleX @interface @since v1.00a @version v1.00a
      * @param {[string]} stats - The list of names of stats involved
+     * @param {[Game_Battler]} mems - The list of battlers to be filtered
      * @returns {[Game_Batler]} The list of requested unit members
      */
     $.notAnyHighestStatMem = function(stats) {
@@ -904,6 +1001,7 @@ Utils.checkRMVersion(DoubleX_RMMZ.Unit_Filters.VERSIONS.codebase);
      * Script call/Nullipotent
      * @author DoubleX @interface @since v1.00a @version v1.00a
      * @param {[string]} stats - The list of names of stats involved
+     * @param {[Game_Battler]} mems - The list of battlers to be filtered
      * @returns {[Game_Batler]} The list of requested unit members
      */
     $.notAllHighestStatsMem = function(stats) {
@@ -915,6 +1013,7 @@ Utils.checkRMVersion(DoubleX_RMMZ.Unit_Filters.VERSIONS.codebase);
      * Script call/Nullipotent
      * @author DoubleX @interface @since v1.00a @version v1.00a
      * @param {[string]} stats - The list of names of stats involved
+     * @param {[Game_Battler]} mems - The list of battlers to be filtered
      * @returns {[Game_Batler]} The list of requested unit members
      */
     $.anyLowestStatMem = function(stats) {
@@ -926,6 +1025,7 @@ Utils.checkRMVersion(DoubleX_RMMZ.Unit_Filters.VERSIONS.codebase);
      * Script call/Nullipotent
      * @author DoubleX @interface @since v1.00a @version v1.00a
      * @param {[string]} stats - The list of names of stats involved
+     * @param {[Game_Battler]} mems - The list of battlers to be filtered
      * @returns {[Game_Batler]} The list of requested unit members
      */
     $.allLowestStatsMem = function(stats) {
@@ -937,6 +1037,7 @@ Utils.checkRMVersion(DoubleX_RMMZ.Unit_Filters.VERSIONS.codebase);
      * Script call/Nullipotent
      * @author DoubleX @interface @since v1.00a @version v1.00a
      * @param {[string]} stats - The list of names of stats involved
+     * @param {[Game_Battler]} mems - The list of battlers to be filtered
      * @returns {[Game_Batler]} The list of requested unit members
      */
     $.notAnyLowestStatMem = function(stats) {
@@ -948,6 +1049,7 @@ Utils.checkRMVersion(DoubleX_RMMZ.Unit_Filters.VERSIONS.codebase);
      * Script call/Nullipotent
      * @author DoubleX @interface @since v1.00a @version v1.00a
      * @param {[string]} stats - The list of names of stats involved
+     * @param {[Game_Battler]} mems - The list of battlers to be filtered
      * @returns {[Game_Batler]} The list of requested unit members
      */
     $.notAllLowestStatsMem = function(stats) {
@@ -960,6 +1062,7 @@ Utils.checkRMVersion(DoubleX_RMMZ.Unit_Filters.VERSIONS.codebase);
      * @author DoubleX @interface @since v1.00a @version v1.00a
      * @param {[string]} stats - The list of names of stats involved
      * @param {number} val - The value to be checked against
+     * @param {[Game_Battler]} mems - The list of battlers to be filtered
      * @returns {[Game_Batler]} The list of requested unit members
      */
     $.anyAboveStatMem = function(stats, val) {
@@ -972,6 +1075,7 @@ Utils.checkRMVersion(DoubleX_RMMZ.Unit_Filters.VERSIONS.codebase);
      * @author DoubleX @interface @since v1.00a @version v1.00a
      * @param {[string]} stats - The list of names of stats involved
      * @param {number} val - The value to be checked against
+     * @param {[Game_Battler]} mems - The list of battlers to be filtered
      * @returns {[Game_Batler]} The list of requested unit members
      */
     $.allAboveStatMem = function(stats, val) {
@@ -984,6 +1088,7 @@ Utils.checkRMVersion(DoubleX_RMMZ.Unit_Filters.VERSIONS.codebase);
      * @author DoubleX @interface @since v1.00a @version v1.00a
      * @param {[string]} stats - The list of names of stats involved
      * @param {number} val - The value to be checked against
+     * @param {[Game_Battler]} mems - The list of battlers to be filtered
      * @returns {[Game_Batler]} The list of requested unit members
      */
     $.anyBelowStatMem = function(stats, val) {
@@ -996,6 +1101,7 @@ Utils.checkRMVersion(DoubleX_RMMZ.Unit_Filters.VERSIONS.codebase);
      * @author DoubleX @interface @since v1.00a @version v1.00a
      * @param {[string]} stats - The list of names of stats involved
      * @param {number} val - The value to be checked against
+     * @param {[Game_Battler]} mems - The list of battlers to be filtered
      * @returns {[Game_Batler]} The list of requested unit members
      */
     $.allBelowStatMem = function(stats, val) {
@@ -1013,16 +1119,14 @@ Utils.checkRMVersion(DoubleX_RMMZ.Unit_Filters.VERSIONS.codebase);
      * @param {(number, number) -> boolean} filterFunc - The filter function
      * @enum @param {string} quantifier - some for any skill/every for all stat
      * @param {[string]} stats - The list of names of stats involved
+     * @param {[Game_Battler]} mems - The list of battlers to be filtered
      * @returns {[Game_Batler]} The list of requested unit members
      */
-    NEW._statFilteredMem = function(compareFunc, filterFunc, quantifier, stats) {
-        var mems = this.members();
+    NEW._statFilteredMem = function(compareFunc, filterFunc, quantifier, stats, mems = this.members()) {
         const sortedStats = NEW._SORTED_STATS(stats, mems, compareFunc);
-        return mems.filter(mem => {
-            return stats[quantifier]((stat, i) => {
-                return filterFunc(mem[stat], sortedStats[i][0]);
-            });
-        });
+        return mems.filter(mem => stats[quantifier]((stat, i) => {
+            return filterFunc(mem[stat], sortedStats[i][0]);
+        }));
     }; // NEW._statFilteredMem
 
     /**
@@ -1032,23 +1136,14 @@ Utils.checkRMVersion(DoubleX_RMMZ.Unit_Filters.VERSIONS.codebase);
      * @enum @param {string} quantifier - some for any skill/every for all stat
      * @param {[string]} stats - The list of names of stats involved
      * @param {number} val - The value to be checked against
+     * @param {[Game_Battler]} mems - The list of battlers to be filtered
      * @returns {[Game_Batler]} The list of requested unit members
      */
-    NEW._statValFilteredMem = function(filterFunc, quantifier, stats, val) {
-        return NEW._filteredMems.call(this, mem => {
+    NEW._statValFilteredMem = function(filterFunc, quantifier, stats, val, mems = this.members()) {
+        return mems.filter(mem => {
             return stats[quantifier](stat => filterFunc(mem[stat], val));
         });
     }; // NEW._statValFilteredMem
-
-    /**
-     * Nullipotent
-     * @author DoubleX @since v1.00a @version v1.00a
-     * @param {(Game_Battler) -> boolean} filterFunc - Member filter function
-     * @returns {[Game_Batler]} The list of requested unit members
-     */
-    NEW._filteredMems = function(filterFunc) {
-        return this.members().filter(filterFunc);
-    }; // NEW._filteredMems
 
 })(Game_Unit.prototype, DoubleX_RMMZ.Unit_Filters);
 
