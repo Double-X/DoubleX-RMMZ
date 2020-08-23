@@ -607,43 +607,6 @@ Utils.checkRMVersion(DoubleX_RMMZ.Enhanced_Codebase.VERSIONS.codebase);
     MZ_EC.rewriteFunc = MZ_EC.extendFunc;
     //
 
-    MZ_EC.onLoadDataNotetags = (obj, datumType, containerName, baseRegex, notePairs) => {
-        obj.forEach(datum_ => {
-        if (!datum_) return;
-        const fullRegex = CORE._FULL_REG_EXP(baseRegex);
-        CORE._ON_LOAD_DATUM_NOTETAGS(
-                datumType, datum_, containerName, fullRegex, notePairs);
-        });
-    }; // MZ_EC.onLoadDataNotetags
-
-    // The this pointer is that of the caller
-    MZ_EC.returnedEntryWithSuffix = function(notePairs, notetagType, suffix, entry, count, argObj = {}) {
-        switch (suffix) {
-            case "val": return CORE._RETURNED_ENTRY_VAL(
-                    notePairs, notetagType, entry, count);
-            case "switch": return $gameSwitches.value(+entry);
-            case "var": return $gameVariables.value(+entry);
-            case "script": {
-                const script = $gameVariables.value(+entry);
-                return new Function("argObj", script).call(this, argObj);
-            }
-            // There's not enough context to throw errors meaningfully
-            default: return entry;
-            //
-        }
-    }; // MZ_EC.returnedEntryWithSuffix
-    //
-
-    MZ_EC.BOOL_SUFFIXES = ["val", "switch", "script"];
-    MZ_EC.VAL_SUFFIXES = ["val", "var", "script"];
-    MZ_EC.EVENT_SUFFIXES = ["event", "script"];
-    MZ_EC.BOOL_ENTRY = "bool";
-    MZ_EC.BOOL_ARRAY_ENTRY = "boolArray";
-    MZ_EC.NUM_ENTRY = "num";
-    MZ_EC.NUM_ARRAY_ENTRY = "numArray";
-    MZ_EC.STRING_ENTRY = "string";
-    MZ_EC.STRING_ARRAY_ENTRY = "stringArray";
-
     const CORE = MZ_EC.CORE = {};
 
     // Search tag: Enhanced_Codebase_Add_Accessors
@@ -676,58 +639,6 @@ Utils.checkRMVersion(DoubleX_RMMZ.Enhanced_Codebase.VERSIONS.codebase);
     CORE._rewriteSetter = CORE._addSetter;
     //
 
-    CORE._REG_EXP_SUFFIX_SEPARATOR = " +", CORE._REG_EXP_SUFFIXES =
-            " +(\\w+(?:" + CORE._REG_EXP_SUFFIX_SEPARATOR + "\\w+)*) *";
-    // So alphanumeric characters as well as numbers with decimals are captured
-    CORE.REG_EXP_ENTRY_VAL = "[\/A-Za-z\\d_\.-]+";
-    // The / is captured as well to support filepath strings
-    CORE._REG_EXP_ENTRY_SEPARATOR = " *, +";
-    CORE._REG_EXP_ENTRIES = " *(" + CORE.REG_EXP_ENTRY_VAL + "(?:" +
-            CORE._REG_EXP_ENTRY_SEPARATOR + CORE.REG_EXP_ENTRY_VAL + ")*) *";
-    CORE._FULL_REG_EXP = baseRegex => new RegExp("<" + baseRegex +
-            CORE._REG_EXP_SUFFIXES + ":" + CORE._REG_EXP_ENTRIES + ">", "gim");
-    CORE._REG_EXP_SPLIT_NOTES = /[\r\n]+/;
-    CORE._ON_LOAD_DATUM_NOTETAGS = (datumType, datum, containerName, fullRegex, notePairs) => {
-        // Storing datumType is to streamline the notetag datum type reading
-        const container = datum.meta[containerName] = {
-            id: datum.id,
-            datumType,
-            notetags: []
-        }, lines = datum.note.split(CORE._REG_EXP_SPLIT_NOTES);
-        //
-        lines.forEach(line => {
-            CORE._ON_LOAD_DATUM_NOTETAG(container, fullRegex, notePairs, line);
-        });
-    }; // CORE._ON_LOAD_DATUM_NOTETAGS
-    CORE._SHOW_INVALID_NOTE_TYPE = (datumType, id, noteType, line) => {
-        console.warn(`A ${datumType} data with id ${id}
-                     has the invalid type ${noteType} in notetag ${line}`);
-    CORE._REG_EXP_SUFFIX_SEPARATOR_OBJ =
-            new RegExp(CORE._REG_EXP_SUFFIX_SEPARATOR);
-    CORE._REG_EXP_ENTRY_SEPARATOR_OBJ =
-            new RegExp(CORE._REG_EXP_ENTRY_SEPARATOR);
-    CORE._ON_LOAD_DATUM_NOTETAG = (container, fullRegex, notePairs, line) => {
-        if (!line.match(fullRegex)) return;
-        const notetagType = RegExp.$1;
-        if (!notePairs.has(notetagType)) return CORE._SHOW_INVALID_NOTE_TYPE(
-                container.datumType, container.id, notetagType, line);
-        // Otherwise split would corrupt RegExp.$2 and RegExp.$3
-        const rawSuffixes = RegExp.$2, rawEntries = RegExp.$3;
-        const suffixes = rawSuffixes.split(CORE._REG_EXP_SUFFIX_SEPARATOR_OBJ);
-        const entries = rawEntries.split(CORE._REG_EXP_ENTRY_SEPARATOR_OBJ);
-        //
-        CORE._ON_LOAD_NOTETAG_PAIRS(
-                container, notePairs, line, notetagType, suffixes, entries);
-        //
-    }; //  CORE._onLoadDatumNotetag
-    }; // CORE._SHOW_INVALID_NOTE_TYPE
-    CORE._ON_LOAD_NOTETAG_PAIRS = (container, notePairs, line, notetagType, suffixes, entries) => {
-        const pairs = CORE._NOTETAG_PAIRS(
-                container, notePairs, line, notetagType, suffixes, entries);
-        // push is much faster than concat and pairs isn't an array
-        container.notetags.push({ notetagType, pairs });
-        //
-    }; // CORE._ON_LOAD_NOTETAG_PAIRS
     CORE._IS_VALID_SUFFIX = (notePairs, notetagType, suffix, count) => {
         const notetagTypePairs = notePairs.get(notetagType);
         const suffixName = `suffix${count}`;
@@ -757,6 +668,67 @@ Utils.checkRMVersion(DoubleX_RMMZ.Enhanced_Codebase.VERSIONS.codebase);
         return pairs;
         //
     }; // CORE._NOTETAG_PAIRS
+    CORE._ON_LOAD_NOTETAG_PAIRS = (container, notePairs, line, notetagType, suffixes, entries) => {
+        const pairs = CORE._NOTETAG_PAIRS(
+                container, notePairs, line, notetagType, suffixes, entries);
+        // push is much faster than concat and pairs isn't an array
+        container.notetags.push({ notetagType, pairs });
+        //
+    }; // CORE._ON_LOAD_NOTETAG_PAIRS
+    CORE._REG_EXP_SUFFIX_SEPARATOR = " +", CORE._REG_EXP_SUFFIX_SEPARATOR_OBJ =
+            new RegExp(CORE._REG_EXP_SUFFIX_SEPARATOR);
+    CORE._REG_EXP_ENTRY_SEPARATOR = " *, +";
+    CORE._REG_EXP_ENTRY_SEPARATOR_OBJ =
+            new RegExp(CORE._REG_EXP_ENTRY_SEPARATOR);
+    CORE._SHOW_INVALID_NOTE_TYPE = (datumType, id, noteType, line) => {
+        console.warn(`A ${datumType} data with id ${id}
+                     has the invalid type ${noteType} in notetag ${line}`);
+    }; // CORE._SHOW_INVALID_NOTE_TYPE
+    CORE._ON_LOAD_DATUM_NOTETAG = (container, fullRegex, notePairs, line) => {
+        if (!line.match(fullRegex)) return;
+        const notetagType = RegExp.$1;
+        if (!notePairs.has(notetagType)) return CORE._SHOW_INVALID_NOTE_TYPE(
+                container.datumType, container.id, notetagType, line);
+        // Otherwise split would corrupt RegExp.$2 and RegExp.$3
+        const rawSuffixes = RegExp.$2, rawEntries = RegExp.$3;
+        const suffixes = rawSuffixes.split(CORE._REG_EXP_SUFFIX_SEPARATOR_OBJ);
+        const entries = rawEntries.split(CORE._REG_EXP_ENTRY_SEPARATOR_OBJ);
+        //
+        CORE._ON_LOAD_NOTETAG_PAIRS(
+                container, notePairs, line, notetagType, suffixes, entries);
+        //
+    }; //  CORE._ON_LOAD_DATUM_NOTETAG
+    CORE._REG_EXP_SUFFIXES =
+            " +(\\w+(?:" + CORE._REG_EXP_SUFFIX_SEPARATOR + "\\w+)*) *";
+    // So alphanumeric characters as well as numbers with decimals are captured
+    CORE.REG_EXP_ENTRY_VAL = "[\/A-Za-z\\d_\.-]+";
+    // The / is captured as well to support filepath strings
+
+    CORE._REG_EXP_ENTRIES = " *(" + CORE.REG_EXP_ENTRY_VAL + "(?:" +
+            CORE._REG_EXP_ENTRY_SEPARATOR + CORE.REG_EXP_ENTRY_VAL + ")*) *";
+    CORE._FULL_REG_EXP = baseRegex => new RegExp("<" + baseRegex +
+            CORE._REG_EXP_SUFFIXES + ":" + CORE._REG_EXP_ENTRIES + ">", "gim");
+    CORE._REG_EXP_SPLIT_NOTES = /[\r\n]+/;
+    CORE._ON_LOAD_DATUM_NOTETAGS = (datumType, datum, containerName, fullRegex, notePairs) => {
+        // Storing datumType is to streamline the notetag datum type reading
+        const container = datum.meta[containerName] = {
+            id: datum.id,
+            datumType,
+            notetags: []
+        }, lines = datum.note.split(CORE._REG_EXP_SPLIT_NOTES);
+        //
+        lines.forEach(line => {
+            CORE._ON_LOAD_DATUM_NOTETAG(container, fullRegex, notePairs, line);
+        });
+    }; // CORE._ON_LOAD_DATUM_NOTETAGS
+    MZ_EC.onLoadDataNotetags = (obj, datumType, containerName, baseRegex, notePairs) => {
+        obj.forEach(datum_ => {
+        if (!datum_) return;
+        const fullRegex = CORE._FULL_REG_EXP(baseRegex);
+        CORE._ON_LOAD_DATUM_NOTETAGS(
+                datumType, datum_, containerName, fullRegex, notePairs);
+        });
+    }; // MZ_EC.onLoadDataNotetags
 
     CORE._ARRAY_VAL_SEPARATOR = "|", CORE._BOOL_ARRAY_VAL = entry => {
         return entry.split(CORE._ARRAY_VAL_SEPARATOR).map(CORE._BOOL_VAL);
@@ -783,6 +755,33 @@ Utils.checkRMVersion(DoubleX_RMMZ.Enhanced_Codebase.VERSIONS.codebase);
             //
         }
     }; // CORE._RETURNED_ENTRY_VAL
+    // The this pointer is that of the caller
+    MZ_EC.returnedEntryWithSuffix = function(notePairs, notetagType, suffix, entry, count, argObj = {}) {
+        switch (suffix) {
+            case "val": return CORE._RETURNED_ENTRY_VAL(
+                    notePairs, notetagType, entry, count);
+            case "switch": return $gameSwitches.value(+entry);
+            case "var": return $gameVariables.value(+entry);
+            case "script": {
+                const script = $gameVariables.value(+entry);
+                return new Function("argObj", script).call(this, argObj);
+            }
+            // There's not enough context to throw errors meaningfully
+            default: return entry;
+            //
+        }
+    }; // MZ_EC.returnedEntryWithSuffix
+    //
+
+    MZ_EC.BOOL_SUFFIXES = ["val", "switch", "script"];
+    MZ_EC.VAL_SUFFIXES = ["val", "var", "script"];
+    MZ_EC.EVENT_SUFFIXES = ["event", "script"];
+    MZ_EC.BOOL_ENTRY = "bool";
+    MZ_EC.BOOL_ARRAY_ENTRY = "boolArray";
+    MZ_EC.NUM_ENTRY = "num";
+    MZ_EC.NUM_ARRAY_ENTRY = "numArray";
+    MZ_EC.STRING_ENTRY = "string";
+    MZ_EC.STRING_ARRAY_ENTRY = "stringArray";
 
 })(DoubleX_RMMZ.Enhanced_Codebase);
 

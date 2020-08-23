@@ -770,8 +770,8 @@ Utils.checkRMVersion(DoubleX_RMMZ.Unit_Filters.VERSIONS.codebase);
     NEW._FILTERED_MEMS = (mems, isEditMems, filterFunc) => {
         if (!isEditMems) return mems.filter(filterFunc);
         for (let i = 0; ; i++) {
+            while (mems[i] && !filterFunc[mems[i]]) mems.remove(mems[i]);
             if (!mems[i]) return mems;
-            while (!filterFunc[mems[i]]) mems.remove(mems[i]);
         }
     }; // NEW._FILTERED_MEMS
 
