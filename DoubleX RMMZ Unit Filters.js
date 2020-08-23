@@ -144,8 +144,8 @@
  *         - The return value should be an Array of Game_Battler
  *         - stateIds must be an Array of natural numbers
  *         - mems must be an Array of Game_Battler
- *         - If mems isn't specified, it'll be default to all members outside
- *           battles and battle members inside battles respectively
+ *         - If mems isn't specified, it'll be default to all unit members
+ *           outside battles and battle members inside battles respectively
  *         - E.g.:
  *           $gameParty.memWithAnyState([1, 2]) returns the list of party
  *           members with any state with id 1 or 2
@@ -156,8 +156,8 @@
  *         - The return value should be an Array of Game_Battler
  *         - stateIds must be an Array of natural numbers
  *         - mems must be an Array of Game_Battler
- *         - If mems isn't specified, it'll be default to all members outside
- *           battles and battle members inside battles respectively
+ *         - If mems isn't specified, it'll be default to all unit members
+ *           outside battles and battle members inside battles respectively
  *         - E.g.:
  *           $gameTroop.memWithAllStates([1, 2], $gameTroop.memWithAnyState([3, 4]))
  *           returns the list of troop members with all states with id 1 or 2
@@ -169,8 +169,8 @@
  *         - The return value should be an Array of Game_Battler
  *         - stateIds must be an Array of natural numbers
  *         - mems must be an Array of Game_Battler
- *         - If mems isn't specified, it'll be default to all members outside
- *           battles and battle members inside battles respectively
+ *         - If mems isn't specified, it'll be default to all unit members
+ *           outside battles and battle members inside battles respectively
  *         - E.g.:
  *           $gameParty.memWithoutAnyState([1, 2]) returns the list of party
  *           members without any state with id 1 or 2
@@ -181,8 +181,8 @@
  *         - The return value should be an Array of Game_Battler
  *         - stateIds must be an Array of natural numbers
  *         - mems must be an Array of Game_Battler
- *         - If mems isn't specified, it'll be default to all members outside
- *           battles and battle members inside battles respectively
+ *         - If mems isn't specified, it'll be default to all unit members
+ *           outside battles and battle members inside battles respectively
  *         - E.g.:
  *           $gameTroop.memWithoutAllStates([1, 2], $gameTroop.memWithoutAnyState([3, 4]))
  *           returns the list of troop members without all states with id 1 or
@@ -194,8 +194,8 @@
  *         - The return value should be an Array of Game_Battler
  *         - paramIds must be an Array of non negative numbers
  *         - mems must be an Array of Game_Battler
- *         - If mems isn't specified, it'll be default to all members outside
- *           battles and battle members inside battles respectively
+ *         - If mems isn't specified, it'll be default to all unit members
+ *           outside battles and battle members inside battles respectively
  *         - E.g.:
  *           $gameParty.memWithAnyBuff([0, 1]) returns the list of party
  *           members with any mhp or mmp buff
@@ -206,8 +206,8 @@
  *         - The return value should be an Array of Game_Battler
  *         - paramIds must be an Array of non negative numbers
  *         - mems must be an Array of Game_Battler
- *         - If mems isn't specified, it'll be default to all members outside
- *           battles and battle members inside battles respectively
+ *         - If mems isn't specified, it'll be default to all unit members
+ *           outside battles and battle members inside battles respectively
  *         - E.g.:
  *           $gameTroop.memWithAllBuffs([0, 1], $gameTroop.memWithAnyBuff([2, 3]))
  *           returns the list of troop members with all mhp and mmp buffs
@@ -219,8 +219,8 @@
  *         - The return value should be an Array of Game_Battler
  *         - paramIds must be an Array of non negative numbers
  *         - mems must be an Array of Game_Battler
- *         - If mems isn't specified, it'll be default to all members outside
- *           battles and battle members inside battles respectively
+ *         - If mems isn't specified, it'll be default to all unit members
+ *           outside battles and battle members inside battles respectively
  *         - E.g.:
  *           $gameParty.memWithoutAnyBuff([0, 1]) returns the list of party
  *           members without any mhp or mmp buff
@@ -231,8 +231,8 @@
  *         - The return value should be an Array of Game_Battler
  *         - paramIds must be an Array of non negative numbers
  *         - mems must be an Array of Game_Battler
- *         - If mems isn't specified, it'll be default to all members outside
- *           battles and battle members inside battles respectively
+ *         - If mems isn't specified, it'll be default to all unit members
+ *           outside battles and battle members inside battles respectively
  *         - E.g.:
  *           $gameTroop.memWithoutAllBuffs([0, 1], $gameTroop.memWithoutAnyBuff([2, 3]))
  *           returns the list of troop members without all mhp and mmp buffs
@@ -244,8 +244,8 @@
  *         - The return value should be an Array of Game_Battler
  *         - paramIds must be an Array of non negative numbers
  *         - mems must be an Array of Game_Battler
- *         - If mems isn't specified, it'll be default to all members outside
- *           battles and battle members inside battles respectively
+ *         - If mems isn't specified, it'll be default to all unit members
+ *           outside battles and battle members inside battles respectively
  *         - E.g.:
  *           $gameParty.memWithAnyDebuff([0, 1]) returns the list of party
  *           members with any mhp or mmp debuff
@@ -256,8 +256,8 @@
  *         - The return value should be an Array of Game_Battler
  *         - paramIds must be an Array of non negative numbers
  *         - mems must be an Array of Game_Battler
- *         - If mems isn't specified, it'll be default to all members outside
- *           battles and battle members inside battles respectively
+ *         - If mems isn't specified, it'll be default to all unit members
+ *           outside battles and battle members inside battles respectively
  *         - E.g.:
  *           $gameTroop.memWithAllDebuffs([0, 1], $gameTroop.memWithAnyDebuff([2, 3]))
  *           returns the list of troop members with all mhp and mmp debuffs
@@ -269,8 +269,8 @@
  *         - The return value should be an Array of Game_Battler
  *         - paramIds must be an Array of non negative numbers
  *         - mems must be an Array of Game_Battler
- *         - If mems isn't specified, it'll be default to all members outside
- *           battles and battle members inside battles respectively
+ *         - If mems isn't specified, it'll be default to all unit members
+ *           outside battles and battle members inside battles respectively
  *         - E.g.:
  *           $gameParty.memWithoutAnyDebuff([0, 1]) returns the list of party
  *           members without any mhp or mmp debuff
@@ -281,8 +281,8 @@
  *         - The return value should be an Array of Game_Battler
  *         - paramIds must be an Array of non negative numbers
  *         - mems must be an Array of Game_Battler
- *         - If mems isn't specified, it'll be default to all members outside
- *           battles and battle members inside battles respectively
+ *         - If mems isn't specified, it'll be default to all unit members
+ *           outside battles and battle members inside battles respectively
  *         - E.g.:
  *           $gameTroop.memWithoutAllDebuffs([0, 1], $gameTroop.memWithoutAnyDebuff([2, 3]))
  *           returns the list of troop members without all mhp and mmp debuffs
@@ -294,8 +294,8 @@
  *         - The return value should be an Array of Game_Battler
  *         - skillIds must be an Array of natural numbers
  *         - mems must be an Array of Game_Battler
- *         - If mems isn't specified, it'll be default to all members outside
- *           battles and battle members inside battles respectively
+ *         - If mems isn't specified, it'll be default to all unit members
+ *           outside battles and battle members inside battles respectively
  *         - E.g.:
  *           $gameParty.memWithAnySkill([1, 2]) returns the list of party
  *           members with skill having id 1 or 2
@@ -306,8 +306,8 @@
  *         - The return value should be an Array of Game_Battler
  *         - skillIds must be an Array of natural numbers
  *         - mems must be an Array of Game_Battler
- *         - If mems isn't specified, it'll be default to all members outside
- *           battles and battle members inside battles respectively
+ *         - If mems isn't specified, it'll be default to all unit members
+ *           outside battles and battle members inside battles respectively
  *         - E.g.:
  *           $gameTroop.memWithAllSkills([1, 2], $gameParty.memWithAnySkill([3, 4]))
  *           returns the list of troop members with skills having id 1 and 2
@@ -319,8 +319,8 @@
  *         - The return value should be an Array of Game_Battler
  *         - skillIds must be an Array of natural numbers
  *         - mems must be an Array of Game_Battler
- *         - If mems isn't specified, it'll be default to all members outside
- *           battles and battle members inside battles respectively
+ *         - If mems isn't specified, it'll be default to all unit members
+ *           outside battles and battle members inside battles respectively
  *         - E.g.:
  *           $gameParty.memWithoutAnySkill([1, 2]) returns the list of party
  *           members without skills having id 1 nor 2
@@ -331,8 +331,8 @@
  *         - The return value should be an Array of Game_Battler
  *         - skillIds must be an Array of natural numbers
  *         - mems must be an Array of Game_Battler
- *         - If mems isn't specified, it'll be default to all members outside
- *           battles and battle members inside battles respectively
+ *         - If mems isn't specified, it'll be default to all unit members
+ *           outside battles and battle members inside battles respectively
  *         - E.g.:
  *           $gameTroop.memWithoutAllSkills([1, 2], $gameParty.memWithoutAnySkill([3, 4]))
  *           returns the list of troop members without skills having id 1 and
@@ -348,8 +348,8 @@
  *         - stats must be an Array of strings as names of Game_Battler
  *           properties with the get function
  *         - mems must be an Array of Game_Battler
- *         - If mems isn't specified, it'll be default to all members outside
- *           battles and battle members inside battles respectively
+ *         - If mems isn't specified, it'll be default to all unit members
+ *           outside battles and battle members inside battles respectively
  *         - E.g.:
  *           $gameParty.anyHighestStatMem(["hp", "mp"]) returns the list of
  *           party members with the highest amount of hp or mp among the party
@@ -364,8 +364,8 @@
  *         - stats must be an Array of strings as names of Game_Battler
  *           properties with the get function
  *         - mems must be an Array of Game_Battler
- *         - If mems isn't specified, it'll be default to all members outside
- *           battles and battle members inside battles respectively
+ *         - If mems isn't specified, it'll be default to all unit members
+ *           outside battles and battle members inside battles respectively
  *         - E.g.:
  *           $gameTroop.allHighestStatsMem(["hp", "mp"], $gameTroop.anyHighestStatMem(["mhp", "mmp"]))
  *           returns the list of troop members with the highest amount of hp
@@ -382,8 +382,8 @@
  *         - stats must be an Array of strings as names of Game_Battler
  *           properties with the get function
  *         - mems must be an Array of Game_Battler
- *         - If mems isn't specified, it'll be default to all members outside
- *           battles and battle members inside battles respectively
+ *         - If mems isn't specified, it'll be default to all unit members
+ *           outside battles and battle members inside battles respectively
  *         - E.g.:
  *           $gameParty.notAnyHighestStatMem(["hp", "mp"]) returns the list of
  *           party members with neither the highest amount of hp nor mp among
@@ -399,8 +399,8 @@
  *         - stats must be an Array of strings as names of Game_Battler
  *           properties with the get function
  *         - mems must be an Array of Game_Battler
- *         - If mems isn't specified, it'll be default to all members outside
- *           battles and battle members inside battles respectively
+ *         - If mems isn't specified, it'll be default to all unit members
+ *           outside battles and battle members inside battles respectively
  *         - E.g.:
  *           $gameTroop.notAllHighestStatsMem(["hp", "mp"], $gameTroop.notAnyHighestStatMem(["mhp", "mmp"]))
  *           returns the list of troop members without the highest amount of
@@ -417,8 +417,8 @@
  *         - stats must be an Array of strings as names of Game_Battler
  *           properties with the get function
  *         - mems must be an Array of Game_Battler
- *         - If mems isn't specified, it'll be default to all members outside
- *           battles and battle members inside battles respectively
+ *         - If mems isn't specified, it'll be default to all unit members
+ *           outside battles and battle members inside battles respectively
  *         - E.g.:
  *           $gameParty.anyLowestStatMem(["hp", "mp"]) returns the list of
  *           party members with the lowest amount of hp or mp among the party
@@ -433,8 +433,8 @@
  *         - stats must be an Array of strings as names of Game_Battler
  *           properties with the get function
  *         - mems must be an Array of Game_Battler
- *         - If mems isn't specified, it'll be default to all members outside
- *           battles and battle members inside battles respectively
+ *         - If mems isn't specified, it'll be default to all unit members
+ *           outside battles and battle members inside battles respectively
  *         - E.g.:
  *           $gameTroop.allLowestStatsMem(["hp", "mp"], $gameTroop.anyLowestStatMem(["mhp", "mmp"]))
  *           returns the list of troop members with the lowest amount of hp
@@ -451,8 +451,8 @@
  *         - stats must be an Array of strings as names of Game_Battler
  *           properties with the get function
  *         - mems must be an Array of Game_Battler
- *         - If mems isn't specified, it'll be default to all members outside
- *           battles and battle members inside battles respectively
+ *         - If mems isn't specified, it'll be default to all unit members
+ *           outside battles and battle members inside battles respectively
  *         - E.g.:
  *           $gameParty.notAnyLowestStatMem(["hp", "mp"]) returns the list of
  *           party members with neither the lowest amount of hp nor mp among
@@ -468,8 +468,8 @@
  *         - stats must be an Array of strings as names of Game_Battler
  *           properties with the get function
  *         - mems must be an Array of Game_Battler
- *         - If mems isn't specified, it'll be default to all members outside
- *           battles and battle members inside battles respectively
+ *         - If mems isn't specified, it'll be default to all unit members
+ *           outside battles and battle members inside battles respectively
  *         - E.g.:
  *           $gameTroop.notAllLowestStatsMem(["hp", "mp"], $gameParty.notAnyLowestStatMem(["mhp", "mmp"]))
  *           returns the list of troop members without the lowest amount of
@@ -486,8 +486,8 @@
  *           properties with the get function
  *         - val must be a number
  *         - mems must be an Array of Game_Battler
- *         - If mems isn't specified, it'll be default to all members outside
- *           battles and battle members inside battles respectively
+ *         - If mems isn't specified, it'll be default to all unit members
+ *           outside battles and battle members inside battles respectively
  *         - E.g.:
  *           $gameParty.anyAboveStatMem(["hp", "mp"], 100) returns the list of
  *           party members with the value of hp or mp above 100
@@ -502,8 +502,8 @@
  *           properties with the get function
  *         - val must be a number
  *         - mems must be an Array of Game_Battler
- *         - If mems isn't specified, it'll be default to all members outside
- *           battles and battle members inside battles respectively
+ *         - If mems isn't specified, it'll be default to all unit members
+ *           outside battles and battle members inside battles respectively
  *         - E.g.:
  *           $gameTroop.allAboveStatMem(["hp", "mp"], 100, $gameTroop.anyAboveStatMem(["mhp", "mmp"], 1000))
  *           returns the list of troop members with the value of hp and mp
@@ -519,8 +519,8 @@
  *           properties with the get function
  *         - val must be a number
  *         - mems must be an Array of Game_Battler
- *         - If mems isn't specified, it'll be default to all members outside
- *           battles and battle members inside battles respectively
+ *         - If mems isn't specified, it'll be default to all unit members
+ *           outside battles and battle members inside battles respectively
  *         - E.g.:
  *           $gameParty.anyBelowStatMem(["hp", "mp"], 100) returns the list of
  *           party members with the value of hp or mp below 100
@@ -535,8 +535,8 @@
  *           properties with the get function
  *         - val must be a number
  *         - mems must be an Array of Game_Battler
- *         - If mems isn't specified, it'll be default to all members outside
- *           battles and battle members inside battles respectively
+ *         - If mems isn't specified, it'll be default to all unit members
+ *           outside battles and battle members inside battles respectively
  *         - E.g.:
  *           $gameTroop.allBelowStatMem(["hp", "mp"], 100, $gameTroop.anyBelowStatMem(["mhp", "mmp"], 1000))
  *           returns the list of troop members with the value of hp and mp
