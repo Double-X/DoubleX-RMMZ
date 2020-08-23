@@ -32,7 +32,7 @@
  *      1. Nothing special for most ordinary cases
  *      2. Little RMMZ plugin development proficiency to fully utilize this
  *         (Elementary Javascript exposures being able to write beginner codes
- *         up to 300LoC scale )
+ *         up to 300LoC scale)
  *----------------------------------------------------------------------------
  *    # Author Notes
  *      1. This plugin's meant to be a convenience tool to facilitate the use
@@ -544,7 +544,7 @@
  *============================================================================
  */
 
-var DoubleX_RMMZ = DoubleX_RMMZ || {};
+const DoubleX_RMMZ = DoubleX_RMMZ || {};
 // Separates the version numbers with the rest to make the former more clear
 DoubleX_RMMZ.Unit_Filters = {
     VERSIONS: { codebase: "1.0.0", plugin: "v1.00a" }
@@ -561,7 +561,7 @@ Utils.checkRMVersion(DoubleX_RMMZ.Unit_Filters.VERSIONS.codebase);
  *         - Little RMMZ plugin development proficiency to fully comprehend
  *           this plugin
  *           (Elementary Javascript exposures being able to write beginner
- *           codes up to 300LoC scale )
+ *           codes up to 300LoC scale)
  *      2. Parameter/Return value of type * means it might be of any type
  *      3. Function signature with (**) means it might take any number of
  *         parameters of any type
