@@ -58,6 +58,8 @@
  *      6.
  *      7.
  *      8.
+ *      9.
+ *      10.
  *----------------------------------------------------------------------------
  *    # Instructions
  *      1. THIS PLUGIN MUST BE PLACED ABOVE ALL THE OTHER PLUGINS
@@ -226,27 +228,46 @@
  *       5. mapReduce(mapCallback, reduceCallback, initVal_, mapThis_, reduceThis_)
  *          The same as chaining map with reduce but is tested to be
  *          noticeably faster(.map().reduce())
- *       6. isProperSubsetOf(arr)
+ *       6. split(splitCallback, splitThis)
+ *          Returns an array of array splited by the removed elements
+ *          returning truthy results in splitCallback
+ *       7. splitInPlace(splitCallback, splitThis)
+ *          Returns an array of array splited by the removed elements
+ *          returning truthy results in splitCallback
+ *          This method changes the original array
+ *       8. isProperSubsetOf(arr)
  *          Returns if this array's a proper subset of the specified array
- *       7. isProperSupersetOf(arr)
+ *       9. isProperSupersetOf(arr)
  *          Returns if this array's a proper superset of the specified array
- *       8. isSupersetOf(arr)
- *          Returns if this array's a superset of the specified array
- *       9. isSubsetOf(arr)
- *          Returns if this array's a subset of the specified array
- *       10. isEmpty()
+ *       10. isSupersetOf(arr)
+ *           Returns if this array's a superset of the specified array
+ *       11. isSubsetOf(arr)
+ *           Returns if this array's a subset of the specified array
+ *       12. isEmpty()
  *           Returns if this array's empty
- *       11. symmetricDifference(arr)
+ *       13. symmetricDifference(arr)
  *           Returns the symmetric difference of this and the specified array
- *       12. union(arr)
+ *       14. symmetricDifferenceInplace(arr)
+ *           Returns the symmetric difference of this and the specified array
+ *           This method changes the original array
+ *       15. union(arr)
  *           Returns the union of this and the specified array
- *       13. difference(arr)
+ *       16. unionInPlace(arr)
+ *           Returns the union of this and the specified array
+ *           This method changes the original array
+ *       17. difference(arr)
  *           Returns the difference of this and the specified array
- *       14. intersection(arr)
+ *       18. differenceInPlace(arr)
+ *           Returns the difference of this and the specified array
+ *           This method changes the original array
+ *       19. intersection(arr)
  *           Returns the intersection of this and the specified array
- *       15. excludes(elem, fromI)
+ *       20. intersectionInPlace(arr)
+ *           Returns the intersection of this and the specified array
+ *           This method changes the original array
+ *       21. excludes(elem, fromI)
  *           Returns if this array doesn't include the specified element
- *       16. clear()
+ *       22. clear()
  *           Empties the whole array
  *     Graphics
  *     - Static Accessor
@@ -730,6 +751,54 @@ Utils.checkRMVersion(DoubleX_RMMZ.Enhanced_Codebase.VERSIONS.codebase);
         });
     }; // MZ_EC.onLoadDataNotetags
 
+    CORE._ACT_DATA_SKILL = ({ skillId }) => $dataSkills[skillId];
+    CORE._USABLE_ITEMS = item => battler.canUse(item);
+    CORE._NOTETAG_DATA = (battler, dataType) => {
+        const [isActor, isEnemy] = [battler.isActor(), battler.isEnemy()];
+        switch (dataType) {
+            case "actor": return isActor ? [battler.actor()] : [];
+            case "class": return isActor ? [battler.currentClass()] : [];
+            case "skills": {
+                if (isActor) return battler.skills();
+                if (!isEnemy) return [];
+                return battler.enemy().actions.map(CORE._ACT_DATA_SKILL);
+            }
+            case "usableSkills": {
+                if (isActor) return battler.usableSkills();
+                if (!isEnemy) return [];
+                return EC_GE._validActs.call(battler).map(CORE._ACT_DATA_SKILL);
+            }
+            case "items" : return isActor ? $gameParty.items() : [];
+            case "usableItems" : {
+                if (isActor) return $gameParty.items().map(CORE._USABLE_ITEMS);
+                return [];
+            }
+            case "latestSkillItem": {
+                const curAct = battler.currentAction();
+                return curAct && curAct.item() ? [curAct.item()] : [];
+            }
+            case "weapons" : return isActor ? battler.weapons() : [];
+            case "armors" : return isActor ? battler.armors() : [];
+            case "enemy" : return isEnemy ? battler.enemy() : [];
+            case "states" : return isEnemy ? battler.states() : [];
+        }
+    }; // CORE._NOTETAG_DATA
+    CORE._IS_VALID_DATUM = datum => datum;
+    CORE._DATA_NOTETAG_CONTAINERS = (battler, dataType, containerName, notetagTypes_) => {
+          const containers = CORE._NOTETAG_DATA(battler, dataType).filterMap(
+                  CORE._IS_VALID_DATUM, ({ meta }) => meta[containerName]);
+          return notetagTypes_ ? containers.filter(({ notetagType }) => {
+              return notetagTypes_.includes(notetagType);
+          }) : containers;
+    }; // CORE._DATA_NOTETAG_CONTAINERS
+    MZ_EC.notetags = (battler, priorities, containerName, notetagTypes_) => {
+        return priorities.reduce((notetags, dataType) => {
+            const containers = CORE._DATA_NOTETAG_CONTAINERS(
+                    battler, dataType, containerName, notetagTypes_);
+            return notetags.fastMerge(containers);
+        }, []);
+    }; // MZ_EC.notetags
+
     CORE._ARRAY_VAL_SEPARATOR = "|", CORE._BOOL_ARRAY_VAL = entry => {
         return entry.split(CORE._ARRAY_VAL_SEPARATOR).map(CORE._BOOL_VAL);
     }; // CORE._BOOL_ARRAY_VAL
@@ -881,9 +950,9 @@ Utils.checkRMVersion(DoubleX_RMMZ.Enhanced_Codebase.VERSIONS.codebase);
      * Potential Hotspot/Nullipotent
      * @author DoubleX @interface @since v0.00a @version v0.00a
      * @memberof JsExtensions
-     * @param {(*, <T>, Index, [<T>]) -> *} mapCallback - The callback in the
+     * @param {(*, <T>, index, [<T>]) -> *} mapCallback - The callback in the
      *                                                    Array map method
-     * @param {(*, *, Index) -> Boolean} filterCallback - The callback in the
+     * @param {(*, *, index) -> boolean} filterCallback - The callback in the
      *                                                    Array filter method
      * @param {*?} mapThis_ - The context of mapCallback
      * @param {*?} filterThis_ - The context of filterCallback
@@ -915,9 +984,9 @@ Utils.checkRMVersion(DoubleX_RMMZ.Enhanced_Codebase.VERSIONS.codebase);
      * Potential Hotspot/Nullipotent
      * @author DoubleX @interface @since v0.00a @version v0.00a
      * @memberof JsExtensions
-     * @param {(*, <T>, Index, [<T>]) -> *} mapCallback - The callback in the
+     * @param {(*, <T>, index, [<T>]) -> *} mapCallback - The callback in the
      *                                                    Array map method
-     * @param {(*, *, *, Index) -> *} reduceCallback - The callback in the Array
+     * @param {(*, *, *, index) -> *} reduceCallback - The callback in the Array
      *                                                 reduce method
      * @param {*?} initVal_ - The initial value of reduceCallback
      * @param {*?} mapThis_ - The context of mapCallback
@@ -958,6 +1027,68 @@ Utils.checkRMVersion(DoubleX_RMMZ.Enhanced_Codebase.VERSIONS.codebase);
         //
         return val;
     }; // $.mapReduce
+
+    /**
+     * Potential Hotspot/Nullipotent
+     * @author DoubleX @interface @since v0.00a @version v0.00a
+     * @memberof JsExtensions
+     * @param {(*, *, index) -> boolean} splitCallback - The callback in the
+     *                                                   Array split method
+     * @param {*?} splitThis_ - The context of splitCallback
+     * @returns {Array} - The fully mapped array from this
+     */
+    $.split = function(splitCallback, splitThis_) {
+        if (this == null) throw new TypeError("this is null or not defined");
+        if (typeof splitCallback !== "function") {
+            throw new TypeError(`${splitCallback} is not a function`);
+        }
+        const newArray = [];
+        let newGroup = [];
+        // forEach is tested to be the fastest among sandboxes including NW.js
+        this.forEach((elem, i) => {
+            // It's ok to call undefined context with previously bound callbacks
+            if (splitCallback.call(splitThis_, elem, i, this)) {
+                newArray.push(newGroup); // It's ok for 1st group to be empty
+                newGroup = [];
+            } else newGroup.push(elem);
+            //
+        });
+        newArray.push(newGroup); // It's ok for the last group to be empty
+        //
+        return newArray;
+    }; // $.split
+
+    /**
+     * This method changes the original array
+     * Potential Hotspot/Nullipotent
+     * @author DoubleX @interface @since v0.00a @version v0.00a
+     * @memberof JsExtensions
+     * @param {(*, *, index) -> boolean} splitCallback - The callback in the
+     *                                                   Array split method
+     * @param {*?} splitThis_ - The context of splitCallback
+     * @returns {Array} - The fully mapped array from this
+     */
+    $.splitInPlace = function(splitCallback, splitThis_) {
+        if (this == null) throw new TypeError("this is null or not defined");
+        if (typeof splitCallback !== "function") {
+            throw new TypeError(`${splitCallback} is not a function`);
+        }
+        let newGroup = [], oldI = newI = 0;
+        while (this.length > newI) {
+            const elem = this.shift();
+            // It's ok to call undefined context with previously bound callbacks
+            if (splitCallback.call(splitThis_, elem, oldI, this)) {
+                this.push(newGroup); // It's ok for 1st group to be empty
+                newGroup = [];
+                newI++;
+            } else newGroup.push(elem);
+            //
+            oldI++;
+        }
+        this.push(newGroup); // It's ok for the last group to be empty
+        //
+        return this;
+    }; // $.splitInPlace
 
     /**
      * Potential Hotspot/Nullipotent
@@ -1019,6 +1150,18 @@ Utils.checkRMVersion(DoubleX_RMMZ.Enhanced_Codebase.VERSIONS.codebase);
     }; // $.symmetricDifference
 
     /**
+     * This method changes the original array
+     * Potential Hotspot/Nullipotent
+     * @author DoubleX @interface @since v0.00a @version v0.00a
+     * @memberof JsExtensions
+     * @param {Array} arr - The array to have symmetric difference with
+     * @returns {Array} The symmetric difference of this and the specified array
+     */
+    $.symmetricDifferenceInPlace = function(arr) {
+        return this.differenceInPlace(arr).unionInPlace(arr.difference(this));
+    }; // $.symmetricDifferenceInPlace
+
+    /**
      * Potential Hotspot/Nullipotent
      * @author DoubleX @interface @since v0.00a @version v0.00a
      * @memberof JsExtensions
@@ -1026,6 +1169,18 @@ Utils.checkRMVersion(DoubleX_RMMZ.Enhanced_Codebase.VERSIONS.codebase);
      * @returns {Array} The union of this and the specified array
      */
     $.union = function(arr) { return this.concat(arr.difference(this)); };
+
+    /**
+     * This method changes the original array
+     * Potential Hotspot/Nullipotent
+     * @author DoubleX @interface @since v0.00a @version v0.00a
+     * @memberof JsExtensions
+     * @param {Array} arr - The array to have union with this array
+     * @returns {Array} The union of this and the specified array
+     */
+    $.unionInPlace = function(arr) {
+        return this.fastMerge(arr.difference(this));
+    }; // $.unionInPlace
 
     /**
      * Potential Hotspot/Nullipotent
@@ -1039,6 +1194,21 @@ Utils.checkRMVersion(DoubleX_RMMZ.Enhanced_Codebase.VERSIONS.codebase);
     }; // $.difference
 
     /**
+     * This method changes the original array
+     * Potential Hotspot/Nullipotent
+     * @author DoubleX @interface @since v0.00a @version v0.00a
+     * @memberof JsExtensions
+     * @param {Array} arr - The array to have difference with this array
+     * @returns {Array} The difference of this and the specified array
+     */
+    $.differenceInPlace = function(arr) {
+        for (let i = 0; ; i++) {
+            while (this[i] && arr.includes(this[i])) this.remove(this[i]);
+            if (!this[i]) return this;
+        }
+    }; // $.differenceInPlace
+
+    /**
      * Potential Hotspot/Nullipotent
      * @author DoubleX @interface @since v0.00a @version v0.00a
      * @memberof JsExtensions
@@ -1050,6 +1220,21 @@ Utils.checkRMVersion(DoubleX_RMMZ.Enhanced_Codebase.VERSIONS.codebase);
         return this.filter(elem => arr.includes(elem));
         //
     }; // $.intersection
+
+    /**
+     * This method changes the original array
+     * Potential Hotspot/Nullipotent
+     * @author DoubleX @interface @since v0.00a @version v0.00a
+     * @memberof JsExtensions
+     * @param {Array} arr - The array to have intersection with this array
+     * @returns {Array} The intersection of this and the specified array
+     */
+    $.intersectionInPlace = function(arr) {
+        for (let i = 0; ; i++) {
+            while (this[i] && arr.excludes(this[i])) this.remove(this[i]);
+            if (!this[i]) return this;
+        }
+    }; // $.intersectionInPlace
 
     /**
      * Potential Hotspot/Nullipotent
@@ -2473,13 +2658,94 @@ Utils.checkRMVersion(DoubleX_RMMZ.Enhanced_Codebase.VERSIONS.codebase);
 
     "use strict";
 
-    const { rewriteFunc } = MZ_EC.setKlassContainer("Game_System", $, MZ_EC);
+    const {
+        NEW,
+        ORIG,
+        extendFunc,
+        rewriteFunc
+    } = MZ_EC.setKlassContainer("Game_System", $, MZ_EC);
+
+    extendFunc("initialize", function() {
+        ORIG.initialize.call(this);
+        // Added to help plugins store all parameter values in game saves
+        NEW.storeParams.call(this);
+        //
+    }); // v0.00a - v0.00a
 
     rewriteFunc("playtime", function() {
         // Edited to help plugins alter the fps in better ways
         return Math.floor(Graphics.frameCount / Graphics.gameFps);
         //
     }); // v0.00a - v0.00a
+
+    /**
+     * The this pointer is Game_System.prototype
+     * Idempotent
+     * @author DoubleX @interface @since v0.00a @version v0.00a
+     */
+    NEW.storeParams = function() {};
+
+    NEW._TRY_JSON_PARAM = val => {
+        if (!val) return val;
+        // It's possible for users to input raw parameter values directly
+        try {
+            return NEW._TRY_JSON_PARAM(JSON.parse(val));
+        } catch (err) { return val; }
+        //
+    }; // NEW._TRY_JSON_PARAM
+    NEW._PARSED_PARAMS = params => { // v0.05b+
+        Object.entries(params).forEach(([param, val]) => {
+            params[param] = NEW._TRY_JSON_PARAM(val);
+        });
+        return params;
+    }; // NEW._PARSED_PARAMS
+    NEW._RAW_PARAMS = pluginName => {
+        // There's no need to cache it as _RAW_PARAMS should only be called once
+        const params = PluginManager.parameters(pluginName);
+        //
+        if (Object.keys(params) <= 0) alert(`Please check if the filename of
+                                            ${pluginName} is ${pluginName}`);
+        // The original plugin parameter container should never be edited
+        return NEW._PARSED_PARAMS(JsonEx.makeDeepCopy(params));
+        //
+    }; // NEW._RAW_PARAMS
+    /**
+     * The this pointer is Game_System.prototype
+     * Idempotent
+     * @author DoubleX @interface @since v0.00a @version v0.00a
+     * @param {string} pluginName - The name of the plugin to store parameters
+     * @param {string} containerName - The name of the parameter container
+     */
+    NEW.onStoreParams = function(pluginName, containerName) {
+        this[containerName] = new Map();
+        Object.entries(NEW._RAW_PARAMS(pluginName)).forEach(([param, val]) => {
+            NEW.storeParam.call(this, containerName, param, val);
+        });
+    }; // NEW.onStoreParams
+
+    /**
+     * The this pointer is Game_System.prototype
+     * Idempotent
+     * @author DoubleX @interface @since v0.00a @version v0.00a
+     * @param {string} containerName - The name of the parameter container
+     * @param {string} param - The name of the parameter to be stored in saves
+     * @param {*} val - The value of the parameter to be stored in game saves
+     */
+    NEW.storeParam = function(containerName, param, val) {
+        this[containerName].set(param, val);
+    }; // NEW.storeParam
+
+    /**
+     * The this pointer is Game_System.prototype
+     * Nullipotent
+     * @author DoubleX @interface @since v0.00a @version v0.00a
+     * @param {string} containerName - The name of the parameter container
+     * @param {string} param - The name of the parameter to be stored in saves
+     * @returns {*} The value of the parameter to be stored in game saves
+     */
+    NEW.storedParam = function(containerName, param) {
+        return this[containerName].get(param);
+    }; // NEW.storeParam
 
 })(Game_System.prototype, DoubleX_RMMZ.Enhanced_Codebase);
 
@@ -4438,6 +4704,19 @@ Utils.checkRMVersion(DoubleX_RMMZ.Enhanced_Codebase.VERSIONS.codebase);
         }
     }); // v0.00a - v0.00a
 
+    rewriteFunc("makeActions", function() {
+        Game_Battler.prototype.makeActions.call(this);
+        /** @todo Extracts these codes into well-named functions */
+        if (this.numActions() > 0) {
+            // Edited to help plugins alter make actions behaviors in better way
+            const actionList = NEW._validActs.call(this);
+            //
+            if (!actionList.isEmpty()) this.selectAllActions(actionList);
+        }
+        //
+        this.setActionState("waiting");
+    }); // v0.00a - v0.00a
+
     /**
      * The this pointer is Game_Enemy.prototype
      * Nullipotent/Random
@@ -4474,6 +4753,16 @@ Utils.checkRMVersion(DoubleX_RMMZ.Enhanced_Codebase.VERSIONS.codebase);
     NEW._ratingZero = function(actList) {
         return Math.max(...actList.map(({ rating }) => rating)) - 3;
     }; // NEW._ratingZero
+
+    /**
+     * The this pointer is Game_Actor.prototype
+     * Nullipotent
+     * @author DoubleX @since v0.00a @version v0.00a
+     * @returns {[DataAction]} The list of valid enemy actions to be inputted
+     */
+    NEW._validActs = function() {
+        return this.enemy().actions.filter(a => this.isActionValid(a));
+    }; // NEW._validActs
 
 })(Game_Enemy.prototype, DoubleX_RMMZ.Enhanced_Codebase);
 
