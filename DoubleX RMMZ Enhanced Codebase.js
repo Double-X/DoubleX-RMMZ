@@ -690,18 +690,23 @@ Utils.checkRMVersion(DoubleX_RMMZ.Enhanced_Codebase.VERSIONS.codebase);
             //
         }
     }; // CORE._RETURNED_ENTRY_VAL
+    CORE._RETURNED_ENTRY_SWITCH = entry => {
+        return $gameSwitches.value.bind($gameSwitches, +entry);
+    }; // CORE._RETURNED_ENTRY_SWITCH
+    CORE._RETURNED_ENTRY_VAR = entry => {
+        return $gameVariables.value.bind($gameVariables, +entry);
+    }; // CORE._RETURNED_ENTRY_VAR
+    CORE._RETURNED_ENTRY_SCRIPT = entry => {
+        return new Function("argObj", $gameVariables.value(+entry));
+    }; // CORE._RETURNED_ENTRY_VAR
     // The this pointer is that of the caller
     CORE._SUFFIX_ENTRY_FUNC = function(notePairs, notetagType, suffix, entry, count) {
         switch (suffix) {
             case "val": return CORE._RETURNED_ENTRY_VAL(
                     notePairs, notetagType, entry, count);
-            case "switch": {
-                return $gameSwitches.value.bind($gameSwitches, +entry);
-            } case "var": {
-                return $gameVariables.value.bind($gameVariables, +entry);
-            } case "script": {
-                return new Function("argObj", $gameVariables.value(+entry));
-            }
+            case "switch": return CORE._RETURNED_ENTRY_SWITCH(entry);
+            case "var": return CORE._RETURNED_ENTRY_VAR(entry);
+            case "script": return CORE._RETURNED_ENTRY_SCRIPT(entry);
             // There's not enough context to throw errors meaningfully
             default: return CORE._STRING_VAL;
             //
@@ -795,43 +800,94 @@ Utils.checkRMVersion(DoubleX_RMMZ.Enhanced_Codebase.VERSIONS.codebase);
     }; // CORE._ON_LOAD_DATUM_NOTETAGS
     MZ_EC.onLoadDataNotetags = (obj, datumType, containerName, baseRegex, notePairs) => {
         obj.forEach(datum_ => {
-        if (!datum_) return;
-        const fullRegex = CORE._FULL_REG_EXP(baseRegex);
-        CORE._ON_LOAD_DATUM_NOTETAGS(
-                datumType, datum_, containerName, fullRegex, notePairs);
+            if (!datum_) return;
+            const fullRegex = CORE._FULL_REG_EXP(baseRegex);
+            CORE._ON_LOAD_DATUM_NOTETAGS(
+                    datumType, datum_, containerName, fullRegex, notePairs);
         });
     }; // MZ_EC.onLoadDataNotetags
 
+    CORE._IS_RELOAD_DATA_NOTETAG_PAIRS = (pairs, count, varId) => {
+        if (pairs.get(`suffix${count}`) !== "script") return false;
+        return +pairs.get(`entry${count}`) === varId;
+    }; // CORE._IS_RELOAD_DATA_NOTETAG_PAIRS
+    CORE._RELOAD_DATA_NOTETAG_PAIRS = (varId, val, pairs) => {
+        let count = 1;
+        while (pairs.has(`func${count}`)) {
+            if (CORE._IS_RELOAD_DATA_NOTETAG_PAIRS(pairs, count, varId)) {
+                pairs.set(`func${count}`, new Function("argObj", val));
+            }
+            count++;
+        }
+    }; // MZ_EC._RELOAD_DATA_NOTETAG_PAIRS
+    MZ_EC.updateDataNotetags = (obj, containerName, varId, val) => {
+        obj.forEach(datum_ => {
+            if (!datum_) return;
+            datum_.meta[containerName].notetags.forEach(({ pairs }) => {
+                CORE._RELOAD_DATA_NOTETAG_PAIRS(varId, val, pairs);
+            });
+        });
+    }; // MZ_EC.updateDataNotetags
+
+    CORE._ACTOR_NOTETAG_DATA = battler => {
+        return battler.isActor() ? [battler.actor()] : [];
+    }; // CORE._ACTOR_NOTETAG_DATA
+    CORE._CLASS_NOTETAG_DATA = battler => {
+        return battler.isActor() ? [battler.currentClass()] : [];
+    }; // CORE._CLASS_NOTETAG_DATA
     CORE._ACT_DATA_SKILL = ({ skillId }) => $dataSkills[skillId];
+    CORE._SKILLS_NOTETAG_DATA = battler => {
+        if (battler.isActor()) return battler.skills();
+        if (!battler.isEnemy()) return [];
+        return battler.enemy().actions.map(CORE._ACT_DATA_SKILL);
+    }; // CORE._SKILLS_NOTETAG_DATA
+    CORE._USABLE_SKILLS_NOTETAG_DATA = battler => {
+        if (battler.isActor()) return battler.usableSkills();
+        if (!battler.isEnemy()) return [];
+        const EC_GE = MZ_CE.Game_Enemy.new;
+        return EC_GE._validActs.call(battler).map(CORE._ACT_DATA_SKILL);
+    }; // CORE._USABLE_SKILLS_NOTETAG_DATA
+    CORE._ITEMS_NOTETAG_DATA = battler => {
+        return battler.isActor() ? $gameParty.items() : [];
+    }; // CORE._ITEMS_NOTETAG_DATA
+    CORE._USABLE_ITEMS_NOTETAG_DATA = battler => {
+        return battler.isActor() ? $gameParty.items().map(item => {
+            return battler.canUse(item);
+        }) : [];
+    }; // CORE._USABLE_ITEMS_NOTETAG_DATA
+    CORE._LATEST_SKILL_ITEM_NOTETAG_DATA = battler => {
+        const curAct = battler.currentAction();
+        return curAct && curAct.item() ? [curAct.item()] : [];
+    }; // CORE._LATEST_SKILL_ITEM_NOTETAG_DATA
+    CORE._WEAPONS_NOTETAG_DATA = battler => {
+        return battler.isActor() ? battler.weapons() : [];
+    }; // CORE._WEAPONS_NOTETAG_DATA
+    CORE._ARMORS_NOTETAG_DATA = battler => {
+        return battler.isActor() ? battler.armors() : [];
+    }; // CORE._ARMORS_NOTETAG_DATA
+    CORE._ENEMIES_NOTETAG_DATA = battler => {
+        return battler.isEnemy() ? [battler.enemy()] : [];
+    }; // CORE._ENEMIES_NOTETAG_DATA
+    CORE._STATES_NOTETAG_DATA = battler => battler.states();
     CORE._NOTETAG_DATA = (battler, dataType) => {
-        const [isActor, isEnemy] = [battler.isActor(), battler.isEnemy()];
         switch (dataType) {
-            case "actor": return isActor ? [battler.actor()] : [];
-            case "class": return isActor ? [battler.currentClass()] : [];
-            case "skills": {
-                if (isActor) return battler.skills();
-                if (!isEnemy) return [];
-                return battler.enemy().actions.map(CORE._ACT_DATA_SKILL);
-            }
+            case "actor": return CORE._ACTOR_NOTETAG_DATA(battler);
+            case "class": return CORE._CLASS_NOTETAG_DATA(battler);
+            case "skills": return CORE._SKILLS_NOTETAG_DATA(battler);
             case "usableSkills": {
-                if (isActor) return battler.usableSkills();
-                if (!isEnemy) return [];
-                return EC_GE._validActs.call(battler).map(CORE._ACT_DATA_SKILL);
+                return CORE._USABLE_SKILLS_NOTETAG_DATA(battler);
             }
-            case "items" : return isActor ? $gameParty.items() : [];
+            case "items" : return CORE._ITEMS_NOTETAG_DATA(battler);
             case "usableItems" : {
-                return isActor ? $gameParty.items().map(item => {
-                    return battler.canUse(item);
-                }) : [];
+                return CORE._USABLE_ITEMS_NOTETAG_DATA(battler);
             }
             case "latestSkillItem": {
-                const curAct = battler.currentAction();
-                return curAct && curAct.item() ? [curAct.item()] : [];
+                return CORE._LATEST_SKILL_ITEM_NOTETAG_DATA(battler);
             }
-            case "weapons" : return isActor ? battler.weapons() : [];
-            case "armors" : return isActor ? battler.armors() : [];
-            case "enemy" : return isEnemy ? [battler.enemy()] : [];
-            case "states" : return isEnemy ? battler.states() : [];
+            case "weapons" : return CORE._WEAPONS_NOTETAG_DATA(battler);
+            case "armors" : return CORE._ARMORS_NOTETAG_DATA(battler);
+            case "enemy" : return CORE._ENEMIES_NOTETAG_DATA(battler);
+            case "states" : return CORE._STATES_NOTETAG_DATA(battler);
             // There's not enough context to throw errors meaningfully
             default: return [];
             //
@@ -2774,10 +2830,10 @@ Utils.checkRMVersion(DoubleX_RMMZ.Enhanced_Codebase.VERSIONS.codebase);
         extendFunc
     } = MZ_EC.setKlassContainer("Game_Variables", $, MZ_EC);
 
-    extendFunc("onChange", function() {
-        ORIG.onChange.call(this);
+    extendFunc("setValue", function(variableId, value) {
+        ORIG.setValue.apply(this, arguments);
         // Added to help plugins store all parameter values in game saves
-        NEW.reloadNotetags.call(this);
+        NEW.updateDataNotetags.call(this, variableId, value);
         //
     }); // v0.00a - v0.00a
 
@@ -2785,8 +2841,10 @@ Utils.checkRMVersion(DoubleX_RMMZ.Enhanced_Codebase.VERSIONS.codebase);
      * The this pointer is Game_Variables.prototype
      * Idempotent
      * @author DoubleX @interface @since v0.00a @version v0.00a
+     * @param {id} varId - The id of the variable to have its values set
+     * @param {*} val - The new value of the variable to have its values set
      */
-    NEW.reloadNotetags = function() {};
+    NEW.updateDataNotetags = function(varId, val) {};
 
 })(Game_Variables.prototype, DoubleX_RMMZ.Enhanced_Codebase);
 
