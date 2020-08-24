@@ -581,13 +581,14 @@ Utils.checkRMVersion(DoubleX_RMMZ.Enhanced_Codebase.VERSIONS.codebase);
  *----------------------------------------------------------------------------
  *    # Plugin Support Info:
  *      1. Prerequisites
- *         - Basic knowledge on what the default RMMZ codebase does in general
- *         - Some RMMZ plugin development proficiency to fully comprehend this
- *           plugin
- *           (Basic knowledge on what RMMZ plugin development does in general
- *           with several easy, simple and small plugins written without
- *           nontrivial bugs up to 1000 LoC scale but still being
- *           inexperienced)
+ *         - Solid understanding on how the default RMMZ codebase works on its
+ *           own in details
+ *         - Decent RMMZ plugin development proficiency to fully comprehend
+ *           this plugin
+ *           (Solid understanding on how RMMZ plugin development works on its
+ *           own in details with dozens of tolerable quality plugins written
+ *           without nontrivial bugs with some up to 3000 LoC scale and being
+ *           experienced)
  *      2. Parameter/Return value of type * means it might be of any type
  *      3. Function signature with (**) means it might take any number of
  *         parameters of any type
@@ -660,6 +661,53 @@ Utils.checkRMVersion(DoubleX_RMMZ.Enhanced_Codebase.VERSIONS.codebase);
     CORE._rewriteSetter = CORE._addSetter;
     //
 
+    CORE._BOOL_VAL = entry => entry === "true" || entry !== "false";
+    CORE._ARRAY_VAL_SEPARATOR = "|", CORE._BOOL_ARRAY_VAL = entry => {
+        return entry.split(CORE._ARRAY_VAL_SEPARATOR).map(CORE._BOOL_VAL);
+    }; // CORE._BOOL_ARRAY_VAL
+    CORE._NUM_VAL = entry => +entry, CORE._NUM_ARRAY_VAL = entry => {
+        return entry.split(CORE._ARRAY_VAL_SEPARATOR).map(CORE._NUM_VAL);
+    }; // CORE._NUM_ARRAY_VAL
+    CORE._STRING_VAL = entry => entry;
+    CORE._STRING_ARRAY_VAL = entry => entry.split(CORE._ARRAY_VAL_SEPARATOR);
+    CORE._RETURNED_ENTRY_VAL = (notePairs, notetagType, entry, count) => {
+        // There's not enough context to throw errors meaningfully
+        if (!notePairs.has(notetagType)) return CORE._STRING_VAL;
+        //CORE.BOOL_ENTRY = "bool";
+        switch (notePairs.get(notetagType).get(`entry${count}`)) {
+            // There's not enough context to throw errors meaningfully
+            case CORE.BOOL_ENTRY: return CORE._BOOL_VAL.bind(undefined, entry);
+            case CORE.BOOL_ARRAY_ENTRY: {
+                return CORE._BOOL_ARRAY_VAL.bind(undefined, entry);
+            } case CORE.NUM_ENTRY: return CORE._NUM_VAL.bind(undefined, entry);
+            case CORE.NUM_ARRAY_ENTRY: {
+                return CORE._NUM_ARRAY_VAL.bind(undefined, entry);
+            } case CORE.STRING_ENTRY: {
+                return CORE._STRING_VAL.bind(undefined, entry);
+            } case CORE.STRING_ARRAY_ENTRY: {
+                return CORE._STRING_ARRAY_VAL.bind(undefined, entry);
+            } default: return CORE._STRING_VAL.bind(undefined, entry);
+            //
+        }
+    }; // CORE._RETURNED_ENTRY_VAL
+    // The this pointer is that of the caller
+    CORE._SUFFIX_ENTRY_FUNC = function(notePairs, notetagType, suffix, entry, count) {
+        switch (suffix) {
+            case "val": return CORE._RETURNED_ENTRY_VAL(
+                    notePairs, notetagType, entry, count);
+            case "switch": {
+                return $gameSwitches.value.bind($gameSwitches, +entry);
+            } case "var": {
+                return $gameVariables.value.bind($gameVariables, +entry);
+            } case "script": {
+                return new Function("argObj", $gameVariables.value(+entry));
+            }
+            // There's not enough context to throw errors meaningfully
+            default: return CORE._STRING_VAL;
+            //
+        }
+    }; // CORE._SUFFIX_ENTRY_FUNC
+    //
     CORE._IS_VALID_SUFFIX = (notePairs, notetagType, suffix, count) => {
         const notetagTypePairs = notePairs.get(notetagType);
         const suffixName = `suffix${count}`;
@@ -680,8 +728,12 @@ Utils.checkRMVersion(DoubleX_RMMZ.Enhanced_Codebase.VERSIONS.codebase);
         while (i < l) { // while is at least slightly faster than for in general
             const suffix = suffixes[i], entry = entries[i], count = i + 1;
             if (CORE._IS_VALID_SUFFIX(notePairs, notetagType, suffix, count)) {
+                // suffixes and entries are still stored to handle dynamic data
                 pairs.set(`suffix${count}`, suffix);
                 pairs.set(`entry${count}`, entry);
+                //
+                pairs.set(`func${count}`, CORE._SUFFIX_ENTRY_FUNC(
+                        notePairs, notetagType, suffix, entry, count));
             } else CORE._SHOW_INVALID_NOTE_SUFFIX(
                     container.datumType, container.id, count, suffix, line);
             i++;
@@ -724,7 +776,6 @@ Utils.checkRMVersion(DoubleX_RMMZ.Enhanced_Codebase.VERSIONS.codebase);
     // So alphanumeric characters as well as numbers with decimals are captured
     CORE.REG_EXP_ENTRY_VAL = "[\/A-Za-z\\d_\.-]+";
     // The / is captured as well to support filepath strings
-
     CORE._REG_EXP_ENTRIES = " *(" + CORE.REG_EXP_ENTRY_VAL + "(?:" +
             CORE._REG_EXP_ENTRY_SEPARATOR + CORE.REG_EXP_ENTRY_VAL + ")*) *";
     CORE._FULL_REG_EXP = baseRegex => new RegExp("<" + baseRegex +
@@ -752,7 +803,6 @@ Utils.checkRMVersion(DoubleX_RMMZ.Enhanced_Codebase.VERSIONS.codebase);
     }; // MZ_EC.onLoadDataNotetags
 
     CORE._ACT_DATA_SKILL = ({ skillId }) => $dataSkills[skillId];
-    CORE._USABLE_ITEMS = item => battler.canUse(item);
     CORE._NOTETAG_DATA = (battler, dataType) => {
         const [isActor, isEnemy] = [battler.isActor(), battler.isEnemy()];
         switch (dataType) {
@@ -770,8 +820,9 @@ Utils.checkRMVersion(DoubleX_RMMZ.Enhanced_Codebase.VERSIONS.codebase);
             }
             case "items" : return isActor ? $gameParty.items() : [];
             case "usableItems" : {
-                if (isActor) return $gameParty.items().map(CORE._USABLE_ITEMS);
-                return [];
+                return isActor ? $gameParty.items().map(item => {
+                    return battler.canUse(item);
+                }) : [];
             }
             case "latestSkillItem": {
                 const curAct = battler.currentAction();
@@ -798,49 +849,6 @@ Utils.checkRMVersion(DoubleX_RMMZ.Enhanced_Codebase.VERSIONS.codebase);
             return notetags.fastMerge(containers);
         }, []);
     }; // MZ_EC.notetags
-
-    CORE._ARRAY_VAL_SEPARATOR = "|", CORE._BOOL_ARRAY_VAL = entry => {
-        return entry.split(CORE._ARRAY_VAL_SEPARATOR).map(CORE._BOOL_VAL);
-    }; // CORE._BOOL_ARRAY_VAL
-    CORE._BOOL_VAL = entry => entry === "true" || entry !== "false";
-    CORE._NUM_ARRAY_VAL = entry => {
-        return entry.split(CORE._ARRAY_VAL_SEPARATOR).map(e => +e);
-    }; // CORE._NUM_ARRAY_VAL
-    CORE._RETURNED_ENTRY_VAL = (notePairs, notetagType, entry, count) => {
-        // There's not enough context to throw errors meaningfully
-        if (!notePairs.has(notetagType)) return entry;
-        //CORE.BOOL_ENTRY = "bool";
-        switch (notePairs.get(notetagType).get(`entry${count}`)) {
-            case CORE.BOOL_ENTRY: return CORE._BOOL_VAL(entry);
-            case CORE.BOOL_ARRAY_ENTRY: return CORE._BOOL_ARRAY_VAL(entry);
-            case CORE.NUM_ENTRY: return +entry;
-            case CORE.NUM_ARRAY_ENTRY: return CORE._NUM_ARRAY_VAL(entry);
-            case CORE.STRING_ENTRY: return entry;
-            case CORE.STRING_ARRAY_ENTRY: {
-                return entry.split(CORE._ARRAY_VAL_SEPARATOR);
-            }
-            // There's not enough context to throw errors meaningfully
-            default: return entry;
-            //
-        }
-    }; // CORE._RETURNED_ENTRY_VAL
-    // The this pointer is that of the caller
-    MZ_EC.returnedEntryWithSuffix = function(notePairs, notetagType, suffix, entry, count, argObj = {}) {
-        switch (suffix) {
-            case "val": return CORE._RETURNED_ENTRY_VAL(
-                    notePairs, notetagType, entry, count);
-            case "switch": return $gameSwitches.value(+entry);
-            case "var": return $gameVariables.value(+entry);
-            case "script": {
-                const script = $gameVariables.value(+entry);
-                return new Function("argObj", script).call(this, argObj);
-            }
-            // There's not enough context to throw errors meaningfully
-            default: return entry;
-            //
-        }
-    }; // MZ_EC.returnedEntryWithSuffix
-    //
 
     MZ_EC.BOOL_SUFFIXES = ["val", "switch", "script"];
     MZ_EC.VAL_SUFFIXES = ["val", "var", "script"];
@@ -2150,7 +2158,7 @@ Utils.checkRMVersion(DoubleX_RMMZ.Enhanced_Codebase.VERSIONS.codebase);
 
 /*----------------------------------------------------------------------------
  *    # Edited class: DataManager
- *      - Impproves code quality
+ *      - Impproves code quality and helps plugins load notetags in better way
  *----------------------------------------------------------------------------*/
 
 (($, MZ_EC) => {
@@ -2748,6 +2756,37 @@ Utils.checkRMVersion(DoubleX_RMMZ.Enhanced_Codebase.VERSIONS.codebase);
     }; // NEW.storeParam
 
 })(Game_System.prototype, DoubleX_RMMZ.Enhanced_Codebase);
+
+/*----------------------------------------------------------------------------
+ *    # Edited class: Game_Variables
+ *      - Helps plugins keep the notetag contents in sync with variable change
+ *----------------------------------------------------------------------------*/
+
+(($, MZ_EC) => {
+
+    "use strict";
+
+    const {
+        NEW,
+        ORIG,
+        extendFunc
+    } = MZ_EC.setKlassContainer("Game_Variables", $, MZ_EC);
+
+    extendFunc("onChange", function() {
+        ORIG.onChange.call(this);
+        // Added to help plugins store all parameter values in game saves
+        NEW.reloadNotetags.call(this);
+        //
+    }); // v0.00a - v0.00a
+
+    /**
+     * The this pointer is Game_Variables.prototype
+     * Idempotent
+     * @author DoubleX @interface @since v0.00a @version v0.00a
+     */
+    NEW.reloadNotetags = function() {};
+
+})(Game_Variables.prototype, DoubleX_RMMZ.Enhanced_Codebase);
 
 /*----------------------------------------------------------------------------
  *    # Edited class: Game_Timer
