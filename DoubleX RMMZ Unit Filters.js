@@ -46,12 +46,14 @@
  *      Posts:
  *      1. https://forums.rpgmakerweb.com/index.php?threads/doublex-rmmz-unit-filters.125807/
  *      2. https://www.rpgmakercentral.com/topic/42539-doublex-rmmz-unit-filters/
- *      3. https://www.save-point.org/thread-8144.html
- *      4. https://gdu.one/forums/topic/13614-doublex-rmmz-unit-filters/
- *      5. http://www.hbgames.org/forums/viewtopic.php?f=332&t=80282
- *      6. https://www.makerdevs.com/plugin/doublex-rmmz-unit-filters
- *      7. https://doublexrpgmaker.wordpress.com/2020/08/23/doublex-rmmz-unit-filters/
- *      8. https://www.patreon.com/posts/40758313
+ *      3. https://rpgmaker.net/engines/rmmz/utilities/242/
+ *      4. https://www.save-point.org/thread-8144.html
+ *      5. https://gdu.one/forums/topic/13614-doublex-rmmz-unit-filters/
+ *      6. http://www.hbgames.org/forums/viewtopic.php?f=332&t=80282
+ *      7. https://forum.chaos-project.com/index.php/topic,16063.msg197361.html
+ *      8. https://doublexrpgmaker.wordpress.com/2020/08/23/doublex-rmmz-unit-filters/
+ *      9. https://www.patreon.com/posts/40758313
+ *      10. https://www.makerdevs.com/plugin/doublex-rmmz-unit-filters
  *----------------------------------------------------------------------------
  *    # Contributors
  *      Authors:
