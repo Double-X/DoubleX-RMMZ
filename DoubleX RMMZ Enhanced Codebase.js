@@ -830,23 +830,28 @@ Utils.checkRMVersion(DoubleX_RMMZ.Enhanced_Codebase.VERSIONS.codebase);
             }
             case "weapons" : return isActor ? battler.weapons() : [];
             case "armors" : return isActor ? battler.armors() : [];
-            case "enemy" : return isEnemy ? battler.enemy() : [];
+            case "enemy" : return isEnemy ? [battler.enemy()] : [];
             case "states" : return isEnemy ? battler.states() : [];
+            // There's not enough context to throw errors meaningfully
+            default: return [];
+            //
         }
     }; // CORE._NOTETAG_DATA
     CORE._IS_VALID_DATUM = datum => datum;
-    CORE._DATA_NOTETAG_CONTAINERS = (battler, dataType, containerName, notetagTypes_) => {
-          const containers = CORE._NOTETAG_DATA(battler, dataType).filterMap(
-                  CORE._IS_VALID_DATUM, ({ meta }) => meta[containerName]);
-          return notetagTypes_ ? containers.filter(({ notetagType }) => {
+    CORE._DATA_NOTETAGS = (battler, dataType, containerName, notetagTypes_) => {
+          const notetagData = CORE._NOTETAG_DATA(battler, dataType);
+          const validNotetagData = notetagData.filter(CORE._IS_VALID_DATUM);
+          const notetags = validNotetagData.reduce((notes, { meta }) => {
+              return notes.fastMerge(meta[containerName].notetags);
+          }, []);
+          return notetagTypes_ ? notetags.filter(({ notetagType }) => {
               return notetagTypes_.includes(notetagType);
-          }) : containers;
-    }; // CORE._DATA_NOTETAG_CONTAINERS
+          }) : notetags;
+    }; // CORE._DATA_NOTETAGS
     MZ_EC.notetags = (battler, priorities, containerName, notetagTypes_) => {
         return priorities.reduce((notetags, dataType) => {
-            const containers = CORE._DATA_NOTETAG_CONTAINERS(
-                    battler, dataType, containerName, notetagTypes_);
-            return notetags.fastMerge(containers);
+            return notetags.fastMerge(CORE._DATA_NOTETAGS(
+                    battler, dataType, containerName, notetagTypes_));
         }, []);
     }; // MZ_EC.notetags
 
@@ -904,7 +909,6 @@ Utils.checkRMVersion(DoubleX_RMMZ.Enhanced_Codebase.VERSIONS.codebase);
 
     /**
      * concat array that can be changed in place will lead to needless throwaway
-     * push can't be applied to merge extremely long arrays so fastMerge is made
      * This method alters the original array(this) as it merges another in place
      * @author DoubleX @interface @since v0.00a @version v0.00a
      * @memberof JsExtensions
@@ -912,9 +916,7 @@ Utils.checkRMVersion(DoubleX_RMMZ.Enhanced_Codebase.VERSIONS.codebase);
      * @returns {This} The original array merged with another array in place
      */
     $.fastMerge = function(arr) {
-        // forEach is tested to be the fastest among sandboxes including NW.js
-        arr.forEach(elem => this.push(elem));
-        // array.forEach(this.push, this) can't be used as forEach has > 1 args
+        this.push(...arr);
         return this;
     }; // $.fastMerge
 
@@ -1081,7 +1083,7 @@ Utils.checkRMVersion(DoubleX_RMMZ.Enhanced_Codebase.VERSIONS.codebase);
         if (typeof splitCallback !== "function") {
             throw new TypeError(`${splitCallback} is not a function`);
         }
-        let newGroup = [], oldI = newI = 0;
+        let newGroup = [], oldI = 0, newI = 0; // oldI = newI = 0 doesn't work
         while (this.length > newI) {
             const elem = this.shift();
             // It's ok to call undefined context with previously bound callbacks
@@ -2727,7 +2729,7 @@ Utils.checkRMVersion(DoubleX_RMMZ.Enhanced_Codebase.VERSIONS.codebase);
     NEW.onStoreParams = function(pluginName, containerName) {
         this[containerName] = new Map();
         Object.entries(NEW._RAW_PARAMS(pluginName)).forEach(([param, val]) => {
-            NEW.storeParam.call(this, containerName, param, val);
+            NEW.storeParamVal.call(this, containerName, param, val);
         });
     }; // NEW.onStoreParams
 
@@ -2739,9 +2741,9 @@ Utils.checkRMVersion(DoubleX_RMMZ.Enhanced_Codebase.VERSIONS.codebase);
      * @param {string} param - The name of the parameter to be stored in saves
      * @param {*} val - The value of the parameter to be stored in game saves
      */
-    NEW.storeParam = function(containerName, param, val) {
+    NEW.storeParamVal = function(containerName, param, val) {
         this[containerName].set(param, val);
-    }; // NEW.storeParam
+    }; // NEW.storeParamVal
 
     /**
      * The this pointer is Game_System.prototype
@@ -2751,9 +2753,9 @@ Utils.checkRMVersion(DoubleX_RMMZ.Enhanced_Codebase.VERSIONS.codebase);
      * @param {string} param - The name of the parameter to be stored in saves
      * @returns {*} The value of the parameter to be stored in game saves
      */
-    NEW.storedParam = function(containerName, param) {
+    NEW.storedParamVal = function(containerName, param) {
         return this[containerName].get(param);
-    }; // NEW.storeParam
+    }; // NEW.storedParamVal
 
 })(Game_System.prototype, DoubleX_RMMZ.Enhanced_Codebase);
 
@@ -2895,6 +2897,13 @@ Utils.checkRMVersion(DoubleX_RMMZ.Enhanced_Codebase.VERSIONS.codebase);
             return NEW._targetForOneDeadAndAlive.call(this, unit);
         } else return unit.members();
         //
+    }); // v0.00a - v0.00a
+
+    rewriteFunc("evaluate", function() {
+        // Edited to help plugins alter evaluate behaviors in better ways
+        const value = NEW._evalBaseVal.call(this) * this.numRepeats();
+        //
+        return value > 0 ? value + Math.random() : value;
     }); // v0.00a - v0.00a
 
     rewriteFunc("evaluateWithTarget", function(target) {
@@ -3136,6 +3145,49 @@ Utils.checkRMVersion(DoubleX_RMMZ.Enhanced_Codebase.VERSIONS.codebase);
     NEW._targetForOneDeadAndAlive = function(unit) {
         return [unit.members()[this._targetIndex]];
     }; // NEW._targetForOneDeadAndAlive
+
+    /**
+     * The this pointer is Game_Action.prototype
+     * Nullipotent/Random
+     * @author DoubleX @since v0.00a @version v0.00a
+     * @returns {number} The evaluated base damage this action
+     */
+    NEW._evalBaseVal = function() {
+        const targets = this.itemTargetCandidates();
+        if (this.isForAll()) return NEW._evalBaseValForAll.call(this, targets);
+        return NEW._evalBaseValForOne.call(this, targets);
+    }; // NEW._evalBaseVal
+
+    /**
+     * The this pointer is Game_Action.prototype
+     * Nullipotent/Random
+     * @author DoubleX @since v0.00a @version v0.00a
+     * @param {[Game_Battler]} targets - The list of targets to be evaluated
+     * @returns {number} The accumulated evaluated base damage of all targets
+     */
+    NEW._evalBaseValForAll = function(targets) {
+        return targets.reduce((value, target) => {
+            return value += this.evaluateWithTarget(target);
+        }, 0);
+    }; // NEW._evalBaseValForAll
+
+    /**
+     * The this pointer is Game_Action.prototype
+     * Random
+     * @author DoubleX @since v0.00a @version v0.00a
+     * @param {[Game_Battler]} targets - The list of targets to be evaluated
+     * @returns {number} The highest evaluated base damage with target index set
+     */
+    NEW._evalBaseValForOne = function(targets) {
+        let value = 0;
+        targets.forEach(target => {
+            const targetValue = this.evaluateWithTarget(target);
+            if (targetValue <= value) return;
+            value = targetValue;
+            this._targetIndex = target.index();
+        });
+        return value;
+    }; // NEW._evalBaseValForOne
 
     /**
      * The this pointer is Game_Action.prototype
