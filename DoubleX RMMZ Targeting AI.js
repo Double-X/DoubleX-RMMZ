@@ -1,8 +1,22 @@
-    /*============================================================================
+/*============================================================================
  *    ## Plugin Info
  *----------------------------------------------------------------------------
  *    # Plugin Name
  *      DoubleX RMMZ Targeting AI
+ *----------------------------------------------------------------------------
+ *    # Introduction
+ *    1. The default RMMZ only lets you control the targeting AI by tgr, which
+ *       is probabilistic rather than deterministic
+ *    2. This plugin lets you use some notetags on actors, classes, learnt
+ *       skills/skills in action list, usable skills, posessed items, usable
+ *       items, weapons, armors, enemies and states, to control the targeting
+ *       AI by specifying some deterministic target filters
+ *    3. Targets passing the filters will still be affected by the
+ *       probabilitic tgr when there are more than 1 such targets
+ *    4. This plugin only works for skills/items having 1 target, and it
+ *       doesn't work well 1 random target either
+ *    5. If a filter causes no target to pass, that filter will be discarded
+ *       upon such use cases
  *----------------------------------------------------------------------------
  *    # Terms Of Use
  *      1. Commercial use's always allowed and crediting me's always optional.
@@ -30,20 +44,29 @@
  *         (Elementary Javascript exposures being able to write beginner codes
  *         up to 300LoC scale)
  *----------------------------------------------------------------------------
+ *    # Author Notes
+ *      1. All notetags of this plugins are just applying script calls in
+ *         DoubleX RMMZ Unit Filters unit manipulation script calls, so you're
+ *         highly encouraged and recommended to have a basic knowledge on what
+ *         they do in general, even though it's not strictly needed to use
+ *         this plugin
+ *----------------------------------------------------------------------------
  *    # Links
+ *      Video:
+ *      1. https://www.youtube.com/watch?v=qqcwK4NwnLM
  *      This Plugin:
- *      1.
+ *      1. https://github.com/Double-X/DoubleX-RMMZ/blob/master/DoubleX%20RMMZ%20Targeting%20AI.js
  *      Posts:
- *      1.
- *      2.
- *      3.
- *      4.
- *      5.
- *      6.
- *      7.
- *      8.
- *      9.
- *      10.
+ *      1. https://forums.rpgmakerweb.com/index.php?threads/doublex-rmmz-targeting-ai.126019/
+ *      2. https://www.rpgmakercentral.com/topic/42547-doublex-rmmz-targeting-ai/
+ *      3. https://rpgmaker.net/engines/rmmz/utilities/246/
+ *      4. https://www.save-point.org/thread-8149.html
+ *      5. https://gdu.one/forums/topic/13616-doublex-rmmz-targeting-ai/
+ *      6. http://www.hbgames.org/forums/viewtopic.php?p=945046#p945046
+ *      7. https://forum.chaos-project.com/index.php/topic,16065.msg197365.html
+ *      8. https://doublexrpgmaker.wordpress.com/2020/08/25/doublex-rmmz-targeting-ai/
+ *      9. https://www.patreon.com/posts/40832897
+ *      10. https://www.makerdevs.com/plugin/doublex-rmmz-targeting-ai
  *----------------------------------------------------------------------------
  *    # Instructions
  *      1. The default plugin parameters file name is
@@ -71,7 +94,7 @@
 /*:
  * @url https://www.patreon.com/doublex
  * @target MZ
- * @plugindesc Versions: ({ codebase: "1.0.0", plugin: "v1.00a" })
+ * @plugindesc Versions: { codebase: "1.0.0", plugin: "v1.00a" }
  * Lets you control some skills/items target selection AI behaviors by notetags
  * @orderAfter DoubleX RMMZ Enhanced Codebase
  * @base DoubleX RMMZ Enhanced Codebase
@@ -107,7 +130,7 @@
  * @default ["latestSkillItem","states","enemy","armors","weapons","class","actor"]
  *
  * @command setTargetingAIParam
- * @desc Applies the script call $gameSystem.setTargetingAIParam(param, val)
+ * @desc Applies script call $gameSystem.setTargetingAIParam(param, val)
  * @arg param
  * @desc The name of a valid parameter of this plugin
  * @arg val
@@ -172,8 +195,6 @@
  *          - entries is the list of entries in the form of:
  *            entry1, entry2, entry3, ..., entryn
  *            Where entryi must conform with the suffixi specifications
- *          - FILTERING NOTETAGS SHOULD BE PLACED ABOVE SORTING NOTETAGS
- *            UNLESS YOU REALLY KNOW WHAT YOU'RE TRULY DOING
  *----------------------------------------------------------------------------
  *    # Actor/Class/Learnt Skills/Usable Skills/Posessed Items/Usable Items/
  *      Inputted Skill Or Item/Weapon/Armor/Enemy/States Notetags
@@ -763,6 +784,7 @@
  *         - Sets the fully parsed value of the parameter param as val
  *         - param must be the name of a valid parameter of this plugin
  *         - val must be a valid new fully parsed value of the parameter param
+ *         - Such parameter value changes will be saved
  *         - E.g.:
  *           $gameSystem.setTargetingAIParam("notetagDataTypePriorities", [
  *               "states",

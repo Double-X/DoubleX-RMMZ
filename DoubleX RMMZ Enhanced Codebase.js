@@ -126,7 +126,7 @@
 /*:
  * @url https://www.patreon.com/doublex
  * @target MZ
- * @plugindesc Versions: ({ codebase: "1.0.0", plugin: "v0.00a" })
+ * @plugindesc Versions: { codebase: "1.0.0", plugin: "v0.00a" }
  * Fixes bugs, improves codebase quality, boosts performance and gives new APIs
  * @author DoubleX
  *
