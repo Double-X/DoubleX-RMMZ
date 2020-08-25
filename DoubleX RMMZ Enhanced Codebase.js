@@ -316,254 +316,6 @@
  *          Returns whether the tpb battler's just ended casting actions
  *       7. isTpbIdle
  *          Returns whether the battler tpb bar's idle(not doing anything)
- *   # New private functions/methods/variables(Search them for details)
- *     DoubleX_RMMZ.Enhanced_Codebase.Graphics.new(NEW in Graphics)
- *     - Static Functions
- *       Their contexts are supposed to be Graphics
- *       1. _initKeyEvents
- *       2. _switchFPSCounterKey
- *       3. _switchStretchModeKey
- *       4. _switchFullScreenKey
- *       5. _hasNoKeyEvent
- *       6. _createPixiAppWithoutRescue
- *       7. _pixiApp
- *       8. _onCreatePixiAppErr
- *       9. _isCreateEffekseerContext
- *       10. _tryCreateEffekseerContext
- *       11. _effekseerContextWithoutRescue
- *       12. _onCreateEffekseerContextErr
- *     - Static Variable
- *       1. _keyEvents
- *     DoubleX_RMMZ.Enhanced_Codebase.Graphics_FPSCounter.new(NEW in
- *     Graphics.FPSCounter)
- *     - Instance Methods
- *       Their contexts are supposed to be Graphics.FPSCounter.prototype
- *       1. _labelDivTextContent
- *       2. _numDivTextContent
- *     DoubleX_RMMZ.Enhanced_Codebase.Bitmap.new(NEW in Bitmap.prototype)
- *     - Instance Methods
- *       Their contexts are supposed to be Bitmap.prototype
- *       1. _bltWithoutRescue
- *       2. _onBltError
- *       3. _drawnTextX
- *       4. _drawnTextY
- *     DoubleX_RMMZ.Enhanced_Codebase.Sprite.new(NEW in Sprite.prototype)
- *     - Instance Methods
- *       Their contexts are supposed to be Sprite.prototype
- *       1. _refreshWithTexture
- *       2. _refreshWithBaseTexture
- *       3. _onRefreshWithBaseTextureErr
- *     DoubleX_RMMZ.Enhanced_Codebase.Tilemap_Renderer.new(NEW in
- *     Tilemap.Renderer.prototype)
- *     - Instance Methods
- *       Their contexts are supposed to be Tilemap.Renderer.prototype
- *       1. _shaderVertexSrc
- *       2. _shaderFragmentSrc
- *     DoubleX_RMMZ.Enhanced_Codebase.TilingSprite.new(NEW in
- *     TilingSprite.prototype)
- *     - Instance Methods
- *       Their contexts are supposed to be TilingSprite.prototype
- *       1. _refreshWithTexture
- *       2. _refreshWithBaseTexture
- *       3. _refreshedTextureFrame
- *       4. _onRefreshWithBaseTextureErr
- *     DoubleX_RMMZ.Enhanced_Codebase.WebAudio.new(NEW in WebAudio)
- *     - Static Function
- *       Their contexts are supposed to be WebAudio
- *       1. _onCreateContextErr
- *     DoubleX_RMMZ.Enhanced_Codebase.WebAudio_Proto.new(NEW_PROTO in
- *     WebAudio)
- *     - Instance Methods
- *       Their contexts are supposed to be WebAudio.prototype
- *       1. _stopEachSourceNode
- *       2. _onStopSourceNodeErr
- *     DoubleX_RMMZ.Enhanced_Codebase.Input.new(NEW in Input)
- *     - Static Functions
- *       Their contexts are supposed to be Input
- *       1. _updateLatestButton
- *       2. _updateCurrentStates
- *       3. _updateCurrentState
- *       4. _updateLatestState
- *       5. _isJustPressed
- *       6. _onStartPress
- *       7. _isKeyJustReleased
- *       8. _updateVirtualClick
- *       9. _shouldClear
- *       10. _isEscCompatibleJustReleased
- *     - Static Variable
- *       1. _isJustReleased
- *     DoubleX_RMMZ.Enhanced_Codebase.DataManager.new(NEW in DataManager)
- *     - Static Functions
- *       Their contexts are supposed to be DataManager
- *       1. loadDataNotetags
- *       2. _onXhrLoadSuc
- *     DoubleX_RMMZ.Enhanced_Codebase.StorageManager.new(NEW in
- *     StorageManager)
- *     - Static Functions
- *       Their contexts are supposed to be StorageManager
- *       1. _zipFromJson
- *       2. _checkSaveDataSize
- *       3. _jsonFromZip
- *       4. _onPrepareSaveToLocalFile
- *       5. _onSaveToLocalFileWithoutRescue
- *       6. _onTryRollbackFailedLocalFileSave
- *       7. _onRollbackFailedLocalFileSaveErr
- *       8. _onRollbackFailedLocalFileSaveWithouRescue
- *     DoubleX_RMMZ.Enhanced_Codebase.SceneManager.new(NEW in SceneManager)
- *     - Static Functions
- *       Their contexts are supposed to be SceneManager
- *       1. _initKeyEvents
- *       2. _reloadGameKey
- *       3. _showDevToolsKey
- *       4. _hasNoKeyEvent
- *     - Static Variable
- *       1. _keyEvents
- *     DoubleX_RMMZ.Enhanced_Codebase.BattleManager.new(NEW in BattleManager)
- *     - Static Functions
- *       Their contexts are supposed to be BattleManager
- *       1. _encounterPreemptive
- *       2. _encounterSurprise
- *       3. _newEscRatio
- *       4. _newCurActor_
- *       5. _battlerActEndState
- *       6. _isInvokeCnt
- *       7. _isInvokeMrf
- *       8. _isEscSuc
- *     DoubleX_RMMZ.Enhanced_Codebase.Game_Timer.new(NEW in
- *     Game_Timer.prototype)
- *     - Instance Methods
- *       Their contexts are supposed to be Game_Timer.prototype
- *       1. _isActive
- *       2. _updateWhenActive
- *     DoubleX_RMMZ.Enhanced_Codebase.Game_Action.new(NEW in
- *     Game_Action.prototype)
- *     - Instance Methods
- *       Their contexts are supposed to be Game_Action.prototype
- *       1. _madeRawTargets
- *       2. _isForConfused
- *       3. _evalDamageWithoutCri
- *       4. _tryEvalDamageFormulaWithoutSideEffects
- *       5. _evalDamageFormulaWithoutSideEffectsRescue
- *       6. _confusionAnyTarget
- *       7. _isMissed
- *       8. _isEvaded
- *       9. _applyHit
- *       10. _isApplyDamage
- *       11. _applyDamage
- *       12. _isCritical
- *       13. _evalDamageFormulaWithoutRescue
- *       14. _onEvalDamageFormulaErr
- *       15. _execDamageVal
- *       16. _recoveredHp
- *       17. _recoveredMp
- *       18. _gainedTp
- *       19. _isAddAtkState
- *       20. _isAddNormState
- *       21. _addNormStateChance
- *       22. _isRemoveState
- *       23. _isAddDebuff
- *       24. _gainedSilentTp
- *     DoubleX_RMMZ.Enhanced_Codebase.Game_BattlerBase.new(NEW in
- *     Game_BattlerBase.prototype)
- *     - Instance Methods
- *       Their contexts are supposed to be Game_BattlerBase.prototype
- *       1. _newStateCounts
- *       2. _updateStateTurn
- *       3. _updateBuffTurn
- *       4. _positiveBuffIconIndex
- *       5. _negativeBuffIconIndex
- *       6. _isLowHp
- *       7. _sortState
- *     DoubleX_RMMZ.Enhanced_Codebase.Game_Battler.new(NEW in
- *     Game_Battler.prototype)
- *     - Instance Methods
- *       Their contexts are supposed to be Game_Battler.prototype
- *       1. _initializedTpbChargeTime
- *       2. _initializedNormTpbChargeTime
- *       3. _updateTpbWhenMovable
- *       4. _onUpdateTpbChargeTime
- *       5. _onUpdateTpbCastTime
- *       6. _isMakeAutoTpbActs
- *       7. _onUpdateTpbIdleTime
- *       8. _castDelay
- *       9. _onAutoInputTpbActs
- *       10. _onAddState
- *       11. _onAddNewState
- *       12. _removeStateByRestriction
- *       13. _onRemoveState
- *       14. _onAddBuff
- *       15. _onAddDebuff
- *       16. _isRemoveBuff
- *       17. _onRemoveBuff
- *       18. _removeBattleState
- *       19. _removeStateAuto
- *       20. _isRemoveStateAuto
- *       21. _removeBuffAuto
- *       22. _removeStateByDamage
- *       23. _isRemoveStateByDamage
- *       24. _makeActsWhenMovable
- *       25. _forcedAct
- *       26. _initializedTp
- *       27. _chargedTpByDamage
- *       28. _regeneratedHp
- *       29. _regeneratedMp
- *       30. _regeneratedTp
- *       31. _regenerateAlive
- *     DoubleX_RMMZ.Enhanced_Codebase.Game_Actor.new(NEW in
- *     Game_Actor.prototype)
- *     - Instance Methods
- *       Their contexts are supposed to be Game_Actor.prototype
- *       1. _initLearntSkill
- *       2. _isInitLearntSkill
- *       3. _initializedEquips
- *       4. _isChangeEquip
- *       5. _onChangeEquip
- *       6. _onTradeItemWithParty
- *       7. _clearEquip
- *       8. _optimizeEquip
- *       9. _releaseUnequippableItem
- *       10. _isUnequippableItem
- *       11. _onReleaseUnequippableItem
- *       12. _isIncludeBareHandElem
- *       13. _isLevelUp
- *       14. _isLevelDown
- *       15. _isDisplayLevelUp
- *       16. _learnLevelUpSkill
- *       17. _isLearnLevelUpSkill
- *       18. _gainedExp
- *       19. _onLearnSkill
- *       20. _performedAtkMotion
- *       21. _performAtkMotion
- *       22. _autoBattleAct
- *       23. _onNormPlayerWalk
- *       24. _showAddedState
- *       25. _showRemovedState
- *       26. _showState
- *       27. _isTurnEndOnMap
- *       28. _onTurnEndOnMap
- *       29. _realFloorDamage
- *     DoubleX_RMMZ.Enhanced_Codebase.Game_Enemy.new(NEW in
- *     Game_Enemy.prototype)
- *     - Instance Methods
- *       Their contexts are supposed to be Game_Enemy.prototype
- *       1. _accumDropItems
- *       2. _isDropItem
- *       3. _ratingZero
- *     DoubleX_RMMZ.Enhanced_Codebase.Game_Party.new(NEW in
- *     Game_Party.prototype)
- *     - Instance Methods
- *       Their contexts are supposed to be Game_Party.prototype
- *       1. _setupBattleTestMem
- *       2. _setupExistingBattleTestMem
- *       3. _addNewActor
- *       4. _addNewActorInBattle
- *       5. _removeExistingActor
- *     DoubleX_RMMZ.Enhanced_Codebase.Game_Troop.new(NEW in
- *     Game_Troop.prototype)
- *     - Instance Methods
- *       Their contexts are supposed to be Game_Troop.prototype
- *       1. _setupMem
- *       2. _setupExistingMem
  *============================================================================
  */
 
@@ -661,6 +413,15 @@ Utils.checkRMVersion(DoubleX_RMMZ.Enhanced_Codebase.VERSIONS.codebase);
     CORE._rewriteSetter = CORE._addSetter;
     //
 
+    // They must be placed here or the notetag pairs of other plugins won't work
+    MZ_EC.BOOL_SUFFIXES = ["val", "switch", "script"];
+    MZ_EC.VAL_SUFFIXES = ["val", "var", "script"];
+    MZ_EC.EVENT_SUFFIXES = ["event", "script"];
+    [MZ_EC.BOOL_ENTRY, MZ_EC.BOOL_ARRAY_ENTRY] = ["bool", "boolArray"];
+    [MZ_EC.NUM_ENTRY, MZ_EC.NUM_ARRAY_ENTRY] = ["num", "numArray"];
+    [MZ_EC.STRING_ENTRY, MZ_EC.STRING_ARRAY_ENTRY] = ["string", "stringArray"];
+    //
+
     CORE._BOOL_VAL = entry => entry === "true" || entry !== "false";
     CORE._ARRAY_VAL_SEPARATOR = "|", CORE._BOOL_ARRAY_VAL = entry => {
         return entry.split(CORE._ARRAY_VAL_SEPARATOR).map(CORE._BOOL_VAL);
@@ -673,18 +434,17 @@ Utils.checkRMVersion(DoubleX_RMMZ.Enhanced_Codebase.VERSIONS.codebase);
     CORE._RETURNED_ENTRY_VAL = (notePairs, notetagType, entry, count) => {
         // There's not enough context to throw errors meaningfully
         if (!notePairs.has(notetagType)) return CORE._STRING_VAL;
-        //CORE.BOOL_ENTRY = "bool";
         switch (notePairs.get(notetagType).get(`entry${count}`)) {
             // There's not enough context to throw errors meaningfully
-            case CORE.BOOL_ENTRY: return CORE._BOOL_VAL.bind(undefined, entry);
-            case CORE.BOOL_ARRAY_ENTRY: {
+            case MZ_EC.BOOL_ENTRY: return CORE._BOOL_VAL.bind(undefined, entry);
+            case MZ_EC.BOOL_ARRAY_ENTRY: {
                 return CORE._BOOL_ARRAY_VAL.bind(undefined, entry);
-            } case CORE.NUM_ENTRY: return CORE._NUM_VAL.bind(undefined, entry);
-            case CORE.NUM_ARRAY_ENTRY: {
+            } case MZ_EC.NUM_ENTRY: return CORE._NUM_VAL.bind(undefined, entry);
+            case MZ_EC.NUM_ARRAY_ENTRY: {
                 return CORE._NUM_ARRAY_VAL.bind(undefined, entry);
-            } case CORE.STRING_ENTRY: {
+            } case MZ_EC.STRING_ENTRY: {
                 return CORE._STRING_VAL.bind(undefined, entry);
-            } case CORE.STRING_ARRAY_ENTRY: {
+            } case MZ_EC.STRING_ARRAY_ENTRY: {
                 return CORE._STRING_ARRAY_VAL.bind(undefined, entry);
             } default: return CORE._STRING_VAL.bind(undefined, entry);
             //
@@ -816,6 +576,9 @@ Utils.checkRMVersion(DoubleX_RMMZ.Enhanced_Codebase.VERSIONS.codebase);
         while (pairs.has(`func${count}`)) {
             if (CORE._IS_RELOAD_DATA_NOTETAG_PAIRS(pairs, count, varId)) {
                 pairs.set(`func${count}`, new Function("argObj", val));
+                // It's a cheap idempotent operation so it's ok to call it here
+                MZ_EC.clearAllBattlerNotetagCaches();
+                //
             }
             count++;
         }
@@ -828,6 +591,16 @@ Utils.checkRMVersion(DoubleX_RMMZ.Enhanced_Codebase.VERSIONS.codebase);
             });
         });
     }; // MZ_EC.updateDataNotetags
+
+    CORE._battlerNotetagCache = new Map();
+
+    CORE._BALLTER_CACHE_KEY = battler => {
+        if (battler.isActor()) return `{"id":${battler.actorId()}}`;
+        if (battler.isEnemy()) return `{"i":${battler.index()}}`;
+        return "";
+    }; // CORE._BALLTER_CACHE_KEY
+    CORE._PRIORITY_CACHE_KEY = priorities => JSON.stringify(priorities);
+    CORE._IS_VALID_CACHE = cache => cache !== null && cache !== undefined;
 
     CORE._ACTOR_NOTETAG_DATA = battler => {
         return battler.isActor() ? [battler.actor()] : [];
@@ -894,32 +667,95 @@ Utils.checkRMVersion(DoubleX_RMMZ.Enhanced_Codebase.VERSIONS.codebase);
         }
     }; // CORE._NOTETAG_DATA
     CORE._IS_VALID_DATUM = datum => datum;
+    CORE._NOTETAG_WITH_TYPES = (notetags, notetagTypes_) => {
+        return notetagTypes_ ? notetags.filter(({ notetagType }) => {
+            return notetagTypes_.includes(notetagType);
+        }) : notetags;
+    }; // CORE._NOTETAG_WITH_TYPES
     CORE._DATA_NOTETAGS = (battler, dataType, containerName, notetagTypes_) => {
           const notetagData = CORE._NOTETAG_DATA(battler, dataType);
           const validNotetagData = notetagData.filter(CORE._IS_VALID_DATUM);
           const notetags = validNotetagData.reduce((notes, { meta }) => {
               return notes.fastMerge(meta[containerName].notetags);
           }, []);
-          return notetagTypes_ ? notetags.filter(({ notetagType }) => {
-              return notetagTypes_.includes(notetagType);
-          }) : notetags;
+          return CORE._NOTETAG_WITH_TYPES(notetags, notetagTypes_);
     }; // CORE._DATA_NOTETAGS
-    MZ_EC.notetags = (battler, priorities, containerName, notetagTypes_) => {
-        return priorities.reduce((notetags, dataType) => {
+    CORE._NEW_NOTETAG_CONTAINER = (containerName, newNotetagList) => {
+        return new Map(Object.entries({
+            [containerName]: newNotetagList
+        }));
+    }; // CORE._NEW_NOTETAG_CONTAINER
+    CORE._NEW_BATTLER_NOTETAG_CACHE = (priorityKey, containerName, newNotetagList) => {
+        return new Map(Object.entries({
+            list: new Map(Object.entries({
+                [priorityKey]: CORE._NEW_NOTETAG_CONTAINER(
+                        containerName, newNotetagList)
+            })), val: new Map()
+        }))
+    }; // CORE._NEW_BATTLER_NOTETAG_CACHE
+    CORE._CACHE_BATTLER_NOTETAG_LIST = (battler, priorities, containerName, newNotetagList) => {
+        const battlerKey = CORE._BALLTER_CACHE_KEY(battler);
+        if (!battlerKey) return;
+        const priorityKey = CORE._PRIORITY_CACHE_KEY(priorities);
+        if (!CORE._battlerNotetagCache.has(battlerKey)) {
+            const newBattlerNotetagCache = CORE._NEW_BATTLER_NOTETAG_CACHE(
+                    priorityKey, containerName, newNotetagList);
+            CORE._battlerNotetagCache.set(battlerKey, newBattlerNotetagCache);
+        }
+        const battlerNotetagCache = CORE._battlerNotetagCache.get(battlerKey);
+        const battlerNotetagListCache = battlerNotetagCache.get("list");
+        if (!battlerNotetagListCache.has(priorityKey)) {
+            battlerNotetagListCache.set(priorityKey,
+                    CORE._NEW_NOTETAG_CONTAINER(containerName, newNotetagList));
+        }
+        battlerNotetagListCache.get(priorityKey).set(
+                containerName, newNotetagList);
+    }; // CORE._CACHE_BATTLER_NOTETAG_LIST
+    CORE._NEW_NOTETAGS = (battler, priorities, containerName, notetagTypes_) => {
+        const newNotetagList = priorities.reduce((notetags, dataType) => {
             return notetags.fastMerge(CORE._DATA_NOTETAGS(
                     battler, dataType, containerName, notetagTypes_));
         }, []);
+        CORE._CACHE_BATTLER_NOTETAG_LIST(
+                battler, priorities, containerName, newNotetagList);
+        // Not cloning the cached list can end up mutating the cache unknowingly
+        return newNotetagList.clone();
+        //
+    }; // CORE._NEW_NOTETAGS
+    CORE._BATTLER_NOTETAG_CACHE_CONTAINER = (battlerNotetagContainerCache, containerName, notetagTypes_) => {
+        if (!battlerNotetagContainerCache.has(containerName)) return undefined;
+        const notetags = battlerNotetagContainerCache.get(containerName);
+        // Not cloning the cached list can end up mutating the cache unknowingly
+        return CORE._NOTETAG_WITH_TYPES(notetags.clone(), notetagTypes_);
+        //
+    }; // CORE._BATTLER_NOTETAG_CACHE_CONTAINER
+    CORE._CACHED_BATTLER_NOTETAG_LIST = (battler, priorities, containerName, notetagTypes_) => {
+        const battlerKey = CORE._BALLTER_CACHE_KEY(battler);
+        if (!CORE._battlerNotetagCache.has(battlerKey)) return undefined;
+        const battlerNotetagCache = CORE._battlerNotetagCache.get(battlerKey);
+        const battlerNotetagListCache = battlerNotetagCache.get("list");
+        const priorityKey = CORE._PRIORITY_CACHE_KEY(priorities);
+        if (!battlerNotetagListCache.has(priorityKey)) return undefined;
+        const battlerNotetagContainerCache =
+                battlerNotetagListCache.get(priorityKey);
+        return CORE._BATTLER_NOTETAG_CACHE_CONTAINER(
+                battlerNotetagContainerCache, containerName, notetagTypes_);
+    }; // CORE._CACHED_BATTLER_NOTETAG_LIST
+    MZ_EC.notetags = (battler, priorities, containerName, notetagTypes_) => {
+        const cachedNotetagList_ = CORE._CACHED_BATTLER_NOTETAG_LIST(
+                battler, priorities, containerName, notetagTypes_);
+        if (CORE._IS_VALID_CACHE(cachedNotetagList_)) return cachedNotetagList_;
+        return CORE._NEW_NOTETAGS(
+                battler, priorities, containerName, notetagTypes_);
     }; // MZ_EC.notetags
 
-    MZ_EC.BOOL_SUFFIXES = ["val", "switch", "script"];
-    MZ_EC.VAL_SUFFIXES = ["val", "var", "script"];
-    MZ_EC.EVENT_SUFFIXES = ["event", "script"];
-    MZ_EC.BOOL_ENTRY = "bool";
-    MZ_EC.BOOL_ARRAY_ENTRY = "boolArray";
-    MZ_EC.NUM_ENTRY = "num";
-    MZ_EC.NUM_ARRAY_ENTRY = "numArray";
-    MZ_EC.STRING_ENTRY = "string";
-    MZ_EC.STRING_ARRAY_ENTRY = "stringArray";
+    MZ_EC.clearAllBattlerNotetagCaches = () => {
+        CORE._battlerNotetagCache.clear();
+    }; // MZ_EC.clearAllBattlerNotetagCaches
+
+    MZ_EC.clearBattlerNotetagCache = battler => {
+        CORE._battlerNotetagCache.delete(CORE._BALLTER_CACHE_KEY(battler));
+    }; // MZ_EC.clearBattlerNotetagCacheCache
 
 })(DoubleX_RMMZ.Enhanced_Codebase);
 
@@ -2514,6 +2350,13 @@ Utils.checkRMVersion(DoubleX_RMMZ.Enhanced_Codebase.VERSIONS.codebase);
         rewriteFunc
     } = MZ_EC.setKlassContainer("BattleManager", $, MZ_EC);
 
+    extendFunc("setup", function() {
+        // Added to ensures the battler notetag cache won't store stale data
+        MZ_EC.clearAllBattlerNotetagCaches();
+        //
+        ORIG.setup.apply(this, arguments);
+    }); // v0.00a - v0.00a
+
     extendFunc("initMembers", function() {
         ORIG.initMembers.apply(this, arguments);
         // Added to help plugins check if the battle should end
@@ -2521,6 +2364,13 @@ Utils.checkRMVersion(DoubleX_RMMZ.Enhanced_Codebase.VERSIONS.codebase);
         //
         // Added to help plugins check if the event main's updated
         NEW._isUpdateEventMain = false;
+        //
+    }); // v0.00a - v0.00a
+
+    extendFunc("updateBattleEnd", function() {
+        ORIG.updateBattleEnd.apply(this, arguments);
+        // Added to ensures the battler notetag cache won't store stale data
+        MZ_EC.clearAllBattlerNotetagCaches();
         //
     }); // v0.00a - v0.00a
 
@@ -3707,8 +3557,17 @@ Utils.checkRMVersion(DoubleX_RMMZ.Enhanced_Codebase.VERSIONS.codebase);
 
     const $$ = Game_BattlerBase.prototype, {
         NEW,
+        ORIG,
+        extendFunc,
         rewriteFunc
     } = MZ_EC.setKlassContainer("Game_Battler", $, MZ_EC);
+
+    extendFunc("refresh", function() {
+        ORIG.refresh.apply(this, arguments);
+        // Edited to ensures the battler notetags will return updated results
+        MZ_EC.clearBattlerNotetagCache(this);
+        //
+    }); // v0.00a - v0.00a
 
     rewriteFunc("initTpbChargeTime", function(advantageous) {
         this._tpbState = "charging";
