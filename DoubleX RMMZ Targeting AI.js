@@ -1064,7 +1064,7 @@ if (DoubleX_RMMZ.Enhanced_Codebase && DoubleX_RMMZ.Unit_Filters) {
         $dataEnemies: "enemy",
         $dataStates: "state"
     }));
-    NEW._REG_EXP_NOTE = " *(?:doublex +rmmz +)?targeting ai +(\\w+)";
+    NEW._REG_EXP_NOTE = "targeting ai";
     MZ_EC.extendFunc(EC_DM, DM, "loadDataNotetags", function(obj, objName) {
         ORIG.loadDataNotetags.apply(this, arguments);
         // Added to load all notetags of this plugin

@@ -513,11 +513,14 @@ Utils.checkRMVersion(DoubleX_RMMZ.Enhanced_Codebase.VERSIONS.codebase);
         container.notetags.push({ notetagType, pairs });
         //
     }; // CORE._ON_LOAD_NOTETAG_PAIRS
+
     CORE._REG_EXP_SUFFIX_SEPARATOR = " +", CORE._REG_EXP_SUFFIX_SEPARATOR_OBJ =
             new RegExp(CORE._REG_EXP_SUFFIX_SEPARATOR);
     CORE._REG_EXP_ENTRY_SEPARATOR = " *, +";
+
     CORE._REG_EXP_ENTRY_SEPARATOR_OBJ =
             new RegExp(CORE._REG_EXP_ENTRY_SEPARATOR);
+
     CORE._SHOW_INVALID_NOTE_TYPE = (datumType, id, noteType, line) => {
         console.warn(`A ${datumType} data with id ${id}
                      has the invalid type ${noteType} in notetag ${line}`);
@@ -536,16 +539,9 @@ Utils.checkRMVersion(DoubleX_RMMZ.Enhanced_Codebase.VERSIONS.codebase);
                 container, notePairs, line, notetagType, suffixes, entries);
         //
     }; //  CORE._ON_LOAD_DATUM_NOTETAG
-    CORE._REG_EXP_SUFFIXES =
-            " +(\\w+(?:" + CORE._REG_EXP_SUFFIX_SEPARATOR + "\\w+)*) *";
-    // So alphanumeric characters as well as numbers with decimals are captured
-    CORE.REG_EXP_ENTRY_VAL = "[\/A-Za-z\\d_\.-]+";
-    // The / is captured as well to support filepath strings
-    CORE._REG_EXP_ENTRIES = " *(" + CORE.REG_EXP_ENTRY_VAL + "(?:" +
-            CORE._REG_EXP_ENTRY_SEPARATOR + CORE.REG_EXP_ENTRY_VAL + ")*) *";
-    CORE._FULL_REG_EXP = baseRegex => new RegExp("<" + baseRegex +
-            CORE._REG_EXP_SUFFIXES + ":" + CORE._REG_EXP_ENTRIES + ">", "gim");
+
     CORE._REG_EXP_SPLIT_NOTES = /[\r\n]+/;
+
     CORE._ON_LOAD_DATUM_NOTETAGS = (datumType, datum, containerName, fullRegex, notePairs) => {
         // Storing datumType is to streamline the notetag datum type reading
         const container = datum.meta[containerName] = {
@@ -558,11 +554,25 @@ Utils.checkRMVersion(DoubleX_RMMZ.Enhanced_Codebase.VERSIONS.codebase);
             CORE._ON_LOAD_DATUM_NOTETAG(container, fullRegex, notePairs, line);
         });
     }; // CORE._ON_LOAD_DATUM_NOTETAGS
+
+    CORE._REG_EXP_PREFIX = " *(?:doublex +rmmz +)?", CORE._REG_EXP_SUFFIXES =
+            " +(\\w+) +(\\w+(?:" + CORE._REG_EXP_SUFFIX_SEPARATOR + "\\w+)*) *";
+    // So alphanumeric characters as well as numbers with decimals are captured
+    CORE.REG_EXP_ENTRY_VAL = "[\/A-Za-z\\d_\.-]+";
+    // The / is captured as well to support filepath strings
+    CORE._REG_EXP_ENTRIES = " *(" + CORE.REG_EXP_ENTRY_VAL + "(?:" +
+            CORE._REG_EXP_ENTRY_SEPARATOR + CORE.REG_EXP_ENTRY_VAL + ")*) *";
+
+    CORE._FULL_REG_EXP = baseRegex => {
+        return new RegExp("<" + CORE._REG_EXP_PREFIX + baseRegex +
+                CORE._REG_EXP_SUFFIXES + ":" + CORE._REG_EXP_ENTRIES + ">",
+                "gim");
+    }; // CORE._FULL_REG_EXP
     MZ_EC.onLoadDataNotetags = (obj, datumType, containerName, baseRegex, notePairs) => {
+        const fullRegex = CORE._FULL_REG_EXP(baseRegex);
+        console.info("MZ_EC.onLoadDataNotetags fullRegex", fullRegex);
         obj.forEach(datum_ => {
-            if (!datum_) return;
-            const fullRegex = CORE._FULL_REG_EXP(baseRegex);
-            CORE._ON_LOAD_DATUM_NOTETAGS(
+            if (datum_) CORE._ON_LOAD_DATUM_NOTETAGS(
                     datumType, datum_, containerName, fullRegex, notePairs);
         });
     }; // MZ_EC.onLoadDataNotetags
