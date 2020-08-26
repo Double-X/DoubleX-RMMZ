@@ -1057,7 +1057,7 @@ if (DoubleX_RMMZ.Enhanced_Codebase && DoubleX_RMMZ.Unit_Filters) {
     }));
     //
 
-    NEW._NOTETAG_DATA_CONTAINER_NAMES = new Map(Object.entries({
+    NEW.NOTETAG_DATA_CONTAINER_NAMES = new Map(Object.entries({
         $dataActors: "actor",
         $dataClasses: "class",
         $dataSkills: "skill",
@@ -1078,13 +1078,13 @@ if (DoubleX_RMMZ.Enhanced_Codebase && DoubleX_RMMZ.Unit_Filters) {
     /**
      * The this pointer is DataManager
      * Idempotent
-     * @author DoubleX @since v0.00a @version v0.00a
+     * @author DoubleX @since v1.00a @version v1.00a
      * @param {[Datum]} obj - The data container having notetags to be loaded
      * @param {string} objName - The name of the data container having notetags
      */
     NEW._loadDataNotetags = function(obj, objName) {
-        if (!NEW._NOTETAG_DATA_CONTAINER_NAMES.has(objName)) return;
-        const datumType = NEW._NOTETAG_DATA_CONTAINER_NAMES.get(objName);
+        if (!NEW.NOTETAG_DATA_CONTAINER_NAMES.has(objName)) return;
+        const datumType = NEW.NOTETAG_DATA_CONTAINER_NAMES.get(objName);
         const [regex, notePairs] = [NEW._REG_EXP_NOTE, NEW.NOTETAG_PAIRS];
         MZ_EC.onLoadDataNotetags.call(
                 this, obj, datumType, "targetingAI", regex, notePairs);
@@ -1121,7 +1121,7 @@ if (DoubleX_RMMZ.Enhanced_Codebase && DoubleX_RMMZ.Unit_Filters) {
     /**
      * The this pointer is Game_System.prototype
      * Script Call/Idempotent
-     * @author DoubleX @interface @since v0.00a @version v0.00a
+     * @author DoubleX @interface @since v1.00a @version v1.00a
      * @param {string} param - The name of the parameter to be stored in saves
      * @param {*} val - The value of the parameter to be stored in game saves
      */
@@ -1132,7 +1132,7 @@ if (DoubleX_RMMZ.Enhanced_Codebase && DoubleX_RMMZ.Unit_Filters) {
     /**
      * The this pointer is Game_System.prototype
      * Script Call/Nullipotent
-     * @author DoubleX @interface @since v0.00a @version v0.00a
+     * @author DoubleX @interface @since v1.00a @version v1.00a
      * @param {string} param - The name of the parameter to be stored in saves
      * @returns {*} The value of the parameter to be stored in game saves
      */
@@ -1140,10 +1140,10 @@ if (DoubleX_RMMZ.Enhanced_Codebase && DoubleX_RMMZ.Unit_Filters) {
         return EC_GS.storedParamVal.call(this, "targetingAI", param);
     }; // $.targetingAIParam
 
-    const pluginName = DoubleX_RMMZ.Targeting_AI.PLUGIN_NAME;
+    const pluginName = TA.PLUGIN_NAME;
     const commandName = "setTargetingAIParam";
     PluginManager.registerCommand(pluginName, commandName, ({ param, val }) => {
-        return $gameSystem[commandName](param, JSON.parse(val));
+        $gameSystem.setTargetingAIParam(param, JSON.parse(val));
     });
 
 })(Game_System.prototype, DoubleX_RMMZ.Enhanced_Codebase,
@@ -1172,12 +1172,12 @@ if (DoubleX_RMMZ.Enhanced_Codebase && DoubleX_RMMZ.Unit_Filters) {
     /**
      * The this pointer is Game_Variables.prototype
      * Idempotent
-     * @author DoubleX @since v0.00a @version v0.00a
+     * @author DoubleX @since v1.00a @version v1.00a
      * @param {id} varId - The id of the variable to have its values set
      * @param {*} val - The new value of the variable to have its values set
      */
     NEW._updateDataNotetags = function(varId, val) {
-        Object.keys(DM._NOTETAG_DATA_CONTAINER_NAMES).forEach(objName => {
+        Object.keys(DM.NOTETAG_DATA_CONTAINER_NAMES).forEach(objName => {
             const obj = window[objName];
             MZ_EC.updateDataNotetags(obj, "targetingAI", varId, val);
         });
@@ -1247,7 +1247,7 @@ if (DoubleX_RMMZ.Enhanced_Codebase && DoubleX_RMMZ.Unit_Filters) {
     /**
      * The this pointer is Game_Action.prototype
      * Nullipotent
-     * @author DoubleX @interface @since v0.00a @version v0.00a
+     * @author DoubleX @interface @since v1.00a @version v1.00a
      * @param {[Game_Battler]} targets - The list of original targets
      * @returns {[Game_Battler]} The list of the filtered targets
      */
@@ -1264,7 +1264,7 @@ if (DoubleX_RMMZ.Enhanced_Codebase && DoubleX_RMMZ.Unit_Filters) {
     /**
      * The this pointer is Game_Action.prototype
      * Nullipotent
-     * @author DoubleX @since v0.00a @version v0.00a
+     * @author DoubleX @since v1.00a @version v1.00a
      * @param {[Game_Battler]} targets - The list of original targets
      * @returns {[Game_Battler]} The list of the filtered targets
      */
@@ -1286,9 +1286,9 @@ if (DoubleX_RMMZ.Enhanced_Codebase && DoubleX_RMMZ.Unit_Filters) {
     /**
      * The this pointer is Game_Action.prototype
      * Nullipotent
-     * @author DoubleX @since v0.00a @version v0.00a
+     * @author DoubleX @since v1.00a @version v1.00a
      * @param {[Game_Battler]} filteredTargets - List of filtered targets
-     * @param {TargetingAINote} notetag - The notetag filtering the targets
+     * @param {Notetag} notetag - The notetag filtering the targets
      * @returns {[Game_Battler]} The list of the filtered  targets
      */
     NEW._accumFilteredTargets = function(filteredTargets, notetag) {
@@ -1309,7 +1309,7 @@ if (DoubleX_RMMZ.Enhanced_Codebase && DoubleX_RMMZ.Unit_Filters) {
     /**
      * The this pointer is Game_Action.prototype
      * Nullipotent
-     * @author DoubleX @since v0.00a @version v0.00a
+     * @author DoubleX @since v1.00a @version v1.00a
      * @enum @param {string} notetagType - Check NEW.NOTETAG_TYPES
      * @param {Map(string, string)} pairs - The list of suffixes and entries
      * @returns {boolean} Whether the notetag involved will filter targets
@@ -1324,7 +1324,7 @@ if (DoubleX_RMMZ.Enhanced_Codebase && DoubleX_RMMZ.Unit_Filters) {
     /**
      * The this pointer is Game_Action.prototype
      * Nullipotent
-     * @author DoubleX @since v0.00a @version v0.00a
+     * @author DoubleX @since v1.00a @version v1.00a
      * @param {Map(string, string)} pairs - The list of suffixes and entries
      * @returns {boolean} Whether the notetag involved will filter targets
      */
@@ -1337,7 +1337,7 @@ if (DoubleX_RMMZ.Enhanced_Codebase && DoubleX_RMMZ.Unit_Filters) {
     /**
      * The this pointer is Game_Action.prototype
      * Nullipotent
-     * @author DoubleX @since v0.00a @version v0.00a
+     * @author DoubleX @since v1.00a @version v1.00a
      * @param {[Game_Battler]} filteredTargets - List of filtered targets
      * @enum @param {string} notetagType - Check NEW.NOTETAG_TYPES
      * @param {Map(string, string)} pairs - The list of suffixes and entries
@@ -1355,7 +1355,7 @@ if (DoubleX_RMMZ.Enhanced_Codebase && DoubleX_RMMZ.Unit_Filters) {
     /**
      * The this pointer is Game_Action.prototype
      * Nullipotent
-     * @author DoubleX @since v0.00a @version v0.00a
+     * @author DoubleX @since v1.00a @version v1.00a
      * @enum @param {string} notetagType - Check NEW.NOTETAG_TYPES
      * @param {Map(string, string)} pairs - The list of suffixes and entries
      * @returns {[*]} Unit filter unit manipulation argument list without mems
@@ -1390,7 +1390,7 @@ if (DoubleX_RMMZ.Enhanced_Codebase && DoubleX_RMMZ.Unit_Filters) {
 
     /**
      * Nullipotent
-     * @author DoubleX @interface @since v0.00a @version v0.00a
+     * @author DoubleX @interface @since v1.00a @version v1.00a
      * @param {Game_Action} act - The action targeting for one alive
      * @returns {Game_Battler} The battler being the dead target of the action
      */
@@ -1407,7 +1407,7 @@ if (DoubleX_RMMZ.Enhanced_Codebase && DoubleX_RMMZ.Unit_Filters) {
     }; // NEW._FILTERED_TARGETS_TGR_RAND
     /**
      * Nullipotent
-     * @author DoubleX @interface @since v0.00a @version v0.00a
+     * @author DoubleX @interface @since v1.00a @version v1.00a
      * @param {Game_Action} act - The action targeting for one alive
      * @returns {Game_Battler} The battler being the alive target of the action
      */
@@ -1427,7 +1427,7 @@ if (DoubleX_RMMZ.Enhanced_Codebase && DoubleX_RMMZ.Unit_Filters) {
 
     /**
      * Nullipotent
-     * @author DoubleX @interface @since v0.00a @version v0.00a
+     * @author DoubleX @interface @since v1.00a @version v1.00a
      * @param {Game_Action} act - The action targeting for one dead
      * @returns {Game_Battler} The battler being the dead target of the action
      */
@@ -1442,7 +1442,7 @@ if (DoubleX_RMMZ.Enhanced_Codebase && DoubleX_RMMZ.Unit_Filters) {
 
     /**
      * Nullipotent
-     * @author DoubleX @interface @since v0.00a @version v0.00a
+     * @author DoubleX @interface @since v1.00a @version v1.00a
      * @param {Game_Action} act - The action targeting for one alive
      * @returns {Game_Battler} The battler being the alive target of the action
      */
@@ -1459,7 +1459,7 @@ if (DoubleX_RMMZ.Enhanced_Codebase && DoubleX_RMMZ.Unit_Filters) {
 
     /**
      * Nullipotent
-     * @author DoubleX @interface @since v0.00a @version v0.00a
+     * @author DoubleX @interface @since v1.00a @version v1.00a
      * @param {Game_Action} act - The action targeting for one alive
      * @returns {Game_Battler} The battler being dead/alive target of the action
      */

@@ -558,7 +558,7 @@ Utils.checkRMVersion(DoubleX_RMMZ.Enhanced_Codebase.VERSIONS.codebase);
     CORE._REG_EXP_PREFIX = " *(?:doublex +rmmz +)?", CORE._REG_EXP_SUFFIXES =
             " +(\\w+) +(\\w+(?:" + CORE._REG_EXP_SUFFIX_SEPARATOR + "\\w+)*) *";
     // So alphanumeric characters as well as numbers with decimals are captured
-    CORE.REG_EXP_ENTRY_VAL = "[\/A-Za-z\\d_\.-]+";
+    CORE.REG_EXP_ENTRY_VAL = "[\\/A-Za-z\\d_\.\\+\\-\\*%=]+";
     // The / is captured as well to support filepath strings
     CORE._REG_EXP_ENTRIES = " *(" + CORE.REG_EXP_ENTRY_VAL + "(?:" +
             CORE._REG_EXP_ENTRY_SEPARATOR + CORE.REG_EXP_ENTRY_VAL + ")*) *";
@@ -640,7 +640,8 @@ Utils.checkRMVersion(DoubleX_RMMZ.Enhanced_Codebase.VERSIONS.codebase);
     }; // CORE._USABLE_ITEMS_NOTETAG_DATA
     CORE._LATEST_SKILL_ITEM_NOTETAG_DATA = battler => {
         const curAct = battler.currentAction();
-        return curAct && curAct.item() ? [curAct.item()] : [];
+        if (curAct && curAct.item()) return [curAct.item()];
+        return battler.latestSkillItems || [];
     }; // CORE._LATEST_SKILL_ITEM_NOTETAG_DATA
     CORE._WEAPONS_NOTETAG_DATA = battler => {
         return battler.isActor() ? battler.weapons() : [];
@@ -758,6 +759,33 @@ Utils.checkRMVersion(DoubleX_RMMZ.Enhanced_Codebase.VERSIONS.codebase);
         return CORE._NEW_NOTETAGS(
                 battler, priorities, containerName, notetagTypes_);
     }; // MZ_EC.notetags
+
+    CORE._accumCondOpValNotetagVal = function(accumVal, { pairs }) {
+        // condFunc
+        if (!pairs.has("func1")) return accumVal;
+        if (!pairs.get("func1").call(this)) return accumVal;
+        //
+        // opFunc and valFunc
+        if (!pairs.has("func2") || !pairs.has("func3")) return accumVal;
+        const val = pairs.get("func3").call(this);
+        switch(pairs.get("func2").call(this)) {
+            case "+": return accumVal + val;
+            case "-": return accumVal - val;
+            case "*": return accumVal * val;
+            case "/": return accumVal / val;
+            case "%": return accumVal % val;
+            case "=": return val;
+            // There's not enough context to throw errors meaningfully
+            default: return accumVal;
+            //
+        }
+        //
+    }; // CORE._accumCondOpValNotetagVal
+    MZ_EC.condOpValNotetagVal = (battler, priorities, containerName, notetagTypes_, initVal) => {
+        const notetags = MZ_EC.notetags(
+                battler, priorities, containerName, notetagTypes_);
+        return notetags.reduce(CORE._accumCondOpValNotetagVal, initVal, this);
+    }; // MZ_EC.condOpValNotetagVal
 
     MZ_EC.clearAllBattlerNotetagCaches = () => {
         CORE._battlerNotetagCache.clear();
@@ -939,6 +967,19 @@ Utils.checkRMVersion(DoubleX_RMMZ.Enhanced_Codebase.VERSIONS.codebase);
         //
         return val;
     }; // $.mapReduce
+
+    /**
+     * This method erases the passed element(if any) from this original array
+     * @author DoubleX @interface @since v0.00a @version v0.00a
+     * @memberof JsExtensions
+     * @param {*} elem - Element(if any) to be erased from this original array
+     * @returns {This} This original array with passed element(if any) erased
+     */
+    $.eraseElem = function(elem) {
+        const i = this.indexOf(elem);
+        if (i >= 0) this.splice(i, 1);
+        return this;
+    }; // $.eraseElem
 
     /**
      * Potential Hotspot/Nullipotent
@@ -2676,6 +2717,31 @@ Utils.checkRMVersion(DoubleX_RMMZ.Enhanced_Codebase.VERSIONS.codebase);
 })(Game_System.prototype, DoubleX_RMMZ.Enhanced_Codebase);
 
 /*----------------------------------------------------------------------------
+ *    # Edited class: Game_Switches
+ *      - Helps plugins keep the notetag contents in sync with switch changes
+ *----------------------------------------------------------------------------*/
+
+(($, MZ_EC) => {
+
+    "use strict";
+
+    const {
+        NEW,
+        ORIG,
+        extendFunc
+    } = MZ_EC.setKlassContainer("Game_Switches", $, MZ_EC);
+
+    NEW._REFRESH_BATTLER = battler => battler.refresh();
+    extendFunc("onChange", function() {
+        ORIG.setValue.onChange(this, arguments);
+        // Added to invalidates all caches of all battlers
+        MZ_EC.clearAllBattlerNotetagCaches();
+        //
+    }); // v0.00a - v0.00a
+
+})(Game_Switches.prototype, DoubleX_RMMZ.Enhanced_Codebase);
+
+/*----------------------------------------------------------------------------
  *    # Edited class: Game_Variables
  *      - Helps plugins keep the notetag contents in sync with variable change
  *----------------------------------------------------------------------------*/
@@ -2704,7 +2770,9 @@ Utils.checkRMVersion(DoubleX_RMMZ.Enhanced_Codebase.VERSIONS.codebase);
      * @param {id} varId - The id of the variable to have its values set
      * @param {*} val - The new value of the variable to have its values set
      */
-    NEW.updateDataNotetags = function(varId, val) {};
+    NEW.updateDataNotetags = function(varId, val) {
+        MZ_EC.clearAllBattlerNotetagCaches();
+    }; // NEW.updateDataNotetags
 
 })(Game_Variables.prototype, DoubleX_RMMZ.Enhanced_Codebase);
 
@@ -4315,12 +4383,7 @@ Utils.checkRMVersion(DoubleX_RMMZ.Enhanced_Codebase.VERSIONS.codebase);
 
     rewriteFunc("makeAutoBattleActions", function() {
         // Edited to help plugins alter make auto battle actions in better ways
-        const action = NEW._autoBattleAct.call(this);
-        for (let i = 0, numActions = this.numActions(); i < numActions; i++) {
-            // It's pointless to evaluate the same action multiple times
-            this.setAction(i, action);
-            //
-        }
+        NEW._setAutoBattleActs.call(this);
         //
         this.setActionState("waiting");
     }); // v0.00a - v0.00a
@@ -4602,6 +4665,19 @@ Utils.checkRMVersion(DoubleX_RMMZ.Enhanced_Codebase.VERSIONS.codebase);
 
     /**
      * The this pointer is Game_Actor.prototype
+     * @author DoubleX @since v0.00a @version v0.00a
+     */
+    NEW._setAutoBattleActs = function() {
+        const action = NEW._autoBattleAct.call(this);
+        for (let i = 0, numActions = this.numActions(); i < numActions; i++) {
+            // It's pointless to evaluate the same action multiple times
+            this.setAction(i, action);
+            //
+        }
+    }; // NEW._setAutoBattleActs
+
+    /**
+     * The this pointer is Game_Actor.prototype
      * Nullipotent/Random
      * @author DoubleX @since v0.00a @version v0.00a
      * @returns {boolean} Whether the actor's turn has ended on the game map
@@ -4697,7 +4773,7 @@ Utils.checkRMVersion(DoubleX_RMMZ.Enhanced_Codebase.VERSIONS.codebase);
 
     "use strict";
 
-    const {
+    const $$ = Game_Battler.prototype, {
         NEW,
         rewriteFunc
     } = MZ_EC.setKlassContainer("Game_Enemy", $, MZ_EC);
@@ -4723,7 +4799,7 @@ Utils.checkRMVersion(DoubleX_RMMZ.Enhanced_Codebase.VERSIONS.codebase);
     }); // v0.00a - v0.00a
 
     rewriteFunc("makeActions", function() {
-        Game_Battler.prototype.makeActions.call(this);
+        $$.makeActions.call(this);
         /** @todo Extracts these codes into well-named functions */
         if (this.numActions() > 0) {
             // Edited to help plugins alter make actions behaviors in better way
