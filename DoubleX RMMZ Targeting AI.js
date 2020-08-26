@@ -192,6 +192,8 @@
  *                            notetag value will be used as the contents of
  *                            the functions to be called upon using the
  *                            notetag)
+ *          - The this pointer of the script suffix is the action involved
+ *            (Game_Action.prototype)
  *          - entries is the list of entries in the form of:
  *            entry1, entry2, entry3, ..., entryn
  *            Where entryi must conform with the suffixi specifications
