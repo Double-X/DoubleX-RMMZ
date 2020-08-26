@@ -789,6 +789,7 @@
  *         - Such parameter value changes will be saved
  *         - E.g.:
  *           $gameSystem.setTargetingAIParam("notetagDataTypePriorities", [
+ *               "latestSkillItem",
  *               "states",
  *               "armors",
  *               "weapons",
@@ -797,7 +798,7 @@
  *               "enemy"
  *           ]) sets the fully parsed value of the parameter
  *           notetagDataTypePriorities as
- *           ["states", "armors", "weapons", "class", "actor", "enemy"]
+ *           ["latestSkillItem","states", "armors", "weapons", "class", "actor", "enemy"]
  *      2. $gameSystem.targetingAIParam(param)
  *         - Returns the fully parsed value of the parameter param
  *         - param must be the name of a valid parameter of this plugin
@@ -805,8 +806,8 @@
  *           $gameSystem.targetingAIParam("notetagDataTypePriorities") returns
  *           the fully parsed value of the parameter
  *           notetagDataTypePriorities, which should be
- *           ["states", "armors", "weapons", "class", "actor", "enemy"] if it
- *           uses its default parameter value
+ *           ["latestSkillItem","states", "armors", "weapons", "class", "actor", "enemy"]
+ *           if it uses its default parameter value
  *============================================================================
  *    ## Plugin Command Info
  *----------------------------------------------------------------------------
