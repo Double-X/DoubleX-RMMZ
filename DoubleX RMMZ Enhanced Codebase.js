@@ -568,7 +568,7 @@ Utils.checkRMVersion(DoubleX_RMMZ.Enhanced_Codebase.VERSIONS.codebase);
                 CORE._REG_EXP_SUFFIXES + ":" + CORE._REG_EXP_ENTRIES + ">",
                 "gim");
     }; // CORE._FULL_REG_EXP
-    MZ_EC.onLoadDataNotetags = (obj, datumType, containerName, baseRegex, notePairs) => {
+    MZ_EC.onLoadDataNotetags = (obj, datumType, baseRegex, notePairs, containerName = baseRegex) => {
         const fullRegex = CORE._FULL_REG_EXP(baseRegex);
         console.info("MZ_EC.onLoadDataNotetags fullRegex", fullRegex);
         obj.forEach(datum_ => {
@@ -604,12 +604,12 @@ Utils.checkRMVersion(DoubleX_RMMZ.Enhanced_Codebase.VERSIONS.codebase);
 
     CORE._battlerNotetagCache = new Map();
 
-    CORE._BALLTER_CACHE_KEY = battler => {
+    CORE._BATTLER_CACHE_KEY = battler => {
         if (battler.isActor()) return `{"id":${battler.actorId()}}`;
         if (battler.isEnemy()) return `{"i":${battler.index()}}`;
         return "";
-    }; // CORE._BALLTER_CACHE_KEY
-    CORE._PRIORITY_CACHE_KEY = priorities => JSON.stringify(priorities);
+    }; // CORE._BATTLER_CACHE_KEY
+    CORE._ARRAY_CACHE_KEY = array => JSON.stringify(array);
     CORE._IS_VALID_CACHE = cache => cache !== null && cache !== undefined;
 
     CORE._ACTOR_NOTETAG_DATA = battler => {
@@ -639,9 +639,9 @@ Utils.checkRMVersion(DoubleX_RMMZ.Enhanced_Codebase.VERSIONS.codebase);
         }) : [];
     }; // CORE._USABLE_ITEMS_NOTETAG_DATA
     CORE._LATEST_SKILL_ITEM_NOTETAG_DATA = battler => {
+        if (battler.latestSkillItems) return battler.latestSkillItems;
         const curAct = battler.currentAction();
-        if (curAct && curAct.item()) return [curAct.item()];
-        return battler.latestSkillItems || [];
+        return curAct && curAct.item() ? [curAct.item()] : [];
     }; // CORE._LATEST_SKILL_ITEM_NOTETAG_DATA
     CORE._WEAPONS_NOTETAG_DATA = battler => {
         return battler.isActor() ? battler.weapons() : [];
@@ -691,72 +691,75 @@ Utils.checkRMVersion(DoubleX_RMMZ.Enhanced_Codebase.VERSIONS.codebase);
           }, []);
           return CORE._NOTETAG_WITH_TYPES(notetags, notetagTypes_);
     }; // CORE._DATA_NOTETAGS
-    CORE._NEW_NOTETAG_CONTAINER = (containerName, newNotetagList) => {
+    CORE._NEW_LIST_CONTAINER = notetagList => new Map(Object.entries({
+        list: notetagList
+    })); // CORE._NEW_LIST_CONTAINER
+    CORE._NEW_NOTETAG_LIST_CONTAINER = (containerName, notetagList) => {
         return new Map(Object.entries({
-            [containerName]: newNotetagList
+            [containerName]: CORE._NEW_LIST_CONTAINER(notetagList)
         }));
-    }; // CORE._NEW_NOTETAG_CONTAINER
-    CORE._NEW_BATTLER_NOTETAG_CACHE = (priorityKey, containerName, newNotetagList) => {
+    }; // CORE._NEW_NOTETAG_LIST_CONTAINER
+    CORE._NEW_BATTLER_NOTETAG_LIST_CACHE = (priorityKey, containerName, notetagList) => {
         return new Map(Object.entries({
-            list: new Map(Object.entries({
-                [priorityKey]: CORE._NEW_NOTETAG_CONTAINER(
-                        containerName, newNotetagList)
-            })), val: new Map()
-        }))
-    }; // CORE._NEW_BATTLER_NOTETAG_CACHE
-    CORE._CACHE_BATTLER_NOTETAG_LIST = (battler, priorities, containerName, newNotetagList) => {
-        const battlerKey = CORE._BALLTER_CACHE_KEY(battler);
+            [priorityKey]: CORE._NEW_NOTETAG_LIST_CONTAINER(
+                    containerName, notetagList)
+        }));
+    }; // CORE._NEW_BATTLER_NOTETAG_LIST_CACHE
+    CORE._CACHE_BATTLER_NOTETAG_LIST = (battler, priorities, containerName, notetagList) => {
+        const battlerKey = CORE._BATTLER_CACHE_KEY(battler);
         if (!battlerKey) return;
-        const priorityKey = CORE._PRIORITY_CACHE_KEY(priorities);
+        const priorityKey = CORE._ARRAY_CACHE_KEY(priorities);
         if (!CORE._battlerNotetagCache.has(battlerKey)) {
-            const newBattlerNotetagCache = CORE._NEW_BATTLER_NOTETAG_CACHE(
-                    priorityKey, containerName, newNotetagList);
-            CORE._battlerNotetagCache.set(battlerKey, newBattlerNotetagCache);
+            const newBattlerNotetagCache = CORE._NEW_BATTLER_NOTETAG_LIST_CACHE(
+                    priorityKey, containerName, notetagList);
+            return CORE._battlerNotetagCache.set(
+                    battlerKey, newBattlerNotetagCache);
         }
         const battlerNotetagCache = CORE._battlerNotetagCache.get(battlerKey);
-        const battlerNotetagListCache = battlerNotetagCache.get("list");
-        if (!battlerNotetagListCache.has(priorityKey)) {
-            battlerNotetagListCache.set(priorityKey,
-                    CORE._NEW_NOTETAG_CONTAINER(containerName, newNotetagList));
+        if (!battlerNotetagCache.has(priorityKey)) {
+            return battlerNotetagCache.set(priorityKey, CORE.
+                    _NEW_NOTETAG_LIST_CONTAINER(containerName, notetagList));
         }
-        battlerNotetagListCache.get(priorityKey).set(
-                containerName, newNotetagList);
+        const battlerNotetagContainerCache =
+                battlerNotetagCache.get(priorityKey);
+        const list = CORE._NEW_LIST_CONTAINER(notetagList);
+        battlerNotetagContainerCache.set(containerName, list);
     }; // CORE._CACHE_BATTLER_NOTETAG_LIST
-    CORE._NEW_NOTETAGS = (battler, priorities, containerName, notetagTypes_) => {
-        const newNotetagList = priorities.reduce((notetags, dataType) => {
+    CORE._NEW_NOTETAG_LIST = (battler, priorities, containerName, notetagTypes_) => {
+        const notetagList = priorities.reduce((notetags, dataType) => {
             return notetags.fastMerge(CORE._DATA_NOTETAGS(
                     battler, dataType, containerName, notetagTypes_));
         }, []);
         CORE._CACHE_BATTLER_NOTETAG_LIST(
-                battler, priorities, containerName, newNotetagList);
+                battler, priorities, containerName, notetagList);
         // Not cloning the cached list can end up mutating the cache unknowingly
-        return newNotetagList.clone();
+        return notetagList.clone();
         //
-    }; // CORE._NEW_NOTETAGS
-    CORE._BATTLER_NOTETAG_CACHE_CONTAINER = (battlerNotetagContainerCache, containerName, notetagTypes_) => {
+    }; // CORE._NEW_NOTETAG_LIST
+    CORE._BATTLER_NOTETAG_CACHE_LIST_CONTAINER = (battlerNotetagContainerCache, containerName, notetagTypes_) => {
         if (!battlerNotetagContainerCache.has(containerName)) return undefined;
-        const notetags = battlerNotetagContainerCache.get(containerName);
+        const container = battlerNotetagContainerCache.get(containerName);
         // Not cloning the cached list can end up mutating the cache unknowingly
-        return CORE._NOTETAG_WITH_TYPES(notetags.clone(), notetagTypes_);
+        const notetags = container.get("list").clone();
         //
-    }; // CORE._BATTLER_NOTETAG_CACHE_CONTAINER
+        return CORE._NOTETAG_WITH_TYPES(notetags, notetagTypes_);
+    }; // CORE._BATTLER_NOTETAG_CACHE_LIST_CONTAINER
     CORE._CACHED_BATTLER_NOTETAG_LIST = (battler, priorities, containerName, notetagTypes_) => {
-        const battlerKey = CORE._BALLTER_CACHE_KEY(battler);
+        const battlerKey = CORE._BATTLER_CACHE_KEY(battler);
         if (!CORE._battlerNotetagCache.has(battlerKey)) return undefined;
         const battlerNotetagCache = CORE._battlerNotetagCache.get(battlerKey);
-        const battlerNotetagListCache = battlerNotetagCache.get("list");
-        const priorityKey = CORE._PRIORITY_CACHE_KEY(priorities);
-        if (!battlerNotetagListCache.has(priorityKey)) return undefined;
+        const priorityKey = CORE._ARRAY_CACHE_KEY(priorities);
+        if (!battlerNotetagCache.has(priorityKey)) return undefined;
         const battlerNotetagContainerCache =
-                battlerNotetagListCache.get(priorityKey);
-        return CORE._BATTLER_NOTETAG_CACHE_CONTAINER(
+                battlerNotetagCache.get(priorityKey);
+        return CORE._BATTLER_NOTETAG_CACHE_LIST_CONTAINER(
                 battlerNotetagContainerCache, containerName, notetagTypes_);
     }; // CORE._CACHED_BATTLER_NOTETAG_LIST
     MZ_EC.notetags = (battler, priorities, containerName, notetagTypes_) => {
         const cachedNotetagList_ = CORE._CACHED_BATTLER_NOTETAG_LIST(
                 battler, priorities, containerName, notetagTypes_);
         if (CORE._IS_VALID_CACHE(cachedNotetagList_)) return cachedNotetagList_;
-        return CORE._NEW_NOTETAGS(
+        return CORE._NEW_NOTETAG_LIST(
                 battler, priorities, containerName, notetagTypes_);
     }; // MZ_EC.notetags
 
@@ -781,10 +784,75 @@ Utils.checkRMVersion(DoubleX_RMMZ.Enhanced_Codebase.VERSIONS.codebase);
         }
         //
     }; // CORE._accumCondOpValNotetagVal
-    MZ_EC.condOpValNotetagVal = (battler, priorities, containerName, notetagTypes_, initVal) => {
+
+    CORE._NEW_INIT_VAL_CONTAINER = (initVal, notetagVal) => {
+        return new Map(Object.entries({ [initVal]: notetagVal }));
+    }; // CORE._NEW_INIT_VAL_CONTAINER
+    CORE._NEW_NOTETAG_TYPE_VAL_CONTAINER = (notetagTypeKey, initVal, notetagVal) => {
+        return new Map(Object.entries({
+            [notetagTypeKey]: CORE._NEW_INIT_VAL_CONTAINER(initVal, notetagVal)
+        }));
+    }; // CORE._NEW_NOTETAG_TYPE_VAL_CONTAINER
+    CORE._CACHE_BATTLER_NOTETAG_VAL = (battler, priorities, containerName, notetagTypes_, initVal, notetagVal) => {
+        const battlerKey = CORE._BATTLER_CACHE_KEY(battler);
+        if (!battlerKey) return;
+        const priorityKey = CORE._ARRAY_CACHE_KEY(priorities);
+        const notetagTypeKey = CORE._ARRAY_CACHE_KEY(notetagTypes_);
+        // CORE._CACHE_BATTLER_NOTETAG_LIST must be run before running this
+        const battlerNotetagCache = CORE._battlerNotetagCache.get(battlerKey);
+        const battlerNotetagValCache =
+                battlerNotetagCache.get(priorityKey).get(containerName);
+        //
+        if (!battlerNotetagValCache.has("val")) {
+            const notetagTypeCache = CORE._NEW_NOTETAG_TYPE_VAL_CONTAINER(
+                    notetagTypeKey, initVal, notetagVal);
+            return battlerNotetagValCache.set("val", notetagTypeCache);
+        }
+        const battlerNotetagTypeCache = battlerNotetagValCache.get("val");
+        if (!battlerNotetagTypeCache.has(notetagTypeKey)) {
+            const initValCache =
+                    CORE._NEW_INIT_VAL_CONTAINER(initVal, notetagVal);
+            return battlerNotetagTypeCache.set(notetagTypeKey, initValCache);
+        }
+        battlerNotetagTypeCache.get(notetagTypeKey).set(initVal, notetagVal);
+    }; // CORE._CACHE_BATTLER_NOTETAG_VAL
+    CORE._NEW_NOTETAG_VAL = (battler, priorities, containerName, notetagTypes_, initVal) => {
         const notetags = MZ_EC.notetags(
                 battler, priorities, containerName, notetagTypes_);
-        return notetags.reduce(CORE._accumCondOpValNotetagVal, initVal, this);
+        const notetagVal =
+                notetags.reduce(CORE._accumCondOpValNotetagVal, initVal, this);
+        CORE._CACHE_BATTLER_NOTETAG_VAL(battler, priorities, containerName,
+                notetagTypes_, initVal, notetagVal);
+        return notetagVal;
+    }; // CORE._NEW_NOTETAG_VAL
+    CORE._BATTLER_NOTETAG_CACHE_VAL_CONTAINER = (battlerNotetagContainerCache, containerName, notetagTypes_, initVal) => {
+        if (!battlerNotetagContainerCache.has(containerName)) return undefined;
+        const container = battlerNotetagContainerCache.get(containerName);
+        const notetagTypes = container.get("val");
+        if (notetagTypes_) {
+            const notetagTypeKey = CORE._ARRAY_CACHE_KEY(notetagTypes_);
+            if (!notetagTypes.has(notetagTypeKey)) return undefined;
+            return notetagTypes.get("notetagTypeKey").get(initVal);
+        }
+        return notetagTypes.get("allNotetags").get(initVal);
+    }; // CORE._BATTLER_NOTETAG_CACHE_VAL_CONTAINER
+    CORE._CACHED_BATTLER_NOTETAG_VAL = (battler, priorities, containerName, notetagTypes_, initVal) => {
+        const battlerKey = CORE._BATTLER_CACHE_KEY(battler);
+        if (!CORE._battlerNotetagCache.has(battlerKey)) return undefined;
+        const battlerNotetagCache = CORE._battlerNotetagCache.get(battlerKey);
+        const priorityKey = CORE._ARRAY_CACHE_KEY(priorities);
+        if (!battlerNotetagCache.has(priorityKey)) return undefined;
+        const battlerNotetagContainerCache =
+                battlerNotetagCache.get(priorityKey);
+        return CORE._BATTLER_NOTETAG_CACHE_VAL_CONTAINER(
+                battlerNotetagContainerCache, containerName, notetagTypes_, initVal);
+    }; // CORE._CACHED_BATTLER_NOTETAG_VAL
+    MZ_EC.condOpValNotetagVal = (battler, priorities, containerName, notetagTypes_, initVal) => {
+        const cachedNotetagVal_ = CORE._CACHED_BATTLER_NOTETAG_VAL(
+                battler, priorities, containerName, notetagTypes_, initVal);
+        if (CORE._IS_VALID_CACHE(cachedNotetagVal_)) return cachedNotetagVal_;
+        return CORE._NEW_NOTETAG_VAL(
+                battler, priorities, containerName, notetagTypes_, initVal);
     }; // MZ_EC.condOpValNotetagVal
 
     MZ_EC.clearAllBattlerNotetagCaches = () => {
@@ -792,7 +860,7 @@ Utils.checkRMVersion(DoubleX_RMMZ.Enhanced_Codebase.VERSIONS.codebase);
     }; // MZ_EC.clearAllBattlerNotetagCaches
 
     MZ_EC.clearBattlerNotetagCache = battler => {
-        CORE._battlerNotetagCache.delete(CORE._BALLTER_CACHE_KEY(battler));
+        CORE._battlerNotetagCache.delete(CORE._BATTLER_CACHE_KEY(battler));
     }; // MZ_EC.clearBattlerNotetagCacheCache
 
 })(DoubleX_RMMZ.Enhanced_Codebase);

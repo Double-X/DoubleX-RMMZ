@@ -1087,7 +1087,7 @@ if (DoubleX_RMMZ.Enhanced_Codebase && DoubleX_RMMZ.Unit_Filters) {
         const datumType = NEW.NOTETAG_DATA_CONTAINER_NAMES.get(objName);
         const [regex, notePairs] = [NEW._REG_EXP_NOTE, NEW.NOTETAG_PAIRS];
         MZ_EC.onLoadDataNotetags.call(
-                this, obj, datumType, "targetingAI", regex, notePairs);
+                this, obj, datumType, regex, notePairs, "targetingAI");
     };
 
 })(DataManager, DoubleX_RMMZ.Enhanced_Codebase, DoubleX_RMMZ.Targeting_AI);
