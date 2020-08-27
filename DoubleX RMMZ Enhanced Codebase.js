@@ -859,8 +859,15 @@ Utils.checkRMVersion(DoubleX_RMMZ.Enhanced_Codebase.VERSIONS.codebase);
         CORE._battlerNotetagCache.clear();
     }; // MZ_EC.clearAllBattlerNotetagCaches
 
-    MZ_EC.clearBattlerNotetagCache = battler => {
-        CORE._battlerNotetagCache.delete(CORE._BATTLER_CACHE_KEY(battler));
+    MZ_EC.clearBattlerNotetagCache = (battler, containerName_) => {
+        const battlerKey = CORE._BATTLER_CACHE_KEY(battler);
+        if (!CORE._battlerNotetagCache.has(battlerKey)) return;
+        if (!containerName_) {
+            return CORE._battlerNotetagCache.delete(battlerKey);
+        }
+        CORE._battlerNotetagCache.get(battlerKey).forEach((container) => {
+            container.delete(containerName_);
+        });
     }; // MZ_EC.clearBattlerNotetagCacheCache
 
 })(DoubleX_RMMZ.Enhanced_Codebase);

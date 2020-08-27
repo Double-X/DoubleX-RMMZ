@@ -61,7 +61,7 @@
  *      Video:
  *      1.
  *      This Plugin:
- *      1.
+ *      1. https://github.com/Double-X/DoubleX-RMMZ/blob/master/DoubleX%20RMMZ%20Skill%20Item%20Cooldown.js
  *      Posts:
  *      1.
  *      2.
@@ -1042,7 +1042,7 @@ if (DoubleX_RMMZ.Enhanced_Codebase) {
      * @param {DataSkill|DataItem} item - The item involved in the cooldowns
      */
     NEW._setSkillItemCooldown = function(item) {
-        MZ_EC.clearBattlerNotetagCache(this);
+        MZ_EC.clearBattlerNotetagCache(this, "cooldown");
         const lastLatestSkillItems = this.latestSkillItems;
         this.latestSkillItems = [item];
         const skillItemTurnCount = NEW._skillItemCooldownTurnCount.call(this);
@@ -1069,7 +1069,7 @@ if (DoubleX_RMMZ.Enhanced_Codebase) {
      * @author DoubleX @since v1.00a @version v1.00a
      */
     NEW._setBattlerCooldown = function() {
-        MZ_EC.clearBattlerNotetagCache(this);
+        MZ_EC.clearBattlerNotetagCache(this, "cooldown");
         const lastLatestSkillItems = this.latestSkillItems;
         this.latestSkillItems = this._cooldown.get("usedSkillItems");
         const battlerTurnCount = NEW._battlerCooldownTurnCount.call(this);
