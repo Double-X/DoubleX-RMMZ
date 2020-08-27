@@ -1195,7 +1195,7 @@ if (DoubleX_RMMZ.Enhanced_Codebase && DoubleX_RMMZ.Unit_Filters) {
 
     "use strict";
 
-    const DM = TA.DataManager.new, klassName = "Game_Action";
+    const GBB = Game_BattlerBase.prototype, klassName = "Game_Action";
     const { NEW, ORIG } = MZ_EC.setKlassContainer(klassName, $, TA);
     const EC_GA = MZ_EC[klassName].new, GA = TA[klassName];
 
@@ -1253,8 +1253,8 @@ if (DoubleX_RMMZ.Enhanced_Codebase && DoubleX_RMMZ.Unit_Filters) {
      */
     NEW.filteredTargets = function(targets) {
         // Checking subject canInput is safer than checking _targetIndex
-        if (this.subject().canInput()) return targets;
-        //
+        if (GBB.canInput.call(this.subject())) return targets;
+        // GBB.canInput must be used or TPBS inputable actor targets would alter
         return NEW._unifiedFilteredTargets.call(this, targets);
     }; // NEW.filteredTargets
 
