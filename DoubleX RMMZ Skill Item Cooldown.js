@@ -59,20 +59,20 @@
  *----------------------------------------------------------------------------
  *    # Links
  *      Video:
- *      1.
+ *      1. https://www.youtube.com/watch?v=jS--0ODtLAY
  *      This Plugin:
  *      1. https://github.com/Double-X/DoubleX-RMMZ/blob/master/DoubleX%20RMMZ%20Skill%20Item%20Cooldown.js
  *      Posts:
- *      1.
- *      2.
- *      3.
- *      4.
- *      5.
- *      6.
- *      7.
- *      8.
- *      9.
- *      10.
+ *      1. https://forums.rpgmakerweb.com/index.php?threads/doublex-rmmz-skill-item-cooldown.126221/
+ *      2. https://www.rpgmakercentral.com/topic/42558-doublex-rmmz-skill-item-cooldown/
+ *      3. https://rpgmaker.net/engines/rmmz/utilities/253/
+ *      4. https://www.save-point.org/thread-8152-post-52587.html
+ *      5. https://gdu.one/forums/topic/13618-doublex-rmmz-skill-item-cooldown/
+ *      6. http://www.hbgames.org/forums/viewtopic.php?p=945067
+ *      7. https://forum.chaos-project.com/index.php/topic,16067.msg197372.html
+ *      8. https://doublexrpgmaker.wordpress.com/2020/08/27/doublex-rmmz-skill-item-cooldown/
+ *      9. https://www.patreon.com/posts/40913611
+ *      10. https://www.makerdevs.com/plugin/doublex-rmmz-skill-item-cooldown
  *----------------------------------------------------------------------------
  *    # Instructions
  *      1. The default plugin parameters file name is
@@ -216,7 +216,7 @@
  * @desc The actor id/enemy index of the battler setting the battler cooldown
  * @arg turnCount
  * @type number
- * @min -999999999999999999999999999999999999999999999999999999999999999999999
+ * @min -999999
  * @desc The new battler cooldown turn count of the battler involved
  *
  * @command setSkillItemCooldown
@@ -227,23 +227,27 @@
  * @value actor
  * @option Enemy
  * @value enemy
- * @desc The side of the battler setting the skill/item cooldown with the skill/item involved
+ * @desc The side of the battler setting the skill/item cooldown
+ * with the skill/item involved
  * @arg label
  * @type number
- * @desc The actor id/enemy index of the battler setting the skill/item cooldown with the skill/item involved
+ * @desc The actor id/enemy index of the battler setting the
+ * skill/item cooldown with the skill/item involved
  * @arg type
  * @type select
  * @option Skill
  * @value skill
  * @option Item
  * @value item
- * @desc The skill/item to have its skill/item cooldown set for the battler involved
+ * @desc The skill/item to have its skill/item cooldown set for the
+ * battler involved
  * @arg id
  * @type number
- * @desc The id of the skill/item to have its skill/item cooldown set for the battler involved
+ * @desc The id of the skill/item to have its skill/item cooldown
+ * set for the battler involved
  * @arg turnCount
  * @type number
- * @min -999999999999999999999999999999999999999999999999999999999999999999999
+ * @min -999999
  * @desc The new skill/item cooldown turn count of the skill/item involved
  *
  * @help
@@ -383,7 +387,13 @@
  *           ["latestSkillItem","states", "armors", "weapons", "class", "actor", "enemy"]
  *           if it uses its default parameter value
  *    # Battler manipulations
- *      1. setBattlerCooldown(turnCount)
+ *      1. clearBattlerSkillItemCooldowns()
+ *         - Clears all battler and skill/item cooldowns for the battler
+ *           involved
+ *         - E.g.:
+ *           $gameActors.actor(1).clearBattlerSkillItemCooldowns(1) will clear
+ *           all battler and skill/item cooldowns for the game actor with id 1
+ *      2. setBattlerCooldown(turnCount)
  *         - Sets the battler cooldown turn count as turnCount for the battler
  *           involved
  *         - turnCount must be a number
@@ -394,18 +404,18 @@
  *           all actions but before charging the TPB bar again(in the case of
  *           TPBS) and in the case of the turn based battle system, that
  *           battler won't be able to input actions in the next turn
- *      2. battlerCooldown()
+ *      3. battlerCooldown()
  *         - Returns the battler cooldown turn count of the battler involed
  *         - E.g.:
  *           $gameParty.battleMembers(0).battlerCooldown() will return the
  *           battler cooldown turn count of the 1st game party member in the
  *           battle
- *      3. isBattlerCooldown()
+ *      4. isBattlerCooldown()
  *         - Returns if the battler involved is having battler cooldown
  *         - E.g.:
  *           $gameParty.aliveMembers(1).isBattlerCooldown() will return if the
  *           2nd alive game party member is having battler cooldown
- *      4. setSkillItemCooldown(item, turnCount)
+ *      5. setSkillItemCooldown(item, turnCount)
  *         - Sets the skill/item cooldown turn count of item as turnCount for
  *           the battler involved
  *         - item must be the data of the skill/item to have its cooldown set
@@ -415,13 +425,13 @@
  *           will set the skill/item cooldown turn count of the skill with id
  *           3 for the 3rd movable game party member as 2, meaning that that
  *           battler can't input that skill for the next 2 turns
- *      5. skillItemCooldown(item)
+ *      6. skillItemCooldown(item)
  *         - Returns the skill/item cooldown with item of the battler involved
  *         - E.g.:
  *           $gameTroop.members(0).skillItemCooldown($dataItems[1]) will
  *           return the skill/item cooldown with item with id 1 of the 1st
  *           game troop member
- *      6. isSkillItemCooldown(item)
+ *      7. isSkillItemCooldown(item)
  *         - Returns if the battler involved is having skill/item cooldown
  *           with item
  *         - E.g.:
@@ -434,9 +444,11 @@
  *      1. setSkillItemCooldownParam param val
  *         - Applies the script call
  *           $gameSystem.setSkillItemCooldownParam(param, val)
- *      2. setBattlerCooldown battler turnCount
+ *      2. clearBattlerSkillItemCooldowns battler
+ *         - Applies the script call battler.clearBattlerSkillItemCooldowns()
+ *      3. setBattlerCooldown battler turnCount
  *         - Applies the script call battler.setBattlerCooldown(turnCount)
- *      3. setSkillItemCooldown battler item turnCount
+ *      4. setSkillItemCooldown battler item turnCount
  *         - Applies the script call
  *           battler.setSkillItemCooldown(item, turnCount)
  *============================================================================
@@ -746,7 +758,7 @@ if (DoubleX_RMMZ.Enhanced_Codebase) {
      * @param {*} val - The new value of the variable to have its values set
      */
     NEW._updateDataNotetags = function(varId, val) {
-        Object.keys(DM.NOTETAG_DATA_CONTAINER_NAMES).forEach(objName => {
+        DM.NOTETAG_DATA_CONTAINER_NAMES.forEach((objType, objName) => {
             const obj = window[objName];
             MZ_EC.updateDataNotetags(obj, "cooldown", varId, val);
         });
@@ -852,14 +864,20 @@ if (DoubleX_RMMZ.Enhanced_Codebase) {
         //
     }); // v1.00a - v1.00a
 
+    // This will break with dynmaic data but it's not actively supported anyway
+    NEW._SKILL_ITEM_COOLDOWN_KEY = item => JSON.stringify(item);
+    //
+
     /**
      * Script Call/Idempotent
      * @author DoubleX @interface @since v1.00a @version v1.00a
      */
     $.clearBattlerSkillItemCooldowns = function() {
         NEW._clearUsedSkillItems.call(this);
-        this._cooldown.set("battlerTurnCount", 0);
-        this._cooldown.get("skillItemTurnCounts").clear();
+        this._cooldown.battlerTurnCount = 0;
+        // Map can't be serialized so ordinary objects must be used
+        this._cooldown.skillItemTurnCounts = {};
+        //
     }; // $.clearBattlerSkillItemCooldowns
 
     /**
@@ -868,7 +886,7 @@ if (DoubleX_RMMZ.Enhanced_Codebase) {
      * @param {number} turnCount - The new battler cooldown turn count
      */
     $.setBattlerCooldown = function(turnCount) {
-        this._cooldown.set("battlerTurnCount", turnCount);
+        this._cooldown.battlerTurnCount = turnCount;
         if (turnCount < 0) NEW._updateBattlerTpbCharge.call(this);
     }; // $.setBattlerCooldown
 
@@ -878,8 +896,7 @@ if (DoubleX_RMMZ.Enhanced_Codebase) {
      * @returns {number} The current battler cooldown turn count
      */
     $.battlerCooldown = function() {
-        if (!this._cooldown.has("battlerTurnCount")) return 0;
-        return this._cooldown.get("battlerTurnCount");
+        return this._cooldown.battlerTurnCount || 0;
     }; // $.battlerCooldown
 
     /**
@@ -896,9 +913,8 @@ if (DoubleX_RMMZ.Enhanced_Codebase) {
      * @returns {number} turnCount - The new item cooldown turn count
      */
     $.setSkillItemCooldown = function(item, turnCount) {
-        const skillItemTurnCounts = this._cooldown.get("skillItemTurnCounts");
-        if (turnCount <= 0) return skillItemTurnCounts.delete(item);
-        skillItemTurnCounts.set(item, turnCount);
+        const itemKey = NEW._SKILL_ITEM_COOLDOWN_KEY(item);
+        NEW._storeSkillItemCooldown.call(this, itemKey, turnCount);
     }; // $.setSkillItemCooldown
 
     /**
@@ -908,8 +924,8 @@ if (DoubleX_RMMZ.Enhanced_Codebase) {
      * @returns {number} The current cooldown turn count of the specified item
      */
     $.skillItemCooldown = function(item) {
-        if (!this._cooldown.get("skillItemTurnCounts").has(item)) return 0;
-        return this._cooldown.get("skillItemTurnCounts").get(item);
+        const itemKey = NEW._SKILL_ITEM_COOLDOWN_KEY(item);
+        return this._cooldown.skillItemTurnCounts[itemKey] || 0;
     }; // $.skillItemCooldown
 
     /**
@@ -929,10 +945,9 @@ if (DoubleX_RMMZ.Enhanced_Codebase) {
      */
     $.clearSkillItemCooldown = function(item_) {
         if (!item_) return;
-        this._cooldown.get("skillItemTurnCounts").delete(item_);
-        const usedSkillItems = this._cooldown.get("usedSkillItems");
-        usedSkillItems.eraseElem(item_);
-        this._cooldown.set("usedSkillItems", usedSkillItems);
+        const itemKey = NEW._SKILL_ITEM_COOLDOWN_KEY(item_);
+        delete this._cooldown.skillItemTurnCounts[itemKey];
+        this._cooldown.usedSkillItems.eraseElem(item_);
     }; // $.clearSkillItemCooldown
 
     /**
@@ -997,11 +1012,13 @@ if (DoubleX_RMMZ.Enhanced_Codebase) {
      * @author DoubleX @since v1.00a @version v1.00a
      */
     NEW._init = function() {
-        this._cooldown = new Map(Object.entries({
+        // Map can't be serialized so ordinary objects must be used
+        this._cooldown = {
             usedSkillItems: [],
             battlerTurnCount: 0,
-            skillItemTurnCounts: new Map()
-        }));
+            skillItemTurnCounts: {}
+        };
+        //
     }; // NEW._init
 
     /**
@@ -1020,8 +1037,11 @@ if (DoubleX_RMMZ.Enhanced_Codebase) {
      * @param {Game_Action} act - The inputted action to have cooldown cleared
      */
     NEW._clearInputtedSkillItemCooldown = function(act) {
-        const item = act.item();
-        if (this.isSkillItemCooldown(item)) this.setSkillItemCooldown(item, 0);
+        const item_ = act.item();
+        // item will be null if prior command and clear action's at same frame
+        if (!item_ || !this.isSkillItemCooldown(item_)) return;
+        //
+        this.setSkillItemCooldown(item_, 0);
     }; // NEW._clearInputtedSkillItemCooldown
 
     /**
@@ -1030,9 +1050,7 @@ if (DoubleX_RMMZ.Enhanced_Codebase) {
      * @param {DataSkill|DataItem} item - Used item to be stored for cooldown
      */
     NEW._storeUsedSkillItem = function(item) {
-        const usedSkillItems = this._cooldown.get("usedSkillItems");
-        usedSkillItems.push(item);
-        this._cooldown.set("usedSkillItems", usedSkillItems);
+        this._cooldown.usedSkillItems.push(item);
     }; // NEW._storeUsedSkillItem
 
     /**
@@ -1071,7 +1089,7 @@ if (DoubleX_RMMZ.Enhanced_Codebase) {
     NEW._setBattlerCooldown = function() {
         MZ_EC.clearBattlerNotetagCache(this, "cooldown");
         const lastLatestSkillItems = this.latestSkillItems;
-        this.latestSkillItems = this._cooldown.get("usedSkillItems");
+        this.latestSkillItems = this._cooldown.usedSkillItems;
         const battlerTurnCount = NEW._battlerCooldownTurnCount.call(this);
         this.latestSkillItems = lastLatestSkillItems;
         this.setBattlerCooldown(battlerTurnCount);
@@ -1099,7 +1117,7 @@ if (DoubleX_RMMZ.Enhanced_Codebase) {
      * @author DoubleX @since v1.00a @version v1.00a
      */
     NEW._clearUsedSkillItems = function() {
-         this._cooldown.set("usedSkillItems", []);
+        this._cooldown.usedSkillItems = [];
     }; // NEW._clearUsedSkillItems
 
     /**
@@ -1138,21 +1156,33 @@ if (DoubleX_RMMZ.Enhanced_Codebase) {
      * @author DoubleX @since v1.00a @version v1.00a
      */
     NEW._updateSkillItemCooldowns = function() {
-        const skillItemTurnCounts = this._cooldown.get("skillItemTurnCounts");
-        skillItemTurnCounts.forEach(NEW._updateSkillItemCooldown, this);
+        const turnCounts = this._cooldown.skillItemTurnCounts;
+        Object.entries(turnCounts).forEach(NEW._updateSkillItemCooldown, this);
     }; // NEW._updateSkillItemCooldowns
 
     /**
      * The this pointer is Game_Battler.prototype
      * Idempotent
      * @author DoubleX @since v1.00a @version v1.00a
+     * @param {string} itemKey - The key of the skill/item having cooldown
      * @param {number} turnCount - The skill/item cooldown turn count
-     * @param {DataSkill|DataItem} item - The skill/item having cooldown
-     * @param {Map(DataSkill|DataItem, number)} skillItemTurnCounts - Container
      */
-    NEW._updateSkillItemCooldown = function(turnCount, item) {
-        this.setSkillItemCooldown(item, turnCount - 1);
+    NEW._updateSkillItemCooldown = function([itemKey, turnCount]) {
+        NEW._storeSkillItemCooldown.call(this, itemKey, turnCount - 1);
     }; // NEW._updateSkillItemCooldown
+
+    /**
+     * The this pointer is Game_Battler.prototype
+     * Idempotent
+     * @author DoubleX @since v1.00a @version v1.00a
+     * @param {string} itemKey - The key of the skill/item having cooldown
+     * @param {number} turnCount - The skill/item cooldown turn count
+     */
+    NEW._storeSkillItemCooldown = function(itemKey, turnCount) {
+        const { skillItemTurnCounts } = this._cooldown;
+        if (turnCount <= 0) return delete skillItemTurnCounts[itemKey];
+        skillItemTurnCounts[itemKey] = turnCount;
+    }; // NEW._storeSkillItemCooldown
 
     /**
      * The this pointer is Game_Battler.prototype

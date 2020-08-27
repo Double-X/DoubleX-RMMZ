@@ -1177,7 +1177,7 @@ if (DoubleX_RMMZ.Enhanced_Codebase && DoubleX_RMMZ.Unit_Filters) {
      * @param {*} val - The new value of the variable to have its values set
      */
     NEW._updateDataNotetags = function(varId, val) {
-        Object.keys(DM.NOTETAG_DATA_CONTAINER_NAMES).forEach(objName => {
+        DM.NOTETAG_DATA_CONTAINER_NAMES.forEach((objType, objName) => {
             const obj = window[objName];
             MZ_EC.updateDataNotetags(obj, "targetingAI", varId, val);
         });

@@ -2199,6 +2199,13 @@ Utils.checkRMVersion(DoubleX_RMMZ.Enhanced_Codebase.VERSIONS.codebase);
         //
     }); // v0.00a - v0.00a
 
+    extendFunc("extractSaveContents", function(contents) {
+        ORIG.extractSaveContents.apply(this, arguments);
+        // Added to ensure all parameter functions uses the parameters in saves
+        $gameSystem.loadParamFuncs();
+        //
+    }); // v0.00a - v0.00a
+
     rewriteFunc("onXhrLoad", function(xhr, name, src, url) {
         // Edited to help plugins alter on xhr load behaviors in better ways
         if (xhr.status < 400) return NEW._onXhrLoadSuc.call(this, xhr, name);
@@ -2721,11 +2728,30 @@ Utils.checkRMVersion(DoubleX_RMMZ.Enhanced_Codebase.VERSIONS.codebase);
     }); // v0.00a - v0.00a
 
     /**
+     * Idempotent
+     * @author DoubleX @interface @since v0.00a @version v0.00a
+     */
+    $.loadParamFuncs = function() {
+        const pluginParamEntries = Object.entries(this._pluginParams);
+        pluginParamEntries.forEach(([containerName, container]) => {
+            Object.entries(container).forEach(([param, val]) => {
+                // It's to update param functions of other plugins
+                NEW.storeParamVal.call(this, containerName, param, val);
+                // Even though it does involve redundant container assignments
+            });
+        });
+    }; // $.loadParamFuncs
+
+    /**
      * The this pointer is Game_System.prototype
      * Idempotent
      * @author DoubleX @interface @since v0.00a @version v0.00a
      */
-    NEW.storeParams = function() {};
+    NEW.storeParams = function() {
+        // Map can't be serialized so ordinary objects must be used
+        this._pluginParams = {};
+        //
+    }; // NEW.storeParams
 
     NEW._TRY_JSON_PARAM = val => {
         if (!val) return val;
@@ -2759,7 +2785,9 @@ Utils.checkRMVersion(DoubleX_RMMZ.Enhanced_Codebase.VERSIONS.codebase);
      * @param {string} containerName - The name of the parameter container
      */
     NEW.onStoreParams = function(pluginName, containerName) {
-        this[containerName] = new Map();
+        // Map can't be serialized so ordinary objects must be used
+        this._pluginParams[containerName] = {};
+        //
         Object.entries(NEW._RAW_PARAMS(pluginName)).forEach(([param, val]) => {
             NEW.storeParamVal.call(this, containerName, param, val);
         });
@@ -2774,7 +2802,7 @@ Utils.checkRMVersion(DoubleX_RMMZ.Enhanced_Codebase.VERSIONS.codebase);
      * @param {*} val - The value of the parameter to be stored in game saves
      */
     NEW.storeParamVal = function(containerName, param, val) {
-        this[containerName].set(param, val);
+        this._pluginParams[containerName][param] = val;
     }; // NEW.storeParamVal
 
     /**
@@ -2786,7 +2814,7 @@ Utils.checkRMVersion(DoubleX_RMMZ.Enhanced_Codebase.VERSIONS.codebase);
      * @returns {*} The value of the parameter to be stored in game saves
      */
     NEW.storedParamVal = function(containerName, param) {
-        return this[containerName].get(param);
+        return this._pluginParams[containerName][param];
     }; // NEW.storedParamVal
 
 })(Game_System.prototype, DoubleX_RMMZ.Enhanced_Codebase);
