@@ -815,6 +815,14 @@ if (DoubleX_RMMZ.Enhanced_Codebase) {
     } = MZ_EC.setKlassContainer(klassName, $, SIC);
     const EC_GB = MZ_EC[klassName].new, GB = SIC[klassName];
 
+    /*------------------------------------------------------------------------
+     *    New private variables
+     *------------------------------------------------------------------------*/
+    // {{*}} _cooldown: The container of all other new variables
+    //       {[DataSkill|DataItem]} usedSkillItems: list of used skills/items
+    //       {number} battlerTurnCount: The battler cooldown turn counter
+    //       {{number}} skillItemTurnCounts: skill/item cooldown of skill/item
+
     extendFunc("initMembers", function(item) {
         ORIG.initMembers.apply(this, arguments);
         // Added to initializes all new variables added by this plugin

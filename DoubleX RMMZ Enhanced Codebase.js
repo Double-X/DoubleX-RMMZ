@@ -228,46 +228,48 @@
  *       5. mapReduce(mapCallback, reduceCallback, initVal_, mapThis_, reduceThis_)
  *          The same as chaining map with reduce but is tested to be
  *          noticeably faster(.map().reduce())
- *       6. split(splitCallback, splitThis)
+ *       6. eraseElem(elem)
+ *          Erases the passed element(if any) from this original array
+ *       7. split(splitCallback, splitThis)
  *          Returns an array of array splited by the removed elements
  *          returning truthy results in splitCallback
- *       7. splitInPlace(splitCallback, splitThis)
+ *       8. splitInPlace(splitCallback, splitThis)
  *          Returns an array of array splited by the removed elements
  *          returning truthy results in splitCallback
  *          This method changes the original array
- *       8. isProperSubsetOf(arr)
+ *       9. isProperSubsetOf(arr)
  *          Returns if this array's a proper subset of the specified array
- *       9. isProperSupersetOf(arr)
- *          Returns if this array's a proper superset of the specified array
- *       10. isSupersetOf(arr)
+ *       10. isProperSupersetOf(arr)
+ *           Returns if this array's a proper superset of the specified array
+ *       11. isSupersetOf(arr)
  *           Returns if this array's a superset of the specified array
- *       11. isSubsetOf(arr)
+ *       12. isSubsetOf(arr)
  *           Returns if this array's a subset of the specified array
- *       12. isEmpty()
+ *       13. isEmpty()
  *           Returns if this array's empty
- *       13. symmetricDifference(arr)
+ *       14. symmetricDifference(arr)
  *           Returns the symmetric difference of this and the specified array
- *       14. symmetricDifferenceInplace(arr)
+ *       15. symmetricDifferenceInplace(arr)
  *           Returns the symmetric difference of this and the specified array
  *           This method changes the original array
- *       15. union(arr)
+ *       16. union(arr)
  *           Returns the union of this and the specified array
- *       16. unionInPlace(arr)
+ *       17. unionInPlace(arr)
  *           Returns the union of this and the specified array
  *           This method changes the original array
- *       17. difference(arr)
+ *       18. difference(arr)
  *           Returns the difference of this and the specified array
- *       18. differenceInPlace(arr)
+ *       19. differenceInPlace(arr)
  *           Returns the difference of this and the specified array
  *           This method changes the original array
- *       19. intersection(arr)
+ *       20. intersection(arr)
  *           Returns the intersection of this and the specified array
- *       20. intersectionInPlace(arr)
+ *       21. intersectionInPlace(arr)
  *           Returns the intersection of this and the specified array
  *           This method changes the original array
- *       21. excludes(elem, fromI)
+ *       22. excludes(elem, fromI)
  *           Returns if this array doesn't include the specified element
- *       22. clear()
+ *       23. clear()
  *           Empties the whole array
  *     Graphics
  *     - Static Accessor
