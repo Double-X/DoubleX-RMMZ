@@ -68,13 +68,22 @@
  *      - None So Far
  *----------------------------------------------------------------------------
  *    # Changelog
+ *      { codebase: "1.0.0", plugin: "v1.01a" }(2020 Aug 28 GMT 0000):
+ *      1. Added the following battler manipulation script calls  -
+ *         - hasAnyUsableSkill(skillIds)
+ *         - hasAllUsableSkills(skillIds)
+ *      2. Added the following unit manipulation script calls  -
+ *         - memWithAnyUsableSkill(skillIds, mems)
+ *         - memWithAllUsableSkills(skillIds, mems)
+ *         - memWithoutAnyUsableSkill(skillIds, mems)
+ *         - memWithoutAllUsableSkills(skillIds, mems)
  *      { codebase: "1.0.0", plugin: "v1.00a" }(2020 Aug 23 GMT 0400):
  *      1. 1st version of this plugin finished
  *============================================================================*/
 /*:
  * @url https://www.patreon.com/doublex
  * @target MZ
- * @plugindesc Versions: { codebase: "1.0.0", plugin: "v1.00a" }
+ * @plugindesc Versions: { codebase: "1.0.0", plugin: "v1.01a" }
  * Lets you use script calls to filter unit members with less codes and eventing
  *
  * @help
@@ -138,6 +147,22 @@
  *         - E.g.:
  *           $gameActors.actor(1).hasAllSkills([1, 2]) returns whether the
  *           actor with id 1 has all skills with id 1 and 2
+ *      (v1.01a+)9. hasAnyUsableSkill(skillIds)
+ *         - Returns whether the battler involved has any usable skill
+ *           included by skillIds, which is a list of id of corresponding
+ *           skills
+ *         - paramIds must be an Array of natural numbers
+ *         - E.g.:
+ *           $gameParty.members()[0].hasAnyUsableSkill([1, 2]) returns whether
+ *           the 1st party member has usable skill with id 1 or 2
+ *      (v1.01a+)10. hasAllUsableSkills(skillIds)
+ *          - Returns whether the battler involved has all usable skills
+ *            included by skillIds, which is a list of id of corresponding
+ *            skills
+ *          - paramIds must be an Array of natural numbers
+ *          - E.g.:
+ *            $gameActors.actor(1).hasAllUsableSkills([1, 2]) returns whether
+ *            the actor with id 1 has all usable skills with id 1 and 2
  *    # Unit manipulations
  *      1. memWithAnyState(stateIds, mems)
  *         - Returns the list of members with any state included by stateIds,
@@ -543,13 +568,63 @@
  *           $gameTroop.allBelowStatMem(["hp", "mp"], 100, $gameTroop.anyBelowStatMem(["mhp", "mmp"], 1000))
  *           returns the list of troop members with the value of hp and mp
  *           below 100 among those with the value of mhp or mmp below 1000
+ *      (v1.01a+)29. memWithAnyUsableSkill(skillIds, mems)
+ *         - Returns the list of members with any usable skill included by
+ *           skillIds, which is a list of id of corresponding skills, among
+ *           all battlers included by mems, which is a list of battlers
+ *         - The return value should be an Array of Game_Battler
+ *         - skillIds must be an Array of natural numbers
+ *         - mems must be an Array of Game_Battler
+ *         - If mems isn't specified, it'll be default to all unit members
+ *           outside battles and battle members inside battles respectively
+ *         - E.g.:
+ *           $gameParty.memWithAnyUsableSkill([1, 2]) returns the list of
+ *           party members with usable skill having id 1 or 2
+ *      (v1.01a+)30. memWithAllUsableSkills(skillIds, mems)
+ *         - Returns the list of members with all usable skills included by
+ *           skillIds, which is a list of id of corresponding skills, among
+ *           all battlers included by mems, which is a list of battlers
+ *         - The return value should be an Array of Game_Battler
+ *         - skillIds must be an Array of natural numbers
+ *         - mems must be an Array of Game_Battler
+ *         - If mems isn't specified, it'll be default to all unit members
+ *           outside battles and battle members inside battles respectively
+ *         - E.g.:
+ *           $gameTroop.memWithAllUsableSkills([1, 2], $gameParty.memWithAnyUsableSkill([3, 4]))
+ *           returns the list of troop members with usable skills having id 1
+ *           and 2 among those with usable skill having id 3 or 4
+ *      (v1.01a+)31. memWithoutAnyUsableSkill(skillIds, mems)
+ *         - Returns the list of members without any usable skill included by
+ *           skillIds, which is a list of id of corresponding skills, among
+ *           all battlers included by mems, which is a list of battlers
+ *         - The return value should be an Array of Game_Battler
+ *         - skillIds must be an Array of natural numbers
+ *         - mems must be an Array of Game_Battler
+ *         - If mems isn't specified, it'll be default to all unit members
+ *           outside battles and battle members inside battles respectively
+ *         - E.g.:
+ *           $gameParty.memWithoutAnyUsableSkill([1, 2]) returns the list of
+ *           party members without usable skills having id 1 nor 2
+ *      (v1.01a+)32. memWithoutAllUsableSkills(skillIds, mems)
+ *         - Returns the list of members without all usable skills included by
+ *           skillIds, which is a list of id of corresponding skills, among
+ *           all battlers included by mems, which is a list of battlers
+ *         - The return value should be an Array of Game_Battler
+ *         - skillIds must be an Array of natural numbers
+ *         - mems must be an Array of Game_Battler
+ *         - If mems isn't specified, it'll be default to all unit members
+ *           outside battles and battle members inside battles respectively
+ *         - E.g.:
+ *           $gameTroop.memWithoutAllUsableSkills([1, 2], $gameParty.memWithoutAnyUsableSkill([3, 4]))
+ *           returns the list of troop members without usable skills having id
+ *           1 and 2 among those without usable skill having id 3 or 4
  *============================================================================
  */
 
 var DoubleX_RMMZ = DoubleX_RMMZ || {}; // var must be used or game will crash
 // Separates the version numbers with the rest to make the former more clear
 DoubleX_RMMZ.Unit_Filters = {
-    VERSIONS: { codebase: "1.0.0", plugin: "v1.00a" }
+    VERSIONS: { codebase: "1.0.0", plugin: "v1.01a" }
 }; // DoubleX_RMMZ.Enhanced_Codebase
 //
 Utils.checkRMVersion(DoubleX_RMMZ.Unit_Filters.VERSIONS.codebase);
@@ -598,6 +673,22 @@ Utils.checkRMVersion(DoubleX_RMMZ.Unit_Filters.VERSIONS.codebase);
      * @returns {boolean} Whether this battler has all of the specified skills
      */
     $.hasAllSkills = function(skillIds) { return false; };
+
+    /**
+     * Script call/Nullipotent
+     * @abstract @author DoubleX @interface @since v1.01a @version v1.01a
+     * @param {[id]} skillIds - The list of id of skills involved
+     * @returns {boolean} Whether the battler has any of specified usable skills
+     */
+    $.hasAnyUsableSkill = function(skillIds) { return false; };
+
+    /**
+     * Script call/Nullipotent
+     * @abstract @author DoubleX @interface @since v1.01a @version v1.01a
+     * @param {[id]} skillIds - The list of id of skills involved
+     * @returns {boolean} Whether the battler has all of specified usable skills
+     */
+    $.hasAllUsableSkills = function(skillIds) { return false; };
 
     /**
      * Script call/Nullipotent
@@ -666,9 +757,11 @@ Utils.checkRMVersion(DoubleX_RMMZ.Unit_Filters.VERSIONS.codebase);
  *      - Implements all the actor-specific battler manipulation script calls
  *----------------------------------------------------------------------------*/
 
-($ => {
+(($, UF) => {
 
     "use strict";
+
+    const { new: NEW } = UF.Game_Actor = { orig: {}, new: {} };
 
     /**
      * Script call/Nullipotent
@@ -677,7 +770,7 @@ Utils.checkRMVersion(DoubleX_RMMZ.Unit_Filters.VERSIONS.codebase);
      * @returns {boolean} Whether this actor has any of the specified skills
      */
     $.hasAnySkill = function(skillIds) {
-        return skillIds.some(this.hasSkill, this);
+        return NEW._hasFilteredSkills.call(this, skillIds, "some");
     }; // $.hasAnySkill
 
     /**
@@ -687,10 +780,57 @@ Utils.checkRMVersion(DoubleX_RMMZ.Unit_Filters.VERSIONS.codebase);
      * @returns {boolean} Whether this actor has all of the specified skills
      */
     $.hasAllSkills = function(skillIds) {
-        return skillIds.every(this.hasSkill, this);
+        return NEW._hasFilteredSkills.call(this, skillIds, "every");
     }; // $.hasAllSkills
 
-})(Game_Actor.prototype);
+    /**
+     * Script call/Nullipotent
+     * @author DoubleX @interface @override @since v1.01a @version v1.01a
+     * @param {[number]} skillIds - The list of id of skills involved
+     * @returns {boolean} Whether this actor has any of specified usable skills
+     */
+    $.hasAnyUsableSkill = function(skillIds) {
+        return NEW._hasFilteredUsableSkills.call(this, skillIds, "some");
+    }; // $.hasAnyUsableSkill
+
+    /**
+     * Script call/Nullipotent
+     * @author DoubleX @interface @override @since v1.01a @version v1.01a
+     * @param {[number]} skillIds - The list of id of skills involved
+     * @returns {boolean} Whether this actor has all of specified usable skills
+     */
+    $.hasAllUsableSkills = function(skillIds) {
+        return NEW._hasFilteredUsableSkills.call(this, skillIds, "every");
+    }; // $.hasAllUsableSkills
+
+    /**
+     * The this pointer is Game_Actor.prototype
+     * Nullipotent
+     * @author DoubleX @since v1.01a @version v1.01a
+     * @param {[number]} skillIds - The list of id of skills involved
+     * @enum @param {string} quantifier - some for any skill/every for all skill
+     * @returns {boolean} Whether this actor passes specified skill filtering
+     */
+    NEW._hasFilteredSkills = function(skillIds, quantifier) {
+        return skillIds[quantifier](this.hasSkill, this);
+    }; // NEW._hasFilteredSkills
+
+    /**
+     * The this pointer is Game_Actor.prototype
+     * Nullipotent
+     * @author DoubleX @since v1.01a @version v1.01a
+     * @param {[number]} skillIds - The list of id of skills involved
+     * @enum @param {string} quantifier - some for any skill/every for all skill
+     * @returns {boolean} Whether actor passes specified usable skill filtering
+     */
+    NEW._hasFilteredUsableSkills = function(skillIds, quantifier) {
+        const usableSkills = this.usableSkills();
+        return skillIds[quantifier](skillId => {
+            return usableSkills.includes($dataSkills[skillId]);
+        });
+    }; // NEW._hasFilteredUsableSkills
+
+})(Game_Actor.prototype, DoubleX_RMMZ.Unit_Filters);
 
 /*----------------------------------------------------------------------------
  *    # Edit class: Game_Enemy
@@ -724,6 +864,32 @@ Utils.checkRMVersion(DoubleX_RMMZ.Unit_Filters.VERSIONS.codebase);
     }; // $.hasAllSkills
 
     /**
+     * Script call/Nullipotent
+     * @author DoubleX @interface @override @since v1.01a @version v1.01a
+     * @param {[number]} skillIds - The list of id of skills involved
+     * @returns {boolean} Whether this enemy has any of specified usable skills
+     */
+    $.hasAnyUsableSkill = function(skillIds) {
+        return NEW._hasFilteredUsableSkills.call(this, skillIds, "some");
+    }; // $.hasAnyUsableSkill
+
+    /**
+     * Script call/Nullipotent
+     * @author DoubleX @interface @override @since v1.01a @version v1.01a
+     * @param {[number]} skillIds - The list of id of skills involved
+     * @returns {boolean} Whether this enemy has all of specified usable skills
+     */
+    $.hasAllUsableSkills = function(skillIds) {
+        return NEW._hasFilteredUsableSkills.call(this, skillIds, "every");
+    }; // $.hasAllUsableSkills
+
+    NEW._ACCUM_ACT_SKILL_IDS = (accumActSkillIds, { skillId }) => {
+        accumActSkillIds.set(skillId, true);
+        return accumActSkillIds;
+    }; // NEW._ACCUM_ACT_SKILL_IDS
+
+    /**
+     * The this pointer is Game_Enemy.prototype
      * Nullipotent
      * @author DoubleX @since v1.00a @version v1.00a
      * @param {[number]} skillIds - The list of id of skills involved
@@ -737,11 +903,8 @@ Utils.checkRMVersion(DoubleX_RMMZ.Unit_Filters.VERSIONS.codebase);
         //
     }; // NEW._hasFilteredSkills
 
-    NEW._ACCUM_ACT_SKILL_IDS = (accumActSkillIds, { skillId }) => {
-        accumActSkillIds.set(skillId, true);
-        return accumActSkillIds;
-    }; // NEW._ACCUM_ACT_SKILL_IDS
     /**
+     * The this pointer is Game_Enemy.prototype
      * Nullipotent
      * @author DoubleX @since v1.00a @version v1.00a
      * @returns {Map[id, boolean]} The mapping of all enemy action skill ids
@@ -749,6 +912,32 @@ Utils.checkRMVersion(DoubleX_RMMZ.Unit_Filters.VERSIONS.codebase);
     NEW._actSkillIds = function() {
         return this.enemy().actions.reduce(NEW._ACCUM_ACT_SKILL_IDS, new Map());
     }; // NEW._actSkillIds
+
+    /**
+     * The this pointer is Game_Enemy.prototype
+     * Nullipotent
+     * @author DoubleX @since v1.01a @version v1.01a
+     * @param {[number]} skillIds - The list of id of skills involved
+     * @enum @param {string} quantifier - some for any skill/every for all skill
+     * @returns {boolean} Whether actor passes specified usable skill filtering
+     */
+    NEW._hasFilteredUsableSkills = function(skillIds, quantifier) {
+        // Optimized to use an O(n) rather than an O(n ^ 2) algorithm
+        const usableActSkillIds = NEW._usableActSkillIds.call(this);
+        return skillIds[quantifier](skillId => usableActSkillIds.has(skillId));
+        //
+    }; // NEW._hasFilteredUsableSkills
+
+    /**
+     * The this pointer is Game_Enemy.prototype
+     * Nullipotent
+     * @author DoubleX @since v1.01a @version v1.01a
+     * @returns {Map[id, boolean]} The mapping of all enemy action skill ids
+     */
+    NEW._usableActSkillIds = function() {
+        const actSkills = this.enemy().actions.filter(this.isActionValid, this);
+        return actSkills.reduce(NEW._ACCUM_ACT_SKILL_IDS, new Map());
+    }; // NEW._usableActSkillIds
 
 })(Game_Enemy.prototype, DoubleX_RMMZ.Unit_Filters);
 
@@ -1177,10 +1366,71 @@ Utils.checkRMVersion(DoubleX_RMMZ.Unit_Filters.VERSIONS.codebase);
         return NEW._statValFilteredMem.call(this, func, "every", stats, val, mems, isEditMems);
     }; // $.allBelowStatMem
 
+    NEW._MEM_WITH_ANY_USABLE_SKILL =
+            NEW._MEM_WITH_COND.bind(undefined, "hasAnyUsableSkill");
+    /**
+     * Script call/Nullipotent
+     * @author DoubleX @interface @since v1.01a @version v1.01a
+     * @param {[id]} skillIds - The list of id of skills involved
+     * @param {[Game_Battler]} mems - The list of battlers to be filtered
+     * @param {boolean} isEditMems - Whether the mems argument will be mutated
+     * @returns {[Game_Batler]} The list of requested unit members
+     */
+    $.memWithAnyUsableSkill = function(skillIds, mems = this.members(), isEditMems = false) {
+        const filterFunc = mem => NEW._MEM_WITH_ANY_USABLE_SKILL(skillIds, mem);
+        return NEW._FILTERED_MEMS(mems, isEditMems, filterFunc);
+    }; // $.memWithAnyUsableSkill
+
+    NEW._MEM_WITH_ALL_USABLE_SKILLS =
+            NEW._MEM_WITH_COND.bind(undefined, "hasAllUsableSkills");
+    /**
+     * Script call/Nullipotent
+     * @author DoubleX @interface @since v1.01a @version v1.01a
+     * @param {[id]} skillIds - The list of id of skills involved
+     * @param {[Game_Battler]} mems - The list of battlers to be filtered
+     * @param {boolean} isEditMems - Whether the mems argument will be mutated
+     * @returns {[Game_Batler]} The list of requested unit members
+     */
+    $.memWithAllUsableSkills = function(skillIds, mems = this.members(), isEditMems = false) {
+        const func = mem => NEW._MEM_WITH_ALL_USABLE_SKILLS(skillIds, mem);
+        return NEW._FILTERED_MEMS(mems, isEditMems, func);
+    }; // $.memWithAllUsableSkills
+
+    NEW._MEM_WITHOUT_ANY_USABLE_SKILL =
+            NEW._MEM_WTHOUT_COND.bind(undefined, "hasAnyUsableSkill");
+    /**
+     * Script call/Nullipotent
+     * @author DoubleX @interface @since v1.01a @version v1.01a
+     * @param {[id]} skillIds - The list of id of skills involved
+     * @param {[Game_Battler]} mems - The list of battlers to be filtered
+     * @param {boolean} isEditMems - Whether the mems argument will be mutated
+     * @returns {[Game_Batler]} The list of requested unit members
+     */
+    $.memWithoutAnyUsableSkill = function(skillIds, mems = this.members(), isEditMems = false) {
+        const func = mem => NEW._MEM_WITHOUT_ANY_USABLE_SKILL(skillIds, mem);
+        return NEW._FILTERED_MEMS(mems, isEditMems, func);
+    }; // $.memWithoutAnyUsableSkill
+
+    NEW._MEM_WITHOUT_ALL_USABLE_SKILLS =
+            NEW._MEM_WTHOUT_COND.bind(undefined, "hasAllUsableSkills");
+    /**
+     * Script call/Nullipotent
+     * @author DoubleX @interface @since v1.01a @version v1.01a
+     * @param {[id]} skillIds - The list of id of skills involved
+     * @param {[Game_Battler]} mems - The list of battlers to be filtered
+     * @param {boolean} isEditMems - Whether the mems argument will be mutated
+     * @returns {[Game_Batler]} The list of requested unit members
+     */
+    $.memWithoutAllUsableSkills = function(skillIds, mems = this.members(), isEditMems = false) {
+        const func = mem => NEW._MEM_WITHOUT_ALL_USABLE_SKILLS(skillIds, mem);
+        return NEW._FILTERED_MEMS(mems, isEditMems, func);
+    }; // $.memWithoutAllUsableSkills
+
     NEW._SORTED_STATS = (stats, mems, compareFunc) => {
         return stats.map(stat => mems.map(mem => mem[stat]).sort(compareFunc));
     }; // NEW._SORTED_STATS
     /**
+     * The this pointer is Game_Unit.prototype
      * Nullipotent
      * @author DoubleX @since v1.00a @version v1.00a
      * @param {(number, number) -> number} compareFunc - The compare function
@@ -1201,6 +1451,7 @@ Utils.checkRMVersion(DoubleX_RMMZ.Unit_Filters.VERSIONS.codebase);
     }; // NEW._statFilteredMem
 
     /**
+     * The this pointer is Game_Unit.prototype
      * Nullipotent
      * @author DoubleX @since v1.00a @version v1.00a
      * @param {(number, number) -> boolean} filterFunc - The filter function

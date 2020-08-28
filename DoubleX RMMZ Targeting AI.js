@@ -88,13 +88,19 @@
  *      - None So Far
  *----------------------------------------------------------------------------
  *    # Changelog
+ *      { codebase: "1.0.0", plugin: "v1.01a" }(2020 Aug 28 GMT 0100):
+ *      1. Added the following notetags -
+ *         - memWithAnyUsableSkill
+ *         - memWithAllUsableSkills
+ *         - memWithoutAnyUsableSkill
+ *         - memWithoutAllUsableSkills
  *      { codebase: "1.0.0", plugin: "v1.00a" }(2020 Aug 25 GMT 0400):
  *      1. 1st version of this plugin finished
  *============================================================================*/
 /*:
  * @url https://www.patreon.com/doublex
  * @target MZ
- * @plugindesc Versions: { codebase: "1.0.0", plugin: "v1.00a" }
+ * @plugindesc Versions: { codebase: "1.0.0", plugin: "v1.01a" }
  * Lets you control some skills/items target selection AI behaviors by notetags
  * @orderAfter DoubleX RMMZ Enhanced Codebase
  * @base DoubleX RMMZ Enhanced Codebase
@@ -778,6 +784,82 @@
  *            Or:
  *            <targeting ai anyHighestStatMem switch val: 13, cnt|hrg>
  *            <targeting ai allHighestStatMem switch val: 14, mrg|trg>
+ *      (v1.01a+)30. memWithAnyUsableSkill condSuffix skillIdsSuffix: condEntry, skillIdsEntry
+ *          - Applies the following DoubleX RMMZ Unit Filters script call:
+ *            memWithAnyUsableSkill(skillIds, mems)
+ *            Where skillIds is the skillIdsEntry results and mems is the list
+ *            of possible targets of the skill/item having this notetag
+ *          - condSuffix can be val, switch or script
+ *          - skillIdsSuffix can be val, var or script
+ *          - The result of condEntry can be anything as only whether it's
+ *            truthy matters
+ *          - If the result of condEntry is falsy, this notetag will be
+ *            discarded upon such use cases
+ *          - The result of skillIdsEntry can be an Array of any natural
+ *            number
+ *          - If skillIdsSuffix is val, then skillIdsEntry should be written
+ *            as skillId1|skillId2|skillId3|skillIdI|skillIdN
+ *          - E.g.:
+ *            <targeting ai memWithAnyUsableSkill switch val: 1, 2|3> will
+ *            restrict the list of targets to be those with usable skill with
+ *            id 2 or 3 if the game switch with id 1 is on
+ *      (v1.01a+)31. memWithAllUsableSkills condSuffix skillIdsSuffix: condEntry, skillIdsEntry
+ *          - Applies the following DoubleX RMMZ Unit Filters script call:
+ *            memWithAllUsableSkills(skillIds, mems)
+ *            Where skillIds is the skillIdsEntry results and mems is the list
+ *            of possible targets of the skill/item having this notetag
+ *          - condSuffix can be val, switch or script
+ *          - skillIdsSuffix can be val, var or script
+ *          - The result of condEntry can be anything as only whether it's
+ *            truthy matters
+ *          - If the result of condEntry is falsy, this notetag will be
+ *            discarded upon such use cases
+ *          - The result of skillIdsEntry can be an Array of any natural
+ *            number
+ *          - If skillIdsSuffix is val, then skillIdsEntry should be written
+ *            as skillId1|skillId2|skillId3|skillIdI|skillIdN
+ *          - E.g.:
+ *            <targeting ai memWithAllUsableSkills switch val: 1, 2|3> will
+ *            restrict the list of targets to be those with usable skill with
+ *            id 2 and 3 if the game switch with id 1 is on
+ *      (v1.01a+)32. memWithoutAnyUsableSkill condSuffix skillIdsSuffix: condEntry, skillIdsEntry
+ *          - Applies the following DoubleX RMMZ Unit Filters script call:
+ *            memWithoutAnyUsableSkill(skillIds, mems)
+ *            Where skillIds is the skillIdsEntry results and mems is the list
+ *            of possible targets of the skill/item having this notetag
+ *          - condSuffix can be val, switch or script
+ *          - skillIdsSuffix can be val, var or script
+ *          - The result of condEntry can be anything as only whether it's
+ *            truthy matters
+ *          - If the result of condEntry is falsy, this notetag will be
+ *            discarded upon such use cases
+ *          - The result of skillIdsEntry can be an Array of any natural
+ *            number
+ *          - If skillIdsSuffix is val, then skillIdsEntry should be written
+ *            as skillId1|skillId2|skillId3|skillIdI|skillIdN
+ *          - E.g.:
+ *            <targeting ai memWithoutAnyUsableSkill switch val: 1, 2|3> will
+ *            restrict the list of targets to be those with usable skill
+ *            without id 2 or 3 if the game switch with id 1 is on
+ *      (v1.01a+)33. memWithoutAllUsableSkills condSuffix skillIdsSuffix: condEntry, skillIdsEntry
+ *          - Applies the following DoubleX RMMZ Unit Filters script call:
+ *            memWithoutAllUsableSkills(skillIds, mems)
+ *            Where skillIds is the skillIdsEntry results and mems is the list
+ *            of possible targets of the skill/item having this notetag
+ *          - condSuffix can be val, switch or script
+ *          - skillIdsSuffix can be val, var or script
+ *          - The result of condEntry can be anything as only whether it's
+ *            truthy matters
+ *          - If the result of condEntry is falsy, this notetag will be
+ *            discarded upon such use cases
+ *          - The result of skillIdsEntry can be an Array of any natural
+ *            number
+ *          - If skillIdsSuffix is val, then skillIdsEntry should be written
+ *            as skillId1|skillId2|skillId3|skillIdI|skillIdN
+ *          - E.g.:
+ *            <targeting ai memWithoutAllUsableSkills switch val: 1, 2|3> will
+ *            restrict the list of targets to be those with usable skill
+ *            without id 2 and 3 if the game switch with id 1 is on
  *============================================================================
  *    ## Script Call Info
  *----------------------------------------------------------------------------
@@ -821,7 +903,7 @@ var DoubleX_RMMZ = DoubleX_RMMZ || {}; // var must be used or game will crash
 // Separates the version numbers with the rest to make the former more clear
 DoubleX_RMMZ.Targeting_AI = {
     PLUGIN_NAME: "DoubleX RMMZ Targeting AI",
-    VERSIONS: { codebase: "1.0.0", plugin: "v1.00a" }
+    VERSIONS: { codebase: "1.0.0", plugin: "v1.01a" }
 }; // DoubleX_RMMZ.Targeting_AI
 //
 Utils.checkRMVersion(DoubleX_RMMZ.Targeting_AI.VERSIONS.codebase);
@@ -1053,7 +1135,33 @@ if (DoubleX_RMMZ.Enhanced_Codebase && DoubleX_RMMZ.Unit_Filters) {
         or: new Map(Object.entries({
             suffix1: MZ_EC.BOOL_SUFFIXES, // condSuffix
             entry1: MZ_EC.BOOL_ENTRY // condEntry
+        })),
+        // v1.01a+
+        memWithAnyUsableSkill: new Map(Object.entries({
+            suffix1: MZ_EC.BOOL_SUFFIXES, // condSuffix
+            suffix2: MZ_EC.VAL_SUFFIXES, // skillIdsSuffix
+            entry1: MZ_EC.BOOL_ENTRY, // condEntry
+            entry2: MZ_EC.NUM_ARRAY_ENTRY // skillIdsEntry
+        })),
+        memWithAllUsableSkills: new Map(Object.entries({
+            suffix1: MZ_EC.BOOL_SUFFIXES, // condSuffix
+            suffix2: MZ_EC.VAL_SUFFIXES, // skillIdsSuffix
+            entry1: MZ_EC.BOOL_ENTRY, // condEntry
+            entry2: MZ_EC.NUM_ARRAY_ENTRY // skillIdsEntry
+        })),
+        memWithoutAnyUsableSkill: new Map(Object.entries({
+            suffix1: MZ_EC.BOOL_SUFFIXES, // condSuffix
+            suffix2: MZ_EC.VAL_SUFFIXES, // skillIdsSuffix
+            entry1: MZ_EC.BOOL_ENTRY, // condEntry
+            entry2: MZ_EC.NUM_ARRAY_ENTRY // skillIdsEntry
+        })),
+        memWithoutAllUsableSkills: new Map(Object.entries({
+            suffix1: MZ_EC.BOOL_SUFFIXES, // condSuffix
+            suffix2: MZ_EC.VAL_SUFFIXES, // skillIdsSuffix
+            entry1: MZ_EC.BOOL_ENTRY, // condEntry
+            entry2: MZ_EC.NUM_ARRAY_ENTRY // skillIdsEntry
         }))
+        //
     }));
     //
 
@@ -1480,7 +1588,7 @@ if (DoubleX_RMMZ.Enhanced_Codebase && DoubleX_RMMZ.Unit_Filters) {
                      ${curMZECVer} but should be at least ${minMZECVer}`);
     }
     const curUFVer = DoubleX_RMMZ.Unit_Filters.VERSIONS.plugin;
-    const minUFVer = "v1.00a";
+    const minUFVer = "v1.01a";
     if (curUFVer < minUFVer) {
         console.warn(`The version of DoubleX RMMZ Unit Filters is ${curUFVer}
                      but should be at least ${minUFVer}`);
