@@ -545,8 +545,10 @@ Utils.checkRMVersion(DoubleX_RMMZ.Enhanced_Codebase.VERSIONS.codebase);
     CORE._REG_EXP_SPLIT_NOTES = /[\r\n]+/;
 
     CORE._ON_LOAD_DATUM_NOTETAGS = (datumType, datum, containerName, fullRegex, notePairs) => {
+        const { meta } = datum;
+        meta.enhancedCodebase = meta.enhancedCodebase || {};
         // Storing datumType is to streamline the notetag datum type reading
-        const container = datum.meta[containerName] = {
+        const container = meta.enhancedCodebase[containerName] = {
             id: datum.id,
             datumType,
             notetags: []
@@ -598,7 +600,8 @@ Utils.checkRMVersion(DoubleX_RMMZ.Enhanced_Codebase.VERSIONS.codebase);
     MZ_EC.updateDataNotetags = (obj, containerName, varId, val) => {
         obj.forEach(datum_ => {
             if (!datum_) return;
-            datum_.meta[containerName].notetags.forEach(({ pairs }) => {
+            const { enhancedCodebase } = datum_.meta;
+            enhancedCodebase[containerName].notetags.forEach(({ pairs }) => {
                 CORE._RELOAD_DATA_NOTETAG_PAIRS(varId, val, pairs);
             });
         });
@@ -688,8 +691,8 @@ Utils.checkRMVersion(DoubleX_RMMZ.Enhanced_Codebase.VERSIONS.codebase);
     CORE._DATA_NOTETAGS = (battler, dataType, containerName, notetagTypes_) => {
           const notetagData = CORE._NOTETAG_DATA(battler, dataType);
           const validNotetagData = notetagData.filter(CORE._IS_VALID_DATUM);
-          const notetags = validNotetagData.reduce((notes, { meta }) => {
-              return notes.fastMerge(meta[containerName].notetags);
+          const notetags = validNotetagData.reduce((notes, { meta: { enhancedCodebase } }) => {
+              return notes.fastMerge(enhancedCodebase[containerName].notetags);
           }, []);
           return CORE._NOTETAG_WITH_TYPES(notetags, notetagTypes_);
     }; // CORE._DATA_NOTETAGS
@@ -2716,6 +2719,11 @@ Utils.checkRMVersion(DoubleX_RMMZ.Enhanced_Codebase.VERSIONS.codebase);
         rewriteFunc
     } = MZ_EC.setKlassContainer("Game_System", $, MZ_EC);
 
+    /*------------------------------------------------------------------------
+     *    New private variables
+     *------------------------------------------------------------------------*/
+    // {{*}} _enhancedCodebase: The container of everything from other plugins
+
     extendFunc("initialize", function() {
         ORIG.initialize.call(this);
         // Added to help plugins store all parameter values in game saves
@@ -2734,7 +2742,7 @@ Utils.checkRMVersion(DoubleX_RMMZ.Enhanced_Codebase.VERSIONS.codebase);
      * @author DoubleX @interface @since v0.00a @version v0.00a
      */
     $.loadParamFuncs = function() {
-        const pluginParamEntries = Object.entries(this._pluginParams);
+        const pluginParamEntries = Object.entries(this._enhancedCodebase);
         pluginParamEntries.forEach(([containerName, container]) => {
             Object.entries(container).forEach(([param, val]) => {
                 // It's to update param functions of other plugins
@@ -2751,7 +2759,7 @@ Utils.checkRMVersion(DoubleX_RMMZ.Enhanced_Codebase.VERSIONS.codebase);
      */
     NEW.storeParams = function() {
         // Map can't be serialized so ordinary objects must be used
-        this._pluginParams = {};
+        this._enhancedCodebase = {};
         //
     }; // NEW.storeParams
 
@@ -2788,7 +2796,7 @@ Utils.checkRMVersion(DoubleX_RMMZ.Enhanced_Codebase.VERSIONS.codebase);
      */
     NEW.onStoreParams = function(pluginName, containerName) {
         // Map can't be serialized so ordinary objects must be used
-        this._pluginParams[containerName] = {};
+        this._enhancedCodebase[containerName] = {};
         //
         Object.entries(NEW._RAW_PARAMS(pluginName)).forEach(([param, val]) => {
             NEW.storeParamVal.call(this, containerName, param, val);
@@ -2804,7 +2812,7 @@ Utils.checkRMVersion(DoubleX_RMMZ.Enhanced_Codebase.VERSIONS.codebase);
      * @param {*} val - The value of the parameter to be stored in game saves
      */
     NEW.storeParamVal = function(containerName, param, val) {
-        this._pluginParams[containerName][param] = val;
+        this._enhancedCodebase[containerName][param] = val;
     }; // NEW.storeParamVal
 
     /**
@@ -2816,7 +2824,7 @@ Utils.checkRMVersion(DoubleX_RMMZ.Enhanced_Codebase.VERSIONS.codebase);
      * @returns {*} The value of the parameter to be stored in game saves
      */
     NEW.storedParamVal = function(containerName, param) {
-        return this._pluginParams[containerName][param];
+        return this._enhancedCodebase[containerName][param];
     }; // NEW.storedParamVal
 
 })(Game_System.prototype, DoubleX_RMMZ.Enhanced_Codebase);
