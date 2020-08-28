@@ -185,6 +185,10 @@
  *            27. anyBelowStatMem
  *            28. allBelowStatMem
  *            (Advanced)29. or
+ *            (v1.01a+)30. memWithAnyUsableSkill
+ *            (v1.01a+)31. memWithAllUsableSkills
+ *            (v1.01a+)32. memWithoutAnyUsableSkill
+ *            (v1.01a+)33. memWithoutAllUsableSkills
  *            (Search tag: NOTE_TYPE)
  *          - suffixes is the list of suffixes in the form of:
  *            suffix1 suffix2 suffix3 ... suffixn
