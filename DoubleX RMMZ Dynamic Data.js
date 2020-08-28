@@ -45,16 +45,16 @@
  *      This Plugin:
  *      1. https://github.com/Double-X/DoubleX-RMMZ/blob/master/DoubleX%20RMMZ%20Dynamic%20Data.js
  *      Posts:
- *      1. 
- *      2. 
- *      3. 
- *      4. 
- *      5. 
- *      6. 
- *      7. 
- *      8. 
- *      9. 
- *      10. 
+ *      1. https://forums.rpgmakerweb.com/index.php?threads/doublex-rmmz-dynamic-data.126289/
+ *      2. https://www.rpgmakercentral.com/topic/42561-doublex-rmmz-dynamic-data/
+ *      3. https://rpgmaker.net/engines/rmmz/utilities/255/
+ *      4. https://www.save-point.org/thread-8153-post-52598.html
+ *      5. https://gdu.one/forums/topic/13619-doublex-rmmz-dynamic-data/
+ *      6. http://www.hbgames.org/forums/viewtopic.php?f=332&t=80296
+ *      7. https://forum.chaos-project.com/index.php/topic,16068.new.html
+ *      8. https://doublexrpgmaker.wordpress.com/2020/08/28/doublex-rmmz-dynamic-data/
+ *      9. https://www.patreon.com/posts/40947317
+ *      10. https://www.makerdevs.com/plugin/doublex-rmmz-dynamic-data
  *----------------------------------------------------------------------------
  *    # Contributors
  *      Authors:
