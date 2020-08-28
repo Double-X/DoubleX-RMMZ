@@ -287,7 +287,6 @@
  *----------------------------------------------------------------------------
  *    # Actor/Class/Learnt Skills/Usable Skills/Posessed Items/Usable Items/
  *      Inputted Skill Or Item/Weapon/Armor/Enemy/States Notetags
- *      Notetags only apply to skills/items with Number as One in Scope
  *      1. battler condSuffix opSuffix valSuffix: condEntry, opEntry, valEntry
  *         - Applies the following formula on the current battler cooldown:
  *           current = current operator value
