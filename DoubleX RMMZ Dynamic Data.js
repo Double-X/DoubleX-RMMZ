@@ -241,7 +241,7 @@ if (DoubleX_RMMZ.Enhanced_Codebase) {
         const origData = NEW._origDatabase.get(containerName);
         if (Array.isArray(origData)) {
             origData.forEach(NEW.VOID_UNSERIALIZABLE_DATUM);
-        }
+        } else NEW.VOID_UNSERIALIZABLE_DATUM(origData);
         window[containerName] = JsonEx.makeDeepCopy(origData);
         this.onLoad(window[containerName], containerName);
     }; // NEW._onloadContainer
