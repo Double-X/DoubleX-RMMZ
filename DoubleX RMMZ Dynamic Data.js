@@ -10,9 +10,9 @@
  *    2. Changing too many database data in the same save can lead to the save
  *       file being too big, so only make absolutely necessary changes
  *    3. This plugin doesn't work with dynamic map data, and I've no plans to
- *       support this as it can all too complicated and convoluted to make it
- *       work well without creating even greater troubles like the game file
- *       being too big
+ *       support this, as it's all too complicated and convoluted to make it
+ *       work well without creating even greater troubles, like the game file
+ *       being too big and map reload issues
  *    4. CHANGING DATA ON THE FLY SHOULD NEVER BE TAKEN LIGHTLY, SO THIS
  *       PLUGIN'S SPECIFICALLY DESIGNED TO NOT HAVE RMMZ BEGINNERS IN MIND
  *----------------------------------------------------------------------------
@@ -41,9 +41,9 @@
  *----------------------------------------------------------------------------
  *    # Links
  *      Video:
- *      1. 
+ *      1. https://www.youtube.com/watch?v=XdBeCGdAchU
  *      This Plugin:
- *      1. 
+ *      1. https://github.com/Double-X/DoubleX-RMMZ/blob/master/DoubleX%20RMMZ%20Dynamic%20Data.js
  *      Posts:
  *      1. 
  *      2. 
@@ -299,7 +299,9 @@ if (DoubleX_RMMZ.Enhanced_Codebase) {
     $.setDynamicData = function(containerName, data) {
         const { dynamicData } = this._enhancedCodebase;
         dynamicData[containerName] = dynamicData[containerName] || {};
-        dynamicData[containerName][data.id] = data;
+        // Not all database data containers are arrays but it must be consistent
+        dynamicData[containerName][data.id || containerName] = data;
+        //
         /** @todo Just reloads the notetags of the edited data */
         EC_DM.loadDataNotetags(window[containerName], containerName);
         //
@@ -320,9 +322,13 @@ if (DoubleX_RMMZ.Enhanced_Codebase) {
     NEW._LOAD_DYNAMIC_DATA_TYPE = function([containerName, container]) {
         const globalContainer = window[containerName];
         Object.entries(container).forEach(([id, data]) => {
-            globalContainer[+id] = data;
+            // Not all database data containers are arrays
+            if (Array.isArray(globalContainer)) {
+                return globalContainer[+id] = data;
+            } else window[containerName] = data;
+            //
         });
-        EC_DM.loadDataNotetags(globalContainer, containerName);
+        EC_DM.loadDataNotetags(window[containerName], containerName);
     }; // NEW._LOAD_DYNAMIC_DATA_TYPE
     /**
      * Idempotent
