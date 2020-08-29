@@ -32,27 +32,27 @@
  *      1. DoubleX RMMZ Enhanced Codebase
  *         https://github.com/Double-X/DoubleX-RMMZ/blob/master/DoubleX%20RMMZ%20Enhanced%20Codebase.js
  *      Abilities:
- *      3. Some RMMV plugin development proficiency
+ *      1. Some RMMV plugin development proficiency
  *         (Basic knowledge on what RMMV plugin development does in general
  *         with several easy, simple and small plugins written without
  *         nontrivial bugs up to 1000 LoC scale but still being inexperienced)
  *----------------------------------------------------------------------------
  *    # Links
  *      Video:
- *      1.
+ *      1. https://www.youtube.com/watch?v=oClYZtOJn8I
  *      This Plugin:
- *      1.
+ *      1. https://github.com/Double-X/DoubleX-RMMZ/blob/master/DoubleX%20RMMZ%20State%20Triggers.js
  *      Posts:
- *      1.
- *      2.
- *      3.
- *      4.
- *      5.
- *      6.
- *      7.
- *      8.
- *      9.
- *      10.
+ *      1. https://forums.rpgmakerweb.com/index.php?threads/doublex-rmmz-state-triggers.126380/
+ *      2. https://www.rpgmakercentral.com/topic/42562-doublex-rmmz-state-triggers/
+ *      3. https://rpgmaker.net/engines/rmmz/utilities/257/
+ *      4. https://www.save-point.org/thread-8154-post-52605.html
+ *      5. https://gdu.one/forums/topic/13620-doublex-rmmz-state-triggers/
+ *      6. http://www.hbgames.org/forums/viewtopic.php?f=332&t=80300
+ *      7. https://forum.chaos-project.com/index.php/topic,16069.new.html
+ *      8. https://doublexrpgmaker.wordpress.com/2020/08/29/doublex-rmmz-state-triggers/
+ *      9. https://www.patreon.com/posts/doublex-rmmz-40988080
+ *      10. https://www.makerdevs.com/plugin/doublex-rmmz-state-triggers
  *----------------------------------------------------------------------------
  *    # Instructions
  *      1. The default plugin parameters file name is
@@ -74,7 +74,7 @@
  *      - None So Far
  *----------------------------------------------------------------------------
  *    # Changelog
- *      { codebase: "1.0.0", plugin: "v1.00a" }(2020 Aug 28 GMT 1300):
+ *      { codebase: "1.0.0", plugin: "v1.00a" }(2020 Aug 29 GMT 1300):
  *      1. 1st version of this plugin finished
  *============================================================================*/
 /*:
