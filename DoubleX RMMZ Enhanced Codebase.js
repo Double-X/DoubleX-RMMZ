@@ -461,7 +461,6 @@ Utils.checkRMVersion(DoubleX_RMMZ.Enhanced_Codebase.VERSIONS.codebase);
     CORE._RETURNED_ENTRY_SCRIPT = entry => {
         return new Function("argObj", $gameVariables.value(+entry));
     }; // CORE._RETURNED_ENTRY_VAR
-    // The this pointer is that of the caller
     CORE._SUFFIX_ENTRY_FUNC = function(notePairs, notetagType, suffix, entry, count) {
         switch (suffix) {
             case "val": return CORE._RETURNED_ENTRY_VAL(
@@ -474,7 +473,6 @@ Utils.checkRMVersion(DoubleX_RMMZ.Enhanced_Codebase.VERSIONS.codebase);
             //
         }
     }; // CORE._SUFFIX_ENTRY_FUNC
-    //
     CORE._IS_VALID_SUFFIX = (notePairs, notetagType, suffix, count) => {
         const notetagTypePairs = notePairs.get(notetagType);
         const suffixName = `suffix${count}`;
@@ -499,8 +497,10 @@ Utils.checkRMVersion(DoubleX_RMMZ.Enhanced_Codebase.VERSIONS.codebase);
                 pairs.set(`suffix${count}`, suffix);
                 pairs.set(`entry${count}`, entry);
                 //
-                pairs.set(`func${count}`, CORE._SUFFIX_ENTRY_FUNC(
-                        notePairs, notetagType, suffix, entry, count));
+                if ($gameSwitches && $gameVariables) {
+                    pairs.set(`func${count}`, CORE._SUFFIX_ENTRY_FUNC(
+                            notePairs, notetagType, suffix, entry, count));
+                }
             } else CORE._SHOW_INVALID_NOTE_SUFFIX(
                     container.datumType, container.id, count, suffix, line);
             i++;
@@ -658,6 +658,7 @@ Utils.checkRMVersion(DoubleX_RMMZ.Enhanced_Codebase.VERSIONS.codebase);
         return battler.isEnemy() ? [battler.enemy()] : [];
     }; // CORE._ENEMIES_NOTETAG_DATA
     CORE._STATES_NOTETAG_DATA = battler => battler.states();
+    CORE._THIS_STATE_NOTETAG_DATA = battler => battler.thisState;
     CORE._NOTETAG_DATA = (battler, dataType) => {
         switch (dataType) {
             case "actor": return CORE._ACTOR_NOTETAG_DATA(battler);
@@ -677,6 +678,7 @@ Utils.checkRMVersion(DoubleX_RMMZ.Enhanced_Codebase.VERSIONS.codebase);
             case "armors" : return CORE._ARMORS_NOTETAG_DATA(battler);
             case "enemy" : return CORE._ENEMIES_NOTETAG_DATA(battler);
             case "states" : return CORE._STATES_NOTETAG_DATA(battler);
+            case "thisState" : return CORE._THIS_STATE_NOTETAG_DATA(battler);
             // There's not enough context to throw errors meaningfully
             default: return [];
             //
@@ -824,8 +826,8 @@ Utils.checkRMVersion(DoubleX_RMMZ.Enhanced_Codebase.VERSIONS.codebase);
     CORE._NEW_NOTETAG_VAL = (battler, priorities, containerName, notetagTypes_, initVal) => {
         const notetags = MZ_EC.notetags(
                 battler, priorities, containerName, notetagTypes_);
-        const notetagVal =
-                notetags.reduce(CORE._accumCondOpValNotetagVal, initVal, this);
+        const notetagVal = notetags.reduce(
+                CORE._accumCondOpValNotetagVal, initVal, battler);
         CORE._CACHE_BATTLER_NOTETAG_VAL(battler, priorities, containerName,
                 notetagTypes_, initVal, notetagVal);
         return notetagVal;
@@ -859,6 +861,13 @@ Utils.checkRMVersion(DoubleX_RMMZ.Enhanced_Codebase.VERSIONS.codebase);
         return CORE._NEW_NOTETAG_VAL(
                 battler, priorities, containerName, notetagTypes_, initVal);
     }; // MZ_EC.condOpValNotetagVal
+
+    MZ_EC.runCondEventNotetags = (battler, notetags) => {
+        notetags.forEach(({ pairs }) => {
+            if (!pairs.func1 || !pairs.func1.call(battler)) return;
+            pairs.func2.call(battler);
+        });
+    }; // MZ_EC.runCondEventNotetags
 
     MZ_EC.clearAllBattlerNotetagCaches = () => {
         CORE._battlerNotetagCache.clear();

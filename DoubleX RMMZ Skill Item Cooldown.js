@@ -741,7 +741,7 @@ if (DoubleX_RMMZ.Enhanced_Codebase) {
     const EC_GV = MZ_EC[klassName].new, GV = SIC[klassName];
 
     MZ_EC.extendFunc(EC_GV, GV, "updateDataNotetags", function(varId, val) {
-        ORIG.storeParams.apply(this, arguments);
+        ORIG.updateDataNotetags.apply(this, arguments);
         // Added to reload all notetags of this plugin to keep script updated
         NEW._updateDataNotetags.call(this, varId, val);
         //
