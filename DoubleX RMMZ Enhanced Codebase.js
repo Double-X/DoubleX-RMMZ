@@ -658,7 +658,9 @@ Utils.checkRMVersion(DoubleX_RMMZ.Enhanced_Codebase.VERSIONS.codebase);
         return battler.isEnemy() ? [battler.enemy()] : [];
     }; // CORE._ENEMIES_NOTETAG_DATA
     CORE._STATES_NOTETAG_DATA = battler => battler.states();
-    CORE._THIS_STATE_NOTETAG_DATA = battler => battler.thisState;
+    CORE._THIS_STATE_NOTETAG_DATA = battler => {
+        return battler.thisState ? [battler.thisState] : [];
+    }; // CORE._THIS_STATE_NOTETAG_DATA
     CORE._NOTETAG_DATA = (battler, dataType) => {
         switch (dataType) {
             case "actor": return CORE._ACTOR_NOTETAG_DATA(battler);
@@ -2855,7 +2857,7 @@ Utils.checkRMVersion(DoubleX_RMMZ.Enhanced_Codebase.VERSIONS.codebase);
 
     NEW._REFRESH_BATTLER = battler => battler.refresh();
     extendFunc("onChange", function() {
-        ORIG.setValue.onChange(this, arguments);
+        ORIG.onChange.apply(this, arguments);
         // Added to invalidates all caches of all battlers
         MZ_EC.clearAllBattlerNotetagCaches();
         //
