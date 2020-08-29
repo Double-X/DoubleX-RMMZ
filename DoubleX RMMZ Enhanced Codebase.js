@@ -453,14 +453,16 @@ Utils.checkRMVersion(DoubleX_RMMZ.Enhanced_Codebase.VERSIONS.codebase);
         }
     }; // CORE._RETURNED_ENTRY_VAL
     CORE._RETURNED_ENTRY_SWITCH = entry => {
-        return $gameSwitches.value.bind($gameSwitches, +entry);
+        const switchId = +entry;
+        return function() { return $gameSwitches.value(switchId); };
     }; // CORE._RETURNED_ENTRY_SWITCH
     CORE._RETURNED_ENTRY_VAR = entry => {
-        return $gameVariables.value.bind($gameVariables, +entry);
+        const varId = +entry;
+        return function() { return $gameVariables.value(varId); };
     }; // CORE._RETURNED_ENTRY_VAR
-    CORE._RETURNED_ENTRY_SCRIPT = entry => {
-        return new Function("argObj", $gameVariables.value(+entry));
-    }; // CORE._RETURNED_ENTRY_VAR
+    // The script function will be reloaded upon setting the variables anyway
+    CORE._RETURNED_ENTRY_SCRIPT = entry => argObj => {};
+    //
     CORE._SUFFIX_ENTRY_FUNC = function(notePairs, notetagType, suffix, entry, count) {
         switch (suffix) {
             case "val": return CORE._RETURNED_ENTRY_VAL(
@@ -497,10 +499,8 @@ Utils.checkRMVersion(DoubleX_RMMZ.Enhanced_Codebase.VERSIONS.codebase);
                 pairs.set(`suffix${count}`, suffix);
                 pairs.set(`entry${count}`, entry);
                 //
-                if ($gameSwitches && $gameVariables) {
-                    pairs.set(`func${count}`, CORE._SUFFIX_ENTRY_FUNC(
-                            notePairs, notetagType, suffix, entry, count));
-                }
+                pairs.set(`func${count}`, CORE._SUFFIX_ENTRY_FUNC(
+                        notePairs, notetagType, suffix, entry, count));
             } else CORE._SHOW_INVALID_NOTE_SUFFIX(
                     container.datumType, container.id, count, suffix, line);
             i++;
@@ -864,10 +864,13 @@ Utils.checkRMVersion(DoubleX_RMMZ.Enhanced_Codebase.VERSIONS.codebase);
                 battler, priorities, containerName, notetagTypes_, initVal);
     }; // MZ_EC.condOpValNotetagVal
 
-    MZ_EC.runCondEventNotetags = (battler, notetags) => {
+    MZ_EC.runCondEventNotetags = (battler, priorities, containerName, notetagTypes_) => {
+        const notetags = MZ_EC.notetags(
+                battler, priorities, containerName, notetagTypes_);
         notetags.forEach(({ pairs }) => {
-            if (!pairs.func1 || !pairs.func1.call(battler)) return;
-            pairs.func2.call(battler);
+            if (!pairs.has("func1")) return;
+            if (!pairs.get("func1").call(battler)) return;
+            pairs.get("func2").call(battler);
         });
     }; // MZ_EC.runCondEventNotetags
 
