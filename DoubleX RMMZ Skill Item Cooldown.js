@@ -820,7 +820,7 @@ if (DoubleX_RMMZ.Enhanced_Codebase) {
     //       {number} battlerTurnCount: The battler cooldown turn counter
     //       {{number}} skillItemTurnCounts: skill/item cooldown of skill/item
 
-    extendFunc("initMembers", function(item) {
+    extendFunc("initMembers", function() {
         ORIG.initMembers.apply(this, arguments);
         // Added to initializes all new variables added by this plugin
         NEW._init.call(this);
