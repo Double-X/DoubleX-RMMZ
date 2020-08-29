@@ -687,18 +687,12 @@ Utils.checkRMVersion(DoubleX_RMMZ.Enhanced_Codebase.VERSIONS.codebase);
         }
     }; // CORE._NOTETAG_DATA
     CORE._IS_VALID_DATUM = datum => datum;
-    CORE._NOTETAG_WITH_TYPES = (notetags, notetagTypes_) => {
-        return notetagTypes_ ? notetags.filter(({ notetagType }) => {
-            return notetagTypes_.includes(notetagType);
-        }) : notetags;
-    }; // CORE._NOTETAG_WITH_TYPES
     CORE._DATA_NOTETAGS = (battler, dataType, containerName, notetagTypes_) => {
           const notetagData = CORE._NOTETAG_DATA(battler, dataType);
           const validNotetagData = notetagData.filter(CORE._IS_VALID_DATUM);
-          const notetags = validNotetagData.reduce((notes, { meta: { enhancedCodebase } }) => {
+          return validNotetagData.reduce((notes, { meta: { enhancedCodebase } }) => {
               return notes.fastMerge(enhancedCodebase[containerName].notetags);
           }, []);
-          return CORE._NOTETAG_WITH_TYPES(notetags, notetagTypes_);
     }; // CORE._DATA_NOTETAGS
     CORE._NEW_LIST_CONTAINER = notetagList => new Map(Object.entries({
         list: notetagList
@@ -734,24 +728,35 @@ Utils.checkRMVersion(DoubleX_RMMZ.Enhanced_Codebase.VERSIONS.codebase);
         const list = CORE._NEW_LIST_CONTAINER(notetagList);
         battlerNotetagContainerCache.set(containerName, list);
     }; // CORE._CACHE_BATTLER_NOTETAG_LIST
+
+    CORE._NOTETAG_WITH_TYPES = (notetags, notetagTypes_) => {
+        // Not cloning the cached list can end up mutating the cache unknowingly
+        return notetagTypes_ ? notetags.filter(({ notetagType }) => {
+            return notetagTypes_.includes(notetagType);
+        }) : notetags.clone();
+        //
+    }; // CORE._NOTETAG_WITH_TYPES
+
     CORE._NEW_NOTETAG_LIST = (battler, priorities, containerName, notetagTypes_) => {
+        // Cache the whole notetag list regardless of notetagTypes_
         const notetagList = priorities.reduce((notetags, dataType) => {
             return notetags.fastMerge(CORE._DATA_NOTETAGS(
                     battler, dataType, containerName, notetagTypes_));
         }, []);
         CORE._CACHE_BATTLER_NOTETAG_LIST(
                 battler, priorities, containerName, notetagList);
-        // Not cloning the cached list can end up mutating the cache unknowingly
-        return notetagList.clone();
+        //
+        // Only returns the needed parts of the whole cached notetag list
+        return CORE._NOTETAG_WITH_TYPES(notetagList, notetagTypes_);
         //
     }; // CORE._NEW_NOTETAG_LIST
     CORE._BATTLER_NOTETAG_CACHE_LIST_CONTAINER = (battlerNotetagContainerCache, containerName, notetagTypes_) => {
         if (!battlerNotetagContainerCache.has(containerName)) return undefined;
         const container = battlerNotetagContainerCache.get(containerName);
-        // Not cloning the cached list can end up mutating the cache unknowingly
-        const notetags = container.get("list").clone();
         //
-        return CORE._NOTETAG_WITH_TYPES(notetags, notetagTypes_);
+        // Only returns the needed parts of the whole cached notetag list
+        return CORE._NOTETAG_WITH_TYPES(container.get("list"), notetagTypes_);
+        //
     }; // CORE._BATTLER_NOTETAG_CACHE_LIST_CONTAINER
     CORE._CACHED_BATTLER_NOTETAG_LIST = (battler, priorities, containerName, notetagTypes_) => {
         const battlerKey = CORE._BATTLER_CACHE_KEY(battler);
