@@ -7,8 +7,9 @@
  *    # Introduction
  *    1. This plugin lets you use notetags to set what happens when an
  *       action's just executed, and different cases like miss, evade, counter
- *       attack, magic reflection, critical hit and normal execution, can have
- *       different notetags
+ *       attack, magic reflection, critical hit, normal execution, substitute,
+ *       right before starting to execute actions, and right after finished
+ *       executing the actions, can have different notetags
  *    2. You're expected to write JavaScript codes directly, as there are so
  *       much possibilities that most of them are just impossible to be
  *       covered by this plugin itself, so this plugin just lets you write
@@ -40,20 +41,20 @@
  *----------------------------------------------------------------------------
  *    # Links
  *      Video:
- *      1. 
+ *      1. https://www.youtube.com/watch?v=nisV-fdFLGA
  *      This Plugin:
- *      1. 
+ *      1. https://github.com/Double-X/DoubleX-RMMZ/blob/master/DoubleX%20RMMZ%20Skill%20Item%20Triggers.js
  *      Posts:
- *      1. 
- *      2. 
- *      3. 
- *      4. 
- *      5. 
- *      6. 
- *      7. 
- *      8. 
- *      9. 
- *      10. 
+ *      1. https://forums.rpgmakerweb.com/index.php?threads/doublex-rmmz-skill-item-triggers.126431/
+ *      2. https://www.rpgmakercentral.com/topic/42565-doublex-rmmz-skill-item-triggers/
+ *      3. https://rpgmaker.net/engines/rmmz/utilities/261/
+ *      4. https://www.save-point.org/thread-8155.html
+ *      5. https://gdu.one/forums/topic/13621-doublex-rmmz-skill-item-triggers/
+ *      6. http://www.hbgames.org/forums/viewtopic.php?p=945080
+ *      7. https://forum.chaos-project.com/index.php/topic,16070.new.html
+ *      8. https://doublexrpgmaker.wordpress.com/2020/08/30/doublex-rmmz-skill-item-triggers/
+ *      9. https://www.patreon.com/posts/41016175
+ *      10. https://www.makerdevs.com/plugin/doublex-rmmz-skill-item-triggers
  *----------------------------------------------------------------------------
  *    # Instructions
  *      1. The default plugin parameters file name is
@@ -75,7 +76,7 @@
  *      - None So Far
  *----------------------------------------------------------------------------
  *    # Changelog
- *      { codebase: "1.0.0", plugin: "v1.00a" }(2020 Aug 30 GMT 1300):
+ *      { codebase: "1.0.0", plugin: "v1.00a" }(2020 Aug 30 GMT 0900):
  *      1. 1st version of this plugin finished
  *============================================================================*/
 /*:
