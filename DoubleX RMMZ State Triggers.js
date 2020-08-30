@@ -386,8 +386,8 @@
  *         - E.g.:
  *           $gameSystem.setStateTriggersParam("removeNotetagDataTypePriorities")
  *           returns the fully parsed value of the parameter
- *           removeNotetagDataTypePriorities, which should be
- *           ["thisState"] if it uses its default parameter value
+ *           removeNotetagDataTypePriorities, which should be ["thisState"] if
+ *           it uses its default parameter value
  *============================================================================
  *    ## Plugin Command Info
  *----------------------------------------------------------------------------
@@ -481,7 +481,7 @@ if (DoubleX_RMMZ.Enhanced_Codebase) {
             entry1: MZ_EC.BOOL_ENTRY, // condEntry
             entry2: MZ_EC.NUM_ENTRY // eventEntry
         }))
-    }));
+    })); // NEW.NOTETAG_PAIRS
     //
 
     NEW.NOTETAG_DATA_CONTAINER_NAMES = new Map(Object.entries({
@@ -493,7 +493,7 @@ if (DoubleX_RMMZ.Enhanced_Codebase) {
         $dataArmors: "armor",
         $dataEnemies: "enemy",
         $dataStates: "state"
-    }));
+    })); // NEW.NOTETAG_DATA_CONTAINER_NAMES
     NEW._REG_EXP_NOTE = "state triggers";
     MZ_EC.extendFunc(EC_DM, DM, "loadDataNotetags", function(obj, objName) {
         ORIG.loadDataNotetags.apply(this, arguments);
@@ -633,7 +633,7 @@ if (DoubleX_RMMZ.Enhanced_Codebase) {
         ORIG.resetStateCounts.apply(this, arguments);
         // Added to run reset notetags only if it's reset instead of add
         if (this._stateTriggers.isAdd) return this._stateTriggers.isAdd = false;
-        NEW._runTriggers.call(this, "reset", $dataStates[stateId]);
+        NEW.runTriggers.call(this, "reset", $dataStates[stateId]);
         //
     }); // v1.00a - v1.00a
 
@@ -643,7 +643,7 @@ if (DoubleX_RMMZ.Enhanced_Codebase) {
         //
         ORIG.addNewState.apply(this, arguments);
         // Added to trigger all events specified by all effective add notetags
-        NEW._runTriggers.call(this, "add", $dataStates[stateId]);
+        NEW.runTriggers.call(this, "add", $dataStates[stateId]);
         //
     }); // v1.00a - v1.00a
 
@@ -651,24 +651,25 @@ if (DoubleX_RMMZ.Enhanced_Codebase) {
         ORIG._updateStateTurn.apply(this, arguments);
         // Added to run turn notetags only if the state isn't already expired
         if (this._stateTurns[stateId] <= 0) return;
-        NEW._runTriggers.call(this, "turn", $dataStates[stateId]);
+        NEW.runTriggers.call(this, "turn", $dataStates[stateId]);
         //
     }); // v1.00a - v1.00a
 
     /**
      * The this pointer is Game_BattlerBase.prototype
-     * @author DoubleX @since v1.00a @version v1.00a
+     * @author DoubleX @interface @since v1.00a @version v1.00a
      * @enum @param {string} notetagName - add/reset/reset/expire/turn
      * @param {DataState} state - The state having effective notetags triggered
      */
-    NEW._runTriggers = function(notetagName, state) {
+    NEW.runTriggers = function(notetagName, state) {
         const suffix = "NotetagDataTypePriorities";
         const types = $gameSystem.stateTriggersParam(`${notetagName}${suffix}`);
+        MZ_EC.clearBattlerNotetagCache(this, "stateTriggers");
         const thisState = this.thisState;
         this.thisState = state;
         MZ_EC.runCondEventNotetags(this, types, "stateTriggers", [notetagName]);
         this.thisState = thisState;
-    }; // NEW._runTriggers
+    }; // NEW.runTriggers
 
 })(Game_BattlerBase.prototype, DoubleX_RMMZ.Enhanced_Codebase,
         DoubleX_RMMZ.State_Triggers);
@@ -708,7 +709,7 @@ if (DoubleX_RMMZ.Enhanced_Codebase) {
         // Added to run remove notetags only if it's remove instead of expire
         if (!this._stateTriggers.isExpire) {
             if (!isStateAffected) return;
-            GBB._runTriggers.call(this, "remove", $dataStates[stateId]);
+            GBB.runTriggers.call(this, "remove", $dataStates[stateId]);
         } else this._stateTriggers.isExpire = false;
         // It must be placed here or some triggers will cause infinite recursion
     }); // v1.00a - v1.00a
@@ -717,7 +718,7 @@ if (DoubleX_RMMZ.Enhanced_Codebase) {
         // Added to trigger all events specified by all effective expire notetag
         if (EC_GB._isRemoveStateAuto.call(this, timing, state)) {
             this._stateTriggers.isExpire = true;
-            GBB._runTriggers.call(this, "expire", state);
+            GBB.runTriggers.call(this, "expire", state);
         }
         //
         ORIG._removeStateAuto.apply(this, arguments);

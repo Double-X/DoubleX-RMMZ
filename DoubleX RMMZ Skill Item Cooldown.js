@@ -549,7 +549,7 @@ if (DoubleX_RMMZ.Enhanced_Codebase) {
             entry2: MZ_EC.STRING_ENTRY, // opEntry
             entry3: MZ_EC.NUM_ENTRY // valEntry
         }))
-    }));
+    })); // NEW.NOTETAG_PAIRS
     //
 
     NEW.NOTETAG_DATA_CONTAINER_NAMES = new Map(Object.entries({
@@ -561,7 +561,7 @@ if (DoubleX_RMMZ.Enhanced_Codebase) {
         $dataArmors: "armor",
         $dataEnemies: "enemy",
         $dataStates: "state"
-    }));
+    })); // NEW.NOTETAG_DATA_CONTAINER_NAMES
     NEW._REG_EXP_NOTE = "cooldown";
     MZ_EC.extendFunc(EC_DM, DM, "loadDataNotetags", function(obj, objName) {
         ORIG.loadDataNotetags.apply(this, arguments);

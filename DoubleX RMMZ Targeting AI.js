@@ -1166,7 +1166,7 @@ if (DoubleX_RMMZ.Enhanced_Codebase && DoubleX_RMMZ.Unit_Filters) {
             entry2: MZ_EC.NUM_ARRAY_ENTRY // skillIdsEntry
         }))
         //
-    }));
+    })); // NEW.NOTETAG_PAIRS
     //
 
     NEW.NOTETAG_DATA_CONTAINER_NAMES = new Map(Object.entries({
@@ -1178,7 +1178,7 @@ if (DoubleX_RMMZ.Enhanced_Codebase && DoubleX_RMMZ.Unit_Filters) {
         $dataArmors: "armor",
         $dataEnemies: "enemy",
         $dataStates: "state"
-    }));
+    })); // NEW.NOTETAG_DATA_CONTAINER_NAMES
     NEW._REG_EXP_NOTE = "targeting ai";
     MZ_EC.extendFunc(EC_DM, DM, "loadDataNotetags", function(obj, objName) {
         ORIG.loadDataNotetags.apply(this, arguments);
