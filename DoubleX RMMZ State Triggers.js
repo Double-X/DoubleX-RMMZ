@@ -274,7 +274,7 @@
  *                            notetag value will be used as the contents of
  *                            the functions to be called upon using the
  *                            notetag)
- *          - The this pointer of the script suffix is the action involved
+ *          - The this pointer of the script suffix is the battler involved
  *            (Game_Battler.prototype)
  *          - entries is the list of entries in the form of:
  *            entry1, entry2, entry3, ..., entryn
