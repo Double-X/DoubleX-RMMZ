@@ -318,6 +318,14 @@
  *          Returns whether the tpb battler's just ended casting actions
  *       7. isTpbIdle
  *          Returns whether the battler tpb bar's idle(not doing anything)
+ *     Game_Interpreter
+ *     - Static Variable
+ *       1. IS_CACHE_SCRIPT
+ *          Controls whether the scripts in events will be always reevaluated
+ *          each time or cached into a function to turn repeated eval calls
+ *          into repeated function calls
+ *          DO NOTE THAT ENABLING THIS WILL CAUSE THE THIS POINTER OF THOSE
+ *          SCRIPTS TO BE NOT THE Game_Interpreter.prototype INSTANCE ANYMORE
  *============================================================================
  */
 
@@ -559,13 +567,14 @@ Utils.checkRMVersion(DoubleX_RMMZ.Enhanced_Codebase.VERSIONS.codebase);
         });
     }; // CORE._ON_LOAD_DATUM_NOTETAGS
 
-    CORE._REG_EXP_PREFIX = " *(?:doublex +rmmz +)?", CORE._REG_EXP_SUFFIXES =
-            " +(\\w+) +(\\w+(?:" + CORE._REG_EXP_SUFFIX_SEPARATOR + "\\w+)*) *";
+    CORE._REG_EXP_PREFIX = "\s*(?:doublex\s+rmmz\s+)?";
+    CORE._REG_EXP_SUFFIXES = "\s+(\\w+)\s+(\\w+(?:" + 
+            CORE._REG_EXP_SUFFIX_SEPARATOR + "\\w+)*)\s*";
     // So alphanumeric characters as well as numbers with decimals are captured
     CORE.REG_EXP_ENTRY_VAL = "[\\/A-Za-z\\d_\.\\+\\-\\*%=]+";
     // The / is captured as well to support filepath strings
     CORE._REG_EXP_ENTRIES = " *(" + CORE.REG_EXP_ENTRY_VAL + "(?:" +
-            CORE._REG_EXP_ENTRY_SEPARATOR + CORE.REG_EXP_ENTRY_VAL + ")*) *";
+            CORE._REG_EXP_ENTRY_SEPARATOR + CORE.REG_EXP_ENTRY_VAL + ")*)\s*";
 
     CORE._FULL_REG_EXP = baseRegex => {
         return new RegExp("<" + CORE._REG_EXP_PREFIX + baseRegex +
@@ -2783,16 +2792,25 @@ Utils.checkRMVersion(DoubleX_RMMZ.Enhanced_Codebase.VERSIONS.codebase);
     }; // NEW.storeParams
 
     NEW._TRY_JSON_PARAM = val => {
-        if (!val) return val;
-        // It's possible for users to input raw parameter values directly
-        try {
-            return NEW._TRY_JSON_PARAM(JSON.parse(val));
-        } catch (err) { return val; }
-        //
+        try { return JSON.parse(val); } catch (err) { return val; }
     }; // NEW._TRY_JSON_PARAM
+    NEW._JSON_PARAM = val => {
+        if (!val) return val;
+        if (Array.isArray(val)) return val.map(v => {
+            return NEW._JSON_PARAM(NEW._TRY_JSON_PARAM(v));
+        });
+        if (typeof val === "object" || val instanceof Object) {
+            return Object.entries(val).reduce((obj, [k, v]) => {
+                obj[k] = NEW._JSON_PARAM(NEW._TRY_JSON_PARAM(v));
+                return obj;
+            }, {});
+        }
+        const jsonVal = NEW._TRY_JSON_PARAM(val);
+        return jsonVal === val ? val : NEW._JSON_PARAM(jsonVal);
+    }; // NEW._JSON_PARAM
     NEW._PARSED_PARAMS = params => { // v0.05b+
         Object.entries(params).forEach(([param, val]) => {
-            params[param] = NEW._TRY_JSON_PARAM(val);
+            params[param] = NEW._JSON_PARAM(val);
         });
         return params;
     }; // NEW._PARSED_PARAMS
@@ -3146,7 +3164,7 @@ Utils.checkRMVersion(DoubleX_RMMZ.Enhanced_Codebase.VERSIONS.codebase);
      * @returns {string} The damage formula with the side effect parts removed
      */
     proto.damageFormulaWithoutSideEffects = function() {
-        const regex = Game_Action.NO_SIDE_EFFECT_DAMAGE_FORMULA_REGEX;
+        const regex = $.NO_SIDE_EFFECT_DAMAGE_FORMULA_REGEX;
         return this.item().damage.formula.replace(regex, "");
     }; // proto.damageFormulaWithoutSideEffects
 
@@ -3454,7 +3472,7 @@ Utils.checkRMVersion(DoubleX_RMMZ.Enhanced_Codebase.VERSIONS.codebase);
      */
     NEW._onEvalDamageFormulaErr = function(e) {
         // Edited to help RM users detect and fix damage formula errors
-        if (!Game_Action.IS_SHOW_DAMAGE_FORMULA_ERRS) return;
+        if (!$.IS_SHOW_DAMAGE_FORMULA_ERRS) return;
         const item = this.item();
         console.warn(`${this._item._dataClass} id:`, item.id);
         console.warn("damage formula:", item.damage.formula);
@@ -5138,7 +5156,7 @@ Utils.checkRMVersion(DoubleX_RMMZ.Enhanced_Codebase.VERSIONS.codebase);
     }); // v0.00a - v0.00a
 
     /**
-     * The this pointer is Game_Party.prototype
+     * The this pointer is Game_Troop.prototype
      * Idempotent
      * @author DoubleX @since v0.00a @version v0.00a
      * @param {Game_Enemy} mem - The enemy to be setup in this troop
@@ -5148,7 +5166,7 @@ Utils.checkRMVersion(DoubleX_RMMZ.Enhanced_Codebase.VERSIONS.codebase);
     }; // NEW._setupMem
 
     /**
-     * The this pointer is Game_Party.prototype
+     * The this pointer is Game_Troop.prototype
      * Idempotent
      * @author DoubleX @since v0.00a @version v0.00a
      * @param {Game_Enemy} mem - The enemy to be setup in this troop
@@ -5160,5 +5178,204 @@ Utils.checkRMVersion(DoubleX_RMMZ.Enhanced_Codebase.VERSIONS.codebase);
     }; // NEW._setupExistingMem
 
 })(Game_Troop.prototype, DoubleX_RMMZ.Enhanced_Codebase);
+
+/*----------------------------------------------------------------------------
+ *    # Edited class: Game_Interpreter
+ *      - Improves code quality
+ *----------------------------------------------------------------------------*/
+
+(($, MZ_EC) => {
+
+    "use strict";
+
+    const {
+        NEW,
+        rewriteFunc
+    } = MZ_EC.setKlassContainer("Game_Interpreter", $, MZ_EC);
+
+    rewriteFunc("command111", function(params) {
+        this._branch[this._indent] = NEW._condBranchResult.call(this, params);
+        if (!this._branch[this._indent]) this.skipBranch();
+        return true;
+    }); // v0.00a - v0.00a
+
+    rewriteFunc("command122", function(params) {
+        const [startId, endId, operationType] = params;
+        const [value, randomMax] = NEW._varValRandMax.call(params);
+        for (let i = startId; i <= endId; i++) {
+            if (!isNaN(value)) {
+                const realValue = value + Math.randomInt(randomMax);
+                this.operateVariable(i, operationType, realValue);
+            } else this.operateVariable(i, operationType, value);
+        }
+        return true;
+    }); // v0.00a - v0.00a
+
+    rewriteFunc("command355", function() {
+        // Edited to help plugins alter command 355 behaviors in better ways
+        let script = NEW.curScriptLine.call(this);
+        while (NEW.hasNextScriptLine.call(this)) {
+            this._index++;
+            script += NEW.curScriptLine.call(this);
+        }
+        NEW.EVAL_SCRIPT(script);
+        return true;
+        //
+    }); // v0.00a - v0.00a
+
+    $.IS_CACHE_SCRIPT = false;
+
+    NEW.EVAL_SCRIPT = script => {
+        if (!script) return;
+        if (!$.IS_CACHE_SCRIPT) return eval(script);
+        // It's to avoid 1st call being eval and subsequent ones being functions
+        if (!NEW._cachedScripts.has(script)) {
+            NEW._cachedScripts.set(script, new Function(script));
+        }
+        return NEW._cachedScripts.get(script)();
+        //
+    }; // NEW.EVAL_SCRIPT
+
+    NEW._cachedScripts = new Map();
+
+    /**
+     * The this pointer is Game_Interpreter.prototype
+     * Nullipotent
+     * @author DoubleX @interface @since v0.00a @version v0.00a
+     * @returns {boolean} Whether there are still more script lines to be read
+     */
+    NEW.hasNextScriptLine = function() { return this.nextEventCode() === 655; };
+
+    /**
+     * The this pointer is Game_Interpreter.prototype
+     * Nullipotent
+     * @author DoubleX @interface @since v0.00a @version v0.00a
+     * @returns {string} The current script line to be read from the script box
+     */
+    NEW.curScriptLine = function() {
+        return `${this.currentCommand().parameters[0]}\n`;
+    }; // $.curScriptLine
+
+    NEW._isSameSwitchState = params => {
+        return $gameSwitches.value(params[1]) === (params[2] === 0);
+    }; // NEW._isSameSwitchState
+    NEW._isVarValRelationMet = params => {
+        const value1 = $gameVariables.value(params[1]), rhs = params[3];
+        const value2 = params[2] === 0 ? rhs : $gameVariables.value(rhs);
+        switch (params[4]) {
+            case 0: return value1 === value2;
+            case 1: return value1 >= value2;
+            case 2: return value1 <= value2;
+            case 3: return value1 > value2;
+            case 4: return value1 < value2;
+            case 5: return value1 !== value2;
+            default: return false;
+        }
+    }; // NEW._isVarValRelationMet
+    NEW._isSameSelfSwitchState = (eventId, mapId, params) => {
+        if (eventId <= 0) return false;
+        const key = [mapId, eventId, params[1]];
+        return $gameSelfSwitches.value(key) === (params[2] === 0);
+    }; // NEW._isSameSwitchState
+    NEW._isTimerValRelationMet = params => {
+        if (!$gameTimer.isWorking()) return false;
+        const secs = $gameTimer.seconds(), timerVal = params[1];
+        return params[2] === 0 ? secs >= timerVal : secs <= timerVal;
+    }; // NEW._isTimerValRelationMet
+    NEW._isActorCondMet = params => {
+        const actor = $gameActors.actor(params[1]);
+        if (!actor) return false;
+        const n = params[3];
+        switch (params[2]) {
+            case 0: return $gameParty.members().includes(actor);
+            case 1: return actor.name() === n;
+            case 2: return actor.isClass($dataClasses[n]);
+            case 3: return actor.hasSkill(n);
+            case 4: return actor.hasWeapon($dataWeapons[n]);
+            case 5: return actor.hasArmor($dataArmors[n]);
+            case 6: return actor.isStateAffected(n);
+            default: return false;
+        }
+    }; // NEW._isActorCondMet
+    NEW._isEnemyCondMet = params => {
+        const enemy = $gameTroop.members()[params[1]];
+        if (!enemy) return false;
+        switch (params[2]) {
+            case 0: return enemy.isAlive();
+            case 1: return enemy.isStateAffected(params[3]);
+            default: return false;
+        }
+    }; // NEW._isEnemyCondMet
+    NEW._isSameCharDir = (char_, dir) => char_ && char_.direction() === dir;
+    NEW._isGoldValRelationMet = params => {
+        const goldVal = params[1];
+        switch (params[2]) {
+            case 0: return $gameParty.gold() >= goldVal;
+            case 1: return $gameParty.gold() <= goldVal;
+            case 2: return $gameParty.gold() < goldVal;
+            default: return false;
+        }
+    }; // NEW._isGoldValRelationMet
+    NEW._isButtonEventRun = params => {
+        const keyName = params[1];
+        switch (params[2] || 0) {
+            case 0: return Input.isPressed(keyName);
+            case 1: return Input.isTriggered(keyName);
+            case 2: return Input.isRepeated(keyName);
+            default: return false;
+        }
+    }; // NEW._isButtonEventRun
+    /**
+     * The this pointer is Game_Interpreter.prototype
+     * Nullipotent
+     * @author DoubleX @interface @since v0.00a @version v0.00a
+     * @param {[*]} params - The conditional branch event parameters
+     * @returns {boolean} Whether the if in the conditional branch is met
+     */
+    NEW._condBranchResult = function(params) {
+        switch (params[0]) {
+            case 0: return NEW._isSameSwitchState(params);
+            case 1: return NEW._isVarValRelationMet(params);
+            case 2: return NEW._isSameSelfSwitchState(
+                    this._eventId, this._mapId, params);
+            case 3: return NEW._isTimerValRelationMet(params);
+            case 4: return NEW._isActorCondMet(params);
+            case 5: return NEW._isEnemyCondMet(params);
+            case 6: {
+                return NEW._isSameCharDir(this.character(params[1]), params[2]);
+            } case 7: return NEW._isGoldValRelationMet(params);
+            case 8: return $gameParty.hasItem($dataItems[params[1]]);
+            case 9: {
+                return $gameParty.hasItem($dataWeapons[params[1]], params[2]);
+            } case 10: {
+                return $gameParty.hasItem($dataArmors[params[1]], params[2]);
+            } case 11: return NEW._isButtonEventRun(params);
+            case 12: return !!NEW.EVAL_SCRIPT(params[1]);
+            case 13: {
+                return $gamePlayer.vehicle() === $gameMap.vehicle(params[1]);
+            }
+        }
+    }; // NEW._condBranchResult
+
+    /**
+     * The this pointer is Game_Interpreter.prototype
+     * Nullipotent
+     * @author DoubleX @interface @since v0.00a @version v0.00a
+     * @param {[*]} params - The control variable event parameters
+     * @returns {[*]} The variable value and random max pair
+     */
+    NEW._varValRandMax = function(params) {
+        const [operand, rhs, param5] = [params[3], params[4], params[5]];
+        switch (operand) {
+            case 0: return [rhs, 1];
+            case 1: return [$gameVariables.value(rhs), 1];
+            case 2: return [rhs, Math.max(param5 - rhs + 1, 1)];
+            case 3: return [this.gameDataOperand(rhs, param5, params[6]), 1];
+            case 4: return [NEW.EVAL_SCRIPT(rhs), 1];
+            default: return [0, 1];
+        }
+    }; // NEW._varValRandMax
+
+})(Game_Interpreter.prototype, DoubleX_RMMZ.Enhanced_Codebase);
 
 /*============================================================================*/

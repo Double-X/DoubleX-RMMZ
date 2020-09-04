@@ -1388,6 +1388,13 @@ if (DoubleX_RMMZ.Enhanced_Codebase && DoubleX_RMMZ.Unit_Filters) {
         }, NEW._UNIFIED_TARGETS, []);
     }; // NEW._unifiedFilteredTargets
 
+    /**
+     * The this pointer is Game_Action.prototype
+     * Nullipotent
+     * @author DoubleX @since v1.00a @version v1.00a
+     * @param {Notetag} notetag - The notetag filtering the targets
+     * @returns {boolean} Whether the specified notetag's an effective or one
+     */
     NEW._isTruthyOr = function(notetag) {
         const { notetagType, pairs } = notetag;
         if (!NEW._IS_OR(notetagType)) return false;
