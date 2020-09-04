@@ -572,7 +572,7 @@ Utils.checkRMVersion(DoubleX_RMMZ.Enhanced_Codebase.VERSIONS.codebase);
     }; // CORE._ON_LOAD_DATUM_NOTETAGS
 
     CORE._REG_EXP_PREFIX = "\s*(?:doublex\s+rmmz\s+)?";
-    CORE._REG_EXP_SUFFIXES = "\s+(\\w+)\s+(\\w+(?:" + 
+    CORE._REG_EXP_SUFFIXES = "\s+(\\w+)\s+(\\w+(?:" +
             CORE._REG_EXP_SUFFIX_SEPARATOR + "\\w+)*)\s*";
     // So alphanumeric characters as well as numbers with decimals are captured
     CORE.REG_EXP_ENTRY_VAL = "[\\/A-Za-z\\d_\.\\+\\-\\*%=]+";
@@ -3372,7 +3372,7 @@ Utils.checkRMVersion(DoubleX_RMMZ.Enhanced_Codebase.VERSIONS.codebase);
         /** @todo Figures out if anyone will use sign in damage formula */
         const sign = [3, 4].includes(this.item().damage.type) ? -1 : 1;
         //
-        const damageFormula = this.damageFormulaWithoutSideEffects(), value = 
+        const damageFormula = this.damageFormulaWithoutSideEffects(), value =
                 NEW._evalDamageFormula_.call(this, target, sign, damageFormula);
         if (!isNaN(value)) return Math.max(value, 0) * sign;
         // Edited to help RM users detect and fix damage formula errors
@@ -3455,7 +3455,7 @@ Utils.checkRMVersion(DoubleX_RMMZ.Enhanced_Codebase.VERSIONS.codebase);
         /** @todo Figures out if anyone will use sign in damage formula */
         const sign = [3, 4].includes(item.damage.type) ? -1 : 1;
         //
-        const damageFormula = item.damage.formula, value = 
+        const damageFormula = item.damage.formula, value =
                 NEW._evalDamageFormula_.call(this, target, sign, damageFormula);
         if (!isNaN(value)) return Math.max(value, 0) * sign;
         // Edited to help RM users detect and fix damage formula errors
@@ -3478,7 +3478,7 @@ Utils.checkRMVersion(DoubleX_RMMZ.Enhanced_Codebase.VERSIONS.codebase);
         if (!$.IS_CACHE_DAMAGE_FORMULA) return eval(damageFormula);
         // It's to avoid 1st call being eval and subsequent ones being functions
         if (!NEW._cachedScripts.has(damageFormula)) {
-            const newDamageFormulaFunc = 
+            const newDamageFormulaFunc =
                   new Function("item", "a", "b", "v", "sign", damageFormula);
             NEW._cachedScripts.set(damageFormula, newDamageFormulaFunc);
         }
@@ -4513,7 +4513,7 @@ Utils.checkRMVersion(DoubleX_RMMZ.Enhanced_Codebase.VERSIONS.codebase);
     rewriteFunc("attackElements", function() {
         const set = $$.attackElements.call(this);
         // Edited to help plugins alter attack elements behaviors in better ways
-        if (NEW._isIncludeBareHandElem.call(this)) {
+        if (NEW._isIncludeBareHandElem.call(this, set)) {
             set.push(this.bareHandsElementId());
         }
         //
