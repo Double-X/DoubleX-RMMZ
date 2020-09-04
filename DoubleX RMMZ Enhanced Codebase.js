@@ -5191,7 +5191,7 @@ Utils.checkRMVersion(DoubleX_RMMZ.Enhanced_Codebase.VERSIONS.codebase);
     const {
         NEW,
         rewriteFunc
-    } = MZ_EC.setKlassContainer("Game_Interpreter", $, MZ_EC);
+    } = MZ_EC.setKlassContainer("Game_Interpreter", $.prototype, MZ_EC);
 
     rewriteFunc("command111", function(params) {
         this._branch[this._indent] = NEW._condBranchResult.call(this, params);
@@ -5376,6 +5376,6 @@ Utils.checkRMVersion(DoubleX_RMMZ.Enhanced_Codebase.VERSIONS.codebase);
         }
     }; // NEW._varValRandMax
 
-})(Game_Interpreter.prototype, DoubleX_RMMZ.Enhanced_Codebase);
+})(Game_Interpreter, DoubleX_RMMZ.Enhanced_Codebase);
 
 /*============================================================================*/

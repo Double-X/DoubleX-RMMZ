@@ -30,8 +30,8 @@
  *      1. DoubleX RMMZ Enhanced Codebase
  *         https://github.com/Double-X/DoubleX-RMMZ/blob/master/DoubleX%20RMMZ%20Enhanced%20Codebase.js
  *      Abilities:
- *      1. Basic knowledge on what plugin command does in general on the user
- *         level
+ *      1. Basic knowledge on what RMMV plugin command does in general on the
+ *         user level
  *----------------------------------------------------------------------------
  *    # Author Notes
  *      1. If a plugin command's inputted as a script call, it must only take
@@ -61,20 +61,20 @@
  *----------------------------------------------------------------------------
  *    # Links
  *      Video:
- *      1.
+ *      1. https://www.youtube.com/watch?v=9Cro1e_uQBI
  *      This Plugin:
- *      1.
+ *      1. https://github.com/Double-X/DoubleX-RMMZ/blob/master/DoubleX%20RMMZ%20Plugin%20Command%20Lines.js
  *      Posts:
- *      1.
- *      2.
- *      3.
- *      4.
- *      5.
- *      6.
- *      7.
- *      8.
- *      9.
- *      10.
+ *      1. https://forums.rpgmakerweb.com/index.php?threads/doublex-rmmz-plugin-command-lines.126735/
+ *      2. https://www.rpgmakercentral.com/topic/42574-doublex-rmmz-plugin-command-lines/
+ *      3. https://rpgmaker.net/engines/rmmz/utilities/282/
+ *      4. https://www.save-point.org/thread-8159.html
+ *      5. https://gdu.one/forums/topic/13629-doublex-rmmz-plugin-command-lines/
+ *      6. http://www.hbgames.org/forums/viewtopic.php?f=332&t=80313
+ *      7. https://forum.chaos-project.com/index.php/topic,16072.0.html
+ *      8. https://doublexrpgmaker.wordpress.com/2020/09/04/doublex-rmmz-plugin-command-lines/
+ *      9. https://www.patreon.com/posts/41227340
+ *      10. https://www.makerdevs.com/plugin/doublex-rmmz-plugin-command-lines
  *----------------------------------------------------------------------------
  *    # Instructions
  *      1. The default plugin parameters file name is
@@ -127,7 +127,7 @@
  *
  * @help
  *============================================================================
- *    ## RMMV Style Plugin Command Lines
+ *    ## RMMV Style Plugin Command Lines Info
  *----------------------------------------------------------------------------
  *    1. General form
  *       cmdName argName1 argName2 argName3 argNameI argNameN
