@@ -291,15 +291,15 @@
  *          Controls whether the damage formula error will be reported on the
  *          console to let users know whether they've some faulty damage
  *          formulae
- *       2. NO_SIDE_EFFECT_DAMAGE_FORMULA_REGEX
+ *       2. IS_CACHE_DAMAGE_FORMULA
+ *          Controls whether the skill/item damage formula will be always
+ *          reevaluated each time or cached into a function to turn repeated
+ *          eval calls into repeated function calls
+ *       3. NO_SIDE_EFFECT_DAMAGE_FORMULA_REGEX
  *          Stores the regular expressions to temporarily remove the parts of
  *          the damage formula leaking side effects when evaluating the damage
  *          among all actions of autobattle actors to fix the side effect
  *          leaking bug when those actor input actions
- *       3. IS_CACHE_DAMAGE_FORMULA
- *          Controls whether the skill/item damage formula will be always
- *          reevaluated each time or cached into a function to turn repeated
- *          eval calls into repeated function calls
  *     Game_BattlerBase
  *     - Instance Method
  *       1. onUnrestrict
@@ -307,20 +307,22 @@
  *          restricted
  *     Game_Battler
  *     - Instance Method
- *       1. isTpbActing
+ *       1. tpbCastTime
+ *          Returns the proportion of the skill/item casting progress
+ *       2. isTpbActing
  *          Returns whether the battler's executing tpb actions
- *       2. isTpbCharging
+ *       3. isTpbCharging
  *          Returns whether the battler's charging the tpb bar
- *       3. isTpbCasting
+ *       4. isTpbCasting
  *          Returns whether the battler's casting tpb actions
- *       4. onTpbReady
+ *       5. onTpbReady
  *          Triggers events to happen when the battler just finished casting
  *          tpb actions
- *       5. isEndTpbCharging
+ *       6. isEndTpbCharging
  *          Returns whether the tpb battler's just ended charging the tpb bar
- *       6. isEndTpbCasting
+ *       7. isEndTpbCasting
  *          Returns whether the tpb battler's just ended casting actions
- *       7. isTpbIdle
+ *       8. isTpbIdle
  *          Returns whether the battler tpb bar's idle(not doing anything)
  *     Game_Interpreter
  *     - Static Variable
@@ -3990,6 +3992,14 @@ Utils.checkRMVersion(DoubleX_RMMZ.Enhanced_Codebase.VERSIONS.codebase);
         if (this.isAlive()) NEW._regenerateAlive.call(this);
         //
     }); // v0.00a - v0.00a
+
+    /**
+     * The this pointer is Game_Battler.prototype
+     * Hotspot/Nullipotent
+     * @author DoubleX @interface @since v0.00a @version v0.00a
+     * @returns {number} The proportion of the skill/item casting progress
+     */
+    $.tpbCastTime = function() { return this._tpbCastTime; };
 
     /**
      * The this pointer is Game_Battler.prototype
