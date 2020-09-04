@@ -325,7 +325,7 @@ if (DoubleX_RMMZ.Enhanced_Codebase) {
     } = MZ_EC.setKlassContainer(klassName, $, PCL);
 
     rewriteFunc("command355", function() {
-        // Rewritten to call the RMMZ plugin commands if they're not scripts
+        // Edited to call the RMMZ plugin commands if they're not scripts
         let script = "", scriptLine = EC_GI.curScriptLine.call(this);
         if (NEW._IS_PLUGIN_CMD(scriptLine)) {
             NEW._callPluginCmd.call(this, scriptLine);
@@ -334,12 +334,12 @@ if (DoubleX_RMMZ.Enhanced_Codebase) {
             this._index++;
             scriptLine = EC_GI.curScriptLine.call(this);
             if (NEW._IS_PLUGIN_CMD(scriptLine)) {
-                EC_GI.EVAL_SCRIPT(script);
+                EC_GI.evalScript_.call(this, script);
                 script = "";
                 NEW._callPluginCmd.call(this, scriptLine);
             } else script += scriptLine;
         }
-        EC_GI.EVAL_SCRIPT(script);
+        EC_GI.evalScript_.call(this, script);
         return true;
         //
     }); // v1.00a - v1.00a

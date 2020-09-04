@@ -296,6 +296,10 @@
  *          the damage formula leaking side effects when evaluating the damage
  *          among all actions of autobattle actors to fix the side effect
  *          leaking bug when those actor input actions
+ *       3. IS_CACHE_DAMAGE_FORMULA
+ *          Controls whether the skill/item damage formula will be always
+ *          reevaluated each time or cached into a function to turn repeated
+ *          eval calls into repeated function calls
  *     Game_BattlerBase
  *     - Instance Method
  *       1. onUnrestrict
@@ -324,8 +328,6 @@
  *          Controls whether the scripts in events will be always reevaluated
  *          each time or cached into a function to turn repeated eval calls
  *          into repeated function calls
- *          DO NOTE THAT ENABLING THIS WILL CAUSE THE THIS POINTER OF THOSE
- *          SCRIPTS TO BE NOT THE Game_Interpreter.prototype INSTANCE ANYMORE
  *============================================================================
  */
 
@@ -3154,7 +3156,7 @@ Utils.checkRMVersion(DoubleX_RMMZ.Enhanced_Codebase.VERSIONS.codebase);
         //
     }); // v0.00a - v0.00a
 
-    $.IS_SHOW_DAMAGE_FORMULA_ERRS = false;
+    $.IS_SHOW_DAMAGE_FORMULA_ERRS = $.IS_CACHE_DAMAGE_FORMULA = false;
     $.NO_SIDE_EFFECT_DAMAGE_FORMULA_REGEX = new RegExp(".*[};] *", "gim");
 
     /**
@@ -3365,15 +3367,11 @@ Utils.checkRMVersion(DoubleX_RMMZ.Enhanced_Codebase.VERSIONS.codebase);
      * @returns {number} The evaluated damage from applying the action to target
      */
     NEW._evalDamageFormulaWithoutSideEffectsRescue = function(target) {
-        const item = this.item();
-        // eslint-disable-line no-unused-vars
-        const [a, b, v] = [this.subject(), target, $gameVariables._data];
-        //
         /** @todo Figures out if anyone will use sign in damage formula */
-        const sign = [3, 4].includes(item.damage.type) ? -1 : 1;
+        const sign = [3, 4].includes(this.item().damage.type) ? -1 : 1;
         //
-        const damageFormula = this.damageFormulaWithoutSideEffects();
-        const value = eval(damageFormula);
+        const damageFormula = this.damageFormulaWithoutSideEffects(), value = 
+                NEW._evalDamageFormula_.call(this, target, sign, damageFormula);
         if (!isNaN(value)) return Math.max(value, 0) * sign;
         // Edited to help RM users detect and fix damage formula errors
         throw new Error(`${damageFormula} doesn't return a number!`);
@@ -3452,18 +3450,40 @@ Utils.checkRMVersion(DoubleX_RMMZ.Enhanced_Codebase.VERSIONS.codebase);
      */
     NEW._evalDamageFormulaWithoutRescue = function(target) {
         const item = this.item();
-        // eslint-disable-line no-unused-vars
-        const [a, b, v] = [this.subject(), target, $gameVariables._data];
-        //
         /** @todo Figures out if anyone will use sign in damage formula */
         const sign = [3, 4].includes(item.damage.type) ? -1 : 1;
         //
-        const value = eval(item.damage.formula);
+        const damageFormula = item.damage.formula, value = 
+                NEW._evalDamageFormula_.call(this, target, sign, damageFormula);
         if (!isNaN(value)) return Math.max(value, 0) * sign;
         // Edited to help RM users detect and fix damage formula errors
-        throw new Error(`${item.damage.formula} doesn't return a number!`);
+        throw new Error(`${damageFormula} doesn't return a number!`);
         //
     }; // NEW._evalDamageFormulaWithoutRescue
+
+    NEW._cachedScripts = new Map();
+    /**
+     * The this pointer is Game_Interpreter.prototype
+     * Idempotent
+     * @author DoubleX @interface @since v0.00a @version v0.00a
+     * @param {Game_Battler} b - The target to have damage formula applied
+     * @enum @param {number} sign - Whether it's damage or recovery(1/-1)
+     * @returns {number?} The evaluated applied damage of skill/item to target
+     */
+    NEW._evalDamageFormula_ = function(b, sign, damageFormula) {
+        const item = this.item();
+        const [a, v] = [this.subject(), $gameVariables._data];
+        if (!$.IS_CACHE_DAMAGE_FORMULA) return eval(damageFormula);
+        // It's to avoid 1st call being eval and subsequent ones being functions
+        if (!NEW._cachedScripts.has(damageFormula)) {
+            const newDamageFormulaFunc = 
+                  new Function("item", "a", "b", "v", "sign", damageFormula);
+            NEW._cachedScripts.set(damageFormula, newDamageFormulaFunc);
+        }
+        const damageFormulaFunc = NEW._cachedScripts.get(damageFormula);
+        return damageFormulaFunc.call(this, item, a, b, v, sign);
+        //
+    }; // NEW._evalDamageFormula_
 
     /**
      * The this pointer is Game_Action.prototype
@@ -5218,25 +5238,12 @@ Utils.checkRMVersion(DoubleX_RMMZ.Enhanced_Codebase.VERSIONS.codebase);
             this._index++;
             script += NEW.curScriptLine.call(this);
         }
-        NEW.EVAL_SCRIPT(script);
+        NEW.evalScript_.call(this, script);
         return true;
         //
     }); // v0.00a - v0.00a
 
     $.IS_CACHE_SCRIPT = false;
-
-    NEW.EVAL_SCRIPT = script => {
-        if (!script) return;
-        if (!$.IS_CACHE_SCRIPT) return eval(script);
-        // It's to avoid 1st call being eval and subsequent ones being functions
-        if (!NEW._cachedScripts.has(script)) {
-            NEW._cachedScripts.set(script, new Function(script));
-        }
-        return NEW._cachedScripts.get(script)();
-        //
-    }; // NEW.EVAL_SCRIPT
-
-    NEW._cachedScripts = new Map();
 
     /**
      * The this pointer is Game_Interpreter.prototype
@@ -5245,6 +5252,25 @@ Utils.checkRMVersion(DoubleX_RMMZ.Enhanced_Codebase.VERSIONS.codebase);
      * @returns {boolean} Whether there are still more script lines to be read
      */
     NEW.hasNextScriptLine = function() { return this.nextEventCode() === 655; };
+
+    NEW._cachedScripts = new Map();
+    /**
+     * The this pointer is Game_Interpreter.prototype
+     * Idempotent
+     * @author DoubleX @interface @since v0.00a @version v0.00a
+     * @param {string} script - The raw script string input to be evaluated
+     * @returns {*?} The result returned by the evaluated script
+     */
+    NEW.evalScript_ = function(script) {
+        if (!script) return undefined;
+        if (!$.IS_CACHE_SCRIPT) return eval(script);
+        // It's to avoid 1st call being eval and subsequent ones being functions
+        if (!NEW._cachedScripts.has(script)) {
+            NEW._cachedScripts.set(script, new Function(script));
+        }
+        return NEW._cachedScripts.get(script).call(this);
+        //
+    }; // NEW.evalScript_
 
     /**
      * The this pointer is Game_Interpreter.prototype
@@ -5350,7 +5376,7 @@ Utils.checkRMVersion(DoubleX_RMMZ.Enhanced_Codebase.VERSIONS.codebase);
             } case 10: {
                 return $gameParty.hasItem($dataArmors[params[1]], params[2]);
             } case 11: return NEW._isButtonEventRun(params);
-            case 12: return !!NEW.EVAL_SCRIPT(params[1]);
+            case 12: return !!NEW.evalScript_.call(this, params[1]);
             case 13: {
                 return $gamePlayer.vehicle() === $gameMap.vehicle(params[1]);
             }
@@ -5371,7 +5397,7 @@ Utils.checkRMVersion(DoubleX_RMMZ.Enhanced_Codebase.VERSIONS.codebase);
             case 1: return [$gameVariables.value(rhs), 1];
             case 2: return [rhs, Math.max(param5 - rhs + 1, 1)];
             case 3: return [this.gameDataOperand(rhs, param5, params[6]), 1];
-            case 4: return [NEW.EVAL_SCRIPT(rhs), 1];
+            case 4: return [NEW.evalScript_.call(this, rhs), 1];
             default: return [0, 1];
         }
     }; // NEW._varValRandMax
