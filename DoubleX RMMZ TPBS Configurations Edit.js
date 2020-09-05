@@ -98,9 +98,95 @@
  * @desc Returns default tpb gain rate of the battler
  * The battler involved can be referred by the this keyword
  * @default "const speed = this.tpbRelativeSpeed();\nconst referenceTime = $gameParty.tpbReferenceTime();\nreturn speed / referenceTime;"
+
+ * @param tpbRelativeSpeed
+ * @parent Battler
+ * @type note
+ * @desc Returns the default tpb relative speed of the battler
+ * The battler involved can be referred by the this keyword
+ * @default "return this.tpbSpeed() / $gameParty.tpbBaseSpeed();"
+ *
+ * @param tpbSpeed
+ * @parent Battler
+ * @type note
+ * @desc Returns the default tpb speed of the battler involved
+ * The battler involved can be referred by the this keyword
+ * @default "return Math.sqrt(this.agi) + 1;"
+ *
+ * @param tpbBaseSpeed
+ * @parent Battler
+ * @type note
+ * @desc Returns the default tpb base speed of the battler involved
+ * The battler involved can be referred by the this keyword
+ * @default "return Math.sqrt(this.paramBasePlus(6)) + 1;"
+ *
+ * @param tpbRequiredCastTime
+ * @parent Battler
+ * @type note
+ * @desc Returns tpb required cast time for inputted skills/items
+ * The battler involved can be referred by the this keyword
+ * @default "const MZ_EC = DoubleX_RMMZ.Enhanced_Codebase;\nconst _tpbCastDelay = MZ_EC.Game_Battler.new._tpbCastDelay;\nreturn Math.sqrt(_tpbCastDelay.call(this)) / this.tpbSpeed();"
+ *
+ * @param tpbChargeTimeWithPenalty
+ * @parent Battler
+ * @type note
+ * @desc Return tpb charge time with escape failure penalty applied
+ * The battler involved can be referred by the this keyword
+ * @default "return this._tpbChargeTime - 1;"
+
+ * @param updatedTpbChargeTime
+ * @parent Battler
+ * @type note
+ * @desc Returns the new tpb charge time upon a TPB charging update
+ * The battler involved can be referred by the this keyword
+ * @default "return this._tpbChargeTime + this.tpbAcceleration();"
+ *
+ * @param updatedTpbCastTime
+ * @parent Battler
+ * @type note
+ * @desc Returns the new tpb cast time upon a TPB casting update
+ * The battler involved can be referred by the this keyword
+ * @default "return this._tpbCastTime + this.tpbAcceleration();"
+ *
+ * @param updatedTpbIdleTime
+ * @parent Battler
+ * @type note
+ * @desc Returns the new tpb idle time upon a TPB casting update
+ * The battler involved can be referred by the this keyword
+ * @default "return this._tpbIdleTime + this.tpbAcceleration();"
+ *
+ * @param tpbCastDelay
+ * @parent Battler
+ * @type note
+ * @desc Returns total TPB casting delay of all inputted skill/item
+ * The battler involved can be referred by the this keyword
+ * @default "return this._actions.filterMap(act => {\n    return act.isValid();\n}, act => act.item()).reduce((delay, { speed }) => {\n    return delay + Math.max(0, -speed);\n}, 0);"
+ *
+ * @param advantageousStartTpbChargeTime
+ * @parent Battler
+ * @type note
+ * @desc Returns the tpb charge time upon advantageous battle start
+ * The battler involved can be referred by the this keyword
+ * @default "return 1;"
+ *
+ * @param disadvantageousStartTpbChargeTime
+ * @parent Battler
+ * @type note
+ * @desc Returns tpb charge time upon disadvantageous battle start
+ * The battler involved can be referred by the this keyword
+ * @default "return 0;"
+ *
+ * @param normStartTpbChargeTime
+ * @parent Battler
+ * @type note
+ * @desc Returns the tpb charge time upon normal battle starts
+ * The battler involved can be referred by the this keyword
+ * @default "return this.tpbRelativeSpeed() * Math.random() * 0.5;"
+ *
+ * @param NotetagDataTypePriorities
  *
  * @param tpbAccelerationNotetagDataTypePriorities
- * @parent Battler
+ * @parent NotetagDataTypePriorities
  * @type select[]
  * @option Data of the actor
  * @value actor
@@ -128,15 +214,8 @@
  * You can use script calls/plugin commands to change this
  * @default ["latestSkillItem","states","enemy","armors","weapons","class","actor"]
  *
- * @param tpbRelativeSpeed
- * @parent Battler
- * @type note
- * @desc Returns the default tpb relative speed of the battler
- * The battler involved can be referred by the this keyword
- * @default "return this.tpbSpeed() / $gameParty.tpbBaseSpeed();"
- *
  * @param tpbRelativeSpeedNotetagDataTypePriorities
- * @parent Battler
+ * @parent NotetagDataTypePriorities
  * @type select[]
  * @option Data of the actor
  * @value actor
@@ -164,15 +243,8 @@
  * You can use script calls/plugin commands to change this
  * @default ["latestSkillItem","states","enemy","armors","weapons","class","actor"]
  *
- * @param tpbSpeed
- * @parent Battler
- * @type note
- * @desc Returns the default tpb speed of the battler involved
- * The battler involved can be referred by the this keyword
- * @default "return Math.sqrt(this.agi) + 1;"
- *
  * @param tpbSpeedNotetagDataTypePriorities
- * @parent Battler
+ * @parent NotetagDataTypePriorities
  * @type select[]
  * @option Data of the actor
  * @value actor
@@ -200,15 +272,8 @@
  * You can use script calls/plugin commands to change this
  * @default ["latestSkillItem","states","enemy","armors","weapons","class","actor"]
  *
- * @param tpbBaseSpeed
- * @parent Battler
- * @type note
- * @desc Returns the default tpb base speed of the battler involved
- * The battler involved can be referred by the this keyword
- * @default "return Math.sqrt(this.paramBasePlus(6)) + 1;"
- *
  * @param tpbBaseSpeedNotetagDataTypePriorities
- * @parent Battler
+ * @parent NotetagDataTypePriorities
  * @type select[]
  * @option Data of the actor
  * @value actor
@@ -236,15 +301,8 @@
  * You can use script calls/plugin commands to change this
  * @default ["latestSkillItem","states","enemy","armors","weapons","class","actor"]
  *
- * @param tpbRequiredCastTime
- * @parent Battler
- * @type note
- * @desc Returns tpb required cast time for inputted skills/items
- * The battler involved can be referred by the this keyword
- * @default "const MZ_EC = DoubleX_RMMZ.Enhanced_Codebase;\nconst _tpbCastDelay = MZ_EC.Game_Battler.new._tpbCastDelay;\nreturn Math.sqrt(_tpbCastDelay.call(this)) / this.tpbSpeed();"
- *
  * @param tpbRequiredCastTimeNotetagDataTypePriorities
- * @parent Battler
+ * @parent NotetagDataTypePriorities
  * @type select[]
  * @option Data of the actor
  * @value actor
@@ -272,15 +330,8 @@
  * You can use script calls/plugin commands to change this
  * @default ["latestSkillItem","states","enemy","armors","weapons","class","actor"]
  *
- * @param tpbChargeTimeWithPenalty
- * @parent Battler
- * @type note
- * @desc Return tpb charge time with escape failure penalty applied
- * The battler involved can be referred by the this keyword
- * @default "return this._tpbChargeTime - 1;"
- *
  * @param tpbChargeTimeWithPenaltyNotetagDataTypePriorities
- * @parent Battler
+ * @parent NotetagDataTypePriorities
  * @type select[]
  * @option Data of the actor
  * @value actor
@@ -308,15 +359,8 @@
  * You can use script calls/plugin commands to change this
  * @default ["latestSkillItem","states","enemy","armors","weapons","class","actor"]
  *
- * @param updatedTpbChargeTime
- * @parent Battler
- * @type note
- * @desc Returns the new tpb charge time upon a TPB charging update
- * The battler involved can be referred by the this keyword
- * @default "return this._tpbChargeTime + this.tpbAcceleration();"
- *
  * @param updatedTpbChargeTimeNotetagDataTypePriorities
- * @parent Battler
+ * @parent NotetagDataTypePriorities
  * @type select[]
  * @option Data of the actor
  * @value actor
@@ -344,15 +388,8 @@
  * You can use script calls/plugin commands to change this
  * @default ["latestSkillItem","states","enemy","armors","weapons","class","actor"]
  *
- * @param updatedTpbCastTime
- * @parent Battler
- * @type note
- * @desc Returns the new tpb cast time upon a TPB casting update
- * The battler involved can be referred by the this keyword
- * @default "return this._tpbCastTime + this.tpbAcceleration();"
- *
  * @param updatedTpbCastTimeNotetagDataTypePriorities
- * @parent Battler
+ * @parent NotetagDataTypePriorities
  * @type select[]
  * @option Data of the actor
  * @value actor
@@ -380,15 +417,8 @@
  * You can use script calls/plugin commands to change this
  * @default ["latestSkillItem","states","enemy","armors","weapons","class","actor"]
  *
- * @param updatedTpbIdleTime
- * @parent Battler
- * @type note
- * @desc Returns the new tpb idle time upon a TPB casting update
- * The battler involved can be referred by the this keyword
- * @default "return this._tpbIdleTime + this.tpbAcceleration();"
- *
  * @param updatedTpbIdleTimeNotetagDataTypePriorities
- * @parent Battler
+ * @parent NotetagDataTypePriorities
  * @type select[]
  * @option Data of the actor
  * @value actor
@@ -416,15 +446,8 @@
  * You can use script calls/plugin commands to change this
  * @default ["latestSkillItem","states","enemy","armors","weapons","class","actor"]
  *
- * @param tpbCastDelay
- * @parent Battler
- * @type note
- * @desc Returns total TPB casting delay of all inputted skill/item
- * The battler involved can be referred by the this keyword
- * @default "return this._actions.filterMap(act => {\n    return act.isValid();\n}, act => act.item()).reduce((delay, { speed }) => {\n    return delay + Math.max(0, -speed);\n}, 0);"
- *
  * @param tpbCastDelayNotetagDataTypePriorities
- * @parent Battler
+ * @parent NotetagDataTypePriorities
  * @type select[]
  * @option Data of the actor
  * @value actor
@@ -452,15 +475,8 @@
  * You can use script calls/plugin commands to change this
  * @default ["latestSkillItem","states","enemy","armors","weapons","class","actor"]
  *
- * @param advantageousStartTpbChargeTime
- * @parent Battler
- * @type note
- * @desc Returns the tpb charge time upon advantageous battle start
- * The battler involved can be referred by the this keyword
- * @default "return 1;"
- *
  * @param advantageousStartTpbChargeTimeNotetagDataTypePriorities
- * @parent Battler
+ * @parent NotetagDataTypePriorities
  * @type select[]
  * @option Data of the actor
  * @value actor
@@ -488,15 +504,8 @@
  * You can use script calls/plugin commands to change this
  * @default ["latestSkillItem","states","enemy","armors","weapons","class","actor"]
  *
- * @param disadvantageousStartTpbChargeTime
- * @parent Battler
- * @type note
- * @desc Returns tpb charge time upon disadvantageous battle start
- * The battler involved can be referred by the this keyword
- * @default "return 0;"
- *
  * @param disadvantageousStartTpbChargeTimeNotetagDataTypePriorities
- * @parent Battler
+ * @parent NotetagDataTypePriorities
  * @type select[]
  * @option Data of the actor
  * @value actor
@@ -524,15 +533,8 @@
  * You can use script calls/plugin commands to change this
  * @default ["latestSkillItem","states","enemy","armors","weapons","class","actor"]
  *
- * @param normStartTpbChargeTime
- * @parent Battler
- * @type note
- * @desc Returns the tpb charge time upon normal battle starts
- * The battler involved can be referred by the this keyword
- * @default "return this.tpbRelativeSpeed() * Math.random() * 0.5;"
- *
  * @param normStartTpbChargeTimeNotetagDataTypePriorities
- * @parent Battler
+ * @parent NotetagDataTypePriorities
  * @type select[]
  * @option Data of the actor
  * @value actor
