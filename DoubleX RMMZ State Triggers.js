@@ -551,7 +551,7 @@ if (DoubleX_RMMZ.Enhanced_Codebase) {
      * The this pointer is Game_System.prototype
      * Script Call/Idempotent
      * @author DoubleX @interface @since v1.00a @version v1.00a
-     * @param {string} param - The name of the parameter to be stored in saves
+     * @enum @param {string} param - The name of parameter to be stored in saves
      * @param {*} val - The value of the parameter to be stored in game saves
      */
     $.setStateTriggersParam = function(param, val) {
@@ -562,7 +562,7 @@ if (DoubleX_RMMZ.Enhanced_Codebase) {
      * The this pointer is Game_System.prototype
      * Script Call/Nullipotent
      * @author DoubleX @interface @since v1.00a @version v1.00a
-     * @param {string} param - The name of the parameter to be stored in saves
+     * @enum @param {string} param - The name of parameter to be stored in saves
      * @returns {*} The value of the parameter to be stored in game saves
      */
     $.stateTriggersParam = function(param) {

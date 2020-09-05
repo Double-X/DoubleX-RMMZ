@@ -309,20 +309,22 @@
  *     - Instance Method
  *       1. tpbCastTime
  *          Returns the proportion of the skill/item casting progress
- *       2. isTpbActing
+ *       2. tpbIdleTime
+ *          Returns the proportion of the battler idling progress
+ *       3. isTpbActing
  *          Returns whether the battler's executing tpb actions
- *       3. isTpbCharging
+ *       4. isTpbCharging
  *          Returns whether the battler's charging the tpb bar
- *       4. isTpbCasting
+ *       5. isTpbCasting
  *          Returns whether the battler's casting tpb actions
- *       5. onTpbReady
+ *       6. onTpbReady
  *          Triggers events to happen when the battler just finished casting
  *          tpb actions
- *       6. isEndTpbCharging
+ *       7. isEndTpbCharging
  *          Returns whether the tpb battler's just ended charging the tpb bar
- *       7. isEndTpbCasting
+ *       8. isEndTpbCasting
  *          Returns whether the tpb battler's just ended casting actions
- *       8. isTpbIdle
+ *       9. isTpbIdle
  *          Returns whether the battler tpb bar's idle(not doing anything)
  *     Game_Interpreter
  *     - Static Variable
@@ -862,7 +864,7 @@ Utils.checkRMVersion(DoubleX_RMMZ.Enhanced_Codebase.VERSIONS.codebase);
         if (notetagTypes_) {
             const notetagTypeKey = CORE._ARRAY_CACHE_KEY(notetagTypes_);
             if (!notetagTypes.has(notetagTypeKey)) return undefined;
-            return notetagTypes.get("notetagTypeKey").get(initVal);
+            return notetagTypes.get(notetagTypeKey).get(initVal);
         }
         return notetagTypes.get("allNotetags").get(initVal);
     }; // CORE._BATTLER_NOTETAG_CACHE_VAL_CONTAINER
@@ -2573,6 +2575,16 @@ Utils.checkRMVersion(DoubleX_RMMZ.Enhanced_Codebase.VERSIONS.codebase);
         //
     }); // v0.00a - v0.00a
 
+    rewriteFunc("startBattle", function() {
+        this._phase = "start";
+        $gameSystem.onBattleStart();
+        // Edited to help plugins alter start battle behaviors in better ways
+        $gameParty.onBattleStart(this._preemptive, this._surprise);
+        $gameTroop.onBattleStart(this._surprise, this._preemptive);
+        //
+        this.displayStartMessages();
+    }); // v0.00a - v0.00a
+
     rewriteFunc("changeCurrentActor", function(forward) {
         // Edited to help plugins alter change current actor in better ways
         this._currentActor = NEW._newCurActor_.call(this, forward);
@@ -2852,7 +2864,7 @@ Utils.checkRMVersion(DoubleX_RMMZ.Enhanced_Codebase.VERSIONS.codebase);
      * Idempotent
      * @author DoubleX @interface @since v0.00a @version v0.00a
      * @param {string} containerName - The name of the parameter container
-     * @param {string} param - The name of the parameter to be stored in saves
+     * @enum @param {string} param - The name of parameter to be stored in saves
      * @param {*} val - The value of the parameter to be stored in game saves
      */
     NEW.storeParamVal = function(containerName, param, val) {
@@ -2864,7 +2876,7 @@ Utils.checkRMVersion(DoubleX_RMMZ.Enhanced_Codebase.VERSIONS.codebase);
      * Nullipotent
      * @author DoubleX @interface @since v0.00a @version v0.00a
      * @param {string} containerName - The name of the parameter container
-     * @param {string} param - The name of the parameter to be stored in saves
+     * @enum @param {string} param - The name of parameter to be stored in saves
      * @returns {*} The value of the parameter to be stored in game saves
      */
     NEW.storedParamVal = function(containerName, param) {
@@ -3826,11 +3838,11 @@ Utils.checkRMVersion(DoubleX_RMMZ.Enhanced_Codebase.VERSIONS.codebase);
         //
     }); // v0.00a - v0.00a
 
-    rewriteFunc("initTpbChargeTime", function(advantageous) {
+    rewriteFunc("initTpbChargeTime", function(advantageous, disadvantageous) {
         this._tpbState = "charging";
         // Edited to help plugins alter init tpb charge time in better ways
-        this._tpbChargeTime =
-                NEW._initializedTpbChargeTime.call(this, advantageous);
+        this._tpbChargeTime = NEW._initializedTpbChargeTime.call(
+                this, advantageous, disadvantageous);
         //
     }); // v0.00a - v0.00a
 
@@ -4000,6 +4012,16 @@ Utils.checkRMVersion(DoubleX_RMMZ.Enhanced_Codebase.VERSIONS.codebase);
         //
     }); // v0.00a - v0.00a
 
+    rewriteFunc("onBattleStart", function(advantageous, disadvantageous) {
+        this.setActionState("undecided");
+        this.clearMotion();
+        // Edited to help plugins alter on battle start in better ways
+        this.initTpbChargeTime(advantageous, disadvantageous);
+        //
+        this.initTpbTurn();
+        if (!this.isPreserveTp()) this.initTp();
+    }); // v0.00a - v0.00a
+
     /**
      * The this pointer is Game_Battler.prototype
      * Hotspot/Nullipotent
@@ -4007,6 +4029,14 @@ Utils.checkRMVersion(DoubleX_RMMZ.Enhanced_Codebase.VERSIONS.codebase);
      * @returns {number} The proportion of the skill/item casting progress
      */
     $.tpbCastTime = function() { return this._tpbCastTime; };
+
+    /**
+     * The this pointer is Game_Battler.prototype
+     * Hotspot/Nullipotent
+     * @author DoubleX @interface @since v0.00a @version v0.00a
+     * @returns {number} The proportion of the battler idling progress
+     */
+    $.tpbIdleTime = function() { return this._tpbIdleTime; };
 
     /**
      * The this pointer is Game_Battler.prototype
@@ -4072,11 +4102,14 @@ Utils.checkRMVersion(DoubleX_RMMZ.Enhanced_Codebase.VERSIONS.codebase);
      * Nullipotent
      * @author DoubleX @since v0.00a @version v0.00a
      * @param {boolean} advantageous - Whether battler has advantageous start
+     * @param {boolean} disadvantageous - If battler has disadvantageous start
      * @returns {number} The starting tpb bar charged proportion for the battler
      */
-    NEW._initializedTpbChargeTime = function(advantageous) {
+    NEW._initializedTpbChargeTime = function(advantageous, disadvantageous) {
+        // disadvantageous is added to be used by other plugins
         if (this.isRestricted()) return 0;
         return advantageous ? 1 : NEW._initializedNormTpbChargeTime.call(this);
+        //
     }; // NEW._initializedTpbChargeTime
 
     /**
@@ -4175,8 +4208,8 @@ Utils.checkRMVersion(DoubleX_RMMZ.Enhanced_Codebase.VERSIONS.codebase);
         return this._tpbIdleTime + this.tpbAcceleration();
     }; // NEW._newTpbIdleTime
 
-    NEW._IS_VALID_FUNC = action => action.isValid();
-    NEW._ITEM_FUNC = action => action.item();
+    NEW._IS_VALID_FUNC = act => act.isValid();
+    NEW._ITEM_FUNC = act => act.item();
     NEW._ACCUM_SPEED_FUNC = (delay, { speed }) => delay + Math.max(0, -speed);
     /**
      * The this pointer is Game_Battler.prototype
@@ -5058,8 +5091,17 @@ Utils.checkRMVersion(DoubleX_RMMZ.Enhanced_Codebase.VERSIONS.codebase);
 
     const { rewriteFunc } = MZ_EC.setKlassContainer("Game_Unit", $, MZ_EC);
 
+    rewriteFunc("onBattleStart", function(advantageous, disadvantageous) {
+        this.members().forEach(mem => {
+            // Edited to help plugins alter the on battle start in better ways
+            mem.onBattleStart(advantageous, disadvantageous);
+            //
+        });
+        this._inBattle = true;
+    }); // v0.00a - v0.00a
+
     rewriteFunc("tpbReferenceTime", function() {
-        // Edited to help plugins alte the fps in better ways
+        // Edited to help plugins alter the fps in better ways
         const fps = Graphics.gameFps;
         return BattleManager.isActiveTpb() ? 4 * fps : fps;
         //

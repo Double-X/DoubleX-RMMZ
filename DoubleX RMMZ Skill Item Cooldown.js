@@ -443,13 +443,16 @@
  *      1. setSkillItemCooldownParam param val
  *         - Applies the script call
  *           $gameSystem.setSkillItemCooldownParam(param, val)
- *      2. clearBattlerSkillItemCooldowns battler
+ *      2. clearBattlerSkillItemCooldowns side label
  *         - Applies the script call battler.clearBattlerSkillItemCooldowns()
- *      3. setBattlerCooldown battler turnCount
+ *         - battler is the battler identified by side and label
+ *      3. setBattlerCooldown side label turnCount
  *         - Applies the script call battler.setBattlerCooldown(turnCount)
- *      4. setSkillItemCooldown battler item turnCount
+ *         - battler is the battler identified by side and label
+ *      4. setSkillItemCooldown side label item turnCount
  *         - Applies the script call
  *           battler.setSkillItemCooldown(item, turnCount)
+ *         - battler is the battler identified by side and label
  *============================================================================
  */
 
@@ -703,7 +706,7 @@ if (DoubleX_RMMZ.Enhanced_Codebase) {
     /**
      * Script Call/Idempotent
      * @author DoubleX @interface @since v1.00a @version v1.00a
-     * @param {string} param - The name of the parameter to be stored in saves
+     * @enum @param {string} param - The name of parameter to be stored in saves
      * @param {*} val - The value of the parameter to be stored in game saves
      */
     $.setSkillItemCooldownParam = function(param, val) {
@@ -713,7 +716,7 @@ if (DoubleX_RMMZ.Enhanced_Codebase) {
     /**
      * Script Call/Nullipotent
      * @author DoubleX @interface @since v1.00a @version v1.00a
-     * @param {string} param - The name of the parameter to be stored in saves
+     * @enum @param {string} param - The name of parameter to be stored in saves
      * @returns {*} The value of the parameter to be stored in game saves
      */
     $.skillItemCooldownParam = function(param) {
