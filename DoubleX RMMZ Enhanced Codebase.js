@@ -2641,7 +2641,7 @@ Utils.checkRMVersion(DoubleX_RMMZ.Enhanced_Codebase.VERSIONS.codebase);
         $gameParty.onEscapeFailure();
         this.displayEscapeFailureMessage();
         // Edited to help plugins alter escape ratio increment in better ways
-        this._escapeRatio = NEW._newEscRatio.call(this);
+        this._escapeRatio = NEW._updatedEscRatio.call(this);
         //
         if (!this.isTpb()) this.startTurn();
     }); // v0.00a - v0.00a
@@ -2740,7 +2740,7 @@ Utils.checkRMVersion(DoubleX_RMMZ.Enhanced_Codebase.VERSIONS.codebase);
      * @author DoubleX @since v0.00a @version v0.00a
      * @returns {number} The new party escape attempt success probability
      */
-    NEW._newEscRatio = function() { return this._escapeRatio + 0.1; };
+    NEW._updatedEscRatio = function() { return this._escapeRatio + 0.1; };
 
 })(BattleManager, DoubleX_RMMZ.Enhanced_Codebase);
 
@@ -3838,6 +3838,13 @@ Utils.checkRMVersion(DoubleX_RMMZ.Enhanced_Codebase.VERSIONS.codebase);
         //
     }); // v0.00a - v0.00a
 
+    rewriteFunc("applyTpbPenalty", function() {
+        this._tpbState = "charging";
+        // Edited to help plugins alter apply tpb penalty in better ways
+        this._tpbChargeTime = NEW._tpbChargeTimeWithPenalty.call(this);
+        //
+    }); // v0.00a - v0.00a
+
     rewriteFunc("initTpbChargeTime", function(advantageous, disadvantageous) {
         this._tpbState = "charging";
         // Edited to help plugins alter init tpb charge time in better ways
@@ -4101,6 +4108,16 @@ Utils.checkRMVersion(DoubleX_RMMZ.Enhanced_Codebase.VERSIONS.codebase);
      * The this pointer is Game_Battler.prototype
      * Nullipotent
      * @author DoubleX @since v0.00a @version v0.00a
+     * @returns {number} The new TPBS charge time value with the penalty applied
+     */
+    NEW._tpbChargeTimeWithPenalty = function() {
+        return this._tpbChargeTime - 1;
+    }; // NEW._tpbChargeTimeWithPenalty
+
+    /**
+     * The this pointer is Game_Battler.prototype
+     * Nullipotent
+     * @author DoubleX @since v0.00a @version v0.00a
      * @param {boolean} advantageous - Whether battler has advantageous start
      * @param {boolean} disadvantageous - If battler has disadvantageous start
      * @returns {number} The starting tpb bar charged proportion for the battler
@@ -4139,7 +4156,7 @@ Utils.checkRMVersion(DoubleX_RMMZ.Enhanced_Codebase.VERSIONS.codebase);
      * @author DoubleX @since v0.00a @version v0.00a
      */
     NEW._onUpdateTpbChargeTime = function() {
-        this._tpbChargeTime = NEW._newTpbChargeTime.call(this);
+        this._tpbChargeTime = NEW._updatedTpbChargeTime.call(this);
         if (!this.isEndTpbCharging()) return;
         this._tpbChargeTime = 1;
         this.onTpbCharged();
@@ -4151,9 +4168,9 @@ Utils.checkRMVersion(DoubleX_RMMZ.Enhanced_Codebase.VERSIONS.codebase);
      * @author DoubleX @since v0.00a @version v0.00a
      * @returns {number} The updated tpb charge time value
      */
-    NEW._newTpbChargeTime = function() {
+    NEW._updatedTpbChargeTime = function() {
         return this._tpbChargeTime + this.tpbAcceleration();
-    }; // NEW._newTpbChargeTime
+    }; // NEW._updatedTpbChargeTime
 
     /**
      * The this pointer is Game_Battler.prototype
@@ -4161,7 +4178,7 @@ Utils.checkRMVersion(DoubleX_RMMZ.Enhanced_Codebase.VERSIONS.codebase);
      * @author DoubleX @interface @since v0.00a @version v0.00a
      */
     NEW._onUpdateTpbCastTime = function() {
-        this._tpbCastTime = NEW._newTpbCastTime.call(this);
+        this._tpbCastTime = NEW._updatedTpbCastTime.call(this);
         if (!this.isEndTpbCasting()) return;
         this._tpbCastTime = this.tpbRequiredCastTime();
         this.onTpbReady();
@@ -4173,9 +4190,9 @@ Utils.checkRMVersion(DoubleX_RMMZ.Enhanced_Codebase.VERSIONS.codebase);
      * @author DoubleX @since v0.00a @version v0.00a
      * @returns {number} The updated tpb cast time value
      */
-    NEW._newTpbCastTime = function() {
+    NEW._updatedTpbCastTime = function() {
         return this._tpbCastTime + this.tpbAcceleration();
-    }; // NEW._newTpbCastTime
+    }; // NEW._updatedTpbCastTime
 
     /**
      * The this pointer is Game_Battler.prototype
@@ -4195,7 +4212,7 @@ Utils.checkRMVersion(DoubleX_RMMZ.Enhanced_Codebase.VERSIONS.codebase);
      * @todo Figures out why isTpbTimeout and onTpbTimeout aren't called here
      */
     NEW._onUpdateTpbIdleTime = function() {
-        this._tpbIdleTime = NEW._newTpbIdleTime.call(this);
+        this._tpbIdleTime = NEW._updatedTpbIdleTime.call(this);
     }; // NEW._onUpdateTpbIdleTime
 
     /**
@@ -4204,9 +4221,9 @@ Utils.checkRMVersion(DoubleX_RMMZ.Enhanced_Codebase.VERSIONS.codebase);
      * @author DoubleX @since v0.00a @version v0.00a
      * @returns {number} The updated tpb idle time value
      */
-    NEW._newTpbIdleTime = function() {
+    NEW._updatedTpbIdleTime = function() {
         return this._tpbIdleTime + this.tpbAcceleration();
-    }; // NEW._newTpbIdleTime
+    }; // NEW._updatedTpbIdleTime
 
     NEW._IS_VALID_FUNC = act => act.isValid();
     NEW._ITEM_FUNC = act => act.item();
