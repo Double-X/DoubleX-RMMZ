@@ -37,20 +37,20 @@
  *----------------------------------------------------------------------------
  *    # Links
  *      Video:
- *      1.
+ *      1. https://www.youtube.com/watch?v=Pq0evMuFvpQ
  *      This Plugin:
  *      1. https://github.com/Double-X/DoubleX-RMMZ/blob/master/DoubleX%20RMMZ%20TPBS%20Configurations%20Edit.js
  *      Posts:
- *      1.
- *      2.
- *      3.
- *      4.
- *      5.
- *      6.
+ *      1. https://forums.rpgmakerweb.com/index.php?threads/doublex-rmmz-tpbs-configurations-edit.126793/
+ *      2. https://www.rpgmakercentral.com/topic/42578-doublex-rmmz-tpbs-configurations-edit/
+ *      3. https://rpgmaker.net/engines/rmmz/utilities/284/
+ *      4. https://www.save-point.org/thread-8160-post-52643.html
+ *      5. https://gdu.one/forums/topic/13631-doublex-rmmz-tpbs-configurations-edit/
+ *      6. http://www.hbgames.org/forums/viewtopic.php?p=945117
  *      7.
- *      8.
- *      9.
- *      10.
+ *      8. https://doublexrpgmaker.wordpress.com/2020/09/05/doublex-rmmz-tpbs-configurations-edit/
+ *      9. https://www.patreon.com/posts/41270147
+ *      10. https://www.makerdevs.com/plugin/doublex-rmmz-tpbs-configurations-edit
  *----------------------------------------------------------------------------
  *    # Instructions
  *      1. The default plugin parameters file name is
