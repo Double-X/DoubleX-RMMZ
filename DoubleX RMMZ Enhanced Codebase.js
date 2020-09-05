@@ -333,6 +333,8 @@
  *============================================================================
  */
 
+// jshint esversion: 6
+
 var DoubleX_RMMZ = DoubleX_RMMZ || {}; // var must be used or game will crash
 // Separates the version numbers with the rest to make the former more clear
 DoubleX_RMMZ.Enhanced_Codebase = {
@@ -645,7 +647,7 @@ Utils.checkRMVersion(DoubleX_RMMZ.Enhanced_Codebase.VERSIONS.codebase);
     CORE._USABLE_SKILLS_NOTETAG_DATA = battler => {
         if (battler.isActor()) return battler.usableSkills();
         if (!battler.isEnemy()) return [];
-        const EC_GE = MZ_CE.Game_Enemy.new;
+        const EC_GE = MZ_EC.Game_Enemy.new;
         return EC_GE._validActs.call(battler).map(CORE._ACT_DATA_SKILL);
     }; // CORE._USABLE_SKILLS_NOTETAG_DATA
     CORE._ITEMS_NOTETAG_DATA = battler => {
@@ -700,10 +702,11 @@ Utils.checkRMVersion(DoubleX_RMMZ.Enhanced_Codebase.VERSIONS.codebase);
         }
     }; // CORE._NOTETAG_DATA
     CORE._IS_VALID_DATUM = datum => datum;
-    CORE._DATA_NOTETAGS = (battler, dataType, containerName, notetagTypes_) => {
+    CORE._DATA_NOTETAGS = (battler, dataType, containerName) => {
           const notetagData = CORE._NOTETAG_DATA(battler, dataType);
           const validNotetagData = notetagData.filter(CORE._IS_VALID_DATUM);
-          return validNotetagData.reduce((notes, { meta: { enhancedCodebase } }) => {
+          return validNotetagData.reduce((notes, { meta }) => {
+              const { enhancedCodebase } = meta;
               return notes.fastMerge(enhancedCodebase[containerName].notetags);
           }, []);
     }; // CORE._DATA_NOTETAGS
@@ -753,8 +756,8 @@ Utils.checkRMVersion(DoubleX_RMMZ.Enhanced_Codebase.VERSIONS.codebase);
     CORE._NEW_NOTETAG_LIST = (battler, priorities, containerName, notetagTypes_) => {
         // Cache the whole notetag list regardless of notetagTypes_
         const notetagList = priorities.reduce((notetags, dataType) => {
-            return notetags.fastMerge(CORE._DATA_NOTETAGS(
-                    battler, dataType, containerName, notetagTypes_));
+            return notetags.fastMerge(
+                    CORE._DATA_NOTETAGS(battler, dataType, containerName));
         }, []);
         CORE._CACHE_BATTLER_NOTETAG_LIST(
                 battler, priorities, containerName, notetagList);
@@ -1809,7 +1812,7 @@ Utils.checkRMVersion(DoubleX_RMMZ.Enhanced_Codebase.VERSIONS.codebase);
                   vTextureCoord = aSource;
                   vTextureId = aTextureId;
                 }`;
-    } // NEW._shaderVertexSrc
+    }; // NEW._shaderVertexSrc
 
     /**
      * The this pointer is Tilemap.Renderer.prototype
@@ -3556,7 +3559,9 @@ Utils.checkRMVersion(DoubleX_RMMZ.Enhanced_Codebase.VERSIONS.codebase);
      * @returns {number} The amount of tp gain applied to the specified target
      */
     NEW._gainedTp = function(target, effect) {
+        // The arugment target's still passed to be used by other plugins
         return Math.floor(effect.value1);
+        //
     }; // NEW._gainedTp
 
     /**
@@ -3615,7 +3620,9 @@ Utils.checkRMVersion(DoubleX_RMMZ.Enhanced_Codebase.VERSIONS.codebase);
      * @returns {boolean} Whether the state should be removed from the target
      */
     NEW._isRemoveState = function(target, effect) {
+        // The arugment target's still passed to be used by other plugins
         return Math.random() < effect.value1;
+        //
     }; // NEW._isRemoveState
 
     /**
@@ -3689,7 +3696,7 @@ Utils.checkRMVersion(DoubleX_RMMZ.Enhanced_Codebase.VERSIONS.codebase);
 
     rewriteFunc("updateBuffTurns", function() {
         // Edited to help plugins alter is dying behaviors in better ways
-        return this.isAlive() && NEW._isLowHp.call(this, );
+        return this.isAlive() && NEW._isLowHp.call(this);
         //
     }); // v0.00a - v0.00a
 

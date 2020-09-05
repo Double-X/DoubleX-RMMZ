@@ -151,6 +151,8 @@
  *============================================================================
  */
 
+// jshint esversion: 6
+
 var DoubleX_RMMZ = DoubleX_RMMZ || {}; // var must be used or game will crash
 // Separates the version numbers with the rest to make the former more clear
 DoubleX_RMMZ.Plugin_Command_Lines = {
