@@ -39,7 +39,7 @@
  *      Video:
  *      1.
  *      This Plugin:
- *      1.
+ *      1. https://github.com/Double-X/DoubleX-RMMZ/blob/master/DoubleX%20RMMZ%20TPBS%20Configurations%20Edit.js
  *      Posts:
  *      1.
  *      2.
@@ -652,8 +652,8 @@
  *          effective
  *       2. Each line can only have at most 1 notetag
  *       3. The following is the structure of all notetags in this plugin:
- *          - <doublex rmmz tpbs cfg edit>
- *          - <tpbs cfg edit>
+ *          - <doublex rmmz tpbs cfgs edit>
+ *          - <tpbs cfgs edit>
  *          Where contents are in the form of type suffixes: entries
  *          Either of the above can be used, but the 1st one reduce the chance
  *          of causing other plugins to treat the notetags of this plugin as
@@ -715,7 +715,7 @@
  *           =
  *         - The result of valEntry can be any number
  *         - E.g.:
- *           <tpbs cfg edit tpbAcceleration switch val val: 1, +, 0.01> will
+ *           <tpbs cfgs edit tpbAcceleration switch val val: 1, +, 0.01> will
  *           cause the tpb gain rate of the battler involved to be increased
  *           by 1% of the full TPBS bar(per frame) if the game switch with id
  *           1 is on
@@ -741,7 +741,7 @@
  *           =
  *         - The result of valEntry can be any number
  *         - E.g.:
- *           <tpbs cfg edit tpbRelativeSpeed switch val val: 1, +, 0.1> will
+ *           <tpbs cfgs edit tpbRelativeSpeed switch val val: 1, +, 0.1> will
  *           cause the tpb relative speed of the battler involved to be
  *           increased by 10% if the game switch with id 1 is on
  *      3. tpbSpeed condSuffix opSuffix valSuffix: condEntry, opEntry, valEntry
@@ -766,7 +766,7 @@
  *           =
  *         - The result of valEntry can be any number
  *         - E.g.:
- *           <tpbs cfg edit tpbSpeed switch val val: 1, +, 10> will cause the
+ *           <tpbs cfgs edit tpbSpeed switch val val: 1, +, 10> will cause the
  *           tpb speed of the battler involved to be increased by 10(roughly
  *           the same as adding 100 agi if tpbSpeed uses the default formula)
  *           if the game switch with id 1 is on
@@ -792,7 +792,7 @@
  *           =
  *         - The result of valEntry can be any number
  *         - E.g.:
- *           <tpbs cfg edit tpbBaseSpeed switch val val: 1, +, 10> will cause
+ *           <tpbs cfgs edit tpbBaseSpeed switch val val: 1, +, 10> will cause
  *           the tpb base speed of the battler involved to be increased by 10
  *           (roughly the same as adding 100 agi if tpbSpeed uses the default
  *           formula) if the game switch with id 1 is on
@@ -818,7 +818,7 @@
  *           =
  *         - The result of valEntry can be any number
  *         - E.g.:
- *           <tpbs cfg edit tpbRequiredCastTime switch val val: 1, +, 1> will
+ *           <tpbs cfgs edit tpbRequiredCastTime switch val val: 1, +, 1> will
  *           cause the tpb required cast time involved to be increased by 100%
  *           of the full TPBS bar if the game switch with id 1 is on
  *      6. tpbChargeTimeWithPenalty condSuffix opSuffix valSuffix: condEntry, opEntry, valEntry
@@ -845,7 +845,7 @@
  *           =
  *         - The result of valEntry can be any number
  *         - E.g.:
- *           <tpbs cfg edit tpbChargeTimeWithPenalty switch val val: 1, -, 1>
+ *           <tpbs cfgs edit tpbChargeTimeWithPenalty switch val val: 1, -, 1>
  *           will cause the tpb charge time with the failed party escape
  *           attempt penalty applied of the battler involved to be decreased
  *           by 100% of the full TPBS bar if the game switch with id 1 is on
@@ -871,7 +871,7 @@
  *           =
  *         - The result of valEntry can be any number
  *         - E.g.:
- *           <tpbs cfg edit updatedTpbChargeTime switch val val: 1, +, 0.01>
+ *           <tpbs cfgs edit updatedTpbChargeTime switch val val: 1, +, 0.01>
  *           will cause the tpb charge time gain rate of the battler involved
  *           to be increased by 1% of the full TPBS bar(per frame) if the game
  *           switch with id 1 is on
@@ -897,7 +897,7 @@
  *           =
  *         - The result of valEntry can be any number
  *         - E.g.:
- *           <tpbs cfg edit updatedTpbCastTime switch val val: 1, +, 0.01>
+ *           <tpbs cfgs edit updatedTpbCastTime switch val val: 1, +, 0.01>
  *           will cause the tpb cast time gain rate of the battler involved to
  *           be increased by 1% of the full TPBS bar(per frame) if the game
  *           switch with id 1 is on
@@ -923,7 +923,7 @@
  *           =
  *         - The result of valEntry can be any number
  *         - E.g.:
- *           <tpbs cfg edit updatedTpbIdleTime switch val val: 1, +, 0.01>
+ *           <tpbs cfgs edit updatedTpbIdleTime switch val val: 1, +, 0.01>
  *           will cause the tpb idle time gain rate of the battler involved to
  *           be increased by 1% of the full TPBS bar(per frame) if the game
  *           switch with id 1 is on
@@ -949,7 +949,7 @@
  *            =
  *          - The result of valEntry can be any number
  *          - E.g.:
- *            <tpbs cfg edit tpbCastDelay switch val val: 1, +, 2000> will
+ *            <tpbs cfgs edit tpbCastDelay switch val val: 1, +, 2000> will
  *            cause the tpb cast delay of the battler involved to be increased
  *            by 2000(as if the total speed of all inputted skills/items is
  *            decreased by 2000) if the game switch with id 1 is on
@@ -977,7 +977,7 @@
  *            =
  *          - The result of valEntry can be any number
  *          - E.g.:
- *            <tpbs cfg edit advantageousStartTpbChargeTime val val val: true, -, 0.5>
+ *            <tpbs cfgs edit advantageousStartTpbChargeTime val val val: true, -, 0.5>
  *            will always cause the tpb charge time upon advantageous
  *            battle start of the battler involved to be decreased by 50% of
  *            the full TPBS bar
@@ -1005,7 +1005,7 @@
  *            =
  *          - The result of valEntry can be any number
  *          - E.g.:
- *            <tpbs cfg edit disadvantageousStartTpbChargeTime val val val: true, -, 0.5>
+ *            <tpbs cfgs edit disadvantageousStartTpbChargeTime val val val: true, -, 0.5>
  *            will always cause the tpb charge time upon disadvantageous
  *            battle start of the battler involved to be decreased by 50% of
  *            the full TPBS bar
@@ -1031,7 +1031,7 @@
  *            =
  *          - The result of valEntry can be any number
  *          - E.g.:
- *            <tpbs cfg edit normStartTpbChargeTime val val val: true, =, 0.5>
+ *            <tpbs cfgs edit normStartTpbChargeTime val val val: true, =, 0.5>
  *            will always cause the tpb charge time upon normal battle start
  *            of the battler involved to be set as 50% of the full TPBS bar
  *============================================================================
@@ -1328,7 +1328,7 @@ if (DoubleX_RMMZ.Enhanced_Codebase) {
         $dataEnemies: "enemy",
         $dataStates: "state"
     })); // NEW.NOTETAG_DATA_CONTAINER_NAMES
-    NEW._REG_EXP_NOTE = "tpbs cfg edit";
+    NEW._REG_EXP_NOTE = "tpbs cfgs edit";
     MZ_EC.extendFunc(EC_DM, DM, "loadDataNotetags", function(obj, objName) {
         ORIG.loadDataNotetags.apply(this, arguments);
         // Added to load all notetags of this plugin
