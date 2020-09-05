@@ -575,14 +575,14 @@ Utils.checkRMVersion(DoubleX_RMMZ.Enhanced_Codebase.VERSIONS.codebase);
         });
     }; // CORE._ON_LOAD_DATUM_NOTETAGS
 
-    CORE._REG_EXP_PREFIX = "\s*(?:doublex\s+rmmz\s+)?";
-    CORE._REG_EXP_SUFFIXES = "\s+(\\w+)\s+(\\w+(?:" +
-            CORE._REG_EXP_SUFFIX_SEPARATOR + "\\w+)*)\s*";
+    CORE._REG_EXP_PREFIX = "\\s*(?:doublex\\s+rmmz\\s+)?";
+    CORE._REG_EXP_SUFFIXES = "\\s+(\\w+)\\s+(\\w+(?:" +
+            CORE._REG_EXP_SUFFIX_SEPARATOR + "\\w+)*)\\s*";
     // So alphanumeric characters as well as numbers with decimals are captured
-    CORE.REG_EXP_ENTRY_VAL = "[\\/A-Za-z\\d_\.\\+\\-\\*%=]+";
+    CORE.REG_EXP_ENTRY_VAL = "[\\/A-Za-z\\d_\\.\\+\\-\\*%=]+";
     // The / is captured as well to support filepath strings
     CORE._REG_EXP_ENTRIES = " *(" + CORE.REG_EXP_ENTRY_VAL + "(?:" +
-            CORE._REG_EXP_ENTRY_SEPARATOR + CORE.REG_EXP_ENTRY_VAL + ")*)\s*";
+            CORE._REG_EXP_ENTRY_SEPARATOR + CORE.REG_EXP_ENTRY_VAL + ")*)\\s*";
 
     CORE._FULL_REG_EXP = baseRegex => {
         return new RegExp("<" + CORE._REG_EXP_PREFIX + baseRegex +
@@ -3886,7 +3886,7 @@ Utils.checkRMVersion(DoubleX_RMMZ.Enhanced_Codebase.VERSIONS.codebase);
 
     rewriteFunc("tpbRequiredCastTime", function() {
         // Edited to help plugins alter tpb required case time in better ways
-        return Math.sqrt(NEW._castDelay.call(this)) / this.tpbSpeed();
+        return Math.sqrt(NEW._tpbCastDelay.call(this)) / this.tpbSpeed();
         //
     }); // v0.00a - v0.00a
 
@@ -4234,12 +4234,12 @@ Utils.checkRMVersion(DoubleX_RMMZ.Enhanced_Codebase.VERSIONS.codebase);
      * @author DoubleX @since v0.00a @version v0.00a
      * @returns {number} The casting delay of the action to be executed
      */
-    NEW._castDelay = function() {
+    NEW._tpbCastDelay = function() {
         /** @todo Uses filterMapReduce if it's faster than filterMap.reduce */
         return this._actions.filterMap(NEW._IS_VALID_FUNC, NEW._ITEM_FUNC).
                 reduce(NEW._ACCUM_SPEED_FUNC, 0);
         //
-    }; // NEW._castDelay
+    }; // NEW._tpbCastDelay
 
     /**
      * The this pointer is Game_Battler.prototype

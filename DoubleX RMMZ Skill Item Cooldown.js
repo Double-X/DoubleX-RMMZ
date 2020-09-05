@@ -290,7 +290,7 @@
  *      1. battler condSuffix opSuffix valSuffix: condEntry, opEntry, valEntry
  *         - Applies the following formula on the current battler cooldown:
  *           current = current operator value
- *           If condEntry returns a turthy result
+ *           if condEntry returns a turthy result
  *           Where current is the current battler cooldown, operator is the
  *           operator specified by opEntry, and value is the value specified
  *           by valEntry
@@ -326,7 +326,7 @@
  *      2. skillItem condSuffix opSuffix valSuffix: condEntry, opEntry, valEntry
  *         - Applies the following formula on the current skill/item cooldown:
  *           current = current operator value
- *           If condEntry returns a turthy result
+ *           if condEntry returns a turthy result
  *           Where current is the current skill/item cooldown, operator is the
  *           operator specified by opEntry, and value is the value specified
  *           by valEntry
