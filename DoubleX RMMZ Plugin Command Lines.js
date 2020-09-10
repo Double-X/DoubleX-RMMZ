@@ -30,6 +30,11 @@
  *      1. DoubleX RMMZ Enhanced Codebase
  *         https://github.com/Double-X/DoubleX-RMMZ/blob/master/DoubleX%20RMMZ%20Enhanced%20Codebase.js
  *      Abilities:
+ *      1. Nothing special for most ordinary cases
+ *      2. Little RMMZ plugin development proficiency to fully utilize this
+ *         (Elementary Javascript exposures being able to write beginner codes
+ *         up to 300LoC scale)
+ *      Knowledge:
  *      1. Basic knowledge on what RMMV plugin command does in general on the
  *         user level
  *----------------------------------------------------------------------------
@@ -96,6 +101,9 @@
  *      - None So Far
  *----------------------------------------------------------------------------
  *    # Changelog
+ *      { codebase: "1.0.0", plugin: "v1.01a" }(2020 Sep 10 GMT 1500):
+ *      1. Lets you make some new plugin commands as existing ones with some
+ *         argument values already set
  *      { codebase: "1.0.0", plugin: "v1.00a" }(2020 Sep 4 GMT 0600):
  *      1. 1st version of this plugin finished
  *============================================================================*/
@@ -113,16 +121,53 @@
  * @default []
  */
 
+/*~struct~NewPluginCmd:
+ *
+ * @param newCmdName
+ * @type string
+ * @desc The name of the new plugin command to be used in the RMMV ways
+ * @default
+ *
+ * @param origCmdName
+ * @type string
+ * @desc The name of the original plugin command used by the new one
+ * @default
+ *
+ * @param cmdArgNameVals
+ * @type struct<NewPluginCmdArg>[]
+ * @desc The list of arguments with their values already set by thre new one
+ * @default []
+ */
+
+/*~struct~NewPluginCmdArg:
+ *
+ * @param argName
+ * @type string
+ * @desc The name of the argument to have its value already set
+ * @default
+ *
+ * @param argVal
+ * @type string
+ * @desc The already set value of the argument with the specified name
+ * @default
+ */
+
 /*:
  * @url https://www.patreon.com/doublex
  * @target MZ
- * @plugindesc Versions: { codebase: "1.0.0", plugin: "v1.00a" }
+ * @plugindesc Versions: { codebase: "1.0.0", plugin: "v1.01a" }
  * Lets you use plugin commands in the RMMV styles by typing them as scripts
  *
  * @param pluginCmds
  * @type struct<PluginCmd>[]
  * @desc Sets the list of plugin commands to be called in RMMV ways
  * This being empty means all plugin commands to be that way
+ * @default []
+ *
+ * @param newPluginCmds
+ * @type struct<NewPluginCmd>[]
+ * @desc Sets list of new plugin commands to be called in RMMV way
+ * They're existing ones with some argument values already set
  * @default []
  *
  * @help
@@ -149,6 +194,23 @@
  *         plugins, and most of them being used in the RMMV styles, then I'm
  *         afraid that this plugin won't be able to give you a nice option
  *============================================================================
+ *    ## (v1.01a+)Script Call Info
+ *----------------------------------------------------------------------------
+ *    # Parameter manipulations
+ *      1. $gameSystem.setNewPluginCmd(newCmdName, origCmdName, argNameVals)
+ *         - Sets the new plugin command with name newCmdName as that with
+ *           name origCmdName but with argument values already set by
+ *           argNameVals
+ *         - argNameVals is an Object with argument names as keys and values
+ *           of those arguments already set in newCmdName as values
+ *         - E.g.:
+ *           $gameSystem.setNewPluginCmd("ssicA1", "setSkillItemCooldown", {
+ *               side: "actor",
+ *               label: 1
+ *           }) sets the new plugin command with name ssicA1 as that with name
+ *           setSkillItemCooldown but with the side and label argument values
+ *           already set as "actor" and 1 respectively
+ *============================================================================
  */
 
 // jshint esversion: 6
@@ -157,7 +219,7 @@ var DoubleX_RMMZ = DoubleX_RMMZ || {}; // var must be used or game will crash
 // Separates the version numbers with the rest to make the former more clear
 DoubleX_RMMZ.Plugin_Command_Lines = {
     PLUGIN_NAME: "DoubleX RMMZ Plugin Command Lines",
-    VERSIONS: { codebase: "1.0.0", plugin: "v1.00a" }
+    VERSIONS: { codebase: "1.0.0", plugin: "v1.01a" }
 }; // DoubleX_RMMZ.Plugin_Command_Lines
 //
 Utils.checkRMVersion(DoubleX_RMMZ.Plugin_Command_Lines.VERSIONS.codebase);
@@ -168,10 +230,13 @@ Utils.checkRMVersion(DoubleX_RMMZ.Plugin_Command_Lines.VERSIONS.codebase);
  *----------------------------------------------------------------------------
  *    # Plugin Support Info:
  *      1. Prerequisites
- *         - Little RMMZ plugin development proficiency to fully comprehend
- *           this plugin
- *           (Elementary Javascript exposures being able to write beginner
- *           codes up to 300LoC scale)
+ *         - Basic knowledge on what the default RMMZ codebase does in general
+ *         - Some RMMZ plugin development proficiency to fully comprehend this
+ *           plugin
+ *           (Basic knowledge on what RMMZ plugin development does in general
+ *           with several easy, simple and small plugins written without
+ *           nontrivial bugs up to 1000 LoC scale but still being
+ *           inexperienced)
  *         - Basic knowledge on what the RMMV plugin command implementation
  *           does in general
  *         - Basic knowledge on what the node js fs and path does in general
@@ -210,28 +275,88 @@ if (DoubleX_RMMZ.Enhanced_Codebase) {
     MZ_EC.extendFunc(EC_GS, GS, "storeParams", function() {
         ORIG.storeParams.apply(this, arguments);
         // Added to store all parameters of this plugin
-        EC_GS.onStoreParams.call(this, PCL.PLUGIN_NAME, "pluginCmdLine");
-        const pluginCmds =
-                EC_GS.storedParamVal.call(this, "pluginCmdLine", "pluginCmds");
-        if (pluginCmds.isEmpty()) NEW._loadAllPluginCmds.call(this);
-        // And loads all plugin commands from all plugins if there's no params
+        NEW._storeParams.call(this);
+        //
     }); // v1.00a - v1.00a
+
+    NEW._NEW_PLUGIN_CMD_ARGS = argNameVals => { // v1.01a+
+        return Object.entries(argNameVals).fastMap(([argName, argVal]) => {
+            return { argName, argVal };
+        });
+    }; // NEW._NEW_PLUGIN_CMD_ARGS
+    /**
+     * The this pointer is Game_System.prototype
+     * Script Call/Nullipotent
+     * @author DoubleX @interface @since v1.01a @version v1.01a
+     * @param {string} newCmdName - The name of the new plugin command
+     * @param {string} origCmdName - The name of the original plugin command
+     * @param {{string}} argNameVals - The argument name-preset value pairs
+     */
+    $.setNewPluginCmd = function(newCmdName, origCmdName, argNameVals) {
+        /** @todo Breaks these codes into well-named functions */
+        const newPluginCmds = EC_GS.storedParamVal.call(
+                this, "pluginCmdLines", "newPluginCmds");
+        const newPluginCmd_ = newPluginCmds.find(newPluginCmd => {
+            return newPluginCmd.newCmdName === newCmdName;
+        });
+        const cmdArgNameVals = NEW._NEW_PLUGIN_CMD_ARGS(argNameVals);
+        if (newPluginCmd_) {
+            newPluginCmd_.origCmdName = origCmdName;
+            newPluginCmd_.cmdArgNameVals = cmdArgNameVals;
+        } else newPluginCmds.push({ newCmdName, origCmdName, cmdArgNameVals });
+        //
+    }; // $.setNewPluginCmd
 
     /**
      * The this pointer is Game_System.prototype
      * Nullipotent
-     * @author DoubleX @interface @since v1.00a @version v1.00a
+     * @author DoubleX @interface @since v1.00a @version v1.01a
      * @param {string} cmdName - The name of the plugin command
-     * @param {[string]} The list of argument names of the plugin command
+     * @returns {{[]}?} The list of argument names with their preset values
      */
-    $.pluginCmdLineArgList_ = function(cmdName) {
+    $.pluginCmdLineArgNameVals_ = function(cmdName) {
+        const newPluginCmds = EC_GS.storedParamVal.call(
+                this, "pluginCmdLines", "newPluginCmds");
+        const newPluginCmd_ = newPluginCmds.find(({ newCmdName }) => {
+            return newCmdName === cmdName;
+        });
         const pluginCmds =
-                EC_GS.storedParamVal.call(this, "pluginCmdLine", "pluginCmds");
+                EC_GS.storedParamVal.call(this, "pluginCmdLines", "pluginCmds");
+        if (newPluginCmd_) {
+            const { origCmdName } = newPluginCmd_;
+            const pluginCmd_ = pluginCmds.find(cmd => {
+                return cmd.cmdName === origCmdName;
+            });
+            if (!pluginCmd_) throw new Error(`The new plugin command name
+                                             ${cmdName} has no matching
+                                             original plugin commands!`);
+            return {
+                origCmdName,
+                argNames: pluginCmd_.argNames,
+                argNameVals: newPluginCmd_.cmdArgNameVals
+            };
+        }
         // Search tag: First_In_Duplicate_Plugin_Cmds
         const pluginCmd_ = pluginCmds.find(cmd => cmd.cmdName === cmdName);
-        return pluginCmd_ && pluginCmd_.argNames;
+        return pluginCmd_ && {
+            origCmdName: pluginCmd_.cmdName,
+            argNames: pluginCmd_.argNames,
+            argNameVals: []
+        };
         //
-    }; // $.pluginCmdLineArgList_
+    }; // $.pluginCmdLineArgNameVals_
+
+    /**
+     * The this pointer is Game_System.prototype
+     * Idempotent
+     * @author DoubleX @since v1.01a @version v1.01a
+     */
+    NEW._storeParams = function() {
+        EC_GS.onStoreParams.call(this, PCL.PLUGIN_NAME, "pluginCmdLines");
+        const pluginCmds =
+                EC_GS.storedParamVal.call(this, "pluginCmdLines", "pluginCmds");
+        if (pluginCmds.isEmpty()) NEW._loadAllPluginCmds.call(this);
+    }; // NEW._storeParams
 
     NEW._PLUGIN_DIR_PATH = path => {
         const base = path.dirname(process.mainModule.filename);
@@ -305,7 +430,7 @@ if (DoubleX_RMMZ.Enhanced_Codebase) {
      */
     NEW._loadPluginCmds = function(fileLines) {
         const pluginCmds = 
-                EC_GS.storedParamVal.call(this, "pluginCmdLine", "pluginCmds");
+                EC_GS.storedParamVal.call(this, "pluginCmdLines", "pluginCmds");
         NEW._ADD_PLUGIN_CMDS(fileLines, pluginCmds);
     }; // NEW._loadPluginCmds
 
@@ -350,8 +475,9 @@ if (DoubleX_RMMZ.Enhanced_Codebase) {
         // The plugin command should be as forgiving to syntax error as possible
         const cmdName_ = scriptLine.split(/\s+/)[0];
         //
-        if (!cmdName_ || !NEW._PLUGIN_CMD_KEY_(cmdName_)) return false;
-        return $gameSystem.pluginCmdLineArgList_(cmdName_);
+        // New plugin commands don't appear in NEW._PLUGIN_CMD_KEY_
+        return cmdName_ && $gameSystem.pluginCmdLineArgNameVals_(cmdName_);
+        //
     }; // NEW._IS_PLUGIN_CMD
 
     NEW._PLUGIN_CMD_KEY_ = cmdName => {
@@ -359,16 +485,23 @@ if (DoubleX_RMMZ.Enhanced_Codebase) {
             return key.split(":")[1] === cmdName;
         });
     }; // NEW._PLUGIN_CMD_KEY_
-    NEW._PLUGIN_CMD_ARG_OBJ = (argList, script) => {
-        return argList.reduce((obj, arg, i) => {
-            obj[arg] = script[i + 1];
+    NEW._PLUGIN_CMD_ARG_OBJ = ({ argNames, argNameVals }, script) => {
+        let j = 0;
+        return argNames.reduce((obj, arg, i) => {
+            const argNameVal_ = argNameVals.find(({ argName }) => {
+                return argName === arg;
+            }), scriptVal = script[i + 1 - j];
+            if (argNameVal_) {
+                j++;
+                obj[arg] = argNameVal_.argVal;
+            } else obj[arg] = scriptVal;
             return obj;
         }, {});
     }; // NEW._PLUGIN_CMD_ARG_OBJ
     /**
      * The this pointer is Game_Interpreter.prototype
      * Nullipotent
-     * @author DoubleX @since v1.00a @version v1.00a
+     * @author DoubleX @since v1.00a @version v1.01a
      * @param {string} scriptLine - The current script line in the script box
      * @returns {boolean} Whether the plugin command's successfully called
      */
@@ -378,12 +511,14 @@ if (DoubleX_RMMZ.Enhanced_Codebase) {
         //
         const cmdName_ = pluginCmd[0];
         if (!cmdName_) return false;
-        const key_ = NEW._PLUGIN_CMD_KEY_(cmdName_);
+        const argNameVals_ = $gameSystem.pluginCmdLineArgNameVals_(cmdName_);
+        if (!argNameVals_) return false;
+        const { origCmdName } = argNameVals_;
+        const key_ = NEW._PLUGIN_CMD_KEY_(origCmdName);
         if (!key_) return false;
-        const argList_ = $gameSystem.pluginCmdLineArgList_(cmdName_);
-        if (!argList_) return false;
-        const argObj = NEW._PLUGIN_CMD_ARG_OBJ(argList_, pluginCmd);
-        PluginManager.callCommand(this, key_.split(":")[0], cmdName_, argObj);
+        const pluginName = key_.split(":")[0];
+        const argObj = NEW._PLUGIN_CMD_ARG_OBJ(argNameVals_, pluginCmd);
+        PluginManager.callCommand(this, pluginName, origCmdName, argObj);
         return true;
     }; // NEW._callPluginCmd
 
