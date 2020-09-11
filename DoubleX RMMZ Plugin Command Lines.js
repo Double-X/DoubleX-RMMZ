@@ -104,6 +104,8 @@
  *      { codebase: "1.0.0", plugin: "v1.01a" }(2020 Sep 10 GMT 1500):
  *      1. Lets you make some new plugin commands as existing ones with some
  *         argument values already set
+ *      2. Fixed the bug to load even inactive plugins and those not in the
+ *         plugin manager when the parameter pluginCmds is empty
  *      { codebase: "1.0.0", plugin: "v1.00a" }(2020 Sep 4 GMT 0600):
  *      1. 1st version of this plugin finished
  *============================================================================*/
@@ -355,7 +357,7 @@ if (DoubleX_RMMZ.Enhanced_Codebase) {
         EC_GS.onStoreParams.call(this, PCL.PLUGIN_NAME, "pluginCmdLines");
         const pluginCmds =
                 EC_GS.storedParamVal.call(this, "pluginCmdLines", "pluginCmds");
-        if (pluginCmds.isEmpty()) NEW._loadAllPluginCmds.call(this);
+        if (true || pluginCmds.isEmpty()) NEW._loadAllPluginCmds.call(this);
     }; // NEW._storeParams
 
     NEW._PLUGIN_DIR_PATH = path => {
@@ -366,7 +368,6 @@ if (DoubleX_RMMZ.Enhanced_Codebase) {
         console.warn(`The fs failed to read the directory with path ${dirPath}
                      by plugin ${PCL.PLUGIN_NAME}: ${err.stack}`);
     }; // NEW._READDIR_ERR
-    NEW._IS_PLUGIN = filename => filename.match(/\.js$/);
     NEW._READ_FILE_ERR = (filePath, err) => {
         console.warn(`The fs failed to read the file with path ${filePath}
                      by plugin ${PCL.PLUGIN_NAME}: ${err.stack}`);
@@ -374,18 +375,14 @@ if (DoubleX_RMMZ.Enhanced_Codebase) {
     /**
      * The this pointer is Game_System.prototype
      * Idempotent
-     * @author DoubleX @since v1.00a @version v1.00a
+     * @author DoubleX @since v1.00a @version v1.01a
      */
     NEW._loadAllPluginCmds = function() {
-        const fs = require("fs");
         const path = require("path"), dirPath = NEW._PLUGIN_DIR_PATH(path);
-        fs.readdir(dirPath, (err, filenames) => {
-            if (err) return NEW._READDIR_ERR(dirPath, err);
-            filenames.forEach(filename => {
-                if (!NEW._IS_PLUGIN(filename)) return;
-                const filePath = path.join(dirPath, filename);
-                NEW._loadPluginFileContent.call(this, fs, filePath);
-            });
+        const fs = require("fs");
+        PluginManager._scripts.forEach(pluginName => {
+            const filePath = path.join(dirPath, `${pluginName}.js`);
+            NEW._loadPluginFileContent.call(this, fs, filePath);
         });
     }; // NEW._loadAllPluginCmds
 
@@ -429,7 +426,7 @@ if (DoubleX_RMMZ.Enhanced_Codebase) {
      * @param {[string]} fileLines - The lines of the plugin file contents
      */
     NEW._loadPluginCmds = function(fileLines) {
-        const pluginCmds = 
+        const pluginCmds =
                 EC_GS.storedParamVal.call(this, "pluginCmdLines", "pluginCmds");
         NEW._ADD_PLUGIN_CMDS(fileLines, pluginCmds);
     }; // NEW._loadPluginCmds
