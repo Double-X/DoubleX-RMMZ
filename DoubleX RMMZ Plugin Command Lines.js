@@ -101,7 +101,7 @@
  *      - None So Far
  *----------------------------------------------------------------------------
  *    # Changelog
- *      { codebase: "1.0.0", plugin: "v1.01a" }(2020 Sep 10 GMT 1500):
+ *      { codebase: "1.0.0", plugin: "v1.01a" }(2020 Sep 11 GMT 1400):
  *      1. Lets you make some new plugin commands as existing ones with some
  *         argument values already set
  *      2. Fixed the bug to load even inactive plugins and those not in the
@@ -357,7 +357,7 @@ if (DoubleX_RMMZ.Enhanced_Codebase) {
         EC_GS.onStoreParams.call(this, PCL.PLUGIN_NAME, "pluginCmdLines");
         const pluginCmds =
                 EC_GS.storedParamVal.call(this, "pluginCmdLines", "pluginCmds");
-        if (true || pluginCmds.isEmpty()) NEW._loadAllPluginCmds.call(this);
+        if (pluginCmds.isEmpty()) NEW._loadAllPluginCmds.call(this);
     }; // NEW._storeParams
 
     NEW._PLUGIN_DIR_PATH = path => {
