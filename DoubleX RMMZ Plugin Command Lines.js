@@ -67,6 +67,7 @@
  *    # Links
  *      Video:
  *      1. https://www.youtube.com/watch?v=9Cro1e_uQBI
+ *      2.(v1.01a+) https://www.youtube.com/watch?v=r9g4S8yuiRU
  *      This Plugin:
  *      1. https://github.com/Double-X/DoubleX-RMMZ/blob/master/DoubleX%20RMMZ%20Plugin%20Command%20Lines.js
  *      Posts:
