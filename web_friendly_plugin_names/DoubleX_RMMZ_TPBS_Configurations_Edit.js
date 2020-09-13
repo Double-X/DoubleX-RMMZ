@@ -569,7 +569,7 @@
  * @type note
  * @desc Returns the tpb base speed for the whole party/troop
  * The game unit involved can be referred by the this keyword
- * @default "return Math.max(...this.members().map(mem => {\n    return mem.tpbBaseSpeed();\n}));"
+ * @default "return Math.max(...this.members().fastMap(mem => {\n    return mem.tpbBaseSpeed();\n}));"
  *
  * @param unitTPBReferenceTime
  * @parent Unit
@@ -585,7 +585,7 @@
  * @type note
  * @desc Returns whether the battle turn has ended
  * The game troop involved can be referred by the this keyword
- * @default "return Math.max(...this.members().map(mem => {\n    return mem.turnCount();\n})) > this._turnCount;"
+ * @default "return Math.max(...this.members().fastMap(mem => {\n    return mem.turnCount();\n})) > this._turnCount;"
  *
  * @command setTPBSCfgEditParam
  * @desc Applies script call $gameSystem.setTPBSCfgEditParam(param, val)
@@ -1183,7 +1183,9 @@ if (DoubleX_RMMZ.Enhanced_Codebase) {
     FP.storeFuncParam = (param, val) => {
         if (!FP._PARAM_FUNC_ARGS.has(param)) return;
         const args = FP._PARAM_FUNC_ARGS.get(param);
+        // Using fastMerge would mutate the parameter function argument lists
         FP.PARAM_FUNCS.set(param, new Function(...args.concat(val)));
+        //
     }; // FP.storeFuncParam
 
 })(DoubleX_RMMZ.TPBS_Configurations_Edit);
