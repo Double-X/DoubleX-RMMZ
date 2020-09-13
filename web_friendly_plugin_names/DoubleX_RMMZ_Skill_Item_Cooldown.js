@@ -510,7 +510,9 @@ if (DoubleX_RMMZ.Enhanced_Codebase) {
     FP.storeFuncParam = (param, val) => {
         if (!FP._PARAM_FUNC_ARGS.has(param)) return;
         const args = FP._PARAM_FUNC_ARGS.get(param);
+        // Using fastMerge would mutate the parameter function argument lists
         FP.PARAM_FUNCS.set(param, new Function(...args.concat(val)));
+        //
     }; // FP.storeFuncParam
 
 })(DoubleX_RMMZ.Skill_Item_Cooldown);
