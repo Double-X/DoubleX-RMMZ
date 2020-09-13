@@ -445,10 +445,10 @@ Utils.checkRMVersion(DoubleX_RMMZ.Enhanced_Codebase.VERSIONS.codebase);
 
     CORE._BOOL_VAL = entry => entry === "true" || entry !== "false";
     CORE._ARRAY_VAL_SEPARATOR = "|", CORE._BOOL_ARRAY_VAL = entry => {
-        return entry.split(CORE._ARRAY_VAL_SEPARATOR).map(CORE._BOOL_VAL);
+        return entry.split(CORE._ARRAY_VAL_SEPARATOR).fastMap(CORE._BOOL_VAL);
     }; // CORE._BOOL_ARRAY_VAL
     CORE._NUM_VAL = entry => +entry, CORE._NUM_ARRAY_VAL = entry => {
-        return entry.split(CORE._ARRAY_VAL_SEPARATOR).map(CORE._NUM_VAL);
+        return entry.split(CORE._ARRAY_VAL_SEPARATOR).fastMap(CORE._NUM_VAL);
     }; // CORE._NUM_ARRAY_VAL
     CORE._STRING_VAL = entry => entry;
     CORE._STRING_ARRAY_VAL = entry => entry.split(CORE._ARRAY_VAL_SEPARATOR);
@@ -480,7 +480,7 @@ Utils.checkRMVersion(DoubleX_RMMZ.Enhanced_Codebase.VERSIONS.codebase);
         return function() { return $gameVariables.value(varId); };
     }; // CORE._RETURNED_ENTRY_VAR
     // The script function will be reloaded upon setting the variables anyway
-    CORE._RETURNED_ENTRY_SCRIPT = entry => argObj => {};
+    CORE._RETURNED_ENTRY_SCRIPT = () => () => {};
     //
     CORE._SUFFIX_ENTRY_FUNC = function(notePairs, notetagType, suffix, entry, count) {
         switch (suffix) {
@@ -488,7 +488,7 @@ Utils.checkRMVersion(DoubleX_RMMZ.Enhanced_Codebase.VERSIONS.codebase);
                     notePairs, notetagType, entry, count);
             case "switch": return CORE._RETURNED_ENTRY_SWITCH(entry);
             case "var": return CORE._RETURNED_ENTRY_VAR(entry);
-            case "script": return CORE._RETURNED_ENTRY_SCRIPT(entry);
+            case "script": return CORE._RETURNED_ENTRY_SCRIPT();
             // There's not enough context to throw errors meaningfully
             default: return CORE._STRING_VAL;
             //
@@ -647,19 +647,19 @@ Utils.checkRMVersion(DoubleX_RMMZ.Enhanced_Codebase.VERSIONS.codebase);
     CORE._SKILLS_NOTETAG_DATA = battler => {
         if (battler.isActor()) return battler.skills();
         if (!battler.isEnemy()) return [];
-        return battler.enemy().actions.map(CORE._ACT_DATA_SKILL);
+        return battler.enemy().actions.fastMap(CORE._ACT_DATA_SKILL);
     }; // CORE._SKILLS_NOTETAG_DATA
     CORE._USABLE_SKILLS_NOTETAG_DATA = battler => {
         if (battler.isActor()) return battler.usableSkills();
         if (!battler.isEnemy()) return [];
         const EC_GE = MZ_EC.Game_Enemy.new;
-        return EC_GE._validActs.call(battler).map(CORE._ACT_DATA_SKILL);
+        return EC_GE._validActs.call(battler).fastMap(CORE._ACT_DATA_SKILL);
     }; // CORE._USABLE_SKILLS_NOTETAG_DATA
     CORE._ITEMS_NOTETAG_DATA = battler => {
         return battler.isActor() ? $gameParty.items() : [];
     }; // CORE._ITEMS_NOTETAG_DATA
     CORE._USABLE_ITEMS_NOTETAG_DATA = battler => {
-        return battler.isActor() ? $gameParty.items().map(item => {
+        return battler.isActor() ? $gameParty.items().fastMap(item => {
             return battler.canUse(item);
         }) : [];
     }; // CORE._USABLE_ITEMS_NOTETAG_DATA
@@ -2818,7 +2818,7 @@ Utils.checkRMVersion(DoubleX_RMMZ.Enhanced_Codebase.VERSIONS.codebase);
     }; // NEW._TRY_JSON_PARAM
     NEW._JSON_PARAM = val => {
         if (!val) return val;
-        if (Array.isArray(val)) return val.map(v => {
+        if (Array.isArray(val)) return val.fastMap(v => {
             return NEW._JSON_PARAM(NEW._TRY_JSON_PARAM(v));
         });
         if (typeof val === "object" || val instanceof Object) {
@@ -4693,7 +4693,7 @@ Utils.checkRMVersion(DoubleX_RMMZ.Enhanced_Codebase.VERSIONS.codebase);
      */
     NEW._initializedEquips = function(equips) {
         const equipNum = equips.length;
-        return this.equipSlots().map((slot, i) => {
+        return this.equipSlots().fastMap((slot, i) => {
             const item = new Game_Item();
             if (i < equipNum) item.setEquip(slot === 1, equips[i]);
             return item;
@@ -5085,7 +5085,7 @@ Utils.checkRMVersion(DoubleX_RMMZ.Enhanced_Codebase.VERSIONS.codebase);
      * @returns {number} The rating to filter out those not having higher rating
      */
     NEW._ratingZero = function(actList) {
-        return Math.max(...actList.map(({ rating }) => rating)) - 3;
+        return Math.max(...actList.fastMap(({ rating }) => rating)) - 3;
     }; // NEW._ratingZero
 
     /**
@@ -5277,6 +5277,31 @@ Utils.checkRMVersion(DoubleX_RMMZ.Enhanced_Codebase.VERSIONS.codebase);
     }; // NEW._setupExistingMem
 
 })(Game_Troop.prototype, DoubleX_RMMZ.Enhanced_Codebase);
+
+/*----------------------------------------------------------------------------
+ *    # Edited class: Game_Map
+ *      - Improves code quality
+ *----------------------------------------------------------------------------*/
+
+(($, MZ_EC) => {
+
+    "use strict";
+
+    const { rewriteFunc } = MZ_EC.setKlassContainer("Game_Map", $.prototype, MZ_EC);
+
+    rewriteFunc("roundXWithDirection", function(x, d) {
+        // Edited to help plugins alter round x with direction in better ways
+        return this.roundX(this.xWithDirection(x, d));
+        //
+    }); // v0.00a - v0.00a
+
+    rewriteFunc("roundYWithDirection", function(y, d) {
+        // Edited to help plugins alter round y with direction in better ways
+        return this.roundY(this.yWithDirection(y, d));
+        //
+    }); // v0.00a - v0.00a
+
+})(Game_Map, DoubleX_RMMZ.Enhanced_Codebase);
 
 /*----------------------------------------------------------------------------
  *    # Edited class: Game_Interpreter
