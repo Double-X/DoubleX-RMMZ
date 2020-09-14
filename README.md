@@ -13,3 +13,5 @@ Fellow Plugin Developers:
 Using Older Versions:
 1. Download the older version from the old versions folder
 2. Renames the older version to be the same as that of the latest version
+
+My RMMZ demo repository: https://github.com/Double-X/DoubleX-RMMZ-Demo
