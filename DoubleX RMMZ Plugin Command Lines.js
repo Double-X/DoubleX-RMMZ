@@ -123,8 +123,7 @@
  *      1. 1st version of this plugin finished
  *----------------------------------------------------------------------------
  *    # Todo
- *      1. Lets you type plugin commands with names having non-alphanumeric
- *         characters
+ *      1. Lets you type plugin commands with names having spaces
  *============================================================================*/
 
 /*~struct~PluginFileCmd:
