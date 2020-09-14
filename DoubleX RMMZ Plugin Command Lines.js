@@ -68,7 +68,6 @@
  *      Video:
  *      1. https://www.youtube.com/watch?v=9Cro1e_uQBI
  *      2.(v1.01a+) https://www.youtube.com/watch?v=r9g4S8yuiRU
- *      2.(v1.02a+) 
  *      This Plugin:
  *      1. https://github.com/Double-X/DoubleX-RMMZ/blob/master/DoubleX%20RMMZ%20Plugin%20Command%20Lines.js
  *      Posts:
@@ -113,6 +112,8 @@
  *      6. Renamed newPluginCmds into newPluginFileCmds
  *      7. Increased the effectiveness and efficiency when reading plugin
  *         commands from the plugin file contents
+ *      8. THIS UPDATE IS A BREAKING CHANGE ON THE PARAMETERS IN THE PLUGIN
+ *         MANAGER
  *      { codebase: "1.0.0", plugin: "v1.01a" }(2020 Sep 11 GMT 1400):
  *      1. Lets you make some new plugin commands as existing ones with some
  *         argument values already set
