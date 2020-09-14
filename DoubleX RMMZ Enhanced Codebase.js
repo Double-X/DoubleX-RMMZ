@@ -68,7 +68,7 @@
  *         must be outdated if those version numbers are indeed different
  *      3. (Plugin developers only)The version numbers of this plugin are
  *         stored in DoubleX_RMMZ.Enhanced_Codebase.VERSIONS, which should be
- *         { codebase: "1.0.0", plugin: "v0.00a" }
+ *         { codebase: "1.0.2", plugin: "v0.00a" }
  *         If it's falsy, it means this plugin's not loaded at the moment of
  *         querying its version numbers
  *      4. (Plugin developers only)Please use the following search tag to
@@ -126,7 +126,7 @@
 /*:
  * @url https://www.patreon.com/doublex
  * @target MZ
- * @plugindesc Versions: { codebase: "1.0.0", plugin: "v0.00a" }
+ * @plugindesc Versions: { codebase: "1.0.2", plugin: "v0.00a" }
  * Fixes bugs, improves codebase quality, boosts performance and gives new APIs
  * @author DoubleX
  *
@@ -343,7 +343,7 @@ var DoubleX_RMMZ = DoubleX_RMMZ || {}; // var must be used or game will crash
 // Separates the version numbers with the rest to make the former more clear
 DoubleX_RMMZ.Enhanced_Codebase = {
     PLUGIN_NAME: "DoubleX RMMZ Enhanced Codebase",
-    VERSIONS: { codebase: "1.0.0", plugin: "v0.00a" }
+    VERSIONS: { codebase: "1.0.2", plugin: "v0.00a" }
 }; // DoubleX_RMMZ.Enhanced_Codebase
 //
 Utils.checkRMVersion(DoubleX_RMMZ.Enhanced_Codebase.VERSIONS.codebase);
@@ -1597,7 +1597,7 @@ Utils.checkRMVersion(DoubleX_RMMZ.Enhanced_Codebase.VERSIONS.codebase);
     }); // v0.00a - v0.00a
 
     rewriteFunc("drawText", function(text, x, y, maxWidth, lineHeight, align) {
-        const { context, context: { alpha } } = this;
+        const { context } = this, alpha = context.globalAlpha;
         maxWidth = maxWidth || 0xffffffff;
         // Edited to help plugins alter the text align behaviors in better ways
         const tx = NEW._drawnTextX.call(this, align, x, maxWidth);
