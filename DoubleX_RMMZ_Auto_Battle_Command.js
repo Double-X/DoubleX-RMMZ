@@ -27,20 +27,20 @@
  *----------------------------------------------------------------------------
  *    # Links
  *      Video:
- *      1.
+ *      1. https://www.youtube.com/watch?v=Cii91D22kA0
  *      This Plugin:
- *      1.
+ *      1. https://github.com/Double-X/DoubleX-RMMZ/blob/master/DoubleX_RMMZ_Auto_Battle_Command.js
  *      Posts:
- *      1.
- *      2.
- *      3.
- *      4.
- *      5.
- *      6.
- *      7.
- *      8.
- *      9.
- *      10.
+ *      1. https://forums.rpgmakerweb.com/index.php?threads/doublex_rmmz_auto_battle_command.127332/
+ *      2. https://www.rpgmakercentral.com/topic/42591-doublex_rmmz_auto_battle_command/
+ *      3. https://rpgmaker.net/engines/rmmz/utilities/286/
+ *      4. https://www.save-point.org/thread-8165.html
+ *      5. https://gdu.one/forums/topic/13640-doublex_rmmz_auto_battle_command/
+ *      6. http://www.hbgames.org/forums/viewtopic.php?f=332&t=80332
+ *      7. https://forum.chaos-project.com/index.php/topic,16078.msg197396.html
+ *      8. https://doublexrpgmaker.wordpress.com/2020/09/14/doublex_rmmz_auto_battle_command/
+ *      9. https://www.patreon.com/posts/41587930
+ *      10. https://www.makerdevs.com/plugin/doublex-rmmz-auto-battle-command
  *----------------------------------------------------------------------------
  *    # Instructions
  *      1. The default plugin parameters file name is
@@ -94,16 +94,20 @@
  * @command setAutoBattleCmdState
  * @desc Sets the new value of the parameter stateId
  * @arg stateId
+ * @type number
+ * @min 1
  * @desc The id of the state added by the auto battle command
  *
  * @command setAutoBattleCmdText
  * @desc Sets the new value of the parameter text
  * @arg text
+ * @type string
  * @desc The auto battle command name
  *
  * @command setCanUseAutoBattleCmd
  * @desc Sets the new value of the parameter canUse
  * @arg canUse
+ * @type boolean
  * @desc Whether the auto battle command can be used
  *
  * @help
