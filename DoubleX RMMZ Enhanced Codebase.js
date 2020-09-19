@@ -5020,9 +5020,8 @@ Utils.checkRMVersion(DoubleX_RMMZ.Enhanced_Codebase.VERSIONS.codebase);
 
     rewriteFunc("makeDropItems", function() {
         // Edited to help plugins alter make drop items in better ways
-        return this.enemy().dropItems.reduce((r, di) => {
-            if (!NEW._isDropItem.call(this, di)) return r;
-            return r.fastMerge(this.itemObject(di.kind, di.dataId));
+        return this.enemy().dropItems.reduce((dropItems, dropItem) => {
+            return NEW._accumDropItems.call(this, dropItems, dropItem);
         }, []);
         //
     }); // v0.00a - v0.00a
@@ -5060,9 +5059,10 @@ Utils.checkRMVersion(DoubleX_RMMZ.Enhanced_Codebase.VERSIONS.codebase);
      * @returns {[DatumDropItem]} The accumulated items to be dropped by enemy
      */
     NEW._accumDropItems = function(dropItems, dropItem) {
-        if (!NEW._isDropItem.call(this, dropItem)) return dropItems;
-        const itemObj = this.itemObject(dropItem.kind, dropItem.dataId);
-        return dropItems.fastMerge(itemObj);
+        if (NEW._isDropItem.call(this, dropItem)) {
+            dropItems.push(this.itemObject(dropItem.kind, dropItem.dataId));
+        }
+        return dropItems;
     }; // NEW._accumDropItems
 
     /**
@@ -5287,7 +5287,9 @@ Utils.checkRMVersion(DoubleX_RMMZ.Enhanced_Codebase.VERSIONS.codebase);
 
     "use strict";
 
-    const { rewriteFunc } = MZ_EC.setKlassContainer("Game_Map", $.prototype, MZ_EC);
+    const {
+        rewriteFunc
+    } = MZ_EC.setKlassContainer("Game_Map", $.prototype, MZ_EC);
 
     rewriteFunc("roundXWithDirection", function(x, d) {
         // Edited to help plugins alter round x with direction in better ways
@@ -5302,6 +5304,106 @@ Utils.checkRMVersion(DoubleX_RMMZ.Enhanced_Codebase.VERSIONS.codebase);
     }); // v0.00a - v0.00a
 
 })(Game_Map, DoubleX_RMMZ.Enhanced_Codebase);
+
+/*----------------------------------------------------------------------------
+ *    # Edited class: Game_CharacterBase
+ *      - Improves code quality
+ *----------------------------------------------------------------------------*/
+
+(($, MZ_EC) => {
+
+    "use strict";
+
+    const {
+        rewriteFunc,
+        NEW
+    } = MZ_EC.setKlassContainer("Game_CharacterBase", $.prototype, MZ_EC);
+
+    rewriteFunc("moveStraight", function(d) {
+        this.setMovementSuccess(this.canPass(this._x, this._y, d));
+        // Edited to help plugins alter move straight behaviors in better ways
+        if (!this.isMovementSucceeded()) {
+            return NEW._onMoveStraightSuc.call(this, d);
+        }
+        NEW._onMoveStraightFail.call(this, d);
+        //
+    }); // v0.00a - v0.00a
+
+    rewriteFunc("moveDiagonally", function(horz, vert) {
+        const canPass = this.canPassDiagonally(this._x, this._y, horz, vert);
+        this.setMovementSuccess(canPass);
+        if (this.isMovementSucceeded()) {
+            // Edited to help plugins alter move diagonally in better ways
+            NEW._onMoveDiagonallySuc.call(this, horz, vert);
+            //
+        }
+        if (this._direction === this.reverseDir(horz)) this.setDirection(horz);
+        if (this._direction === this.reverseDir(vert)) this.setDirection(vert);
+    }); // v0.00a - v0.00a
+
+    /**
+     * The this pointer is Game_Interpreter.prototype
+     * Idempotent
+     * @author DoubleX @interface @since v0.00a @version v0.00a
+     * @enum @param {number} d - 2 for down/4 for left/6 for right/8 for up
+     */
+    NEW._onMoveStraightSuc = function(d) {
+        this.setDirection(d);
+        NEW._updateStraightXY.call(this, d);
+        this.increaseSteps();
+    }; // NEW._onMoveStraightSuc
+
+    /**
+     * The this pointer is Game_Interpreter.prototype
+     * Idempotent
+     * @author DoubleX @interface @since v0.00a @version v0.00a
+     * @enum @param {number} d - 2 for down/4 for left/6 for right/8 for up
+     */
+    NEW._updateStraightXY = function(d) {
+        this._x = $gameMap.roundXWithDirection(this._x, d);
+        this._y = $gameMap.roundYWithDirection(this._y, d);
+        this._realX = $gameMap.xWithDirection(this._x, this.reverseDir(d));
+        this._realY = $gameMap.yWithDirection(this._y, this.reverseDir(d));
+    }; // NEW._updateStraightXY
+
+    /**
+     * The this pointer is Game_Interpreter.prototype
+     * Idempotent
+     * @author DoubleX @interface @since v0.00a @version v0.00a
+     * @enum @param {number} d - 2 for down/4 for left/6 for right/8 for up
+     */
+    NEW._onMoveStraightFail = function(d) {
+        this.setDirection(d);
+        this.checkEventTriggerTouchFront(d);
+    }; // NEW._onMoveStraightFail
+
+    /**
+     * The this pointer is Game_Interpreter.prototype
+     * Idempotent
+     * @author DoubleX @interface @since v0.00a @version v0.00a
+     * @enum @param {number} horz - 4 for left/6 for right
+     * @enum @param {number} vert - 2 for down/8 for up
+     */
+    NEW._onMoveDiagonalSuc = function(horz, vert) {
+        NEW._updateDiagonalXY.call(this, horz, vert);
+        this.increaseSteps();
+    }; // NEW._onMoveDiagonalSuc
+
+    /**
+     * The this pointer is Game_Interpreter.prototype
+     * Idempotent
+     * @author DoubleX @interface @since v0.00a @version v0.00a
+     * @enum @param {number} horz - 4 for left/6 for right
+     * @enum @param {number} vert - 2 for down/8 for up
+     */
+    NEW._updateDiagonalXY = function(horz, vert) {
+        this._x = $gameMap.roundXWithDirection(this._x, horz);
+        this._y = $gameMap.roundYWithDirection(this._y, vert);
+        this._realX = $gameMap.xWithDirection(this._x, this.reverseDir(horz));
+        this._realY = $gameMap.yWithDirection(this._y, this.reverseDir(vert));
+    }; // NEW._updateDiagonalXY
+
+})(Game_CharacterBase, DoubleX_RMMZ.Enhanced_Codebase);
 
 /*----------------------------------------------------------------------------
  *    # Edited class: Game_Interpreter
