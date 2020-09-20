@@ -5322,7 +5322,7 @@ Utils.checkRMVersion(DoubleX_RMMZ.Enhanced_Codebase.VERSIONS.codebase);
     rewriteFunc("moveStraight", function(d) {
         this.setMovementSuccess(this.canPass(this._x, this._y, d));
         // Edited to help plugins alter move straight behaviors in better ways
-        if (!this.isMovementSucceeded()) {
+        if (this.isMovementSucceeded()) {
             return NEW._onMoveStraightSuc.call(this, d);
         }
         NEW._onMoveStraightFail.call(this, d);
