@@ -5324,8 +5324,7 @@ Utils.checkRMVersion(DoubleX_RMMZ.Enhanced_Codebase.VERSIONS.codebase);
         // Edited to help plugins alter move straight behaviors in better ways
         if (this.isMovementSucceeded()) {
             return NEW._onMoveStraightSuc.call(this, d);
-        }
-        NEW._onMoveStraightFail.call(this, d);
+        } else NEW._onMoveStraightFail.call(this, d);
         //
     }); // v0.00a - v0.00a
 
@@ -5384,10 +5383,10 @@ Utils.checkRMVersion(DoubleX_RMMZ.Enhanced_Codebase.VERSIONS.codebase);
      * @enum @param {number} horz - 4 for left/6 for right
      * @enum @param {number} vert - 2 for down/8 for up
      */
-    NEW._onMoveDiagonalSuc = function(horz, vert) {
+    NEW._onMoveDiagonallySuc = function(horz, vert) {
         NEW._updateDiagonalXY.call(this, horz, vert);
         this.increaseSteps();
-    }; // NEW._onMoveDiagonalSuc
+    }; // NEW._onMoveDiagonallySuc
 
     /**
      * The this pointer is Game_Interpreter.prototype
