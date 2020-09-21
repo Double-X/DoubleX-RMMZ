@@ -348,7 +348,7 @@ if (DoubleX_RMMZ.Enhanced_Codebase) {
     }; // NEW._NEW_PLUGIN_CMD_ARGS
     /**
      * The this pointer is Game_System.prototype
-     * Script Call/Nullipotent
+     * Script Call/Idempotent
      * @author DoubleX @interface @since v1.01a @version v1.02a
      * @param {string} pluginFilename - Filename of plugin having origCmdName
      * @param {string} newCmdName - The name of the new plugin command
@@ -606,7 +606,7 @@ if (DoubleX_RMMZ.Enhanced_Codebase) {
             //
             argName = "";
         }
-    }; // NEW._ADD_PLUGIN_CMDS
+    }; // NEW._LOAD_PLUGIN_CMDS
 
 })(Game_System.prototype, DoubleX_RMMZ.Enhanced_Codebase,
         DoubleX_RMMZ.Plugin_Command_Lines);
@@ -674,7 +674,7 @@ if (DoubleX_RMMZ.Enhanced_Codebase) {
     }; // NEW._PLUGIN_CMD_ARG_OBJ
     /**
      * The this pointer is Game_Interpreter.prototype
-     * Nullipotent
+     * Idempotent
      * @author DoubleX @since v1.00a @version v1.01a
      * @param {string} scriptLine - The current script line in the script box
      * @returns {boolean} Whether the plugin command's successfully called
