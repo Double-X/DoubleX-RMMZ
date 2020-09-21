@@ -17,7 +17,7 @@
  *      1. DoubleX RMMZ Enhanced Codebase
  *         https://github.com/Double-X/DoubleX-RMMZ/blob/master/DoubleX%20RMMZ%20Enhanced%20Codebase.js
  *      Abilities:
- *      2. Little RMMZ plugin development proficiency to fully utilize this
+ *      1. Little RMMZ plugin development proficiency to fully utilize this
  *         (Elementary Javascript exposures being able to write beginner codes
  *         up to 300LoC scale)
  *----------------------------------------------------------------------------
@@ -25,6 +25,8 @@
  *      1. If multiple new script calls have the same name, the one having the
  *         lowest ordering in newScriptCalls will be used
  *         (Search tag: Last_In_Duplicate_Script_Calls)
+ *      2. (Advanced)DON'T REDEFINE EXISTING SCRIPT CALLS UNLESS YOU REALLY
+ *         KNOW WHAT YOU'RE TRULY DOING
  *----------------------------------------------------------------------------
  *    # Terms Of Use
  *      1. Commercial use's always allowed and crediting me's always optional.
@@ -42,20 +44,20 @@
  *----------------------------------------------------------------------------
  *    # Links
  *      Video:
- *      1. 
+ *      1. https://www.youtube.com/watch?v=S8BK_ApNnQw
  *      This Plugin:
- *      1. 
+ *      1. https://github.com/Double-X/DoubleX-RMMZ/blob/master/DoubleX_RMMZ_Custom_Script_Calls.js
  *      Posts:
- *      1. 
- *      2. 
- *      3. 
- *      4. 
- *      5. 
- *      6. 
- *      7. 
- *      8. 
- *      9. 
- *      10. 
+ *      1. https://forums.rpgmakerweb.com/index.php?threads/doublex_rmmz_custom_script_calls.127678/
+ *      2. https://www.rpgmakercentral.com/topic/42615-doublex_rmmz_custom_script_calls/
+ *      3. https://rpgmaker.net/engines/rmmz/utilities/291/
+ *      4. https://www.save-point.org/thread-8171-post-52719.html
+ *      5. https://gdu.one/forums/topic/13646-doublex_rmmz_custom_script_calls/
+ *      6. http://www.hbgames.org/forums/viewtopic.php?p=945208
+ *      7. https://forum.chaos-project.com/index.php/topic,16080.new.html
+ *      8. https://doublexrpgmaker.wordpress.com/2020/09/21/doublex_rmmz_custom_script_calls/
+ *      9. https://www.patreon.com/posts/41857800
+ *      10. https://www.makerdevs.com/plugin/doublex-rmmz-custom-script-calls
  *----------------------------------------------------------------------------
  *    # Instructions
  *      1. The default plugin parameters file name is
@@ -154,7 +156,7 @@
  *    3.
  *       - newScriptCallFullName = asdasd
  *       - origScriptCallFullName = fghfgh
- *       - origScriptCallContext = 
+ *       - origScriptCallContext =
  *       - scriptCallArgVals = [{ argI: 1, argVal: "$gameSwitches.value(1)" }]
  *       If the signature of fghfgh is (zxc, vbn), then this defines the new
  *       function asdasd as fghfgh(zxc, $gameSwitches.value(1));
@@ -283,8 +285,10 @@ if (DoubleX_RMMZ.Enhanced_Codebase) {
         let newScriptCall = window;
         newFullNameParts.forEach((part, i) => {
             if (i < maxI) return newScriptCall = newScriptCall[part] || {};
+            // Search tag: Last_In_Duplicate_Script_Calls
             newScriptCall[part] = new Function(NEW._FUNC_CONTENTS(
                     origScriptCallFullName, context, argVals));
+            //
         });
     }; // $.setNewScriptCall
 
@@ -324,7 +328,7 @@ if (DoubleX_RMMZ.Enhanced_Codebase) {
             origScriptCallContext,
             scriptCallArgVals
         } = newScriptCall;
-        this.setNewScriptCall(newScriptCallFullName, origScriptCallFullName, 
+        this.setNewScriptCall(newScriptCallFullName, origScriptCallFullName,
                 origScriptCallContext, scriptCallArgVals);
     }; // NEW._setNewScriptCall
 
