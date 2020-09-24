@@ -18,20 +18,6 @@
  *    5. If a filter causes no target to pass, that filter will be discarded
  *       upon such use cases
  *----------------------------------------------------------------------------
- *    # Terms Of Use
- *      1. Commercial use's always allowed and crediting me's always optional.
- *      2. You shall keep this plugin's Plugin Info part's contents intact.
- *      3. You shalln't claim that this plugin's written by anyone other than
- *         DoubleX or my aliases. I always reserve the right to deny you from
- *         using any of my plugins anymore if you've violated this.
- *      4. If you repost this plugin directly(rather than just linking back),
- *         you shall inform me of these direct repostings. I always reserve
- *         the right to request you to edit those direct repostings.
- *      5. CC BY 4.0, except those conflicting with any of the above, applies
- *         to this plugin, unless you've my permissions not needing follow so.
- *      6. I always reserve the right to deny you from using this plugin
- *         anymore if you've violated any of the above.
- *----------------------------------------------------------------------------
  *    # Prerequisites
  *      Plugins:
  *      1. DoubleX RMMZ Enhanced Codebase
@@ -50,6 +36,20 @@
  *         highly encouraged and recommended to have a basic knowledge on what
  *         they do in general, even though it's not strictly needed to use
  *         this plugin
+ *----------------------------------------------------------------------------
+ *    # Terms Of Use
+ *      1. Commercial use's always allowed and crediting me's always optional.
+ *      2. You shall keep this plugin's Plugin Info part's contents intact.
+ *      3. You shalln't claim that this plugin's written by anyone other than
+ *         DoubleX or my aliases. I always reserve the right to deny you from
+ *         using any of my plugins anymore if you've violated this.
+ *      4. If you repost this plugin directly(rather than just linking back),
+ *         you shall inform me of these direct repostings. I always reserve
+ *         the right to request you to edit those direct repostings.
+ *      5. CC BY 4.0, except those conflicting with any of the above, applies
+ *         to this plugin, unless you've my permissions not needing follow so.
+ *      6. I always reserve the right to deny you from using this plugin
+ *         anymore if you've violated any of the above.
  *----------------------------------------------------------------------------
  *    # Links
  *      Video:

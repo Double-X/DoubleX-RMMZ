@@ -21,6 +21,17 @@
  *    4. THIS PLUGIN'S INTENDED TO GIVES AN EXTRA OPTION TO PLUGIN DEVELOPERS
  *       RATHER THAN REPLACING THE DEFAULT RMMZ CODEBASE
  *----------------------------------------------------------------------------
+ *    # Prerequisites
+ *      Abilities(Plugin Users):
+ *      1. Nothing special
+ *      Abilities(Plugin Developers):
+ *      1. Basic knowledge on what the default RMMZ codebase does in general
+ *      2. Some RMMZ plugin development proficiency to fully utilize this
+ *         plugin in intended ways
+ *         (Basic knowledge on what RMMZ plugin development does in general
+ *         with several easy, simple and small plugins written without
+ *         nontrivial bugs up to 1000 LoC scale but still being inexperienced)
+ *----------------------------------------------------------------------------
  *    # Terms Of Use
  *      1. Commercial use's always allowed and crediting me's always optional.
  *      2. You shall keep this plugin's Plugin Info part's contents intact.
@@ -34,17 +45,6 @@
  *         to this plugin, unless you've my permissions not needing follow so.
  *      6. I always reserve the right to deny you from using this plugin
  *         anymore if you've violated any of the above.
- *----------------------------------------------------------------------------
- *    # Prerequisites
- *      Abilities(Plugin Users):
- *      1. Nothing special
- *      Abilities(Plugin Developers):
- *      1. Basic knowledge on what the default RMMZ codebase does in general
- *      2. Some RMMZ plugin development proficiency to fully utilize this
- *         plugin in intended ways
- *         (Basic knowledge on what RMMZ plugin development does in general
- *         with several easy, simple and small plugins written without
- *         nontrivial bugs up to 1000 LoC scale but still being inexperienced)
  *----------------------------------------------------------------------------
  *    # Links
  *      This Plugin:
@@ -1398,11 +1398,9 @@ Utils.checkRMVersion(DoubleX_RMMZ.Enhanced_Codebase.VERSIONS.codebase);
     //
 
     // Search tag: Graphics_Game_FPS
-    addAccessor("gameFps", function() {
+    addAccessor("gameFps", function() { // v0.00a - v0.00a
         return PIXI.settings.TARGET_FPMS * 1000.0;
-    }, function(gameFps) {
-        PIXI.settings.TARGET_FPMS = gameFps / 1000.0;
-    }); // v0.00a - v0.00a
+    }, function(gameFps) { PIXI.settings.TARGET_FPMS = gameFps / 1000.0; });
     //
 
     NEW._keyEvents = new Map();
@@ -1657,8 +1655,7 @@ Utils.checkRMVersion(DoubleX_RMMZ.Enhanced_Codebase.VERSIONS.codebase);
      */
     NEW._drawnTextX = function(align, x, maxWidth) {
         if (align === "center") return x + maxWidth / 2;
-        if (align === "right") return x + maxWidth;
-        return x;
+        return align === "right" ? x + maxWidth : x;
     }; // NEW._drawnTextX
 
     /**
@@ -4103,9 +4100,7 @@ Utils.checkRMVersion(DoubleX_RMMZ.Enhanced_Codebase.VERSIONS.codebase);
      * @author DoubleX @interface @since v0.00a @version v0.00a
      * @returns {boolean} Whether the tpb battler's in the idle state
      */
-    $.isTpbIdle = function() {
-        return !this.canMove() || this.isTpbCharged();
-    }; // $.isTpbIdle
+    $.isTpbIdle = function() { return !this.canMove() || this.isTpbCharged(); };
 
     /**
      * The this pointer is Game_Battler.prototype

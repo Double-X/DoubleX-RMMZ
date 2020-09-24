@@ -4,6 +4,13 @@
  *    # Plugin Name
  *      DoubleX_RMMZ_Auto_Battle_Command
  *----------------------------------------------------------------------------
+ *    # Prerequisites
+ *      Plugins:
+ *      1. DoubleX RMMZ Enhanced Codebase
+ *         https://github.com/Double-X/DoubleX-RMMZ/blob/master/DoubleX%20RMMZ%20Enhanced%20Codebase.js
+ *      Abilities:
+ *      1. Nothing special
+ *----------------------------------------------------------------------------
  *    # Terms Of Use
  *      1. Commercial use's always allowed and crediting me's always optional.
  *      2. You shall keep this plugin's Plugin Info part's contents intact.
@@ -17,13 +24,6 @@
  *         to this plugin, unless you've my permissions not needing follow so.
  *      6. I always reserve the right to deny you from using this plugin
  *         anymore if you've violated any of the above.
- *----------------------------------------------------------------------------
- *    # Prerequisites
- *      Plugins:
- *      1. DoubleX RMMZ Enhanced Codebase
- *         https://github.com/Double-X/DoubleX-RMMZ/blob/master/DoubleX%20RMMZ%20Enhanced%20Codebase.js
- *      Abilities:
- *      1. Nothing special
  *----------------------------------------------------------------------------
  *    # Links
  *      Video:
