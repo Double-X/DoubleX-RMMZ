@@ -13,6 +13,19 @@
  *         and small script calls instead of writing several common events
  *         from scratch, thus further improving effectiveness and efficiency.
  *----------------------------------------------------------------------------
+ *    # Prerequisites
+ *      Abilities:
+ *      1. Nothing special for most ordinary cases
+ *      2. Little RMMZ plugin development proficiency to fully utilize this
+ *         (Elementary Javascript exposures being able to write beginner codes
+ *         up to 300LoC scale)
+ *----------------------------------------------------------------------------
+ *    # Author Notes
+ *      1. This plugin's meant to be a convenience tool to facilitate the use
+ *         of some unit filters that aren't already available from the default
+ *         RMMZ codebase, so you're still supposed to write some Javascript
+ *         codes with the aid of the new script calls provided by this plugin.
+ *----------------------------------------------------------------------------
  *    # Terms Of Use
  *      1. Commercial use's always allowed and crediting me's always optional.
  *      2. You shall keep this plugin's Plugin Info part's contents intact.
@@ -26,19 +39,6 @@
  *         to this plugin, unless you've my permissions not needing follow so.
  *      6. I always reserve the right to deny you from using this plugin
  *         anymore if you've violated any of the above.
- *----------------------------------------------------------------------------
- *    # Prerequisites
- *      Abilities:
- *      1. Nothing special for most ordinary cases
- *      2. Little RMMZ plugin development proficiency to fully utilize this
- *         (Elementary Javascript exposures being able to write beginner codes
- *         up to 300LoC scale)
- *----------------------------------------------------------------------------
- *    # Author Notes
- *      1. This plugin's meant to be a convenience tool to facilitate the use
- *         of some unit filters that aren't already available from the default
- *         RMMZ codebase, so you're still supposed to write some Javascript
- *         codes with the aid of the new script calls provided by this plugin.
  *----------------------------------------------------------------------------
  *    # Links
  *      This Plugin:
