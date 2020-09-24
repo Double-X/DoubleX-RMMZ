@@ -15,6 +15,16 @@
  *       covered by this plugin itself, so this plugin just lets you write
  *       JavaScript codes that are executed on some important timings
  *----------------------------------------------------------------------------
+ *    # Prerequisites
+ *      Plugins:
+ *      1. DoubleX RMMZ Enhanced Codebase
+ *         https://github.com/Double-X/DoubleX-RMMZ/blob/master/DoubleX%20RMMZ%20Enhanced%20Codebase.js
+ *      Abilities:
+ *      1. Some RMMV plugin development proficiency
+ *         (Basic knowledge on what RMMV plugin development does in general
+ *         with several easy, simple and small plugins written without
+ *         nontrivial bugs up to 1000 LoC scale but still being inexperienced)
+ *----------------------------------------------------------------------------
  *    # Terms Of Use
  *      1. Commercial use's always allowed and crediting me's always optional.
  *      2. You shall keep this plugin's Plugin Info part's contents intact.
@@ -28,16 +38,6 @@
  *         to this plugin, unless you've my permissions not needing follow so.
  *      6. I always reserve the right to deny you from using this plugin
  *         anymore if you've violated any of the above.
- *----------------------------------------------------------------------------
- *    # Prerequisites
- *      Plugins:
- *      1. DoubleX RMMZ Enhanced Codebase
- *         https://github.com/Double-X/DoubleX-RMMZ/blob/master/DoubleX%20RMMZ%20Enhanced%20Codebase.js
- *      Abilities:
- *      1. Some RMMV plugin development proficiency
- *         (Basic knowledge on what RMMV plugin development does in general
- *         with several easy, simple and small plugins written without
- *         nontrivial bugs up to 1000 LoC scale but still being inexperienced)
  *----------------------------------------------------------------------------
  *    # Links
  *      Video:
