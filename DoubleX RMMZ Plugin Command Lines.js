@@ -209,7 +209,7 @@
 /*:
  * @url https://www.patreon.com/doublex
  * @target MZ
- * @plugindesc Versions: { codebase: "1.0.2", plugin: "v1.02a" }
+ * @plugindesc Versions: { codebase: "1.0.2", plugin: "v1.03a" }
  * Lets you use plugin commands in the RMMV styles by typing them as scripts
  *
  * @param pluginFileCmds
@@ -285,7 +285,7 @@ var DoubleX_RMMZ = DoubleX_RMMZ || {}; // var must be used or game will crash
 // Separates the version numbers with the rest to make the former more clear
 DoubleX_RMMZ.Plugin_Command_Lines = {
     PLUGIN_NAME: "DoubleX RMMZ Plugin Command Lines",
-    VERSIONS: { codebase: "1.0.2", plugin: "v1.02a" }
+    VERSIONS: { codebase: "1.0.2", plugin: "v1.03a" }
 }; // DoubleX_RMMZ.Plugin_Command_Lines
 //
 Utils.checkRMVersion(DoubleX_RMMZ.Plugin_Command_Lines.VERSIONS.codebase);
