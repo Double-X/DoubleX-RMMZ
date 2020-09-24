@@ -11,20 +11,6 @@
  *      2. With this plugin, those preferring the RMMV plugin command can
  *         replicate this style in RMMZ by typing plugin command as a script
  *----------------------------------------------------------------------------
- *    # Terms Of Use
- *      1. Commercial use's always allowed and crediting me's always optional.
- *      2. You shall keep this plugin's Plugin Info part's contents intact.
- *      3. You shalln't claim that this plugin's written by anyone other than
- *         DoubleX or my aliases. I always reserve the right to deny you from
- *         using any of my plugins anymore if you've violated this.
- *      4. If you repost this plugin directly(rather than just linking back),
- *         you shall inform me of these direct repostings. I always reserve
- *         the right to request you to edit those direct repostings.
- *      5. CC BY 4.0, except those conflicting with any of the above, applies
- *         to this plugin, unless you've my permissions not needing follow so.
- *      6. I always reserve the right to deny you from using this plugin
- *         anymore if you've violated any of the above.
- *----------------------------------------------------------------------------
  *    # Prerequisites
  *      Plugins:
  *      1. DoubleX RMMZ Enhanced Codebase
@@ -64,6 +50,20 @@
  *           to be a separate script call from the script call of the scripts
  *           combined from scriptLine3 and scriptLine4
  *----------------------------------------------------------------------------
+ *    # Terms Of Use
+ *      1. Commercial use's always allowed and crediting me's always optional.
+ *      2. You shall keep this plugin's Plugin Info part's contents intact.
+ *      3. You shalln't claim that this plugin's written by anyone other than
+ *         DoubleX or my aliases. I always reserve the right to deny you from
+ *         using any of my plugins anymore if you've violated this.
+ *      4. If you repost this plugin directly(rather than just linking back),
+ *         you shall inform me of these direct repostings. I always reserve
+ *         the right to request you to edit those direct repostings.
+ *      5. CC BY 4.0, except those conflicting with any of the above, applies
+ *         to this plugin, unless you've my permissions not needing follow so.
+ *      6. I always reserve the right to deny you from using this plugin
+ *         anymore if you've violated any of the above.
+ *----------------------------------------------------------------------------
  *    # Links
  *      Video:
  *      1. https://www.youtube.com/watch?v=9Cro1e_uQBI
@@ -102,6 +102,10 @@
  *      - None So Far
  *----------------------------------------------------------------------------
  *    # Changelog
+ *      { codebase: "1.0.2", plugin: "v1.03a" }(2020 Sep 24 GMT 0900):
+ *      1. Game_Interpreter.prototype.pluginCommand can now use RMMZ plugin
+ *         commands in parameter pluginFileCmds or new ones in parameter
+ *         newPluginFileCmds
  *      { codebase: "1.0.2", plugin: "v1.02a" }(2020 Sep 14 GMT 0700):
  *      1. Lets you use text instead of command for plugin command names
  *      2. Lets you use text instead of arg for plugin command argument names
@@ -645,6 +649,19 @@ if (DoubleX_RMMZ.Enhanced_Codebase) {
         //
     }); // v1.00a - v1.00a
 
+    rewriteFunc("pluginCommand", function(command, args) {
+        // Added to call the plugin commands registered in this plugin
+        const argNameVals_ = $gameSystem.pluginCmdLineArgNameVals_(command);
+        if (!argNameVals_) return;
+        const { origCmdName } = argNameVals_;
+        const key_ = NEW._PLUGIN_CMD_KEY_(origCmdName);
+        if (!key_) return false;
+        const pluginName = key_.split(":")[0];
+        const argObj = NEW._PLUGIN_CMD_ARG_OBJ(argNameVals_, args);
+        PluginManager.callCommand(this, pluginName, origCmdName, argObj);
+        //
+    }); // v1.00a - v1.00a
+
     NEW._IS_PLUGIN_CMD = scriptLine => {
         // The plugin command should be as forgiving to syntax error as possible
         const cmdName_ = scriptLine.split(/\s+/)[0];
@@ -659,12 +676,12 @@ if (DoubleX_RMMZ.Enhanced_Codebase) {
             return key.split(":")[1] === cmdName;
         });
     }; // NEW._PLUGIN_CMD_KEY_
-    NEW._PLUGIN_CMD_ARG_OBJ = ({ argNames, argNameVals }, script) => {
+    NEW._PLUGIN_CMD_ARG_OBJ = ({ argNames, argNameVals }, args) => {
         let j = 0;
         return argNames.reduce((obj, arg, i) => {
             const argNameVal_ = argNameVals.find(({ argName }) => {
                 return argName === arg;
-            }), scriptVal = script[i + 1 - j];
+            }), scriptVal = args[i - j];
             if (argNameVal_) {
                 j++;
                 obj[arg] = argNameVal_.argVal;
@@ -681,17 +698,10 @@ if (DoubleX_RMMZ.Enhanced_Codebase) {
      */
     NEW._callPluginCmd = function(scriptLine) {
         // The plugin command should be as forgiving to syntax error as possible
-        const pluginCmd = scriptLine.split(/\s+/), cmdName_ = pluginCmd[0];
+        const pluginCmd = scriptLine.split(/\s+/), cmdName_ = pluginCmd.shift();
         //
         if (!cmdName_) return false;
-        const argNameVals_ = $gameSystem.pluginCmdLineArgNameVals_(cmdName_);
-        if (!argNameVals_) return false;
-        const { origCmdName } = argNameVals_;
-        const key_ = NEW._PLUGIN_CMD_KEY_(origCmdName);
-        if (!key_) return false;
-        const pluginName = key_.split(":")[0];
-        const argObj = NEW._PLUGIN_CMD_ARG_OBJ(argNameVals_, pluginCmd);
-        PluginManager.callCommand(this, pluginName, origCmdName, argObj);
+        this.pluginCommand(cmdName_, pluginCmd);
         return true;
     }; // NEW._callPluginCmd
 
