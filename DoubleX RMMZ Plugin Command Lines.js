@@ -102,7 +102,7 @@
  *      - None So Far
  *----------------------------------------------------------------------------
  *    # Changelog
- *      { codebase: "1.0.2", plugin: "v1.03a" }(2020 Sep 24 GMT 1400):
+ *      { codebase: "1.0.2", plugin: "v1.03a" }(2020 Sep 24 GMT 0900):
  *      1. Game_Interpreter.prototype.pluginCommand can now use RMMZ plugin
  *         commands in parameter pluginFileCmds or new ones in parameter
  *         newPluginFileCmds
