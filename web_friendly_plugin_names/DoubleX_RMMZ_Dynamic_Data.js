@@ -16,6 +16,15 @@
  *    4. CHANGING DATA ON THE FLY SHOULD NEVER BE TAKEN LIGHTLY, SO THIS
  *       PLUGIN'S SPECIFICALLY DESIGNED TO NOT HAVE RMMZ BEGINNERS IN MIND
  *----------------------------------------------------------------------------
+ *    # Prerequisites
+ *      Plugins:
+ *      1. DoubleX RMMZ Enhanced Codebase
+ *         https://github.com/Double-X/DoubleX-RMMZ/blob/master/DoubleX%20RMMZ%20Enhanced%20Codebase.js
+ *      Abilities:
+ *      2. Little RMMZ plugin development proficiency
+ *         (Elementary Javascript exposures being able to write beginner codes
+ *         up to 300LoC scale)
+ *----------------------------------------------------------------------------
  *    # Terms Of Use
  *      1. Commercial use's always allowed and crediting me's always optional.
  *      2. You shall keep this plugin's Plugin Info part's contents intact.
@@ -29,15 +38,6 @@
  *         to this plugin, unless you've my permissions not needing follow so.
  *      6. I always reserve the right to deny you from using this plugin
  *         anymore if you've violated any of the above.
- *----------------------------------------------------------------------------
- *    # Prerequisites
- *      Plugins:
- *      1. DoubleX RMMZ Enhanced Codebase
- *         https://github.com/Double-X/DoubleX-RMMZ/blob/master/DoubleX%20RMMZ%20Enhanced%20Codebase.js
- *      Abilities:
- *      2. Little RMMZ plugin development proficiency
- *         (Elementary Javascript exposures being able to write beginner codes
- *         up to 300LoC scale)
  *----------------------------------------------------------------------------
  *    # Links
  *      Video:
