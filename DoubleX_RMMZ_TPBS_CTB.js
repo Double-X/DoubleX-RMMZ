@@ -40,16 +40,16 @@
  *      This Plugin:
  *      1. https://github.com/Double-X/DoubleX-RMMZ/blob/master/DoubleX_RMMZ_TPBS_CTB.js
  *      Posts:
- *      1. 
- *      2. 
- *      3. 
- *      4. 
- *      5. 
- *      6. 
- *      7. 
- *      8. 
- *      9. 
- *      10. 
+ *      1. https://forums.rpgmakerweb.com/index.php?threads/doublex_rmmz_tpbs_ctb.127940/
+ *      2. https://www.rpgmakercentral.com/topic/42622-doublex_rmmz_tpbs_ctb/
+ *      3. https://rpgmaker.net/engines/rmmz/utilities/293/
+ *      4. https://www.save-point.org/thread-8172.html
+ *      5. https://gdu.one/forums/topic/13652-doublex_rmmz_tpbs_ctb/
+ *      6. http://www.hbgames.org/forums/viewtopic.php?p=945235
+ *      7. https://forum.chaos-project.com/index.php/topic,16081.msg197414.html
+ *      8. https://doublexrpgmaker.wordpress.com/2020/09/27/doublex_rmmz_tpbs_ctb/
+ *      9. https://www.patreon.com/posts/42067877
+ *      10. https://www.makerdevs.com/plugin/doublex-rmmz-tpbs-ctb
  *----------------------------------------------------------------------------
  *    # Instructions
  *      1. The default plugin parameters file name is DoubleX_RMMZ_TPBS_CTB
