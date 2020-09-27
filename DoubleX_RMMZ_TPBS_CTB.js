@@ -1,0 +1,244 @@
+/*============================================================================
+ *    ## Plugin Info
+ *----------------------------------------------------------------------------
+ *    # Plugin Name
+ *      DoubleX_RMMZ_TPBS_CTB
+ *----------------------------------------------------------------------------
+ *    # Prerequisites
+ *      Plugins:
+ *      1. DoubleX RMMZ Enhanced Codebase
+ *         https://github.com/Double-X/DoubleX-RMMZ/blob/master/DoubleX%20RMMZ%20Enhanced%20Codebase.js
+ *      Abilities:
+ *      1. Nothing special
+ *----------------------------------------------------------------------------
+ *    # Terms Of Use
+ *      1. Commercial use's always allowed and crediting me's always optional.
+ *      2. You shall keep this plugin's Plugin Info part's contents intact.
+ *      3. You shalln't claim that this plugin's written by anyone other than
+ *         DoubleX or my aliases. I always reserve the right to deny you from
+ *         using any of my plugins anymore if you've violated this.
+ *      4. If you repost this plugin directly(rather than just linking back),
+ *         you shall inform me of these direct repostings. I always reserve
+ *         the right to request you to edit those direct repostings.
+ *      5. CC BY 4.0, except those conflicting with any of the above, applies
+ *         to this plugin, unless you've my permissions not needing follow so.
+ *      6. I always reserve the right to deny you from using this plugin
+ *         anymore if you've violated any of the above.
+ *----------------------------------------------------------------------------
+ *    # Links
+ *      Video:
+ *      1. 
+ *      This Plugin:
+ *      1. 
+ *      Posts:
+ *      1. 
+ *      2. 
+ *      3. 
+ *      4. 
+ *      5. 
+ *      6. 
+ *      7. 
+ *      8. 
+ *      9. 
+ *      10. 
+ *----------------------------------------------------------------------------
+ *    # Instructions
+ *      1. The default plugin parameters file name is DoubleX_RMMZ_TPBS_CTB
+ *         If you want to change that, you must edit the value of
+ *         DoubleX_RMMZ.TPBS_CTB.PLUGIN_NAME, which must be done via opening
+ *         this plugin js file directly
+ *----------------------------------------------------------------------------
+ *    # Contributors
+ *      Authors:
+ *      1. DoubleX
+ *      Plugin Development Collaborators:
+ *      - None So Far
+ *      Bug Reporters:
+ *      - None So Far
+ *      Compatibility Issue Raisers:
+ *      - None So Far
+ *      Feature Requesters:
+ *      - None So Far
+ *----------------------------------------------------------------------------
+ *    # Changelog
+ *      { codebase: "1.0.2", plugin: "v1.00a" }(2020 Sep 27 GMT 0400):
+ *      1. 1st version of this plugin finished
+ *============================================================================*/
+
+/*:
+ * @url https://www.patreon.com/doublex
+ * @target MZ
+ * @plugindesc Versions: { codebase: "1.0.2", plugin: "v1.00a" }
+ * Adds a party command to add an autobattle state to the party in battles
+ *
+ * @param isCTB
+ * @type boolean
+ * @desc Sets whether the CTB mode will be enabled in TPBS
+ * This can be changed inside as well as outside battles
+ * @default true
+ *
+ * @command setIsTPBSCTB
+ * @desc Sets whether the CTB mode will be enabled in TPBS
+ * This can be changed inside as well as outside battles
+ * @arg isCTB
+ * @type boolean
+ * @desc Whether the CTB mode will be enabled in TPBS
+ *
+ * @help
+ *============================================================================
+ *    ## Plugin Command Info
+ *----------------------------------------------------------------------------
+ *      1. setIsTPBSCTB isCTB
+ *         - Sets whether the CTB mode will be enabled in TPBS as isCTB
+ *============================================================================
+ */
+
+// jshint esversion: 6
+
+var DoubleX_RMMZ = DoubleX_RMMZ || {}; // var must be used or game will crash
+// Separates the version numbers with the rest to make the former more clear
+DoubleX_RMMZ.TPBS_CTB = {
+    PLUGIN_NAME: "DoubleX_RMMZ_TPBS_CTB",
+    VERSIONS: { codebase: "1.0.2", plugin: "v1.00a" }
+}; // DoubleX_RMMZ.TPBS_CTB
+//
+Utils.checkRMVersion(DoubleX_RMMZ.TPBS_CTB.VERSIONS.codebase);
+
+/*============================================================================
+ *    ## Plugin Implementations
+ *       You need not edit this part as it's about how this plugin works
+ *----------------------------------------------------------------------------
+ *    # Plugin Support Info:
+ *      1. Prerequisites
+ *         - Little RMMZ plugin development proficiency to fully comprehend
+ *           this plugin
+ *           (Elementary Javascript exposures being able to write beginner
+ *           codes up to 300LoC scale)
+ *      2. Parameter/Return value of type * means it might be of any type
+ *      3. Function signature with (**) means it might take any number of
+ *         parameters of any type
+ *      4. Supposedly nullable variables are marked with the _ suffix in their
+ *         names(but they can be sure to be non null in some cases)
+ *      5. Functions supposedly returning nullable values are marked with the
+ *         _ suffix in their names(but their return values can be sure to be
+ *         non null in some cases)
+ *----------------------------------------------------------------------------*/
+
+if (DoubleX_RMMZ.Enhanced_Codebase) {
+
+/*============================================================================*/
+
+/*----------------------------------------------------------------------------
+ *    ## Managers
+ *----------------------------------------------------------------------------*/
+
+/*----------------------------------------------------------------------------*/
+
+/*----------------------------------------------------------------------------
+ *    # Edited class: Game_System
+ *      - Mimics the CTB functionality by skipping TPBS frame updates
+ *----------------------------------------------------------------------------*/
+
+(($, MZ_EC, TPBSCTB) => {
+
+    "use strict";
+
+    const {
+        extendFunc,
+        NEW,
+        ORIG
+    } = MZ_EC.setKlassContainer("BattleManager", $, TPBSCTB);
+
+    extendFunc("updateTurn", function() {
+        do {
+            ORIG.updateTurn.apply(this, arguments);
+        } while (NEW._canUpdateTpb.call(this));
+    }); // v1.00a - v1.00a
+
+    /**
+     * The this pointer is BattleManager
+     * Hotspot/Nullipotent
+     * @author DoubleX @since v1.00a @version v1.00a
+     * @returns {boolean} Whether the TPBS frame updates can be skipped
+     */
+    NEW._canUpdateTpb = function() {
+        if (this.isInputting() || this.isPartyTpbInputtable()) return false;
+        if (this.isAborting() || this.isBattleEnd()) return false;
+        if (this._phase === "init" || this._phase === "action") return false;
+        if ($gameTemp.isBattleRefreshRequested()) return false;
+        return $gameSystem.tpbsCTBParam("isCTB") && !$gameMessage.isBusy();
+    }; // NEW._canUpdateTpb
+
+})(BattleManager, DoubleX_RMMZ.Enhanced_Codebase, DoubleX_RMMZ.TPBS_CTB);
+
+/*----------------------------------------------------------------------------
+ *    ## Objects
+ *----------------------------------------------------------------------------*/
+
+/*----------------------------------------------------------------------------*/
+
+/*----------------------------------------------------------------------------
+ *    # Edited class: Game_System
+ *      - Lets you access the parameters of this plugin and store them in save
+ *----------------------------------------------------------------------------*/
+
+(($, MZ_EC, TPBSCTB) => {
+
+    "use strict";
+
+    const klassName = "Game_System";
+    const { ORIG } = MZ_EC.setKlassContainer(klassName, $, TPBSCTB);
+    const EC_GS = MZ_EC[klassName].new, GS = TPBSCTB[klassName];
+
+    MZ_EC.extendFunc(EC_GS, GS, "storeParams", function() {
+        ORIG.storeParams.apply(this, arguments);
+        // Added to store all parameters of this plugin
+        EC_GS.onStoreParams.call(this, TPBSCTB.PLUGIN_NAME, "tpbsCTB");
+        //
+    }); // v1.00a - v1.00a
+
+    /**
+     * The this pointer is Game_System.prototype
+     * Idempotent
+     * @author DoubleX @interface @since v1.00a @version v1.00a
+     * @enum @param {string} param - The name of parameter to be stored in saves
+     * @param {*} val - The value of the parameter to be stored in game saves
+     */
+    $.setTPBSCTBParam = function(param, val) {
+        EC_GS.storeParamVal.call(this, "tpbsCTB", param, val);
+    }; // $.setTPBSCTBParam
+
+    /**
+     * The this pointer is Game_System.prototype
+     * Nullipotent
+     * @author DoubleX @interface @since v1.00a @version v1.00a
+     * @enum @param {string} param - The name of parameter to be stored in saves
+     * @returns {*} The value of the parameter to be stored in game saves
+     */
+    $.tpbsCTBParam = function(param) {
+        return EC_GS.storedParamVal.call(this, "tpbsCTB", param);
+    }; // $.tpbsCTBParam
+
+    const pluginName = TPBSCTB.PLUGIN_NAME;
+    PluginManager.registerCommand(pluginName, "setIsTPBSCTB", ({ isCTB }) => {
+        $gameSystem.setTPBSCTBParam("isCTB", JSON.parse(isCTB));
+    });
+
+})(Game_System.prototype, DoubleX_RMMZ.Enhanced_Codebase,
+        DoubleX_RMMZ.TPBS_CTB);
+
+/*============================================================================*/
+
+    const curMZECVer = DoubleX_RMMZ.Enhanced_Codebase.VERSIONS.plugin;
+    const minMZECVer = "v0.00a";
+    if (curMZECVer < minMZECVer) {
+        console.warn(`The version of DoubleX RMMZ Enhanced Codebase is
+                     ${curMZECVer} but should be at least ${minMZECVer}`);
+    }
+
+} else {
+
+    console.warn(`DoubleX RMMZ Enhanced Codebase should be placed above
+                 ${DoubleX_RMMZ.TPBS_CTB.PLUGIN_NAME}`);
+
+} // if (DoubleX_RMMZ.Enhanced_Codebase)
