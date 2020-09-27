@@ -144,7 +144,7 @@ if (DoubleX_RMMZ.Enhanced_Codebase) {
 /*----------------------------------------------------------------------------*/
 
 /*----------------------------------------------------------------------------
- *    # Edited class: Game_System
+ *    # Edited class: BattleManager
  *      - Mimics the CTB functionality by skipping TPBS frame updates
  *----------------------------------------------------------------------------*/
 
