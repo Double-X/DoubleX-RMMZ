@@ -37,27 +37,20 @@
  *----------------------------------------------------------------------------
  *    # Links
  *      Video:
- *      1. 
+ *      1. https://www.youtube.com/watch?v=yP4yKRl3r_Q
  *      This Plugin:
- *      1. 
+ *      1. https://github.com/Double-X/DoubleX-RMMZ/blob/master/DoubleX_RMMZ_Confusion_Edit.js
  *      Posts:
- *      1. 
- *      2. 
- *      3. 
- *      4. 
- *      5. 
- *      6. 
- *      7. 
- *      8. 
- *      9. 
- *      10. 
- *----------------------------------------------------------------------------
- *    # Instructions
- *      1. The default plugin parameters file name is
- *         DoubleX_RMMZ_Confusion_Edit
- *         If you want to change that, you must edit the value of
- *         DoubleX_RMMZ.Confusion_Edit.PLUGIN_NAME, which must be done via
- *         opening this plugin js file directly
+ *      1. https://forums.rpgmakerweb.com/index.php?threads/doublex_rmmz_confusion_edit.127953/
+ *      2. https://www.rpgmakercentral.com/topic/42624-doublex_rmmz_confusion_edit/
+ *      3. https://rpgmaker.net/engines/rmmz/utilities/295/
+ *      4. https://www.save-point.org/thread-8173.html
+ *      5. https://gdu.one/forums/topic/13653-doublex_rmmz_confusion_edit/
+ *      6. http://www.hbgames.org/forums/viewtopic.php?f=332&t=80346
+ *      7. https://forum.chaos-project.com/index.php/topic,16082.new.html
+ *      8. https://doublexrpgmaker.wordpress.com/2020/09/28/doublex_rmmz_confusion_edit/
+ *      9. https://www.patreon.com/posts/42077864
+ *      10. https://www.makerdevs.com/plugin/doublex-rmmz-confusion-edit
  *----------------------------------------------------------------------------
  *    # Contributors
  *      Authors:
@@ -72,8 +65,11 @@
  *      - None So Far
  *----------------------------------------------------------------------------
  *    # Changelog
- *      { codebase: "1.0.2", plugin: "v1.00a" }(2020 Sep 27 GMT 1400):
+ *      { codebase: "1.0.2", plugin: "v1.00a" }(2020 Sep 27 GMT 1600):
  *      1. 1st version of this plugin finished
+ *----------------------------------------------------------------------------
+ *    # Todo
+ *      1. Makes the reverse notetag works with substitute as well
  *============================================================================*/
 
 /*:
