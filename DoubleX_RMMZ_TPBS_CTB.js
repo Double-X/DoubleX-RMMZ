@@ -36,7 +36,7 @@
  *----------------------------------------------------------------------------
  *    # Links
  *      Video:
- *      1. 
+ *      1. https://www.youtube.com/watch?v=ZI-hur2rmn8
  *      This Plugin:
  *      1. https://github.com/Double-X/DoubleX-RMMZ/blob/master/DoubleX_RMMZ_TPBS_CTB.js
  *      Posts:
@@ -78,7 +78,7 @@
  * @url https://www.patreon.com/doublex
  * @target MZ
  * @plugindesc Versions: { codebase: "1.0.2", plugin: "v1.00a" }
- * Adds a party command to add an autobattle state to the party in battles
+ * Lets you mimic the CTB functionality in the TPBS on the fly
  *
  * @param isCTB
  * @type boolean
@@ -175,7 +175,8 @@ if (DoubleX_RMMZ.Enhanced_Codebase) {
         if (this.isAborting() || this.isBattleEnd()) return false;
         if (this._phase === "init" || this._phase === "action") return false;
         if ($gameTemp.isBattleRefreshRequested()) return false;
-        return $gameSystem.tpbsCTBParam("isCTB") && !$gameMessage.isBusy();
+        if ($gameMessage.isBusy()) return false;
+        return this.isTpb() && $gameSystem.tpbsCTBParam("isCTB");
     }; // NEW._canUpdateTpb
 
 })(BattleManager, DoubleX_RMMZ.Enhanced_Codebase, DoubleX_RMMZ.TPBS_CTB);
