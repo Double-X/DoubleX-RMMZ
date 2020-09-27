@@ -4,12 +4,21 @@
  *    # Plugin Name
  *      DoubleX_RMMZ_TPBS_CTB
  *----------------------------------------------------------------------------
+ *    # Introduction
+ *      1. This plugin lets you skip TPBS frames having no important moments,
+ *         like inputting actions, executing actions, to mimic the CTB
+ *         functionality in TPBS
+ *----------------------------------------------------------------------------
  *    # Prerequisites
  *      Plugins:
  *      1. DoubleX RMMZ Enhanced Codebase
  *         https://github.com/Double-X/DoubleX-RMMZ/blob/master/DoubleX%20RMMZ%20Enhanced%20Codebase.js
  *      Abilities:
  *      1. Nothing special
+ *----------------------------------------------------------------------------
+ *    # Author Notes
+ *      1. DON'T USE THE CTB FUNCTIONALITY IN ACTIVE TPBS UNLESS YOU REALLY
+ *         KNOW WHAT YOU'RE TRULY DOING
  *----------------------------------------------------------------------------
  *    # Terms Of Use
  *      1. Commercial use's always allowed and crediting me's always optional.
@@ -29,7 +38,7 @@
  *      Video:
  *      1. 
  *      This Plugin:
- *      1. 
+ *      1. https://github.com/Double-X/DoubleX-RMMZ/blob/master/DoubleX_RMMZ_TPBS_CTB.js
  *      Posts:
  *      1. 
  *      2. 
