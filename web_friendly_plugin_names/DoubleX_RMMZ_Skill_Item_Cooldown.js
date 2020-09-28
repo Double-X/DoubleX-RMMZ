@@ -547,7 +547,7 @@ if (DoubleX_RMMZ.Enhanced_Codebase) {
             entry1: MZ_EC.BOOL_ENTRY, // condEntry
             entry2: MZ_EC.STRING_ENTRY, // opEntry
             entry3: MZ_EC.NUM_ENTRY // valEntry
-        })),
+        })), // battler
         skillItem: new Map(Object.entries({
             suffix1: MZ_EC.BOOL_SUFFIXES, // condSuffix
             suffix2: MZ_EC.VAL_SUFFIXES, // opSuffix
@@ -555,7 +555,7 @@ if (DoubleX_RMMZ.Enhanced_Codebase) {
             entry1: MZ_EC.BOOL_ENTRY, // condEntry
             entry2: MZ_EC.STRING_ENTRY, // opEntry
             entry3: MZ_EC.NUM_ENTRY // valEntry
-        }))
+        })) // skillItem
     })); // NEW.NOTETAG_PAIRS
     //
 
@@ -589,7 +589,7 @@ if (DoubleX_RMMZ.Enhanced_Codebase) {
         const datumType = NEW.NOTETAG_DATA_CONTAINER_NAMES.get(objName);
         const [regex, notePairs] = [NEW._REG_EXP_NOTE, NEW.NOTETAG_PAIRS];
         MZ_EC.onLoadDataNotetags.call(this, obj, datumType, regex, notePairs);
-    };
+    }; // NEW._loadDataNotetags
 
 })(DataManager, DoubleX_RMMZ.Enhanced_Codebase,
         DoubleX_RMMZ.Skill_Item_Cooldown);
@@ -822,7 +822,7 @@ if (DoubleX_RMMZ.Enhanced_Codebase) {
     /*------------------------------------------------------------------------
      *    New private variables
      *------------------------------------------------------------------------*/
-    // {{*}} _cooldown: The container of all other new variables
+    // {{*}} _skillItemCooldown: The container of all other new variables
     //       {[DataSkill|DataItem]} usedSkillItems: list of used skills/items
     //       {number} battlerTurnCount: The battler cooldown turn counter
     //       {{number}} skillItemTurnCounts: skill/item cooldown of skill/item
@@ -886,9 +886,9 @@ if (DoubleX_RMMZ.Enhanced_Codebase) {
      */
     $.clearBattlerSkillItemCooldowns = function() {
         NEW._clearUsedSkillItems.call(this);
-        this._cooldown.battlerTurnCount = 0;
+        this._skillItemCooldown.battlerTurnCount = 0;
         // Map can't be serialized so ordinary objects must be used
-        this._cooldown.skillItemTurnCounts = {};
+        this._skillItemCooldown.skillItemTurnCounts = {};
         //
     }; // $.clearBattlerSkillItemCooldowns
 
@@ -898,7 +898,7 @@ if (DoubleX_RMMZ.Enhanced_Codebase) {
      * @param {number} turnCount - The new battler cooldown turn count
      */
     $.setBattlerCooldown = function(turnCount) {
-        this._cooldown.battlerTurnCount = turnCount;
+        this._skillItemCooldown.battlerTurnCount = turnCount;
         if (turnCount < 0) NEW._updateBattlerTpbCharge.call(this);
     }; // $.setBattlerCooldown
 
@@ -908,7 +908,7 @@ if (DoubleX_RMMZ.Enhanced_Codebase) {
      * @returns {number} The current battler cooldown turn count
      */
     $.battlerCooldown = function() {
-        return this._cooldown.battlerTurnCount || 0;
+        return this._skillItemCooldown.battlerTurnCount || 0;
     }; // $.battlerCooldown
 
     /**
@@ -937,7 +937,7 @@ if (DoubleX_RMMZ.Enhanced_Codebase) {
      */
     $.skillItemCooldown = function(item) {
         const itemKey = NEW._SKILL_ITEM_COOLDOWN_KEY(item);
-        return this._cooldown.skillItemTurnCounts[itemKey] || 0;
+        return this._skillItemCooldown.skillItemTurnCounts[itemKey] || 0;
     }; // $.skillItemCooldown
 
     /**
@@ -958,8 +958,8 @@ if (DoubleX_RMMZ.Enhanced_Codebase) {
     $.clearSkillItemCooldown = function(item_) {
         if (!item_) return;
         const itemKey = NEW._SKILL_ITEM_COOLDOWN_KEY(item_);
-        delete this._cooldown.skillItemTurnCounts[itemKey];
-        this._cooldown.usedSkillItems.eraseElem(item_);
+        delete this._skillItemCooldown.skillItemTurnCounts[itemKey];
+        this._skillItemCooldown.usedSkillItems.eraseElem(item_);
     }; // $.clearSkillItemCooldown
 
     /**
@@ -1025,7 +1025,7 @@ if (DoubleX_RMMZ.Enhanced_Codebase) {
      */
     NEW._init = function() {
         // Map can't be serialized so ordinary objects must be used
-        this._cooldown = {
+        this._skillItemCooldown = {
             usedSkillItems: [],
             battlerTurnCount: 0,
             skillItemTurnCounts: {}
@@ -1062,7 +1062,7 @@ if (DoubleX_RMMZ.Enhanced_Codebase) {
      * @param {DataSkill|DataItem} item - Used item to be stored for cooldown
      */
     NEW._storeUsedSkillItem = function(item) {
-        this._cooldown.usedSkillItems.push(item);
+        this._skillItemCooldown.usedSkillItems.push(item);
     }; // NEW._storeUsedSkillItem
 
     /**
@@ -1101,7 +1101,7 @@ if (DoubleX_RMMZ.Enhanced_Codebase) {
     NEW._setBattlerCooldown = function() {
         MZ_EC.clearBattlerNotetagCache(this, "cooldown");
         const lastLatestSkillItems = this.latestSkillItems;
-        this.latestSkillItems = this._cooldown.usedSkillItems;
+        this.latestSkillItems = this._skillItemCooldown.usedSkillItems;
         const battlerTurnCount = NEW._battlerCooldownTurnCount.call(this);
         this.latestSkillItems = lastLatestSkillItems;
         this.setBattlerCooldown(battlerTurnCount);
@@ -1129,7 +1129,7 @@ if (DoubleX_RMMZ.Enhanced_Codebase) {
      * @author DoubleX @since v1.00a @version v1.00a
      */
     NEW._clearUsedSkillItems = function() {
-        this._cooldown.usedSkillItems = [];
+        this._skillItemCooldown.usedSkillItems = [];
     }; // NEW._clearUsedSkillItems
 
     /**
@@ -1168,7 +1168,7 @@ if (DoubleX_RMMZ.Enhanced_Codebase) {
      * @author DoubleX @since v1.00a @version v1.00a
      */
     NEW._updateSkillItemCooldowns = function() {
-        const turnCounts = this._cooldown.skillItemTurnCounts;
+        const turnCounts = this._skillItemCooldown.skillItemTurnCounts;
         Object.entries(turnCounts).forEach(NEW._updateSkillItemCooldown, this);
     }; // NEW._updateSkillItemCooldowns
 
@@ -1191,7 +1191,7 @@ if (DoubleX_RMMZ.Enhanced_Codebase) {
      * @param {number} turnCount - The skill/item cooldown turn count
      */
     NEW._storeSkillItemCooldown = function(itemKey, turnCount) {
-        const { skillItemTurnCounts } = this._cooldown;
+        const { skillItemTurnCounts } = this._skillItemCooldown;
         if (turnCount <= 0) return delete skillItemTurnCounts[itemKey];
         skillItemTurnCounts[itemKey] = turnCount;
     }; // NEW._storeSkillItemCooldown
