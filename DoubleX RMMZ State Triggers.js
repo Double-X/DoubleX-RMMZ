@@ -458,31 +458,31 @@ if (DoubleX_RMMZ.Enhanced_Codebase) {
             suffix2: MZ_EC.VAL_SUFFIXES, // eventSuffix
             entry1: MZ_EC.BOOL_ENTRY, // condEntry
             entry2: MZ_EC.NUM_ENTRY // eventEntry
-        })),
+        })), // add
         remove: new Map(Object.entries({
             suffix1: MZ_EC.BOOL_SUFFIXES, // condSuffix
             suffix2: MZ_EC.VAL_SUFFIXES, // eventSuffix
             entry1: MZ_EC.BOOL_ENTRY, // condEntry
             entry2: MZ_EC.NUM_ENTRY // eventEntry
-        })),
+        })), // remove
         reset: new Map(Object.entries({
             suffix1: MZ_EC.BOOL_SUFFIXES, // condSuffix
             suffix2: MZ_EC.VAL_SUFFIXES, // eventSuffix
             entry1: MZ_EC.BOOL_ENTRY, // condEntry
             entry2: MZ_EC.NUM_ENTRY // eventEntry
-        })),
+        })), // reset
         expire: new Map(Object.entries({
             suffix1: MZ_EC.BOOL_SUFFIXES, // condSuffix
             suffix2: MZ_EC.VAL_SUFFIXES, // eventSuffix
             entry1: MZ_EC.BOOL_ENTRY, // condEntry
             entry2: MZ_EC.NUM_ENTRY // eventEntry
-        })),
+        })), // expire
         turn: new Map(Object.entries({
             suffix1: MZ_EC.BOOL_SUFFIXES, // condSuffix
             suffix2: MZ_EC.VAL_SUFFIXES, // eventSuffix
             entry1: MZ_EC.BOOL_ENTRY, // condEntry
             entry2: MZ_EC.NUM_ENTRY // eventEntry
-        }))
+        })) // turn
     })); // NEW.NOTETAG_PAIRS
     //
 
@@ -517,7 +517,7 @@ if (DoubleX_RMMZ.Enhanced_Codebase) {
         const [regex, notePairs] = [NEW._REG_EXP_NOTE, NEW.NOTETAG_PAIRS];
         MZ_EC.onLoadDataNotetags.call(
                 this, obj, datumType, regex, notePairs, "stateTriggers");
-    };
+    }; // NEW._loadDataNotetags
 
 })(DataManager, DoubleX_RMMZ.Enhanced_Codebase, DoubleX_RMMZ.State_Triggers);
 

@@ -2,14 +2,12 @@
  *    ## Plugin Info
  *----------------------------------------------------------------------------
  *    # Plugin Name
- *      DoubleX_RMMZ_Confusion_Edit
+ *      DoubleX_RMMZ_Equip_Prerequisites
  *----------------------------------------------------------------------------
  *    # Introduction
- *      1. The default RMMZ confusion causes the battler to only use attack
- *         and nothing else
- *      2. This plugin lets you set some confusion states to cause the
- *         battlers to behave like autobattle ones, with the definitions of
- *         friends and opponents being reversed
+ *      1. The default RMMZ equip requirements are just the equip types
+ *      2. This plugin lets you set some equips to have more prerequisites, 
+ *         like the actors' parameters/ex-parameters/sp-parameters/etc
  *----------------------------------------------------------------------------
  *    # Prerequisites
  *      Plugins:
@@ -37,20 +35,20 @@
  *----------------------------------------------------------------------------
  *    # Links
  *      Video:
- *      1. https://www.youtube.com/watch?v=yP4yKRl3r_Q
+ *      1. 
  *      This Plugin:
- *      1. https://github.com/Double-X/DoubleX-RMMZ/blob/master/DoubleX_RMMZ_Confusion_Edit.js
+ *      1. 
  *      Posts:
- *      1. https://forums.rpgmakerweb.com/index.php?threads/doublex_rmmz_confusion_edit.127953/
- *      2. https://www.rpgmakercentral.com/topic/42624-doublex_rmmz_confusion_edit/
- *      3. https://rpgmaker.net/engines/rmmz/utilities/295/
- *      4. https://www.save-point.org/thread-8173.html
- *      5. https://gdu.one/forums/topic/13653-doublex_rmmz_confusion_edit/
- *      6. http://www.hbgames.org/forums/viewtopic.php?f=332&t=80346
- *      7. https://forum.chaos-project.com/index.php/topic,16082.new.html
- *      8. https://doublexrpgmaker.wordpress.com/2020/09/28/doublex_rmmz_confusion_edit/
- *      9. https://www.patreon.com/posts/42077864
- *      10. https://www.makerdevs.com/plugin/doublex-rmmz-confusion-edit
+ *      1. 
+ *      2. 
+ *      3. 
+ *      4. 
+ *      5. 
+ *      6. 
+ *      7. 
+ *      8. 
+ *      9. 
+ *      10. 
  *----------------------------------------------------------------------------
  *    # Contributors
  *      Authors:
@@ -65,35 +63,37 @@
  *      - None So Far
  *----------------------------------------------------------------------------
  *    # Changelog
- *      { codebase: "1.0.2", plugin: "v1.00a" }(2020 Sep 27 GMT 1600):
+ *      { codebase: "1.0.2", plugin: "v1.00a" }(2020 Sep 28 GMT 0500):
  *      1. 1st version of this plugin finished
- *----------------------------------------------------------------------------
- *    # Todo
- *      1. Makes the reverse notetag works with substitute as well
  *============================================================================*/
 
 /*:
  * @url https://www.patreon.com/doublex
  * @target MZ
  * @plugindesc Versions: { codebase: "1.0.2", plugin: "v1.00a" }
- * Lets you set some confusion states to not be restricted to attacks only
+ * Lets you set some equips to have prerequisites other than equip types
  *
  * @help
  *============================================================================
  *    ## Notetag Info
- *       1. Among all the same notetag types in the same data, only the 1st
- *          one can be effective
+ *       1. Among all the same notetag types in the same data, all can be
+ *          effective
  *       2. Each line can only have at most 1 notetag
  *       3. The following is the structure of all notetags in this plugin:
- *          - <doublex rmmz confusion edit>
- *          - <confusion edit>
+ *          - <doublex rmmz equip prerequisites>
+ *          - <equip prerequisites>
  *          Where contents are in the form of type suffixes: entries
  *          Either of the above can be used, but the 1st one reduce the chance
  *          of causing other plugins to treat the notetags of this plugin as
  *          theirs, while the 2nd one is more user-friendly
  *          - type is one of the following:
- *            1. reverse
- *            2. excludeSelf
+ *            1. noWeapon
+ *            2. noArmor
+ *            3. weapon
+ *            4. armor
+ *            5. stat
+ *            6. equation
+ *            7. or
  *            (Search tag: NOTE_TYPE)
  *          - suffixes is the list of suffixes in the form of:
  *            suffix1 suffix2 suffix3 ... suffixn
@@ -114,7 +114,7 @@
  *            Where entryi must conform with the suffixi specifications
  *----------------------------------------------------------------------------
  *    # State Notetags
- *      1. reverse condSuffix: condEntry
+ *      1. noWeapon condSuffix: condEntry
  *         - Reverses the definitions of friends and opponents instead of
  *           using the default confusion behaviors when condEntry returns a
  *           truthy result
@@ -208,11 +208,11 @@ if (DoubleX_RMMZ.Enhanced_Codebase) {
         reverse: new Map(Object.entries({
             suffix1: MZ_EC.BOOL_SUFFIXES, // condSuffix
             entry1: MZ_EC.BOOL_ENTRY // condEntry
-        })), // reverse
+        })),
         excludeSelf: new Map(Object.entries({
             suffix1: MZ_EC.BOOL_SUFFIXES, // condSuffix
             entry1: MZ_EC.BOOL_ENTRY // condEntry
-        })) // excludeSelf
+        }))
     })); // NEW.NOTETAG_PAIRS
     //
 

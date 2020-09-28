@@ -2592,6 +2592,16 @@ Utils.checkRMVersion(DoubleX_RMMZ.Enhanced_Codebase.VERSIONS.codebase);
         this.startActorInput();
     }); // v0.00a - v0.00a
 
+    rewriteFunc("updateTurn", function(timeActive) {
+        $gameParty.requestMotionRefresh();
+        // Edited to help plugins alter update turn behaviors in better ways
+        if (NEW._isUpdateTpb.call(this, timeActive)) this.updateTpb();
+        //
+        this._subject = this._subject || this.getNextSubject();
+        if (this._subject) return this.processTurn();
+        if (!this.isTpb()) this.endTurn();
+    }); // v0.00a - v0.00a
+
     rewriteFunc("endBattlerActions", function(battler) {
         // Edited to help plugins alter battler action end state in better ways
         battler.setActionState(NEW._battlerActEndState.call(this));
@@ -2693,6 +2703,17 @@ Utils.checkRMVersion(DoubleX_RMMZ.Enhanced_Codebase.VERSIONS.codebase);
             if (actor.canInput()) return actor;
         }
     }; // NEW._newCurActor_
+
+    /**
+     * The this pointer is BattleManager
+     * Hotspot/Nullipotent
+     * @author DoubleX @since v0.00a @version v0.00a
+     * @param {boolean} timeActive - Whether the TPBS time is actually active
+     * @returns {boolean} Whether the TPBS frame update should proceed
+     */
+    NEW._isUpdateTpb = function(timeActive) {
+        return this.isTpb() && timeActive;
+    }; // NEW._isUpdateTpb
 
     /**
      * The this pointer is BattleManager
@@ -5318,7 +5339,7 @@ Utils.checkRMVersion(DoubleX_RMMZ.Enhanced_Codebase.VERSIONS.codebase);
         this.setMovementSuccess(this.canPass(this._x, this._y, d));
         // Edited to help plugins alter move straight behaviors in better ways
         if (this.isMovementSucceeded()) {
-            return NEW._onMoveStraightSuc.call(this, d);
+            NEW._onMoveStraightSuc.call(this, d);
         } else NEW._onMoveStraightFail.call(this, d);
         //
     }); // v0.00a - v0.00a
@@ -5398,6 +5419,47 @@ Utils.checkRMVersion(DoubleX_RMMZ.Enhanced_Codebase.VERSIONS.codebase);
     }; // NEW._updateDiagonalXY
 
 })(Game_CharacterBase, DoubleX_RMMZ.Enhanced_Codebase);
+
+/*----------------------------------------------------------------------------
+ *    # Edited class: Game_Player
+ *      - Improves code quality
+ *----------------------------------------------------------------------------*/
+
+(($, MZ_EC) => {
+
+    "use strict";
+
+    const $$ = Game_Character.prototype, {
+        rewriteFunc,
+        NEW
+    } = MZ_EC.setKlassContainer("Game_Player", $.prototype, MZ_EC);
+
+    rewriteFunc("update", function(sceneActive) {
+        const lastScrolledX = this.scrolledX();
+        const lastScrolledY = this.scrolledY();
+        const wasMoving = this.isMoving();
+        this.updateDashing();
+        if (sceneActive) this.moveByInput();
+        $$.update.call(this);
+        this.updateScroll(lastScrolledX, lastScrolledY);
+        this.updateVehicle();
+        if (!this.isMoving()) this.updateNonmoving(wasMoving, sceneActive);
+        this._followers.update();
+    }); // v0.00a - v0.00a
+
+    /**
+     * The this pointer is Game_Interpreter.prototype
+     * Idempotent
+     * @author DoubleX @interface @since v0.00a @version v0.00a
+     * @enum @param {number} horz - 4 for left/6 for right
+     * @enum @param {number} vert - 2 for down/8 for up
+     */
+    NEW._onMoveDiagonallySuc = function(horz, vert) {
+        NEW._updateDiagonalXY.call(this, horz, vert);
+        this.increaseSteps();
+    }; // NEW._onMoveDiagonallySuc
+
+})(Game_Player, DoubleX_RMMZ.Enhanced_Codebase);
 
 /*----------------------------------------------------------------------------
  *    # Edited class: Game_Interpreter
