@@ -35,20 +35,20 @@
  *----------------------------------------------------------------------------
  *    # Links
  *      Video:
- *      1. 
+ *      1.
  *      This Plugin:
- *      1. 
+ *      1. https://github.com/Double-X/DoubleX-RMMZ/blob/master/DoubleX_RMMZ_Permanent_States.js
  *      Posts:
- *      1. 
- *      2. 
- *      3. 
- *      4. 
- *      5. 
- *      6. 
- *      7. 
- *      8. 
- *      9. 
- *      10. 
+ *      1. https://forums.rpgmakerweb.com/index.php?threads/doublex_rmmz_permanent_states.128016/
+ *      2. https://www.rpgmakercentral.com/topic/42625-doublex_rmmz_permanent_states/
+ *      3. https://rpgmaker.net/engines/rmmz/utilities/296/
+ *      4. https://www.save-point.org/thread-8175.html
+ *      5. https://gdu.one/forums/topic/13655-doublex_rmmz_permanent_states/
+ *      6. http://www.hbgames.org/forums/viewtopic.php?f=332&t=80350
+ *      7. https://forum.chaos-project.com/index.php/topic,16083.0.html
+ *      8. https://doublexrpgmaker.wordpress.com/2020/09/28/doublex_rmmz_permanent_states/
+ *      9. https://www.patreon.com/posts/42113127
+ *      10. https://www.makerdevs.com/plugin/doublex-rmmz-permanent-states
  *----------------------------------------------------------------------------
  *    # Contributors
  *      Authors:
@@ -124,7 +124,7 @@
  *           <permanent states battle switch val: 1, persist> will make the
  *           state to be kept upon death inside battles if the game switch
  *           with id 1 is on
- *      1. map condSuffix typeSuffix: condEntry, typeEntry
+ *      2. map condSuffix typeSuffix: condEntry, typeEntry
  *         - Sets the permanent state type as specified by typeEntry outside
  *           battles if condEntry returns a truthy result
  *         - condSuffix can be val, switch or script
@@ -383,7 +383,7 @@ if (DoubleX_RMMZ.Enhanced_Codebase) {
         this._stateTurns[id] = turn;
     }; // NEW._restorePermanentState
 
-})(Game_BattlerBase.prototype, DoubleX_RMMZ.Enhanced_Codebase, 
+})(Game_BattlerBase.prototype, DoubleX_RMMZ.Enhanced_Codebase,
         DoubleX_RMMZ.Permanent_States);
 
 /*============================================================================*/
