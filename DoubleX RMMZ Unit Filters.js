@@ -85,6 +85,7 @@
  * @target MZ
  * @plugindesc Versions: { codebase: "1.0.0", plugin: "v1.01a" }
  * Lets you use script calls to filter unit members with less codes and eventing
+ * @author DoubleX
  *
  * @help
  *============================================================================

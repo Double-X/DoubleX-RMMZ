@@ -124,6 +124,9 @@
  * @target MZ
  * @plugindesc Versions: { codebase: "1.0.2", plugin: "v1.00a" }
  * Lets you set new script calls as old ones with some arguments bound
+ * @orderAfter DoubleX RMMZ Enhanced Codebase
+ * @base DoubleX RMMZ Enhanced Codebase
+ * @author DoubleX
  *
  * @param newScriptCalls
  * @type struct<NewScriptCall>[]

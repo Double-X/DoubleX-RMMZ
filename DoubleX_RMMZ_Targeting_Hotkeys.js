@@ -2,7 +2,7 @@
  *    ## Plugin Info
  *----------------------------------------------------------------------------
  *    # Plugin Name
- *      DoubleX_RMMZ_Auto_Battle_Command
+ *      DoubleX_RMMZ_Targeting_Hotkeys
  *----------------------------------------------------------------------------
  *    # Prerequisites
  *      Plugins:
@@ -10,6 +10,11 @@
  *         https://github.com/Double-X/DoubleX-RMMZ/blob/master/DoubleX%20RMMZ%20Enhanced%20Codebase.js
  *      Abilities:
  *      1. Nothing special
+ *----------------------------------------------------------------------------
+ *    # Author Notes
+ *      1. A custom key map plugin, like DoubleX_RMMZ_Custom_Key_Maps:
+ *         
+ *         Can be useful when setting hotkeys to select targets in this plugin
  *----------------------------------------------------------------------------
  *    # Terms Of Use
  *      1. Commercial use's always allowed and crediting me's always optional.
@@ -27,26 +32,26 @@
  *----------------------------------------------------------------------------
  *    # Links
  *      Video:
- *      1. https://www.youtube.com/watch?v=Cii91D22kA0
+ *      1. 
  *      This Plugin:
- *      1. https://github.com/Double-X/DoubleX-RMMZ/blob/master/DoubleX_RMMZ_Auto_Battle_Command.js
+ *      1. 
  *      Posts:
- *      1. https://forums.rpgmakerweb.com/index.php?threads/doublex_rmmz_auto_battle_command.127332/
- *      2. https://www.rpgmakercentral.com/topic/42591-doublex_rmmz_auto_battle_command/
- *      3. https://rpgmaker.net/engines/rmmz/utilities/286/
- *      4. https://www.save-point.org/thread-8165.html
- *      5. https://gdu.one/forums/topic/13640-doublex_rmmz_auto_battle_command/
- *      6. http://www.hbgames.org/forums/viewtopic.php?f=332&t=80332
- *      7. https://forum.chaos-project.com/index.php/topic,16078.msg197396.html
- *      8. https://doublexrpgmaker.wordpress.com/2020/09/14/doublex_rmmz_auto_battle_command/
- *      9. https://www.patreon.com/posts/41587930
- *      10. https://www.makerdevs.com/plugin/doublex-rmmz-auto-battle-command
+ *      1. 
+ *      2. 
+ *      3. 
+ *      4. 
+ *      5. 
+ *      6. 
+ *      7. 
+ *      8. 
+ *      9. 
+ *      10. 
  *----------------------------------------------------------------------------
  *    # Instructions
  *      1. The default plugin parameters file name is
- *         DoubleX_RMMZ_Auto_Battle_Command
+ *         DoubleX_RMMZ_Targeting_Hotkeys
  *         If you want to change that, you must edit the value of
- *         DoubleX_RMMZ.Auto_Battle_Command.PLUGIN_NAME, which must be done
+ *         DoubleX_RMMZ.Targeting_Hotkeys.PLUGIN_NAME, which must be done
  *         via opening this plugin js file directly
  *----------------------------------------------------------------------------
  *    # Contributors
@@ -62,69 +67,54 @@
  *      - None So Far
  *----------------------------------------------------------------------------
  *    # Changelog
- *      { codebase: "1.0.2", plugin: "v1.00a" }(2020 Sep 14 GMT 0900):
+ *      { codebase: "1.0.2", plugin: "v1.00a" }(2020 Sep 29 GMT 0400):
  *      1. 1st version of this plugin finished
  *============================================================================*/
+
+/*~struct~Hotkey:
+ *
+ * @param targetIndex
+ * @type number
+ * @desc The index of the target selected by hotkey targetHotkey
+ * @default
+ *
+ * @param targetHotkey
+ * @type string
+ * @desc The keymap of the hotkey selecting the target with index targetIndex
+ * @default 
+ */
 
 /*:
  * @url https://www.patreon.com/doublex
  * @target MZ
  * @plugindesc Versions: { codebase: "1.0.2", plugin: "v1.00a" }
- * Adds a party command to add an autobattle state to the party in battles
+ * Lets you set some hotkeys to select skill/item targets
  * @orderAfter DoubleX RMMZ Enhanced Codebase
  * @base DoubleX RMMZ Enhanced Codebase
  * @author DoubleX
  *
- * @param stateId
+ * @param hotkeys
+ * @type struct<Hotkey>[]
+ * @desc Sets the list of hotkeys selecting skill/item targets
+ * @default []
+ *
+ * @command setTargetingHotkey
+ * @desc Sets the mapping from the target index to the hotkey
+ * selecting the corresponding target
+ * @arg targetIndex
  * @type number
- * @min 1
- * @desc Sets the id of the state added by the auto battle command
- * All alive members in the party will have this state added
- * @default 7
- *
- * @param text
+ * @desc The index of the target selected by hotkey targetHotkey
+ * @arg targetHotkey
  * @type string
- * @desc Sets the auto battle command name
- * The command will appear in the party command window
- * @default Auto Battle
- *
- * @param canUse
- * @type boolean
- * @desc Sets whether the auto battle command can be used
- * It'll be checked whenever the party command window's shown
- * @default true
- *
- * @command setAutoBattleCmdState
- * @desc Sets the new value of the parameter stateId
- * @arg stateId
- * @type number
- * @min 1
- * @desc The id of the state added by the auto battle command
- *
- * @command setAutoBattleCmdText
- * @desc Sets the new value of the parameter text
- * @arg text
- * @type string
- * @desc The auto battle command name
- *
- * @command setCanUseAutoBattleCmd
- * @desc Sets the new value of the parameter canUse
- * @arg canUse
- * @type boolean
- * @desc Whether the auto battle command can be used
+ * @desc The keymap of the hotkey selecting the target with index targetIndex
  *
  * @help
  *============================================================================
  *    ## Plugin Command Info
  *----------------------------------------------------------------------------
- *      1. setAutoBattleCmdState stateId
- *         - Sets the id of the state added by the auto battle command as
- *           stateId
- *      2. setAutoBattleCmdText text
- *         - Sets auto battle command name as text
- *      3. setCanUseAutoBattleCmd canUse
- *         - Sets whether the auto battle command can be used as canUse
- *         - canUse must be either true or false
+ *      1. setTargetingHotkey targetIndex targetHotkey
+ *         - Sets the target with index targetIndex to be selected by the
+ *           hotkey targetHotkey
  *============================================================================
  */
 
@@ -132,12 +122,12 @@
 
 var DoubleX_RMMZ = DoubleX_RMMZ || {}; // var must be used or game will crash
 // Separates the version numbers with the rest to make the former more clear
-DoubleX_RMMZ.Auto_Battle_Command = {
-    PLUGIN_NAME: "DoubleX_RMMZ_Auto_Battle_Command",
+DoubleX_RMMZ.Targeting_Hotkeys = {
+    PLUGIN_NAME: "DoubleX_RMMZ_Targeting_Hotkeys",
     VERSIONS: { codebase: "1.0.2", plugin: "v1.00a" }
-}; // DoubleX_RMMZ.Auto_Battle_Command
+}; // DoubleX_RMMZ.Targeting_Hotkeys
 //
-Utils.checkRMVersion(DoubleX_RMMZ.Auto_Battle_Command.VERSIONS.codebase);
+Utils.checkRMVersion(DoubleX_RMMZ.Targeting_Hotkeys.VERSIONS.codebase);
 
 /*============================================================================
  *    ## Plugin Implementations
@@ -172,20 +162,38 @@ if (DoubleX_RMMZ.Enhanced_Codebase) {
  *      - Lets you access the parameters of this plugin and store them in save
  *----------------------------------------------------------------------------*/
 
-(($, MZ_EC, ABC) => {
+(($, MZ_EC, TH) => {
 
     "use strict";
 
     const klassName = "Game_System";
-    const { ORIG } = MZ_EC.setKlassContainer(klassName, $, ABC);
-    const EC_GS = MZ_EC[klassName].new, GS = ABC[klassName];
+    const { ORIG } = MZ_EC.setKlassContainer(klassName, $, TH);
+    const EC_GS = MZ_EC[klassName].new, GS = TH[klassName];
 
     MZ_EC.extendFunc(EC_GS, GS, "storeParams", function() {
         ORIG.storeParams.apply(this, arguments);
         // Added to store all parameters of this plugin
-        EC_GS.onStoreParams.call(this, ABC.PLUGIN_NAME, "autoBattleCmd");
+        EC_GS.onStoreParams.call(this, TH.PLUGIN_NAME, "targetingHotkeys");
         //
     }); // v1.00a - v1.00a
+
+    /**
+     * The this pointer is Game_System.prototype
+     * Idempotent
+     * @author DoubleX @interface @since v1.00a @version v1.00a
+     * @param {number} targetIndex - The index of the target to be selected
+     * @param {string} hotkey - The keymap of the hotkey selecting the target
+     */
+    $.setTargetingHotkey = function(targetIndex, hotkey) {
+        const hotkeys = this.targetingHotkeysParam("hotkeys");
+        const hotkey_ = hotkeys.find(({ targetingIndex }) => {
+            return targetingIndex === targetIndex;
+        });
+        hotkey_ ? hotkey_.targetingHotkey = hotkey : hotkeys.push({
+            targetingIndex: targetIndex,
+            targetingHotkey: hotkey
+        });
+    }; // $.setTargetingHotkey
 
     /**
      * The this pointer is Game_System.prototype
@@ -194,9 +202,9 @@ if (DoubleX_RMMZ.Enhanced_Codebase) {
      * @enum @param {string} param - The name of parameter to be stored in saves
      * @param {*} val - The value of the parameter to be stored in game saves
      */
-    $.setAutoBattleCmdParam = function(param, val) {
-        EC_GS.storeParamVal.call(this, "autoBattleCmd", param, val);
-    }; // $.setAutoBattleCmdParam
+    $.setTargetingHotkeysParam = function(param, val) {
+        EC_GS.storeParamVal.call(this, "targetingHotkeys", param, val);
+    }; // $.setTargetingHotkeysParam
 
     /**
      * The this pointer is Game_System.prototype
@@ -205,23 +213,16 @@ if (DoubleX_RMMZ.Enhanced_Codebase) {
      * @enum @param {string} param - The name of parameter to be stored in saves
      * @returns {*} The value of the parameter to be stored in game saves
      */
-    $.autoBattleCmdParam = function(param) {
-        return EC_GS.storedParamVal.call(this, "autoBattleCmd", param);
-    }; // $.autoBattleCmdParam
+    $.targetingHotkeysParam = function(param) {
+        return EC_GS.storedParamVal.call(this, "targetingHotkeys", param);
+    }; // $.targetingHotkeysParam
 
-    const pluginName = ABC.PLUGIN_NAME;
-    PluginManager.registerCommand(pluginName, "setAutoBattleCmdState", ({ stateId }) => {
-        $gameSystem.setAutoBattleCmdParam("stateId", +stateId);
-    });
-    PluginManager.registerCommand(pluginName, "setAutoBattleCmdText", ({ text }) => {
-        $gameSystem.setAutoBattleCmdParam("text", text);
-    });
-    PluginManager.registerCommand(pluginName, "setCanUseAutoBattleCmd", ({ canUse }) => {
-        $gameSystem.setAutoBattleCmdParam("canUse", JSON.parse(canUse));
+    PluginManager.registerCommand(TH.PLUGIN_NAME, "setTargetingHotkey", ({ targetIndex, targetHotkey }) => {
+        $gameSystem.setTargetingHotkey(+targetIndex, targetHotkey);
     });
 
 })(Game_System.prototype, DoubleX_RMMZ.Enhanced_Codebase,
-        DoubleX_RMMZ.Auto_Battle_Command);
+        DoubleX_RMMZ.Targeting_Hotkeys);
 
 /*----------------------------------------------------------------------------*/
 
@@ -234,93 +235,57 @@ if (DoubleX_RMMZ.Enhanced_Codebase) {
  *      - Adds the party command that adds an auto battle state to the party
  *----------------------------------------------------------------------------*/
 
-(($, MZ_EC, ABC) => {
+((MZ_EC, TH) => {
 
     "use strict";
 
-    const {
-        ORIG,
-        NEW,
-        extendFunc
-    } = MZ_EC.setKlassContainer("Window_PartyCommand", $, ABC);
+    const $$ = Window_Selectable.prototype;
 
-    extendFunc("makeCommandList", function() {
-        ORIG.makeCommandList.apply(this, arguments);
-        // Added to add party command that adds an auto battle state to party
-        NEW._addAutoBattleCmd.call(this);
-        //
-    }); // v1.00a - v1.00a
+    [
+        ["Window_BattleActor", Window_BattleActor.prototype],
+        ["Window_BattleEnemy", Window_BattleEnemy.prototype]
+    ].forEach(([klassName, proto]) => {
 
-    /**
-     * The this pointer is Window_PartyCommand.prototype
-     * Idempotent
-     * @author DoubleX @since v1.00a @version v1.00a
-     */
-    NEW._addAutoBattleCmd = function() {
-        const text = $gameSystem.autoBattleCmdParam("text");
-        const canUse = $gameSystem.autoBattleCmdParam("canUse");
-        this.addCommand(text, "autoBattle", canUse);
-    }; // NEW._addAutoBattleCmd
+        const {
+            ORIG,
+            NEW,
+            extendFunc
+        } = MZ_EC.setKlassContainer(klassName, proto, TH);
 
-})(Window_PartyCommand.prototype, DoubleX_RMMZ.Enhanced_Codebase,
-        DoubleX_RMMZ.Auto_Battle_Command);
+        if (proto.processHandling) {
+            extendFunc("processHandling", function() {
+                ORIG.processHandling.apply(this, arguments);
+                // Added to process the targeting hotkeys of this plugin as well
+                NEW._procHotkeys.call(this);
+                //
+            }); // v1.00a - v1.00a
+        } else {
+            /**
+             * Hotspot/Idempotent
+             * @author DoubleX @interface @since v1.00a @version v1.00a
+             */
+            proto.processHandling = function() {
+                $$.processHandling.call(this);
+                NEW._procHotkeys.call(this);
+            }; // proto.processHandling
+        }
 
-/*----------------------------------------------------------------------------*/
+        /**
+         * The this pointer is klassName.prototype
+         * Hotspot/Idempotent
+         * @author DoubleX @since v1.00a @version v1.00a
+         */
+        NEW._procHotkeys = function() {
+            if (!this.isOpenAndActive()) return;
+            const hotkeys = $gameSystem.targetingHotkeysParam("hotkeys");
+            hotkeys.forEach(({ targetIndex, targetHotkey }) => {
+                if (Input.isTriggered(targetHotkey)) this.select(targetIndex);
+            });
+        }; // NEW._procHotkeys
 
-/*----------------------------------------------------------------------------
- *    ## Scenes
- *----------------------------------------------------------------------------*/
+    });
 
-/*----------------------------------------------------------------------------
- *    # Edited class: Scene_Battle
- *      - Adds the party command that adds an auto battle state to the party
- *----------------------------------------------------------------------------*/
-
-(($, MZ_EC, ABC) => {
-
-    "use strict";
-
-    const {
-        ORIG,
-        NEW,
-        extendFunc
-    } = MZ_EC.setKlassContainer("Scene_Battle", $, ABC);
-
-    extendFunc("createPartyCommandWindow", function() {
-        ORIG.createPartyCommandWindow.apply(this, arguments);
-        // Added to add party command that adds an auto battle state to party
-        NEW._addAutoBattleCmd.call(this);
-        //
-    }); // v1.00a - v1.00a
-
-    /**
-     * The this pointer is Scene_Battle.prototype
-     * Idempotent
-     * @author DoubleX @since v1.00a @version v1.00a
-     */
-    NEW._addAutoBattleCmd = function() {
-        const callback = NEW._cmdAutoBattle.bind(this);
-        this._partyCommandWindow.setHandler("autoBattle", callback);
-    }; // NEW._addAutoBattleCmd
-
-    /**
-     * The this pointer is Scene_Battle.prototype
-     * Idempotent
-     * @author DoubleX @since v1.00a @version v1.00a
-     */
-    NEW._cmdAutoBattle = function() {
-        const autoBattleStateId = $gameSystem.autoBattleCmdParam("stateId");
-        $gameParty.members().forEach(mem => mem.addState(autoBattleStateId));
-        this.endCommandSelection();
-        // It's possible that some users might not use autobattle states
-        if ($gameParty.canInput() || BattleManager.isTpb()) return;
-        $gameParty.makeActions();
-        BattleManager.startTurn();
-        //
-    }; // NEW._cmdAutoBattle
-
-})(Scene_Battle.prototype, DoubleX_RMMZ.Enhanced_Codebase,
-        DoubleX_RMMZ.Auto_Battle_Command);
+})(DoubleX_RMMZ.Enhanced_Codebase, DoubleX_RMMZ.Targeting_Hotkeys);
 
 /*============================================================================*/
 
@@ -334,6 +299,6 @@ if (DoubleX_RMMZ.Enhanced_Codebase) {
 } else {
 
     console.warn(`DoubleX RMMZ Enhanced Codebase should be placed above
-                 ${DoubleX_RMMZ.Auto_Battle_Command.PLUGIN_NAME}`);
+                 ${DoubleX_RMMZ.Targeting_Hotkeys.PLUGIN_NAME}`);
 
 } // if (DoubleX_RMMZ.Enhanced_Codebase)

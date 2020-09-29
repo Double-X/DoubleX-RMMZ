@@ -72,6 +72,9 @@
  * @target MZ
  * @plugindesc Versions: { codebase: "1.0.2", plugin: "v1.00a" }
  * Lets you set some equips to have prerequisites other than equip types
+ * @orderAfter DoubleX RMMZ Enhanced Codebase
+ * @base DoubleX RMMZ Enhanced Codebase
+ * @author DoubleX
  *
  * @help
  *============================================================================

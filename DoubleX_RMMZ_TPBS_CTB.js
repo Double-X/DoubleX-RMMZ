@@ -79,6 +79,9 @@
  * @target MZ
  * @plugindesc Versions: { codebase: "1.0.2", plugin: "v1.00a" }
  * Lets you mimic the CTB functionality in the TPBS on the fly
+ * @orderAfter DoubleX RMMZ Enhanced Codebase
+ * @base DoubleX RMMZ Enhanced Codebase
+ * @author DoubleX
  *
  * @param isCTB
  * @type boolean
