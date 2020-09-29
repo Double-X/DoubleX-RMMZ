@@ -24,20 +24,20 @@
  *----------------------------------------------------------------------------
  *    # Links
  *      Video:
- *      1. 
+ *      1. https://www.youtube.com/watch?v=UA4BjaNii0k
  *      This Plugin:
- *      1. 
+ *      1. https://github.com/Double-X/DoubleX-RMMZ/blob/master/DoubleX_RMMZ_Custom_Key_Maps.js
  *      Posts:
- *      1. 
- *      2. 
- *      3. 
- *      4. 
- *      5. 
- *      6. 
- *      7. 
- *      8. 
- *      9. 
- *      10. 
+ *      1.
+ *      2.
+ *      3.
+ *      4.
+ *      5.
+ *      6.
+ *      7.
+ *      8.
+ *      9.
+ *      10.
  *----------------------------------------------------------------------------
  *    # Instructions
  *      1. The default plugin parameters file name is
@@ -59,7 +59,7 @@
  *      - None So Far
  *----------------------------------------------------------------------------
  *    # Changelog
- *      { codebase: "1.0.2", plugin: "v1.00a" }(2020 Sep 29 GMT 0400):
+ *      { codebase: "1.0.2", plugin: "v1.00a" }(2020 Sep 29 GMT 1600):
  *      1. 1st version of this plugin finished
  *----------------------------------------------------------------------------
  *    # Todo
@@ -315,7 +315,7 @@
  * @param keyName
  * @type string
  * @desc The custom name of the key referring to the key code keyCode
- * @default 
+ * @default
  */
 
 /*:
@@ -323,6 +323,7 @@
  * @target MZ
  * @plugindesc Versions: { codebase: "1.0.2", plugin: "v1.00a" }
  * Lets you set some hotkeys to select skill/item targets
+ * @orderAfter DoubleX RMMZ Enhanced Codebase
  * @author DoubleX
  *
  * @param keyMaps
@@ -368,7 +369,7 @@ Utils.checkRMVersion(DoubleX_RMMZ.Custom_Key_Maps.VERSIONS.codebase);
 /*----------------------------------------------------------------------------
  *    ## Core
  *----------------------------------------------------------------------------*/
- 
+
 /*----------------------------------------------------------------------------*/
 
 /*----------------------------------------------------------------------------
@@ -377,10 +378,12 @@ Utils.checkRMVersion(DoubleX_RMMZ.Custom_Key_Maps.VERSIONS.codebase);
  *----------------------------------------------------------------------------*/
 
 (($, CKM) => {
-  
+
     "use strict";
 
-    const keyCodes = {
+    const I = CKM.Input = { orig: {}, new: {} }, [ORIG, NEW] = [I.orig, I.new];
+
+    NEW._KEY_CODES = new Map(Object.entries({
         Digit1: 49,
         Digit2: 50,
         Digit3: 51,
@@ -500,14 +503,50 @@ Utils.checkRMVersion(DoubleX_RMMZ.Custom_Key_Maps.VERSIONS.codebase);
         NumpadEqual: 12,
         NumpadMultiply: 106,
         NumpadSubtract: 109
-    }; // keyCodes
+    })); // NEW._KEY_CODES
 
-    const { keyMapper } = $;
-    const keyMaps = PluginManager.parameters(CKM.PLUGIN_NAME).keyMaps;
-    JSON.parse(keyMaps).forEach(keyMap => {
-        const { keyCode, keyName } = JSON.parse(keyMap);
-        keyMapper[keyCodes[keyCode]] = keyName;
+    NEW._KEY_MAPPER = new Map();
+    const { keyMaps } = PluginManager.parameters(CKM.PLUGIN_NAME);
+    JSON.parse(keyMaps).forEach(rawKeyMap => {
+        const keyMap = JSON.parse(rawKeyMap), { keyName } = keyMap;
+        const keyCode = NEW._KEY_CODES.get(keyMap.keyCode);
+        const keyMapper = NEW._KEY_MAPPER;
+        if (!keyMapper.has(keyCode)) return keyMapper.set(keyCode, [keyName]);
+        const keyNames = keyMapper.get(keyCode);
+        if (!keyNames.includes(keyName)) keyNames.push(keyName);
     });
+
+    ORIG._onKeyDown = $._onKeyDown;
+    NEW._onKeyDown = $._onKeyDown = function(event) {
+    // v1.00a - v1.00a; Extended
+        ORIG._onKeyDown.apply(this, arguments);
+        // Added to update the current states as true with the custom key maps
+        NEW._updateCurrentStates.call(this, event.keyCode, true);
+        //
+    }; // $._onKeyDown
+
+    ORIG._onKeyUp = $._onKeyUp;
+    NEW._onKeyUp = $._onKeyUp = function(event) { // v1.00a - v1.00a; Extended
+        ORIG._onKeyUp.apply(this, arguments);
+        // Added to update the current states as false with the custom key maps
+        NEW._updateCurrentStates.call(this, event.keyCode, false);
+        //
+    }; // $._onKeyUp
+
+    /**
+     * The this pointer is Input
+     * Hotspot/Idempotent
+     * @author DoubleX @since v1.00a @version v1.00a
+     * @enum @param {number} keyCode - Code of the key to have its state updated
+     * @param {boolean} currentState - The new state of the key with the code
+     */
+    NEW._updateCurrentStates = function(keyCode, currentState) {
+        const keyMapper = NEW._KEY_MAPPER;
+        if (keyMapper.has(keyCode)) keyMapper.get(keyCode).forEach(keyName => {
+            this._currentState[keyName] = currentState;
+        });
+    }; // NEW._updateCurrentStates
+
 
 })(Input, DoubleX_RMMZ.Custom_Key_Maps);
 
