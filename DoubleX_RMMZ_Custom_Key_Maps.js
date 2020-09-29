@@ -28,16 +28,16 @@
  *      This Plugin:
  *      1. https://github.com/Double-X/DoubleX-RMMZ/blob/master/DoubleX_RMMZ_Custom_Key_Maps.js
  *      Posts:
- *      1.
- *      2.
- *      3.
- *      4.
- *      5.
- *      6.
- *      7.
- *      8.
- *      9.
- *      10.
+ *      1. https://forums.rpgmakerweb.com/index.php?threads/doublex_rmmz_custom_key_maps.128057/
+ *      2. https://www.rpgmakercentral.com/topic/42628-doublex_rmmz_custom_key_maps/
+ *      3. https://rpgmaker.net/engines/rmmz/utilities/297/
+ *      4. https://www.save-point.org/thread-8176.html
+ *      5. https://gdu.one/forums/topic/13657-doublex_rmmz_custom_key_maps/
+ *      6. http://www.hbgames.org/forums/viewtopic.php?f=332&t=80351
+ *      7. https://forum.chaos-project.com/index.php/topic,16085.new.html
+ *      8. https://doublexrpgmaker.wordpress.com/2020/09/30/doublex_rmmz_custom_key_maps/
+ *      9. https://www.patreon.com/posts/42155627
+ *      10. https://www.makerdevs.com/plugin/doublex-rmmz-custom-key-maps
  *----------------------------------------------------------------------------
  *    # Instructions
  *      1. The default plugin parameters file name is
@@ -322,13 +322,12 @@
  * @url https://www.patreon.com/doublex
  * @target MZ
  * @plugindesc Versions: { codebase: "1.0.2", plugin: "v1.00a" }
- * Lets you set some hotkeys to select skill/item targets
+ * Lets you use more keys in the keyboard for RMMZ by setting the key maps
  * @orderAfter DoubleX RMMZ Enhanced Codebase
  * @author DoubleX
  *
  * @param keyMaps
  * @type struct<KeyMap>[]
- * @min 1
  * @desc Sets the list of custom key maps with codes and names
  * @default []
  */

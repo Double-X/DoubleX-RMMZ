@@ -13,7 +13,7 @@
  *----------------------------------------------------------------------------
  *    # Author Notes
  *      1. A custom key map plugin, like DoubleX_RMMZ_Custom_Key_Maps:
- *         
+ *         https://github.com/Double-X/DoubleX-RMMZ/blob/master/DoubleX_RMMZ_Custom_Key_Maps.js
  *         Can be useful when setting hotkeys to select targets in this plugin
  *----------------------------------------------------------------------------
  *    # Terms Of Use
@@ -32,20 +32,20 @@
  *----------------------------------------------------------------------------
  *    # Links
  *      Video:
- *      1. 
+ *      1. https://www.youtube.com/watch?v=UA4BjaNii0k
  *      This Plugin:
- *      1. 
+ *      1. https://github.com/Double-X/DoubleX-RMMZ/blob/master/DoubleX_RMMZ_Targeting_Hotkeys.js
  *      Posts:
- *      1. 
- *      2. 
- *      3. 
- *      4. 
- *      5. 
- *      6. 
- *      7. 
- *      8. 
- *      9. 
- *      10. 
+ *      1. https://forums.rpgmakerweb.com/index.php?threads/doublex_rmmz_targeting_hotkeys.128058/
+ *      2. https://www.rpgmakercentral.com/topic/42629-doublex_rmmz_targeting_hotkeys/
+ *      3. https://rpgmaker.net/engines/rmmz/utilities/298/
+ *      4. https://www.save-point.org/thread-8177.html
+ *      5. https://gdu.one/forums/topic/13658-doublex_rmmz_targeting_hotkeys/
+ *      6. http://www.hbgames.org/forums/viewtopic.php?f=332&t=80352
+ *      7. https://forum.chaos-project.com/index.php/topic,16086.new.html
+ *      8. https://doublexrpgmaker.wordpress.com/2020/09/30/doublex_rmmz_targeting_hotkeys/
+ *      9. https://www.patreon.com/posts/42155629
+ *      10. https://www.makerdevs.com/plugin/doublex-rmmz-targeting-hotkeys
  *----------------------------------------------------------------------------
  *    # Instructions
  *      1. The default plugin parameters file name is
@@ -81,14 +81,14 @@
  * @param targetHotkey
  * @type string
  * @desc The keymap of the hotkey selecting the target with index targetIndex
- * @default 
+ * @default
  */
 
 /*:
  * @url https://www.patreon.com/doublex
  * @target MZ
  * @plugindesc Versions: { codebase: "1.0.2", plugin: "v1.00a" }
- * Lets you set some hotkeys to select skill/item targets
+ * Lets you set some custom hotkeys to select some skill/item targets
  * @orderAfter DoubleX RMMZ Enhanced Codebase
  * @base DoubleX RMMZ Enhanced Codebase
  * @author DoubleX
