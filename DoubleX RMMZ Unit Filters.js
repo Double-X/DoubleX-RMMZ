@@ -68,6 +68,9 @@
  *      - None So Far
  *----------------------------------------------------------------------------
  *    # Changelog
+ *      { codebase: "1.0.0", plugin: "v1.01a" }(2020 Oct 3 GMT 1400):
+ *      1. Added the plugin query and command counterparts for the script
+ *         calls of this plugin
  *      { codebase: "1.0.0", plugin: "v1.01a" }(2020 Aug 28 GMT 0000):
  *      1. Added the following battler manipulation script calls  -
  *         - hasAnyUsableSkill(skillIds)
@@ -619,6 +622,497 @@
  *           $gameTroop.memWithoutAllUsableSkills([1, 2], $gameParty.memWithoutAnyUsableSkill([3, 4]))
  *           returns the list of troop members without usable skills having id
  *           1 and 2 among those without usable skill having id 3 or 4
+ *----------------------------------------------------------------------------
+ *    ## (v1.02a+)Plugin Query Info
+ *       1. You need to use DoubleX_RMMZ_Plugin_Query as well in order to use
+ *          the plugin queries of this plugin:
+ *          https://github.com/Double-X/DoubleX-RMMZ/blob/master/DoubleX_RMMZ_Plugin_Query.js
+ *----------------------------------------------------------------------------
+ *      1. isAnyStateAffected side label stateIds
+ *         - Applies the script call battler.isAnyStateAffected(stateIds)
+ *         - battler is the battler identified by side and label
+ *         - side is either actor or enemy
+ *         - label is the actor id for side actor and troop member index for
+ *           side enemy
+ *         - stateIds is in the form of
+ *           stateId1_stateId2_stateId3_stateIdI_stateIdN
+ *      2. stateIdsisAllStatesAffected side label stateIds
+ *         - Applies the script call battler.isAllStatesAffected(stateIds)
+ *         - battler is the battler identified by side and label
+ *         - side is either actor or enemy
+ *         - label is the actor id for side actor and troop member index for
+ *           side enemy
+ *         - stateIds is in the form of
+ *           stateId1_stateId2_stateId3_stateIdI_stateIdN
+ *      3. isAnyBuffAffected side label paramIds
+ *         - Applies the script call battler.isAnyBuffAffected(paramIds)
+ *         - battler is the battler identified by side and label
+ *         - side is either actor or enemy
+ *         - label is the actor id for side actor and troop member index for
+ *           side enemy
+ *         - paramIds is in the form of
+ *           paramId1_paramId2_paramId3_paramIdI_paramIdN
+ *      4. isAllBuffsAffected side label paramIds
+ *         - Applies the script call battler.isAllBuffsAffected(paramIds)
+ *         - battler is the battler identified by side and label
+ *         - side is either actor or enemy
+ *         - label is the actor id for side actor and troop member index for
+ *           side enemy
+ *         - paramIds is in the form of
+ *           paramId1_paramId2_paramId3_paramIdI_paramIdN
+ *      5. isAnyDebuffAffected side label paramIds
+ *         - Applies the script call battler.isAnyDebuffAffected(paramIds)
+ *         - battler is the battler identified by side and label
+ *         - side is either actor or enemy
+ *         - label is the actor id for side actor and troop member index for
+ *           side enemy
+ *         - paramIds is in the form of
+ *           paramId1_paramId2_paramId3_paramIdI_paramIdN
+ *      6. isAllDebuffsAffected side label paramIds
+ *         - Applies the script call battler.isAllDebuffsAffected(paramIds)
+ *         - battler is the battler identified by side and label
+ *         - side is either actor or enemy
+ *         - label is the actor id for side actor and troop member index for
+ *           side enemy
+ *         - paramIds is in the form of
+ *           paramId1_paramId2_paramId3_paramIdI_paramIdN
+ *      7. hasAnySkill side label skillIds
+ *         - Applies the script call battler.hasAnySkill(skillIds)
+ *         - battler is the battler identified by side and label
+ *         - side is either actor or enemy
+ *         - label is the actor id for side actor and troop member index for
+ *           side enemy
+ *         - skillIds is in the form of
+ *           skillId1_skillId2_skillId3_skillIdI_skillIdN
+ *      8. hasAllSkills side label skillIds
+ *         - Applies the script call battler.hasAllSkills(skillIds)
+ *         - battler is the battler identified by side and label
+ *         - side is either actor or enemy
+ *         - label is the actor id for side actor and troop member index for
+ *           side enemy
+ *         - skillIds is in the form of
+ *           skillId1_skillId2_skillId3_skillIdI_skillIdN
+ *      9. hasAnyUsableSkill side label skillIds
+ *         - Applies the script call battler.hasAnyUsableSkill(skillIds)
+ *         - battler is the battler identified by side and label
+ *         - side is either actor or enemy
+ *         - label is the actor id for side actor and troop member index for
+ *           side enemy
+ *         - skillIds is in the form of
+ *           skillId1_skillId2_skillId3_skillIdI_skillIdN
+ *      10. hasAllUsableSkills side label skillIds
+ *         - Applies the script call battler.hasAllUsableSkills(skillIds)
+ *         - battler is the battler identified by side and label
+ *         - side is either actor or enemy
+ *         - label is the actor id for side actor and troop member index for
+ *           side enemy
+ *         - skillIds is in the form of
+ *           skillId1_skillId2_skillId3_skillIdI_skillIdN
+ *    # Unit manipulations
+ *      1. memWithAnyState side stateIds memFunc
+ *         - Applies the script call unit.memWithAnyState(stateIds, mems)
+ *         - unit is the unit identified by side
+ *         - side is either party or troop
+ *         - stateIds is in the form of
+ *           stateId1_stateId2_stateId3_stateIdI_stateIdN
+ *         - mems is the list of unit members returned by the method with name
+ *           memFunc, which is either of the following:
+ *           i. members - All members of the unit
+ *           ii. aliveMembers - All alive mnembers of the unit
+ *           iii. deadMembers - All dead members of the unit
+ *           iv. movableMembers - All movable members of the unit
+ *           Not specifying memFunc is the same as not specifying mems
+ *      2. memWithAllStates side stateIds memFunc
+ *         - Applies the script call unit.memWithAllStates(stateIds, mems)
+ *         - unit is the unit identified by side
+ *         - side is either party or troop
+ *         - stateIds is in the form of
+ *           stateId1_stateId2_stateId3_stateIdI_stateIdN
+ *         - mems is the list of unit members returned by the method with name
+ *           memFunc, which is either of the following:
+ *           i. members - All members of the unit
+ *           ii. aliveMembers - All alive mnembers of the unit
+ *           iii. deadMembers - All dead members of the unit
+ *           iv. movableMembers - All movable members of the unit
+ *           Not specifying memFunc is the same as not specifying mems
+ *      3. memWithoutAnyState side stateIds memFunc
+ *         - Applies the script call unit.memWithoutAnyState(stateIds, mems)
+ *         - unit is the unit identified by side
+ *         - side is either party or troop
+ *         - stateIds is in the form of
+ *           stateId1_stateId2_stateId3_stateIdI_stateIdN
+ *         - mems is the list of unit members returned by the method with name
+ *           memFunc, which is either of the following:
+ *           i. members - All members of the unit
+ *           ii. aliveMembers - All alive mnembers of the unit
+ *           iii. deadMembers - All dead members of the unit
+ *           iv. movableMembers - All movable members of the unit
+ *           Not specifying memFunc is the same as not specifying mems
+ *      4. memWithoutAllStates side stateIds memFunc
+ *         - Applies the script call unit.memWithoutAllStates(stateIds, mems)
+ *         - unit is the unit identified by side
+ *         - side is either party or troop
+ *         - stateIds is in the form of
+ *           stateId1_stateId2_stateId3_stateIdI_stateIdN
+ *         - mems is the list of unit members returned by the method with name
+ *           memFunc, which is either of the following:
+ *           i. members - All members of the unit
+ *           ii. aliveMembers - All alive mnembers of the unit
+ *           iii. deadMembers - All dead members of the unit
+ *           iv. movableMembers - All movable members of the unit
+ *           Not specifying memFunc is the same as not specifying mems
+ *      5. memWithAnyBuff side paramIds memFunc
+ *         - Applies the script call unit.memWithAnyBuff(paramIds, mems)
+ *         - unit is the unit identified by side
+ *         - side is either party or troop
+ *         - paramIds is in the form of
+ *           paramId1_paramId2_paramId3_paramIdI_paramIdN
+ *         - mems is the list of unit members returned by the method with name
+ *           memFunc, which is either of the following:
+ *           i. members - All members of the unit
+ *           ii. aliveMembers - All alive mnembers of the unit
+ *           iii. deadMembers - All dead members of the unit
+ *           iv. movableMembers - All movable members of the unit
+ *           Not specifying memFunc is the same as not specifying mems
+ *      6. memWithAllBuffs side paramIds memFunc
+ *         - Applies the script call unit.memWithAllBuffs(paramIds, mems)
+ *         - unit is the unit identified by side
+ *         - side is either party or troop
+ *         - paramIds is in the form of
+ *           paramId1_paramId2_paramId3_paramIdI_paramIdN
+ *         - mems is the list of unit members returned by the method with name
+ *           memFunc, which is either of the following:
+ *           i. members - All members of the unit
+ *           ii. aliveMembers - All alive mnembers of the unit
+ *           iii. deadMembers - All dead members of the unit
+ *           iv. movableMembers - All movable members of the unit
+ *           Not specifying memFunc is the same as not specifying mems
+ *      7. memWithoutAnyBuff side paramIds memFunc
+ *         - Applies the script call unit.memWithoutAnyBuff(paramIds, mems)
+ *         - unit is the unit identified by side
+ *         - side is either party or troop
+ *         - paramIds is in the form of
+ *           paramId1_paramId2_paramId3_paramIdI_paramIdN
+ *         - mems is the list of unit members returned by the method with name
+ *           memFunc, which is either of the following:
+ *           i. members - All members of the unit
+ *           ii. aliveMembers - All alive mnembers of the unit
+ *           iii. deadMembers - All dead members of the unit
+ *           iv. movableMembers - All movable members of the unit
+ *           Not specifying memFunc is the same as not specifying mems
+ *      8. memWithoutAllBuffs side paramIds memFunc
+ *         - Applies the script call unit.memWithoutAllBuffs(paramIds, mems)
+ *         - unit is the unit identified by side
+ *         - side is either party or troop
+ *         - paramIds is in the form of
+ *           paramId1_paramId2_paramId3_paramIdI_paramIdN
+ *         - mems is the list of unit members returned by the method with name
+ *           memFunc, which is either of the following:
+ *           i. members - All members of the unit
+ *           ii. aliveMembers - All alive mnembers of the unit
+ *           iii. deadMembers - All dead members of the unit
+ *           iv. movableMembers - All movable members of the unit
+ *           Not specifying memFunc is the same as not specifying mems
+ *      9. memWithAnyDebuff side paramIds memFunc
+ *         - Applies the script call unit.memWithAnyDebuff(paramIds, mems)
+ *         - unit is the unit identified by side
+ *         - side is either party or troop
+ *         - paramIds is in the form of
+ *           paramId1_paramId2_paramId3_paramIdI_paramIdN
+ *         - mems is the list of unit members returned by the method with name
+ *           memFunc, which is either of the following:
+ *           i. members - All members of the unit
+ *           ii. aliveMembers - All alive mnembers of the unit
+ *           iii. deadMembers - All dead members of the unit
+ *           iv. movableMembers - All movable members of the unit
+ *           Not specifying memFunc is the same as not specifying mems
+ *      10. memWithAllDebuffs side paramIds memFunc
+ *         - Applies the script call unit.memWithAllDebuffs(paramIds, mems)
+ *         - unit is the unit identified by side
+ *         - side is either party or troop
+ *         - paramIds is in the form of
+ *           paramId1_paramId2_paramId3_paramIdI_paramIdN
+ *         - mems is the list of unit members returned by the method with name
+ *           memFunc, which is either of the following:
+ *           i. members - All members of the unit
+ *           ii. aliveMembers - All alive mnembers of the unit
+ *           iii. deadMembers - All dead members of the unit
+ *           iv. movableMembers - All movable members of the unit
+ *           Not specifying memFunc is the same as not specifying mems
+ *      11. memWithoutAnyDebuff side paramIds memFunc
+ *         - Applies the script call unit.memWithoutAnyDebuff(paramIds, mems)
+ *         - unit is the unit identified by side
+ *         - side is either party or troop
+ *         - paramIds is in the form of
+ *           paramId1_paramId2_paramId3_paramIdI_paramIdN
+ *         - mems is the list of unit members returned by the method with name
+ *           memFunc, which is either of the following:
+ *           i. members - All members of the unit
+ *           ii. aliveMembers - All alive mnembers of the unit
+ *           iii. deadMembers - All dead members of the unit
+ *           iv. movableMembers - All movable members of the unit
+ *           Not specifying memFunc is the same as not specifying mems
+ *      12. memWithoutAllDebuffs side paramIds memFunc
+ *         - Applies the script call unit.memWithoutAllDebuffs(paramIds, mems)
+ *         - unit is the unit identified by side
+ *         - side is either party or troop
+ *         - paramIds is in the form of
+ *           paramId1_paramId2_paramId3_paramIdI_paramIdN
+ *         - mems is the list of unit members returned by the method with name
+ *           memFunc, which is either of the following:
+ *           i. members - All members of the unit
+ *           ii. aliveMembers - All alive mnembers of the unit
+ *           iii. deadMembers - All dead members of the unit
+ *           iv. movableMembers - All movable members of the unit
+ *           Not specifying memFunc is the same as not specifying mems
+ *      13. memWithAnySkill side skillIds memFunc
+ *         - Applies the script call unit.memWithAnySkill(skillIds, mems)
+ *         - unit is the unit identified by side
+ *         - side is either party or troop
+ *         - skillIds is in the form of
+ *           skillId1_skillId2_skillId3_skillIdI_skillIdN
+ *         - mems is the list of unit members returned by the method with name
+ *           memFunc, which is either of the following:
+ *           i. members - All members of the unit
+ *           ii. aliveMembers - All alive mnembers of the unit
+ *           iii. deadMembers - All dead members of the unit
+ *           iv. movableMembers - All movable members of the unit
+ *           Not specifying memFunc is the same as not specifying mems
+ *      14. memWithAllSkills side skillIds memFunc
+ *         - Applies the script call unit.memWithAllSkills(skillIds, mems)
+ *         - unit is the unit identified by side
+ *         - side is either party or troop
+ *         - skillIds is in the form of
+ *           skillId1_skillId2_skillId3_skillIdI_skillIdN
+ *         - mems is the list of unit members returned by the method with name
+ *           memFunc, which is either of the following:
+ *           i. members - All members of the unit
+ *           ii. aliveMembers - All alive mnembers of the unit
+ *           iii. deadMembers - All dead members of the unit
+ *           iv. movableMembers - All movable members of the unit
+ *           Not specifying memFunc is the same as not specifying mems
+ *      15. memWithoutAnySkill side skillIds memFunc
+ *         - Applies the script call unit.memWithoutAnySkill(skillIds, mems)
+ *         - unit is the unit identified by side
+ *         - side is either party or troop
+ *         - skillIds is in the form of
+ *           skillId1_skillId2_skillId3_skillIdI_skillIdN
+ *         - mems is the list of unit members returned by the method with name
+ *           memFunc, which is either of the following:
+ *           i. members - All members of the unit
+ *           ii. aliveMembers - All alive mnembers of the unit
+ *           iii. deadMembers - All dead members of the unit
+ *           iv. movableMembers - All movable members of the unit
+ *           Not specifying memFunc is the same as not specifying mems
+ *      16. memWithoutAllSkills side skillIds memFunc
+ *         - Applies the script call unit.memWithoutAllSkills(skillIds, mems)
+ *         - unit is the unit identified by side
+ *         - side is either party or troop
+ *         - skillIds is in the form of
+ *           skillId1_skillId2_skillId3_skillIdI_skillIdN
+ *         - mems is the list of unit members returned by the method with name
+ *           memFunc, which is either of the following:
+ *           i. members - All members of the unit
+ *           ii. aliveMembers - All alive mnembers of the unit
+ *           iii. deadMembers - All dead members of the unit
+ *           iv. movableMembers - All movable members of the unit
+ *           Not specifying memFunc is the same as not specifying mems
+ *      17. anyHighestStatMem side stats memFunc
+ *         - Applies the script call unit.anyHighestStatMem(stats, mems)
+ *         - unit is the unit identified by side
+ *         - side is either party or troop
+ *         - stats is in the form of stat1_stat2_stat3_statI_statN
+ *         - mems is the list of unit members returned by the method with name
+ *           memFunc, which is either of the following:
+ *           i. members - All members of the unit
+ *           ii. aliveMembers - All alive mnembers of the unit
+ *           iii. deadMembers - All dead members of the unit
+ *           iv. movableMembers - All movable members of the unit
+ *           Not specifying memFunc is the same as not specifying mems
+ *      18. allHighestStatsMem side stats memFunc
+ *         - Applies the script call unit.allHighestStatsMem(stats, mems)
+ *         - unit is the unit identified by side
+ *         - side is either party or troop
+ *         - stats is in the form of stat1_stat2_stat3_statI_statN
+ *         - mems is the list of unit members returned by the method with name
+ *           memFunc, which is either of the following:
+ *           i. members - All members of the unit
+ *           ii. aliveMembers - All alive mnembers of the unit
+ *           iii. deadMembers - All dead members of the unit
+ *           iv. movableMembers - All movable members of the unit
+ *           Not specifying memFunc is the same as not specifying mems
+ *      19. notAnyHighestStatMem side stats memFunc
+ *         - Applies the script call unit.notAnyHighestStatMem(stats, mems)
+ *         - unit is the unit identified by side
+ *         - side is either party or troop
+ *         - stats is in the form of stat1_stat2_stat3_statI_statN
+ *         - mems is the list of unit members returned by the method with name
+ *           memFunc, which is either of the following:
+ *           i. members - All members of the unit
+ *           ii. aliveMembers - All alive mnembers of the unit
+ *           iii. deadMembers - All dead members of the unit
+ *           iv. movableMembers - All movable members of the unit
+ *           Not specifying memFunc is the same as not specifying mems
+ *      20. notAllHighestStatsMem side stats memFunc
+ *         - Applies the script call unit.notAllHighestStatsMem(stats, mems)
+ *         - unit is the unit identified by side
+ *         - side is either party or troop
+ *         - stats is in the form of stat1_stat2_stat3_statI_statN
+ *         - mems is the list of unit members returned by the method with name
+ *           memFunc, which is either of the following:
+ *           i. members - All members of the unit
+ *           ii. aliveMembers - All alive mnembers of the unit
+ *           iii. deadMembers - All dead members of the unit
+ *           iv. movableMembers - All movable members of the unit
+ *           Not specifying memFunc is the same as not specifying mems
+ *      21. anyLowestStatMem side stats memFunc
+ *         - Applies the script call unit.anyLowestStatMem(stats, mems)
+ *         - unit is the unit identified by side
+ *         - side is either party or troop
+ *         - stats is in the form of stat1_stat2_stat3_statI_statN
+ *         - mems is the list of unit members returned by the method with name
+ *           memFunc, which is either of the following:
+ *           i. members - All members of the unit
+ *           ii. aliveMembers - All alive mnembers of the unit
+ *           iii. deadMembers - All dead members of the unit
+ *           iv. movableMembers - All movable members of the unit
+ *           Not specifying memFunc is the same as not specifying mems
+ *      22. allLowestStatsMem side stats memFunc
+ *         - Applies the script call unit.allLowestStatsMem(stats, mems)
+ *         - unit is the unit identified by side
+ *         - side is either party or troop
+ *         - stats is in the form of stat1_stat2_stat3_statI_statN
+ *         - mems is the list of unit members returned by the method with name
+ *           memFunc, which is either of the following:
+ *           i. members - All members of the unit
+ *           ii. aliveMembers - All alive mnembers of the unit
+ *           iii. deadMembers - All dead members of the unit
+ *           iv. movableMembers - All movable members of the unit
+ *           Not specifying memFunc is the same as not specifying mems
+ *      23. notAnyLowestStatMem side stats memFunc
+ *         - Applies the script call unit.notAnyLowestStatMem(stats, mems)
+ *         - unit is the unit identified by side
+ *         - side is either party or troop
+ *         - stats is in the form of stat1_stat2_stat3_statI_statN
+ *         - mems is the list of unit members returned by the method with name
+ *           memFunc, which is either of the following:
+ *           i. members - All members of the unit
+ *           ii. aliveMembers - All alive mnembers of the unit
+ *           iii. deadMembers - All dead members of the unit
+ *           iv. movableMembers - All movable members of the unit
+ *           Not specifying memFunc is the same as not specifying mems
+ *      24. notAllLowestStatsMem side stats memFunc
+ *         - Applies the script call unit.notAllLowestStatsMem(stats, mems)
+ *         - unit is the unit identified by side
+ *         - side is either party or troop
+ *         - stats is in the form of stat1_stat2_stat3_statI_statN
+ *         - mems is the list of unit members returned by the method with name
+ *           memFunc, which is either of the following:
+ *           i. members - All members of the unit
+ *           ii. aliveMembers - All alive mnembers of the unit
+ *           iii. deadMembers - All dead members of the unit
+ *           iv. movableMembers - All movable members of the unit
+ *           Not specifying memFunc is the same as not specifying mems
+ *      25. anyAboveStatMem side stats val memFunc
+ *         - Applies the script call unit.anyAboveStatMem(stats, val, mems)
+ *         - unit is the unit identified by side
+ *         - side is either party or troop
+ *         - stats is in the form of stat1_stat2_stat3_statI_statN
+ *         - mems is the list of unit members returned by the method with name
+ *           memFunc, which is either of the following:
+ *           i. members - All members of the unit
+ *           ii. aliveMembers - All alive mnembers of the unit
+ *           iii. deadMembers - All dead members of the unit
+ *           iv. movableMembers - All movable members of the unit
+ *           Not specifying memFunc is the same as not specifying mems
+ *      26. allAboveStatMem side stats val memFunc
+ *         - Applies the script call unit.allAboveStatMem(stats, val, mems)
+ *         - unit is the unit identified by side
+ *         - side is either party or troop
+ *         - stats is in the form of stat1_stat2_stat3_statI_statN
+ *         - mems is the list of unit members returned by the method with name
+ *           memFunc, which is either of the following:
+ *           i. members - All members of the unit
+ *           ii. aliveMembers - All alive mnembers of the unit
+ *           iii. deadMembers - All dead members of the unit
+ *           iv. movableMembers - All movable members of the unit
+ *           Not specifying memFunc is the same as not specifying mems
+ *      27. anyBelowStatMem side stats val memFunc
+ *         - Applies the script call unit.anyBelowStatMem(stats, val, mems)
+ *         - unit is the unit identified by side
+ *         - side is either party or troop
+ *         - stats is in the form of stat1_stat2_stat3_statI_statN
+ *         - mems is the list of unit members returned by the method with name
+ *           memFunc, which is either of the following:
+ *           i. members - All members of the unit
+ *           ii. aliveMembers - All alive mnembers of the unit
+ *           iii. deadMembers - All dead members of the unit
+ *           iv. movableMembers - All movable members of the unit
+ *           Not specifying memFunc is the same as not specifying mems
+ *      28. allBelowStatMem side stats val memFunc
+ *         - Applies the script call unit.allBelowStatMem(stats, val, mems)
+ *         - unit is the unit identified by side
+ *         - side is either party or troop
+ *         - stats is in the form of stat1_stat2_stat3_statI_statN
+ *         - mems is the list of unit members returned by the method with name
+ *           memFunc, which is either of the following:
+ *           i. members - All members of the unit
+ *           ii. aliveMembers - All alive mnembers of the unit
+ *           iii. deadMembers - All dead members of the unit
+ *           iv. movableMembers - All movable members of the unit
+ *           Not specifying memFunc is the same as not specifying mems
+ *      29. memWithAnyUsableSkill side skillIds memFunc
+ *         - Applies the script call unit.memWithAnyUsableSkill(skillIds, mems)
+ *         - unit is the unit identified by side
+ *         - side is either party or troop
+ *         - skillIds is in the form of
+ *           skillId1_skillId2_skillId3_skillIdI_skillIdN
+ *         - mems is the list of unit members returned by the method with name
+ *           memFunc, which is either of the following:
+ *           i. members - All members of the unit
+ *           ii. aliveMembers - All alive mnembers of the unit
+ *           iii. deadMembers - All dead members of the unit
+ *           iv. movableMembers - All movable members of the unit
+ *           Not specifying memFunc is the same as not specifying mems
+ *      30. memWithAllUsableSkills side skillIds memFunc
+ *         - Applies the script call unit.memWithAnyUsableSkill(skillIds, mems)
+ *         - unit is the unit identified by side
+ *         - side is either party or troop
+ *         - skillIds is in the form of
+ *           skillId1_skillId2_skillId3_skillIdI_skillIdN
+ *         - mems is the list of unit members returned by the method with name
+ *           memFunc, which is either of the following:
+ *           i. members - All members of the unit
+ *           ii. aliveMembers - All alive mnembers of the unit
+ *           iii. deadMembers - All dead members of the unit
+ *           iv. movableMembers - All movable members of the unit
+ *           Not specifying memFunc is the same as not specifying mems
+ *      31. memWithoutAnyUsableSkill side skillIds memFunc
+ *         - Applies the script call unit.memWithAnyUsableSkill(skillIds, mems)
+ *         - unit is the unit identified by side
+ *         - side is either party or troop
+ *         - skillIds is in the form of
+ *           skillId1_skillId2_skillId3_skillIdI_skillIdN
+ *         - mems is the list of unit members returned by the method with name
+ *           memFunc, which is either of the following:
+ *           i. members - All members of the unit
+ *           ii. aliveMembers - All alive mnembers of the unit
+ *           iii. deadMembers - All dead members of the unit
+ *           iv. movableMembers - All movable members of the unit
+ *           Not specifying memFunc is the same as not specifying mems
+ *      32. memWithoutAllUsableSkills side skillIds memFunc
+ *         - Applies the script call unit.memWithAnyUsableSkill(skillIds, mems)
+ *         - unit is the unit identified by side
+ *         - side is either party or troop
+ *         - skillIds is in the form of
+ *           skillId1_skillId2_skillId3_skillIdI_skillIdN
+ *         - mems is the list of unit members returned by the method with name
+ *           memFunc, which is either of the following:
+ *           i. members - All members of the unit
+ *           ii. aliveMembers - All alive mnembers of the unit
+ *           iii. deadMembers - All dead members of the unit
+ *           iv. movableMembers - All movable members of the unit
+ *           Not specifying memFunc is the same as not specifying mems
  *============================================================================
  */
 
@@ -651,6 +1145,126 @@ Utils.checkRMVersion(DoubleX_RMMZ.Unit_Filters.VERSIONS.codebase);
  *      5. Functions supposedly returning nullable values are marked with the
  *         _ suffix in their names(but their return values can be sure to be
  *         non null in some cases)
+ *----------------------------------------------------------------------------*/
+
+/*----------------------------------------------------------------------------*/
+
+if (DoubleX_RMMZ.Plugin_Query) {
+
+(UF => {
+
+    "use strict";
+
+    const PQ = UF.Plugin_Query = {};
+
+    PQ._BATTLER_ = (side, label) => {
+        switch (side) {
+            case "actor": return $gameActors.actor(+label);
+            case "enemy": return $gameTroop.members()[+label];
+            default: return undefined;
+        }
+    }; // PQ._BATTLER_
+    PQ._NUM_ARR = arrStr => PQ._STR_ARR(arrStr).map(Number);
+    PQ._STR_ARR = arrStr => arrStr.split(/_+/);
+    PQ._UNIT_ = side => {
+        switch (side) {
+            case "party": return $gameParty;
+            case "troop": return $gameTroop;
+            default: return undefined;
+        }
+    }; // PQ._UNIT_
+
+    [
+        "hasAnySkill",
+        "hasAllSkills",
+        "hasAnyUsableSkill",
+        "hasAllUsableSkills",
+        "isAnyStateAffected",
+        "isAllStatesAffected",
+        "isAnyBuffAffected",
+        "isAllBuffsAffected",
+        "isAnyDebuffAffected",
+        "isAllDebuffsAffected"
+    ].forEach(name => {
+        PluginManager.pluginQueries.set(name, (side, label, ids) => {
+            const battler_ = PQ._BATTLER_(side, label);
+            if (battler_) battler[name](PQ._NUM_ARR(ids));
+        });
+    });
+
+    [
+        "memWithAnyState",
+        "memWithAllStates",
+        "memWithoutAnyState",
+        "memWithoutAllStates",
+        "memWithAnyBuff",
+        "memWithAllBuffs",
+        "memWithoutAnyBuff",
+        "memWithoutAllBuffs",
+        "memWithAnyDebuff",
+        "memWithAllDebuffs",
+        "memWithoutAnyDebuff",
+        "memWithoutAllDebuffs",
+        "memWithAnySkill",
+        "memWithAllSkills",
+        "memWithoutAnySkill",
+        "memWithoutAllSkills",
+        "memWithAnyUsableSkill",
+        "memWithAllUsableSkills",
+        "memWithoutAnyUsableSkill",
+        "memWithoutAllUsableSkills"
+    ].forEach(name => {
+        PluginManager.pluginQueries.set(name, (side, arrStr, memFunc_) => {
+            const unit_ = PQ._UNIT_(side);
+            if (!unit_) return;
+            const numArr = PQ._NUM_ARR(arrStr);
+            if (memFunc_) unit_[name](numArr, unit[memFunc_]());
+            return unit_[name](numArr);
+        });
+    });
+
+    [
+        "anyHighestStatMem",
+        "allHighestStatsMem",
+        "notAnyHighestStatMem",
+        "notAllHighestStatsMem",
+        "anyLowestStatMem",
+        "allLowestStatsMem",
+        "notAnyLowestStatMem",
+        "notAllLowestStatsMem"
+    ].forEach(name => {
+        PluginManager.pluginQueries.set(name, (side, arrStr, memFunc_) => {
+            const unit_ = PQ._UNIT_(side);
+            if (!unit_) return;
+            const strArr = PQ._STR_ARR(arrStr);
+            if (memFunc_) unit_[name](strArr, unit[memFunc_]());
+            return unit_[name](strArr);
+        });
+    });
+
+    [
+        "anyAboveStatMem",
+        "allAboveStatMem",
+        "anyBelowStatMem",
+        "allBelowStatMem"
+    ].forEach(name => {
+        PluginManager.pluginQueries.set(name, (side, arrStr, val, memFunc_) => {
+            const unit_ = PQ._UNIT_(side);
+            if (!unit_) return;
+            const strArr = PQ._STR_ARR(arrStr);
+            if (memFunc_) unit_[name](strArr, val, unit[memFunc_]());
+            return unit_[name](strArr, val);
+        });
+    });
+
+})(DoubleX_RMMZ.Unit_Filters);
+
+} // if (DoubleX_RMMZ.Plugin_Query)
+
+/*----------------------------------------------------------------------------*/
+
+/*----------------------------------------------------------------------------
+ *    ## Objects
  *----------------------------------------------------------------------------*/
 
 /*----------------------------------------------------------------------------
