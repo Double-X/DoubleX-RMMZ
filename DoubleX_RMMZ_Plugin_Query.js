@@ -49,20 +49,20 @@
  *----------------------------------------------------------------------------
  *    # Links
  *      Video:
- *      1. 
+ *      1.
  *      This Plugin:
- *      1. 
+ *      1. https://github.com/Double-X/DoubleX-RMMZ/blob/master/DoubleX_RMMZ_Plugin_Query.js
  *      Posts:
- *      1. 
- *      2. 
- *      3. 
- *      4. 
- *      5. 
- *      6. 
- *      7. 
- *      8. 
- *      9. 
- *      10. 
+ *      1.
+ *      2.
+ *      3.
+ *      4.
+ *      5.
+ *      6.
+ *      7.
+ *      8.
+ *      9.
+ *      10.
  *----------------------------------------------------------------------------
  *    # Contributors
  *      Authors:
@@ -81,6 +81,24 @@
  *      1. 1st version of this plugin finished
  *============================================================================*/
 
+/*~struct~NewPluginQuery:
+ *
+ * @param name
+ * @type string
+ * @desc The name of the new plugin query
+ * @default
+ *
+ * @param args
+ * @type string[]
+ * @desc The list of argument names of the new plugin query
+ * @default []
+ *
+ * @param funcContents
+ * @type note
+ * @desc The contents of the function of the new plugin query
+ * @default
+ */
+
 /*:
  * @url https://www.patreon.com/doublex
  * @target MZ
@@ -89,6 +107,18 @@
  * @orderAfter DoubleX RMMZ Enhanced Codebase
  * @base DoubleX RMMZ Enhanced Codebase
  * @author DoubleX
+ *
+ * @param newDamageFormulaPluginQueries
+ * @type struct<NewPluginQuery>[]
+ * @desc Sets the list of new damage formula plugin queries
+ * This list shouldn't include those already added by other plugins
+ * @default []
+ *
+ * @param newEventCmdPluginQueries
+ * @type struct<NewPluginQuery>[]
+ * @desc Sets the list of new event command plugin queries
+ * This list shouldn't include those already added by other plugins
+ * @default []
  *
  * @help
  *============================================================================
@@ -100,16 +130,36 @@
  *       - If the plugin query has its query name as abcdefg and arguments
  *         as h, i, j and k, then the plugin query is abcdefg h i j k
  *    2. (Plugin Developers Only)Registration
- *       PluginManager.pluginQueries.set(name, func);
+ *       PluginManager.damageFormulaPluginQueries.set(name, func);
  *       - Registers a plugin query with the name being name and function
  *         returning the result being func
+ *       - The first 5 arguments of the function must be the following:
+ *         i. item - The skill/item having the damage formula
+ *         ii. a - The subject executing the skill/item
+ *         iii. b - The target having the damage formula applied to
+ *         iv. v - The raw data list of the game variables
+ *         v. sign - 1(damage)/-1(recovery)
+ *       - The registered plugin query can be used in skill/item damage
+ *         formulae
  *       E.g.:
- *       - PluginManager.pluginQueries.set("isActorAnyStateAffected", (actorId, paramIds) => {
+ *       - PluginManager.damageFormulaPluginQueries.set("matDmg", (item, a, b, v, sign, baseDmg) => {
+ *             return +baseDmg + a.mat * 2 - b.mdf * 2;
+ *         });
+ *         Will define the plugin query atkDmg in the skill/item damage
+ *         formulae as baseDmg + a.mat * 2 - b.mdf * 2
+ *         Where baseDmg must be a Number
+ *       PluginManager.eventCmdPluginQueries.set(name, func);
+ *       - Registers a plugin query with the name being name and function
+ *         returning the result being func
+ *       - The registered plugin query can be used in conditional branch and
+ *         control variables event commands
+ *       E.g.:
+ *       - PluginManager.eventCmdPluginQueries.set("isActorAnyStateAffected", (actorId, paramIds) => {
  *             return $gameActors.actor(+actorId).isAnyStateAffected(paramIds.split("_").map(Number));
  *         });
  *         Will define the plugin query
  *         isActorAnyStateAffected actorId paramIds
- *         as
+ *         in the conditional branch/control variables event commands as
  *         $gameActors.actor(actorId).isAnyStateAffected(paramIds);
  *         If paramIds is written in the form of
  *         paramId1_paramId2_paramId3_paramIdI_paramIdN
@@ -160,18 +210,39 @@ if (DoubleX_RMMZ.Enhanced_Codebase) {
  *      - Lets other plugins register their plugin queries to be used by users
  *----------------------------------------------------------------------------*/
 
-($ => {
+(($, PQ) => {
 
     "use strict";
 
     /*------------------------------------------------------------------------
      *    New public variable
      *------------------------------------------------------------------------*/
-    // {Map(string, (**) -> *)} pluginQueries: Plugin query name-function map
+    // {Map(string, (**) -> *)} damageFormulaPluginQueries: Damage formula
+    //                                                      plugin queries
+    // {Map(string, (**) -> *)} eventCmdPluginQueries: Event cmd plugin queries
 
-    $.pluginQueries = new Map();
+    $.damageFormulaPluginQueries = new Map();
+    $.eventCmdPluginQueries = new Map();
 
-})(PluginManager);
+    const params = $.parameters(PQ.PLUGIN_NAME);
+    [
+        [
+            "newDamageFormulaPluginQueries",
+            "damageFormulaPluginQueries",
+            ["item", "a", "b", "v", "sign"]
+        ],
+        ["newEventCmdPluginQueries", "eventCmdPluginQueries", []]
+    ].forEach(([param, queryContainer, fixedArgs]) => {
+        JSON.parse(params[param]).forEach(rawPluginQuery => {
+            const pluginQuery = JSON.parse(rawPluginQuery);
+            const args = fixedArgs.concat(JSON.parse(pluginQuery.args));
+            args.push(JSON.parse(pluginQuery.funcContents));
+            $[queryContainer].set(pluginQuery.name, new Function(...args));
+        });
+    });
+
+
+})(PluginManager, DoubleX_RMMZ.Plugin_Query);
 
 /*----------------------------------------------------------------------------*/
 
@@ -180,8 +251,64 @@ if (DoubleX_RMMZ.Enhanced_Codebase) {
  *----------------------------------------------------------------------------*/
 
 /*----------------------------------------------------------------------------
+ *    # Edit class: Game_Action
+ *      - Runs plugin queries in the skill/item damage formulae
+ *----------------------------------------------------------------------------*/
+
+(($, MZ_EC, PQ) => {
+
+    "use strict";
+
+    const klassName = "Game_Action", EC_GI = MZ_EC[klassName].new, {
+        NEW,
+        ORIG
+    } = MZ_EC.setKlassContainer(klassName, $, PQ), GI = PQ[klassName];
+
+    MZ_EC.extendFunc(EC_GI, GI, "_evalDamageFormula_", function(b, sign, damageFormula) {
+        // Added to return the plugin query result if it's a plugin query
+        const query = NEW.PLUGIN_QUERY(damageFormula);
+        if (NEW._IS_PLUGIN_QUERY(query)) {
+            return NEW._pluginQueryResult.call(this, b, sign, query);
+        }
+        //
+        return ORIG._evalDamageFormula_.apply(this, arguments);
+    }); // v1.00a - v1.00a
+
+    // The plugin query should be as forgiving to syntax error as possible
+    NEW.PLUGIN_QUERY = scriptLine => scriptLine.split(/\s+/);
+    //
+
+    NEW._IS_PLUGIN_QUERY = query => {
+        return PluginManager.damageFormulaPluginQueries.has(query[0]);
+    }; // NEW._IS_PLUGIN_QUERY
+
+    /**
+     * The this pointer is Game_Action.prototype
+     * Idempotent
+     * @author DoubleX @interface @since v0.00a @version v0.00a
+     * @param {Game_Battler} b - The target to have damage formula applied
+     * @enum @param {number} sign - Whether it's damage or recovery(1/-1)
+     * @enum @param {string[]} query - The query name and argument value strings
+     * @returns {number?} The evaluated applied damage of skill/item to target
+     */
+    NEW._pluginQueryResult = function(b, sign, query) {
+        const item = this.item();
+        const [a, v] = [this.subject(), $gameVariables._data];
+        return NEW._PLUGIN_QUERY_RESULT(item, a, b, v, sign, query);
+    }; // NEW._pluginQueryResult
+
+    NEW._PLUGIN_QUERY_RESULT = (item, a, b, v, sign, query) => {
+        const name = query.shift();
+        const args = [item, a, b, v, sign].fastMerge(query);
+        return PluginManager.damageFormulaPluginQueries.get(name)(...args);
+    }; // NEW._PLUGIN_QUERY_RESULT
+
+})(Game_Interpreter.prototype, DoubleX_RMMZ.Enhanced_Codebase,
+        DoubleX_RMMZ.Plugin_Query);
+
+/*----------------------------------------------------------------------------
  *    # Edit class: Game_Interpreter
- *      - Intercepts plugin commands as script calls to use the RMMZ ones
+ *      - Runs plugin queries in conditional branch/control variables commands
  *----------------------------------------------------------------------------*/
 
 (($, MZ_EC, PQ) => {
@@ -191,24 +318,21 @@ if (DoubleX_RMMZ.Enhanced_Codebase) {
     const klassName = "Game_Interpreter", EC_GI = MZ_EC[klassName].new, {
         NEW,
         ORIG
-    } = MZ_EC.setKlassContainer(klassName, $, PQ), GI = PQ[klassName];
+    } = MZ_EC.setKlassContainer(klassName, $, PQ);
+    const GA = PQ.Game_Action.new, GI = PQ[klassName];
 
     MZ_EC.extendFunc(EC_GI, GI, "evalScriptLine_", function(scriptLine) {
         // Added to return the plugin query result if it's a plugin query
-        const query = NEW._PLUGIN_QUERY(scriptLine);
+        const query = GA.PLUGIN_QUERY(scriptLine);
         if (NEW._IS_PLUGIN_QUERY(query)) return NEW._PLUGIN_QUERY_RESULT(query);
         //
         return ORIG.evalScriptLine_.apply(this, arguments);
     }); // v1.00a - v1.00a
-
-    // The plugin query should be as forgiving to syntax error as possible
-    NEW._PLUGIN_QUERY = scriptLine => scriptLine.split(/\s+/);
-    //
-
-    NEW._IS_PLUGIN_QUERY = query => PluginManager.pluginQueries.has(query[0]);
-
+    NEW._IS_PLUGIN_QUERY = query => {
+        return PluginManager.eventCmdPluginQueries.has(query[0]);
+    }; // NEW._IS_PLUGIN_QUERY
     NEW._PLUGIN_QUERY_RESULT = query => {
-        return PluginManager.pluginQueries.get(query.shift())(query);
+        return PluginManager.eventCmdPluginQueries.get(query.shift())(...query);
     }; // NEW._PLUGIN_QUERY_RESULT
 
 })(Game_Interpreter.prototype, DoubleX_RMMZ.Enhanced_Codebase,

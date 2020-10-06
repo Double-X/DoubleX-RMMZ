@@ -369,8 +369,6 @@ Utils.checkRMVersion(DoubleX_RMMZ.Custom_Key_Maps.VERSIONS.codebase);
  *    ## Core
  *----------------------------------------------------------------------------*/
 
-/*----------------------------------------------------------------------------*/
-
 /*----------------------------------------------------------------------------
  *    # Edited class: Input
  *      - Adds all custom key maps in this plugin to the default key mappers
@@ -545,7 +543,6 @@ Utils.checkRMVersion(DoubleX_RMMZ.Custom_Key_Maps.VERSIONS.codebase);
             this._currentState[keyName] = currentState;
         });
     }; // NEW._updateCurrentStates
-
 
 })(Input, DoubleX_RMMZ.Custom_Key_Maps);
 

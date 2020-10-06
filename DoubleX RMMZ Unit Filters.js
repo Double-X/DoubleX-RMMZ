@@ -88,6 +88,7 @@
  * @target MZ
  * @plugindesc Versions: { codebase: "1.0.0", plugin: "v1.01a" }
  * Lets you use script calls to filter unit members with less codes and eventing
+ * @orderAfter DoubleX_RMMZ_Plugin_Query
  * @author DoubleX
  *
  * @help
@@ -1743,7 +1744,7 @@ Utils.checkRMVersion(DoubleX_RMMZ.Unit_Filters.VERSIONS.codebase);
         }
     }; // PQ._UNIT_
 
-    const _BATTLER_QUERY_FUNC = (side, label, ids) => {
+    const _BATTLER_QUERY_FUNC = (name, side, label, ids) => {
         const battler_ = PQ._BATTLER_(side, label);
         return battler_ && battler_[name](PQ._NUM_ARR(ids));
     }; // _BATTLER_QUERY_FUNC
@@ -1760,14 +1761,15 @@ Utils.checkRMVersion(DoubleX_RMMZ.Unit_Filters.VERSIONS.codebase);
         "isAllDebuffsAffected"
     ].forEach(name => {
         PluginManager.registerCommand(_PLUGIN_NAME, name, (side, label, ids, switchId) => {
-            const val = _BATTLER_QUERY_FUNC(side, label, ids);
+            const val = _BATTLER_QUERY_FUNC(name, side, label, ids);
             $gameSwitches.setValue(+switchId, val);
         });
         if (!_IS_QUERY) return;
-        PluginManager.pluginQueries.set(name, _BATTLER_QUERY_FUNC);
+        const queryFunc = _BATTLER_QUERY_FUNC.bind(undefined, name);
+        PluginManager.eventCmdPluginQueries.set(name, queryFunc);
     });
 
-    const _UNIT_QUERY_FUNC = arrFunc => (side, arrStr, memFunc_) => {
+    const _UNIT_QUERY_FUNC = arrFunc => (name, side, arrStr, memFunc_) => {
         const unit_ = PQ._UNIT_(side);
         if (!unit_) return;
         const numArr = arrFunc(arrStr);
@@ -1806,13 +1808,15 @@ Utils.checkRMVersion(DoubleX_RMMZ.Unit_Filters.VERSIONS.codebase);
         ["notAllLowestStatsMem", _STR_UNIT_QUERY_FUNC]
     ].forEach(([name, queryFunc]) => {
         PluginManager.registerCommand(_PLUGIN_NAME, name, (side, arrStr, varId, memFunc_) => {
-            $gameVariables.setValue(+varId, queryFunc(side, arrStr, memFunc_));
+            const val = queryFunc(name, side, arrStr, memFunc_);
+            $gameVariables.setValue(+varId, val);
         });
         if (!_IS_QUERY) return;
-        PluginManager.pluginQueries.set(name, queryFunc);
+        const boundQueryFunc = queryFunc.bind(undefined, name);
+        PluginManager.eventCmdPluginQueries.set(name, boundQueryFunc);
     });
 
-    const _VAL_UNIT_QUERY_FUNC = () => (side, arrStr, val, memFunc_) => {
+    const _VAL_UNIT_QUERY_FUNC = () => (name, side, arrStr, val, memFunc_) => {
         const unit_ = PQ._UNIT_(side);
         if (!unit_) return;
         const strArr = PQ._STR_ARR(arrStr);
@@ -1827,11 +1831,12 @@ Utils.checkRMVersion(DoubleX_RMMZ.Unit_Filters.VERSIONS.codebase);
         "allBelowStatMem"
     ].forEach(name => {
         PluginManager.registerCommand(_PLUGIN_NAME, name, (side, arrStr, val, varId, memFunc_) => {
-            const value = _VAL_UNIT_QUERY_FUNC(side, arrStr, val, memFunc_);
-            $gameVariables.setValue(+varId, value);
+            const v = _VAL_UNIT_QUERY_FUNC(name, side, arrStr, val, memFunc_);
+            $gameVariables.setValue(+varId, v);
         });
         if (!_IS_QUERY) return;
-        PluginManager.pluginQueries.set(name, _VAL_UNIT_QUERY_FUNC);
+        const queryFunc = _VAL_UNIT_QUERY_FUNC.bind(undefined, name);
+        PluginManager.eventCmdPluginQueries.set(name, queryFunc);
     });
 
 })(DoubleX_RMMZ.Unit_Filters);
