@@ -83,7 +83,6 @@
  * @default 7
  *
  * @param text
- * @type string
  * @desc Sets the auto battle command name
  * The command will appear in the party command window
  * @default Auto Battle
@@ -104,7 +103,6 @@
  * @command setAutoBattleCmdText
  * @desc Sets the new value of the parameter text
  * @arg text
- * @type string
  * @desc The auto battle command name
  *
  * @command setCanUseAutoBattleCmd

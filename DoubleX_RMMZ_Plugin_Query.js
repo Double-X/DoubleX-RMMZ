@@ -77,14 +77,13 @@
  *      - None So Far
  *----------------------------------------------------------------------------
  *    # Changelog
- *      { codebase: "1.0.2", plugin: "v1.00a" }(2020 Oct 1 GMT 0600):
+ *      { codebase: "1.0.2", plugin: "v1.00a" }(2020 Oct 6 GMT 1600):
  *      1. 1st version of this plugin finished
  *============================================================================*/
 
 /*~struct~NewPluginQuery:
  *
  * @param name
- * @type string
  * @desc The name of the new plugin query
  * @default
  *

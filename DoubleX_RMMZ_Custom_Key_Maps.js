@@ -313,7 +313,6 @@
  * @desc The code of the key to have a custom key name keyName
  * @default
  * @param keyName
- * @type string
  * @desc The custom name of the key referring to the key code keyCode
  * @default
  */

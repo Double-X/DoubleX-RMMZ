@@ -86,17 +86,14 @@
 /*~struct~NewScriptCall:
  *
  * @param newScriptCallFullName
- * @type string
  * @desc The full name of the new script call function/method
  * @default
  *
  * @param origScriptCallFullName
- * @type string
  * @desc The full name of the original script call function/method
  * @default
  *
  * @param origScriptCallContext
- * @type string
  * @desc The context of the original script call function/method
  * @default
  *
@@ -114,7 +111,6 @@
  * @default
  *
  * @param argVal
- * @type string
  * @desc The already set value of the argument with specified index
  * @default
  */

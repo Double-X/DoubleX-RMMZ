@@ -68,7 +68,7 @@
  *      - None So Far
  *----------------------------------------------------------------------------
  *    # Changelog
- *      { codebase: "1.0.0", plugin: "v1.01a" }(2020 Oct 3 GMT 1400):
+ *      { codebase: "1.0.2", plugin: "v1.02a" }(2020 Oct 6 GMT 1600):
  *      1. Added the plugin query and command counterparts for the script
  *         calls of this plugin
  *      { codebase: "1.0.0", plugin: "v1.01a" }(2020 Aug 28 GMT 0000):
@@ -90,6 +90,1182 @@
  * Lets you use script calls to filter unit members with less codes and eventing
  * @orderAfter DoubleX_RMMZ_Plugin_Query
  * @author DoubleX
+ *
+ * @command isAnyStateAffected
+ * @desc Stores the battler.isAnyStateAffected(stateIds) result in
+ * switch with id switchId
+ * @arg side
+ * @type select
+ * @option Actor
+ * @value actor
+ * @option Enemy
+ * @value enemy
+ * @desc The side of the battler using the script call
+ * @arg label
+ * @type number
+ * @desc The actor id/enemy index of the battler using the script call
+ * @arg stateIds
+ * @type number[]
+ * @desc The list of ids of the states to be checked against
+ * @arg switchId
+ * @type number
+ * @desc The id of the game switch to store the script call result
+ *
+ * @command isAllStatesAffected
+ * @desc Stores the battler.isAllStatesAffected(stateIds) result in
+ * switch with id switchId
+ * @arg side
+ * @type select
+ * @option Actor
+ * @value actor
+ * @option Enemy
+ * @value enemy
+ * @desc The side of the battler using the script call
+ * @arg label
+ * @type number
+ * @desc The actor id/enemy index of the battler using the script call
+ * @arg stateIds
+ * @type number[]
+ * @desc The list of ids of the states to be checked against
+ * @arg switchId
+ * @type number
+ * @desc The id of the game switch to store the script call result
+ *
+ * @command isAnyBuffAffected
+ * @desc Stores the battler.isAnyBuffAffected(paramIds) result in
+ * switch with id switchId
+ * @arg side
+ * @type select
+ * @option Actor
+ * @value actor
+ * @option Enemy
+ * @value enemy
+ * @desc The side of the battler using the script call
+ * @arg label
+ * @type number
+ * @desc The actor id/enemy index of the battler using the script call
+ * @arg paramIds
+ * @type number[]
+ * @desc The list of ids of the parameters to be checked against
+ * @arg switchId
+ * @type number
+ * @desc The id of the game switch to store the script call result
+ *
+ * @command isAllBuffsAffected
+ * @desc Stores the battler.isAllBuffsAffected(paramIds) result in
+ * switch with id switchId
+ * @arg side
+ * @type select
+ * @option Actor
+ * @value actor
+ * @option Enemy
+ * @value enemy
+ * @desc The side of the battler using the script call
+ * @arg label
+ * @type number
+ * @desc The actor id/enemy index of the battler using the script call
+ * @arg paramIds
+ * @type number[]
+ * @desc The list of ids of the parameters to be checked against
+ * @arg switchId
+ * @type number
+ * @desc The id of the game switch to store the script call result
+ *
+ * @command isAnyDebuffAffected
+ * @desc Stores the battler.isAnyDebuffAffected(paramIds) result in
+ * switch with id switchId
+ * @arg side
+ * @type select
+ * @option Actor
+ * @value actor
+ * @option Enemy
+ * @value enemy
+ * @desc The side of the battler using the script call
+ * @arg label
+ * @type number
+ * @desc The actor id/enemy index of the battler using the script call
+ * @arg paramIds
+ * @type number[]
+ * @desc The list of ids of the parameters to be checked against
+ * @arg switchId
+ * @type number
+ * @desc The id of the game switch to store the script call result
+ *
+ * @command isAllDebuffsAffected
+ * @desc Stores the battler.isAllDebuffsAffected(paramIds) result
+ * in switch with id switchId
+ * @arg side
+ * @type select
+ * @option Actor
+ * @value actor
+ * @option Enemy
+ * @value enemy
+ * @desc The side of the battler using the script call
+ * @arg label
+ * @type number
+ * @desc The actor id/enemy index of the battler using the script call
+ * @arg paramIds
+ * @type number[]
+ * @desc The list of ids of the parameters to be checked against
+ * @arg switchId
+ * @type number
+ * @desc The id of the game switch to store the script call result
+ *
+ * @command hasAnySkill
+ * @desc Stores the battler.hasAnySkill(skillIds) result in switch
+ * with id switchId
+ * @arg side
+ * @type select
+ * @option Actor
+ * @value actor
+ * @option Enemy
+ * @value enemy
+ * @desc The side of the battler using the script call
+ * @arg label
+ * @type number
+ * @desc The actor id/enemy index of the battler using the script call
+ * @arg skillIds
+ * @type skill[]
+ * @desc The list of ids of the skills to be checked against
+ * @arg switchId
+ * @type number
+ * @desc The id of the game switch to store the script call result
+ *
+ * @command hasAllSkills
+ * @desc Stores the battler.hasAllSkills(skillIds) result in switch
+ * with id switchId
+ * @arg side
+ * @type select
+ * @option Actor
+ * @value actor
+ * @option Enemy
+ * @value enemy
+ * @desc The side of the battler using the script call
+ * @arg label
+ * @type number
+ * @desc The actor id/enemy index of the battler using the script call
+ * @arg skillIds
+ * @type skill[]
+ * @desc The list of ids of the skills to be checked against
+ * @arg switchId
+ * @type number
+ * @desc The id of the game switch to store the script call result
+ *
+ * @command hasAnyUsableSkill
+ * @desc Stores the battler.hasAnyUsableSkill(skillIds) result in
+ * switch with id switchId
+ * @arg side
+ * @type select
+ * @option Actor
+ * @value actor
+ * @option Enemy
+ * @value enemy
+ * @desc The side of the battler using the script call
+ * @arg label
+ * @type number
+ * @desc The actor id/enemy index of the battler using the script call
+ * @arg skillIds
+ * @type skill[]
+ * @desc The list of ids of the skills to be checked against
+ * @arg switchId
+ * @type number
+ * @desc The id of the game switch to store the script call result
+ *
+ * @command hasAllUsableSkills
+ * @desc Stores the battler.hasAllUsableSkills(skillIds) result in
+ * switch with id switchId
+ * @arg side
+ * @type select
+ * @option Actor
+ * @value actor
+ * @option Enemy
+ * @value enemy
+ * @desc The side of the battler using the script call
+ * @arg label
+ * @type number
+ * @desc The actor id/enemy index of the battler using the script call
+ * @arg skillIds
+ * @type skill[]
+ * @desc The list of ids of the skills to be checked against
+ * @arg switchId
+ * @type number
+ * @desc The id of the game switch to store the script call result
+ *
+ * @command memWithAnyState
+ * @desc Stores the unit.memWithAnyState(stateIds, mems) result in
+ * variable with id varId
+ * @arg side
+ * @type select
+ * @option Game Party
+ * @value party
+ * @option Game Troop
+ * @value troop
+ * @desc The side of the unit using the script call
+ * @arg stateIds
+ * @type number[]
+ * @desc The list of ids of the states to be checked against
+ * @arg varId
+ * @type number
+ * @desc The id of the game variable to store the script call result
+ * @arg memFunc_
+ * @type select
+ * @option All members
+ * @value members
+ * @option All alive members
+ * @value aliveMembers
+ * @option All dead members
+ * @value deadMembers
+ * @option All movable members
+ * @value movableMembers
+ * @option Don't specify
+ * @value
+ * @desc The list of members in the unit to be filtered against
+ *
+ * @command memWithAllStates
+ * @desc Stores the unit.memWithAllStates(stateIds, mems) result in
+ * variable with id varId
+ * @arg side
+ * @type select
+ * @option Game Party
+ * @value party
+ * @option Game Troop
+ * @value troop
+ * @desc The side of the unit using the script call
+ * @arg stateIds
+ * @type number[]
+ * @desc The list of ids of the states to be checked against
+ * @arg varId
+ * @type number
+ * @desc The id of the game variable to store the script call result
+ * @arg memFunc_
+ * @type select
+ * @option All members
+ * @value members
+ * @option All alive members
+ * @value aliveMembers
+ * @option All dead members
+ * @value deadMembers
+ * @option All movable members
+ * @value movableMembers
+ * @option Don't specify
+ * @value
+ * @desc The list of members in the unit to be filtered against
+ *
+ * @command memWithoutAnyState
+ * @desc Stores the unit.memWithoutAnyState(stateIds, mems) result
+ * in variable with id varId
+ * @arg side
+ * @type select
+ * @option Game Party
+ * @value party
+ * @option Game Troop
+ * @value troop
+ * @desc The side of the unit using the script call
+ * @arg stateIds
+ * @type number[]
+ * @desc The list of ids of the states to be checked against
+ * @arg varId
+ * @type number
+ * @desc The id of the game variable to store the script call result
+ * @arg memFunc_
+ * @type select
+ * @option All members
+ * @value members
+ * @option All alive members
+ * @value aliveMembers
+ * @option All dead members
+ * @value deadMembers
+ * @option All movable members
+ * @value movableMembers
+ * @option Don't specify
+ * @value
+ * @desc The list of members in the unit to be filtered against
+ *
+ * @command memWithoutAllStates
+ * @desc Stores the unit.memWithoutAllStates(stateIds, mems) result
+ * in variable with id varId
+ * @arg side
+ * @type select
+ * @option Game Party
+ * @value party
+ * @option Game Troop
+ * @value troop
+ * @desc The side of the unit using the script call
+ * @arg stateIds
+ * @type number[]
+ * @desc The list of ids of the states to be checked against
+ * @arg varId
+ * @type number
+ * @desc The id of the game variable to store the script call result
+ * @arg memFunc_
+ * @type select
+ * @option All members
+ * @value members
+ * @option All alive members
+ * @value aliveMembers
+ * @option All dead members
+ * @value deadMembers
+ * @option All movable members
+ * @value movableMembers
+ * @option Don't specify
+ * @value
+ * @desc The list of members in the unit to be filtered against
+ *
+ * @command memWithAnyBuff
+ * @desc Stores the unit.memWithAnyBuff(paramIds, mems) result in
+ * variable with id varId
+ * @arg side
+ * @type select
+ * @option Game Party
+ * @value party
+ * @option Game Troop
+ * @value troop
+ * @desc The side of the unit using the script call
+ * @arg paramIds
+ * @type number[]
+ * @desc The list of ids of the parameters to be checked against
+ * @arg varId
+ * @type number
+ * @desc The id of the game variable to store the script call result
+ * @arg memFunc_
+ * @type select
+ * @option All members
+ * @value members
+ * @option All alive members
+ * @value aliveMembers
+ * @option All dead members
+ * @value deadMembers
+ * @option All movable members
+ * @value movableMembers
+ * @option Don't specify
+ * @value
+ * @desc The list of members in the unit to be filtered against
+ *
+ * @command memWithAllBuffs
+ * @desc Stores the unit.memWithAllBuffs(paramIds, mems) result in
+ * variable with id varId
+ * @arg side
+ * @type select
+ * @option Game Party
+ * @value party
+ * @option Game Troop
+ * @value troop
+ * @desc The side of the unit using the script call
+ * @arg paramIds
+ * @type number[]
+ * @desc The list of ids of the parameters to be checked against
+ * @arg varId
+ * @type number
+ * @desc The id of the game variable to store the script call result
+ * @arg memFunc_
+ * @type select
+ * @option All members
+ * @value members
+ * @option All alive members
+ * @value aliveMembers
+ * @option All dead members
+ * @value deadMembers
+ * @option All movable members
+ * @value movableMembers
+ * @option Don't specify
+ * @value
+ * @desc The list of members in the unit to be filtered against
+ *
+ * @command memWithoutAnyBuff
+ * @desc Stores the unit.memWithoutAnyBuff(paramIds, mems) result
+ * in variable with id varId
+ * @arg side
+ * @type select
+ * @option Game Party
+ * @value party
+ * @option Game Troop
+ * @value troop
+ * @desc The side of the unit using the script call
+ * @arg paramIds
+ * @type number[]
+ * @desc The list of ids of the parameters to be checked against
+ * @arg varId
+ * @type number
+ * @desc The id of the game variable to store the script call result
+ * @arg memFunc_
+ * @type select
+ * @option All members
+ * @value members
+ * @option All alive members
+ * @value aliveMembers
+ * @option All dead members
+ * @value deadMembers
+ * @option All movable members
+ * @value movableMembers
+ * @option Don't specify
+ * @value
+ * @desc The list of members in the unit to be filtered against
+ *
+ * @command memWithoutAllBuffs
+ * @desc Stores the unit.memWithoutAllBuffs(paramIds, mems) result
+ * in variable with id varId
+ * @arg side
+ * @type select
+ * @option Game Party
+ * @value party
+ * @option Game Troop
+ * @value troop
+ * @desc The side of the unit using the script call
+ * @arg paramIds
+ * @type number[]
+ * @desc The list of ids of the parameters to be checked against
+ * @arg varId
+ * @type number
+ * @desc The id of the game variable to store the script call result
+ * @arg memFunc_
+ * @type select
+ * @option All members
+ * @value members
+ * @option All alive members
+ * @value aliveMembers
+ * @option All dead members
+ * @value deadMembers
+ * @option All movable members
+ * @value movableMembers
+ * @option Don't specify
+ * @value
+ * @desc The list of members in the unit to be filtered against
+ *
+ * @command memWithAnyDebuff
+ * @desc Stores the unit.memWithAnyDebuff(paramIds, mems) result
+ * in variable with id varId
+ * @arg side
+ * @type select
+ * @option Game Party
+ * @value party
+ * @option Game Troop
+ * @value troop
+ * @desc The side of the unit using the script call
+ * @arg paramIds
+ * @type number[]
+ * @desc The list of ids of the parameters to be checked against
+ * @arg varId
+ * @type number
+ * @desc The id of the game variable to store the script call result
+ * @arg memFunc_
+ * @type select
+ * @option All members
+ * @value members
+ * @option All alive members
+ * @value aliveMembers
+ * @option All dead members
+ * @value deadMembers
+ * @option All movable members
+ * @value movableMembers
+ * @option Don't specify
+ * @value
+ * @desc The list of members in the unit to be filtered against
+ *
+ * @command memWithAllDebuffs
+ * @desc Stores the unit.memWithAllDebuffs(paramIds, mems) result
+ * in variable with id varId
+ * @arg side
+ * @type select
+ * @option Game Party
+ * @value party
+ * @option Game Troop
+ * @value troop
+ * @desc The side of the unit using the script call
+ * @arg paramIds
+ * @type number[]
+ * @desc The list of ids of the parameters to be checked against
+ * @arg varId
+ * @type number
+ * @desc The id of the game variable to store the script call result
+ * @arg memFunc_
+ * @type select
+ * @option All members
+ * @value members
+ * @option All alive members
+ * @value aliveMembers
+ * @option All dead members
+ * @value deadMembers
+ * @option All movable members
+ * @value movableMembers
+ * @option Don't specify
+ * @value
+ * @desc The list of members in the unit to be filtered against
+ *
+ * @command memWithoutAnyDebuff
+ * @desc Stores the unit.memWithoutAnyDebuff(paramIds, mems) result
+ * in variable with id varId
+ * @arg side
+ * @type select
+ * @option Game Party
+ * @value party
+ * @option Game Troop
+ * @value troop
+ * @desc The side of the unit using the script call
+ * @arg paramIds
+ * @type number[]
+ * @desc The list of ids of the parameters to be checked against
+ * @arg varId
+ * @type number
+ * @desc The id of the game variable to store the script call result
+ * @arg memFunc_
+ * @type select
+ * @option All members
+ * @value members
+ * @option All alive members
+ * @value aliveMembers
+ * @option All dead members
+ * @value deadMembers
+ * @option All movable members
+ * @value movableMembers
+ * @option Don't specify
+ * @value
+ * @desc The list of members in the unit to be filtered against
+ *
+ * @command memWithoutAllDebuffs
+ * @desc Stores the unit.memWithoutAllDebuffs(paramIds, mems)
+ * result in variable with id varId
+ * @arg side
+ * @type select
+ * @option Game Party
+ * @value party
+ * @option Game Troop
+ * @value troop
+ * @desc The side of the unit using the script call
+ * @arg paramIds
+ * @type number[]
+ * @desc The list of ids of the parameters to be checked against
+ * @arg varId
+ * @type number
+ * @desc The id of the game variable to store the script call result
+ * @arg memFunc_
+ * @type select
+ * @option All members
+ * @value members
+ * @option All alive members
+ * @value aliveMembers
+ * @option All dead members
+ * @value deadMembers
+ * @option All movable members
+ * @value movableMembers
+ * @option Don't specify
+ * @value
+ * @desc The list of members in the unit to be filtered against
+ *
+ * @command memWithAnySkill
+ * @desc Stores the unit.memWithAnySkill(skillIds, mems) result in
+ * variable with id varId
+ * @arg side
+ * @type select
+ * @option Game Party
+ * @value party
+ * @option Game Troop
+ * @value troop
+ * @desc The side of the unit using the script call
+ * @arg skillIds
+ * @type skill[]
+ * @desc The list of ids of the skills to be checked against
+ * @arg varId
+ * @type number
+ * @desc The id of the game variable to store the script call result
+ * @arg memFunc_
+ * @type select
+ * @option All members
+ * @value members
+ * @option All alive members
+ * @value aliveMembers
+ * @option All dead members
+ * @value deadMembers
+ * @option All movable members
+ * @value movableMembers
+ * @option Don't specify
+ * @value
+ * @desc The list of members in the unit to be filtered against
+ *
+ * @command memWithAllSkills
+ * @desc Stores the unit.memWithAllSkills(skillIds, mems) result in
+ * variable with id varId
+ * @arg side
+ * @type select
+ * @option Game Party
+ * @value party
+ * @option Game Troop
+ * @value troop
+ * @desc The side of the unit using the script call
+ * @arg skillIds
+ * @type skill[]
+ * @desc The list of ids of the skills to be checked against
+ * @arg varId
+ * @type number
+ * @desc The id of the game variable to store the script call result
+ * @arg memFunc_
+ * @type select
+ * @option All members
+ * @value members
+ * @option All alive members
+ * @value aliveMembers
+ * @option All dead members
+ * @value deadMembers
+ * @option All movable members
+ * @value movableMembers
+ * @option Don't specify
+ * @value
+ * @desc The list of members in the unit to be filtered against
+ *
+ * @command memWithoutAnySkill
+ * @desc Stores the unit.memWithoutAnySkill(skillIds, mems) result
+ * in variable with id varId
+ * @arg side
+ * @type select
+ * @option Game Party
+ * @value party
+ * @option Game Troop
+ * @value troop
+ * @desc The side of the unit using the script call
+ * @arg skillIds
+ * @type skill[]
+ * @desc The list of ids of the skills to be checked against
+ * @arg varId
+ * @type number
+ * @desc The id of the game variable to store the script call result
+ * @arg memFunc_
+ * @type select
+ * @option All members
+ * @value members
+ * @option All alive members
+ * @value aliveMembers
+ * @option All dead members
+ * @value deadMembers
+ * @option All movable members
+ * @value movableMembers
+ * @option Don't specify
+ * @value
+ * @desc The list of members in the unit to be filtered against
+ *
+ * @command memWithoutAllSkills
+ * @desc Stores the unit.memWithoutAllSkills(skillIds, mems) result
+ * in variable with id varId
+ * @arg side
+ * @type select
+ * @option Game Party
+ * @value party
+ * @option Game Troop
+ * @value troop
+ * @desc The side of the unit using the script call
+ * @arg skillIds
+ * @type skill[]
+ * @desc The list of ids of the skills to be checked against
+ * @arg varId
+ * @type number
+ * @desc The id of the game variable to store the script call result
+ * @arg memFunc_
+ * @type select
+ * @option All members
+ * @value members
+ * @option All alive members
+ * @value aliveMembers
+ * @option All dead members
+ * @value deadMembers
+ * @option All movable members
+ * @value movableMembers
+ * @option Don't specify
+ * @value
+ * @desc The list of members in the unit to be filtered against
+ *
+ * @command anyHighestStatMem
+ * @desc Stores the unit.anyHighestStatMem(stats, mems) result in
+ * variable with id varId
+ * @arg side
+ * @type select
+ * @option Game Party
+ * @value party
+ * @option Game Troop
+ * @value troop
+ * @desc The side of the unit using the script call
+ * @arg stats
+ * @type string[]
+ * @desc The list of the names of the getters of the battlers in the unit
+ * @arg varId
+ * @type number
+ * @desc The id of the game variable to store the script call result
+ * @arg memFunc_
+ * @type select
+ * @option All members
+ * @value members
+ * @option All alive members
+ * @value aliveMembers
+ * @option All dead members
+ * @value deadMembers
+ * @option All movable members
+ * @value movableMembers
+ * @option Don't specify
+ * @value
+ * @desc The list of members in the unit to be filtered against
+ *
+ * @command allHighestStatsMem
+ * @desc Stores the unit.allHighestStatsMem(stats, mems) result in
+ * variable with id varId
+ * @arg side
+ * @type select
+ * @option Game Party
+ * @value party
+ * @option Game Troop
+ * @value troop
+ * @desc The side of the unit using the script call
+ * @arg stats
+ * @type string[]
+ * @desc The list of the names of the getters of the battlers in the unit
+ * @arg varId
+ * @type number
+ * @desc The id of the game variable to store the script call result
+ * @arg memFunc_
+ * @type select
+ * @option All members
+ * @value members
+ * @option All alive members
+ * @value aliveMembers
+ * @option All dead members
+ * @value deadMembers
+ * @option All movable members
+ * @value movableMembers
+ * @option Don't specify
+ * @value
+ * @desc The list of members in the unit to be filtered against
+ *
+ * @command notAnyHighestStatMem
+ * @desc Stores the unit.notAnyHighestStatMem(stats, mems) result
+ * in variable with id varId
+ * @arg side
+ * @type select
+ * @option Game Party
+ * @value party
+ * @option Game Troop
+ * @value troop
+ * @desc The side of the unit using the script call
+ * @arg stats
+ * @type string[]
+ * @desc The list of the names of the getters of the battlers in the unit
+ * @arg varId
+ * @type number
+ * @desc The id of the game variable to store the script call result
+ * @arg memFunc_
+ * @type select
+ * @option All members
+ * @value members
+ * @option All alive members
+ * @value aliveMembers
+ * @option All dead members
+ * @value deadMembers
+ * @option All movable members
+ * @value movableMembers
+ * @option Don't specify
+ * @value
+ * @desc The list of members in the unit to be filtered against
+ *
+ * @command notAllHighestStatsMem
+ * @desc Stores the unit.notAllHighestStatsMem(stats, mems) result
+ * in variable with id varId
+ * @arg side
+ * @type select
+ * @option Game Party
+ * @value party
+ * @option Game Troop
+ * @value troop
+ * @desc The side of the unit using the script call
+ * @arg stats
+ * @type string[]
+ * @desc The list of the names of the getters of the battlers in the unit
+ * @arg varId
+ * @type number
+ * @desc The id of the game variable to store the script call result
+ * @arg memFunc_
+ * @type select
+ * @option All members
+ * @value members
+ * @option All alive members
+ * @value aliveMembers
+ * @option All dead members
+ * @value deadMembers
+ * @option All movable members
+ * @value movableMembers
+ * @option Don't specify
+ * @value
+ * @desc The list of members in the unit to be filtered against
+ *
+ * @command anyLowestStatMem
+ * @desc Stores the unit.anyLowestStatMem(stats, mems) result in
+ * variable with id varId
+ * @arg side
+ * @type select
+ * @option Game Party
+ * @value party
+ * @option Game Troop
+ * @value troop
+ * @desc The side of the unit using the script call
+ * @arg stats
+ * @type string[]
+ * @desc The list of the names of the getters of the battlers in the unit
+ * @arg varId
+ * @type number
+ * @desc The id of the game variable to store the script call result
+ * @arg memFunc_
+ * @type select
+ * @option All members
+ * @value members
+ * @option All alive members
+ * @value aliveMembers
+ * @option All dead members
+ * @value deadMembers
+ * @option All movable members
+ * @value movableMembers
+ * @option Don't specify
+ * @value
+ * @desc The list of members in the unit to be filtered against
+ *
+ * @command allLowestStatsMem
+ * @desc Stores the unit.allLowestStatsMem(stats, mems) result in
+ * variable with id varId
+ * @arg side
+ * @type select
+ * @option Game Party
+ * @value party
+ * @option Game Troop
+ * @value troop
+ * @desc The side of the unit using the script call
+ * @arg stats
+ * @type string[]
+ * @desc The list of the names of the getters of the battlers in the unit
+ * @arg varId
+ * @type number
+ * @desc The id of the game variable to store the script call result
+ * @arg memFunc_
+ * @type select
+ * @option All members
+ * @value members
+ * @option All alive members
+ * @value aliveMembers
+ * @option All dead members
+ * @value deadMembers
+ * @option All movable members
+ * @value movableMembers
+ * @option Don't specify
+ * @value
+ * @desc The list of members in the unit to be filtered against
+ *
+ * @command notAnyLowestStatMem
+ * @desc Stores the unit.notAnyLowestStatMem(stats, mems) result in
+ * variable with id varId
+ * @arg side
+ * @type select
+ * @option Game Party
+ * @value party
+ * @option Game Troop
+ * @value troop
+ * @desc The side of the unit using the script call
+ * @arg stats
+ * @type string[]
+ * @desc The list of the names of the getters of the battlers in the unit
+ * @arg varId
+ * @type number
+ * @desc The id of the game variable to store the script call result
+ * @arg memFunc_
+ * @type select
+ * @option All members
+ * @value members
+ * @option All alive members
+ * @value aliveMembers
+ * @option All dead members
+ * @value deadMembers
+ * @option All movable members
+ * @value movableMembers
+ * @option Don't specify
+ * @value
+ * @desc The list of members in the unit to be filtered against
+ *
+ * @command notAllLowestStatsMem
+ * @desc Stores the unit.notAllLowestStatsMem(stats, mems) result
+ * in variable with id varId
+ * @arg side
+ * @type select
+ * @option Game Party
+ * @value party
+ * @option Game Troop
+ * @value troop
+ * @desc The side of the unit using the script call
+ * @arg stats
+ * @type string[]
+ * @desc The list of the names of the getters of the battlers in the unit
+ * @arg varId
+ * @type number
+ * @desc The id of the game variable to store the script call result
+ * @arg memFunc_
+ * @type select
+ * @option All members
+ * @value members
+ * @option All alive members
+ * @value aliveMembers
+ * @option All dead members
+ * @value deadMembers
+ * @option All movable members
+ * @value movableMembers
+ * @option Don't specify
+ * @value
+ * @desc The list of members in the unit to be filtered against
+ *
+ * @command anyAboveStatMem
+ * @desc Stores the unit.anyAboveStatMem(stats, val, mems) result
+ * in variable with id varId
+ * @arg side
+ * @type select
+ * @option Game Party
+ * @value party
+ * @option Game Troop
+ * @value troop
+ * @desc The side of the unit using the script call
+ * @arg stats
+ * @type string[]
+ * @desc The list of the names of the getters of the battlers in the unit
+ * @arg val
+ * @type number
+ * @decimals 9
+ * @desc The value to be checked against the list of stats
+ * @arg varId
+ * @type number
+ * @desc The id of the game variable to store the script call result
+ * @arg memFunc_
+ * @type select
+ * @option All members
+ * @value members
+ * @option All alive members
+ * @value aliveMembers
+ * @option All dead members
+ * @value deadMembers
+ * @option All movable members
+ * @value movableMembers
+ * @option Don't specify
+ * @value
+ * @desc The list of members in the unit to be filtered against
+ *
+ * @command allAboveStatMem
+ * @desc Stores the unit.allAboveStatMem(stats, val, mems) result
+ * in variable with id varId
+ * @arg side
+ * @type select
+ * @option Game Party
+ * @value party
+ * @option Game Troop
+ * @value troop
+ * @desc The side of the unit using the script call
+ * @arg stats
+ * @type string[]
+ * @desc The list of the names of the getters of the battlers in the unit
+ * @arg val
+ * @type number
+ * @decimals 9
+ * @desc The value to be checked against the list of stats
+ * @arg varId
+ * @type number
+ * @desc The id of the game variable to store the script call result
+ * @arg memFunc_
+ * @type select
+ * @option All members
+ * @value members
+ * @option All alive members
+ * @value aliveMembers
+ * @option All dead members
+ * @value deadMembers
+ * @option All movable members
+ * @value movableMembers
+ * @option Don't specify
+ * @value
+ * @desc The list of members in the unit to be filtered against
+ *
+ * @command anyBelowStatMem
+ * @desc Stores the unit.anyBelowStatMem(stats, val, mems) result
+ * in variable with id varId
+ * @arg side
+ * @type select
+ * @option Game Party
+ * @value party
+ * @option Game Troop
+ * @value troop
+ * @desc The side of the unit using the script call
+ * @arg stats
+ * @type string[]
+ * @desc The list of the names of the getters of the battlers in the unit
+ * @arg val
+ * @type number
+ * @decimals 9
+ * @desc The value to be checked against the list of stats
+ * @arg varId
+ * @type number
+ * @desc The id of the game variable to store the script call result
+ * @arg memFunc_
+ * @type select
+ * @option All members
+ * @value members
+ * @option All alive members
+ * @value aliveMembers
+ * @option All dead members
+ * @value deadMembers
+ * @option All movable members
+ * @value movableMembers
+ * @option Don't specify
+ * @value
+ * @desc The list of members in the unit to be filtered against
+ *
+ * @command allBelowStatMem
+ * @desc Stores the unit.allBelowStatMem(stats, val, mems) result
+ * in variable with id varId
+ * @arg side
+ * @type select
+ * @option Game Party
+ * @value party
+ * @option Game Troop
+ * @value troop
+ * @desc The side of the unit using the script call
+ * @arg stats
+ * @type string[]
+ * @desc The list of the names of the getters of the battlers in the unit
+ * @arg val
+ * @type number
+ * @decimals 9
+ * @desc The value to be checked against the list of stats
+ * @arg varId
+ * @type number
+ * @desc The id of the game variable to store the script call result
+ * @arg memFunc_
+ * @type select
+ * @option All members
+ * @value members
+ * @option All alive members
+ * @value aliveMembers
+ * @option All dead members
+ * @value deadMembers
+ * @option All movable members
+ * @value movableMembers
+ * @option Don't specify
+ * @value
+ * @desc The list of members in the unit to be filtered against
+ *
+ * @command memWithAnyUsableSkill
+ * @desc Stores the unit.memWithAnyUsableSkill(skillIds, mems)
+ * result in variable with id varId
+ * @arg side
+ * @type select
+ * @option Game Party
+ * @value party
+ * @option Game Troop
+ * @value troop
+ * @desc The side of the unit using the script call
+ * @arg skillIds
+ * @type skill[]
+ * @desc The list of ids of the usable skills to be checked againt
+ * @arg varId
+ * @type number
+ * @desc The id of the game variable to store the script call result
+ * @arg memFunc_
+ * @type select
+ * @option All members
+ * @value members
+ * @option All alive members
+ * @value aliveMembers
+ * @option All dead members
+ * @value deadMembers
+ * @option All movable members
+ * @value movableMembers
+ * @option Don't specify
+ * @value
+ * @desc The list of members in the unit to be filtered against
+ *
+ * @command memWithAllUsableSkills
+ * @desc Stores the unit.memWithAllUsableSkills(skillIds, mems)
+ * result in variable with id varId
+ * @arg side
+ * @type select
+ * @option Game Party
+ * @value party
+ * @option Game Troop
+ * @value troop
+ * @desc The side of the unit using the script call
+ * @arg skillIds
+ * @type skill[]
+ * @desc The list of ids of the usable skills to be checked againt
+ * @arg varId
+ * @type number
+ * @desc The id of the game variable to store the script call result
+ * @arg memFunc_
+ * @type select
+ * @option All members
+ * @value members
+ * @option All alive members
+ * @value aliveMembers
+ * @option All dead members
+ * @value deadMembers
+ * @option All movable members
+ * @value movableMembers
+ * @option Don't specify
+ * @value
+ * @desc The list of members in the unit to be filtered against
+ *
+ * @command memWithoutAnyUsableSkill
+ * @desc Stores the unit.memWithoutAnyUsableSkill(skillIds, mems)
+ * result in variable with id varId
+ * @arg side
+ * @type select
+ * @option Game Party
+ * @value party
+ * @option Game Troop
+ * @value troop
+ * @desc The side of the unit using the script call
+ * @arg skillIds
+ * @type skill[]
+ * @desc The list of ids of the usable skills to be checked againt
+ * @arg varId
+ * @type number
+ * @desc The id of the game variable to store the script call result
+ * @arg memFunc_
+ * @type select
+ * @option All members
+ * @value members
+ * @option All alive members
+ * @value aliveMembers
+ * @option All dead members
+ * @value deadMembers
+ * @option All movable members
+ * @value movableMembers
+ * @option Don't specify
+ * @value
+ * @desc The list of members in the unit to be filtered against
+ *
+ * @command memWithoutAllUsableSkills
+ * @desc Stores the unit.memWithoutAllUsableSkills(skillIds, mems)
+ * result in variable with id varId
+ * @arg side
+ * @type select
+ * @option Game Party
+ * @value party
+ * @option Game Troop
+ * @value troop
+ * @desc The side of the unit using the script call
+ * @arg skillIds
+ * @type skill[]
+ * @desc The list of ids of the usable skills to be checked againt
+ * @arg varId
+ * @type number
+ * @desc The id of the game variable to store the script call result
+ * @arg memFunc_
+ * @type select
+ * @option All members
+ * @value members
+ * @option All alive members
+ * @value aliveMembers
+ * @option All dead members
+ * @value deadMembers
+ * @option All movable members
+ * @value movableMembers
+ * @option Don't specify
+ * @value
+ * @desc The list of members in the unit to be filtered against
  *
  * @help
  *============================================================================
@@ -1735,7 +2911,9 @@ Utils.checkRMVersion(DoubleX_RMMZ.Unit_Filters.VERSIONS.codebase);
         }
     }; // PQ._BATTLER_
     PQ._NUM_ARR = arrStr => PQ._STR_ARR(arrStr).map(Number);
-    PQ._STR_ARR = arrStr => arrStr.split(/_+/);
+    // A dirty hack to handle both plugin commands and queries
+    PQ._STR_ARR = arrStr => Array.isArray(arrStr) ? arrStr : arrStr.split(/_+/);
+    //
     PQ._UNIT_ = side => {
         switch (side) {
             case "party": return $gameParty;
@@ -1749,19 +2927,19 @@ Utils.checkRMVersion(DoubleX_RMMZ.Unit_Filters.VERSIONS.codebase);
         return battler_ && battler_[name](PQ._NUM_ARR(ids));
     }; // _BATTLER_QUERY_FUNC
     [
-        "hasAnySkill",
-        "hasAllSkills",
-        "hasAnyUsableSkill",
-        "hasAllUsableSkills",
-        "isAnyStateAffected",
-        "isAllStatesAffected",
-        "isAnyBuffAffected",
-        "isAllBuffsAffected",
-        "isAnyDebuffAffected",
-        "isAllDebuffsAffected"
-    ].forEach(name => {
-        PluginManager.registerCommand(_PLUGIN_NAME, name, (side, label, ids, switchId) => {
-            const val = _BATTLER_QUERY_FUNC(name, side, label, ids);
+        ["hasAnySkill", "skillIds"],
+        ["hasAllSkills", "skillIds"],
+        ["hasAnyUsableSkill", "skillIds"],
+        ["hasAllUsableSkills", "skillIds"],
+        ["isAnyStateAffected", "stateIds"],
+        ["isAllStatesAffected", "stateIds"],
+        ["isAnyBuffAffected", "paramIds"],
+        ["isAllBuffsAffected", "paramIds"],
+        ["isAnyDebuffAffected", "paramIds"],
+        ["isAllDebuffsAffected", "paramIds"]
+    ].forEach(([name, idNames]) => {
+        PluginManager.registerCommand(_PLUGIN_NAME, name, ({ side, label, [idNames]: ids, switchId }) => {
+            const val = _BATTLER_QUERY_FUNC(name, side, label, JSON.parse(ids));
             $gameSwitches.setValue(+switchId, val);
         });
         if (!_IS_QUERY) return;
@@ -1778,37 +2956,37 @@ Utils.checkRMVersion(DoubleX_RMMZ.Unit_Filters.VERSIONS.codebase);
     }, _NUM_UNIT_QUERY_FUNC = _UNIT_QUERY_FUNC(PQ._NUM_ARR);
     const _STR_UNIT_QUERY_FUNC = _UNIT_QUERY_FUNC(PQ._STR_ARR);
     [
-        ["memWithAnyState", _NUM_UNIT_QUERY_FUNC],
-        ["memWithAllStates", _NUM_UNIT_QUERY_FUNC],
-        ["memWithoutAnyState", _NUM_UNIT_QUERY_FUNC],
-        ["memWithoutAllStates", _NUM_UNIT_QUERY_FUNC],
-        ["memWithAnyBuff", _NUM_UNIT_QUERY_FUNC],
-        ["memWithAllBuffs", _NUM_UNIT_QUERY_FUNC],
-        ["memWithoutAnyBuff", _NUM_UNIT_QUERY_FUNC],
-        ["memWithoutAllBuffs", _NUM_UNIT_QUERY_FUNC],
-        ["memWithAnyDebuff", _NUM_UNIT_QUERY_FUNC],
-        ["memWithAllDebuffs", _NUM_UNIT_QUERY_FUNC],
-        ["memWithoutAnyDebuff", _NUM_UNIT_QUERY_FUNC],
-        ["memWithoutAllDebuffs", _NUM_UNIT_QUERY_FUNC],
-        ["memWithAnySkill", _NUM_UNIT_QUERY_FUNC],
-        ["memWithAllSkills", _NUM_UNIT_QUERY_FUNC],
-        ["memWithoutAnySkill", _NUM_UNIT_QUERY_FUNC],
-        ["memWithoutAllSkills", _NUM_UNIT_QUERY_FUNC],
-        ["memWithAnyUsableSkill", _NUM_UNIT_QUERY_FUNC],
-        ["memWithAllUsableSkills", _NUM_UNIT_QUERY_FUNC],
-        ["memWithoutAnyUsableSkill", _NUM_UNIT_QUERY_FUNC],
-        ["memWithoutAllUsableSkills", _NUM_UNIT_QUERY_FUNC],
-        ["anyHighestStatMem", _STR_UNIT_QUERY_FUNC],
-        ["allHighestStatsMem", _STR_UNIT_QUERY_FUNC],
-        ["notAnyHighestStatMem", _STR_UNIT_QUERY_FUNC],
-        ["notAllHighestStatsMem", _STR_UNIT_QUERY_FUNC],
-        ["anyLowestStatMem", _STR_UNIT_QUERY_FUNC],
-        ["allLowestStatsMem", _STR_UNIT_QUERY_FUNC],
-        ["notAnyLowestStatMem", _STR_UNIT_QUERY_FUNC],
-        ["notAllLowestStatsMem", _STR_UNIT_QUERY_FUNC]
-    ].forEach(([name, queryFunc]) => {
-        PluginManager.registerCommand(_PLUGIN_NAME, name, (side, arrStr, varId, memFunc_) => {
-            const val = queryFunc(name, side, arrStr, memFunc_);
+        ["memWithAnyState", "stateIds", _NUM_UNIT_QUERY_FUNC],
+        ["memWithAllStates", "stateIds", _NUM_UNIT_QUERY_FUNC],
+        ["memWithoutAnyState", "stateIds", _NUM_UNIT_QUERY_FUNC],
+        ["memWithoutAllStates", "stateIds", _NUM_UNIT_QUERY_FUNC],
+        ["memWithAnyBuff", "paramIds", _NUM_UNIT_QUERY_FUNC],
+        ["memWithAllBuffs", "paramIds", _NUM_UNIT_QUERY_FUNC],
+        ["memWithoutAnyBuff", "paramIds", _NUM_UNIT_QUERY_FUNC],
+        ["memWithoutAllBuffs", "paramIds", _NUM_UNIT_QUERY_FUNC],
+        ["memWithAnyDebuff", "paramIds", _NUM_UNIT_QUERY_FUNC],
+        ["memWithAllDebuffs", "paramIds", _NUM_UNIT_QUERY_FUNC],
+        ["memWithoutAnyDebuff", "paramIds", _NUM_UNIT_QUERY_FUNC],
+        ["memWithoutAllDebuffs", "paramIds", _NUM_UNIT_QUERY_FUNC],
+        ["memWithAnySkill", "skillIds", _NUM_UNIT_QUERY_FUNC],
+        ["memWithAllSkills", "skillIds", _NUM_UNIT_QUERY_FUNC],
+        ["memWithoutAnySkill", "skillIds", _NUM_UNIT_QUERY_FUNC],
+        ["memWithoutAllSkills", "skillIds", _NUM_UNIT_QUERY_FUNC],
+        ["memWithAnyUsableSkill", "skillIds", _NUM_UNIT_QUERY_FUNC],
+        ["memWithAllUsableSkills", "skillIds", _NUM_UNIT_QUERY_FUNC],
+        ["memWithoutAnyUsableSkill", "skillIds", _NUM_UNIT_QUERY_FUNC],
+        ["memWithoutAllUsableSkills", "skillIds", _NUM_UNIT_QUERY_FUNC],
+        ["anyHighestStatMem", "stats", _STR_UNIT_QUERY_FUNC],
+        ["allHighestStatsMem", "stats", _STR_UNIT_QUERY_FUNC],
+        ["notAnyHighestStatMem", "stats", _STR_UNIT_QUERY_FUNC],
+        ["notAllHighestStatsMem", "stats", _STR_UNIT_QUERY_FUNC],
+        ["anyLowestStatMem", "stats", _STR_UNIT_QUERY_FUNC],
+        ["allLowestStatsMem", "stats", _STR_UNIT_QUERY_FUNC],
+        ["notAnyLowestStatMem", "stats", _STR_UNIT_QUERY_FUNC],
+        ["notAllLowestStatsMem", "stats", _STR_UNIT_QUERY_FUNC]
+    ].forEach(([name, arrStrName, queryFunc]) => {
+        PluginManager.registerCommand(_PLUGIN_NAME, name, ({ side, [arrStrName]: arrStr, varId, memFunc_ }) => {
+            const val = queryFunc(name, side, JSON.parse(arrStr), memFunc_);
             $gameVariables.setValue(+varId, val);
         });
         if (!_IS_QUERY) return;
@@ -1830,8 +3008,9 @@ Utils.checkRMVersion(DoubleX_RMMZ.Unit_Filters.VERSIONS.codebase);
         "anyBelowStatMem",
         "allBelowStatMem"
     ].forEach(name => {
-        PluginManager.registerCommand(_PLUGIN_NAME, name, (side, arrStr, val, varId, memFunc_) => {
-            const v = _VAL_UNIT_QUERY_FUNC(name, side, arrStr, val, memFunc_);
+        PluginManager.registerCommand(_PLUGIN_NAME, name, ({ side, stats, val, varId, memFunc_ }) => {
+            const arrStats = JSON.parse(stats);
+            const v = _VAL_UNIT_QUERY_FUNC(name, side, arrStats, val, memFunc_);
             $gameVariables.setValue(+varId, v);
         });
         if (!_IS_QUERY) return;

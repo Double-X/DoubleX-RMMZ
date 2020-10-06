@@ -79,7 +79,6 @@
  * @default
  *
  * @param targetHotkey
- * @type string
  * @desc The keymap of the hotkey selecting the target with index targetIndex
  * @default
  */
@@ -105,7 +104,6 @@
  * @type number
  * @desc The index of the target selected by hotkey targetHotkey
  * @arg targetHotkey
- * @type string
  * @desc The keymap of the hotkey selecting the target with index targetIndex
  *
  * @help
