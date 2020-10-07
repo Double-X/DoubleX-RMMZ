@@ -10,8 +10,9 @@
  *      2. With this plugin, other plugins can declare plugin queries that
  *         behave like RMMV plugin commands but return end results instead of
  *         making side effects
- *      3. Plugin commands can replace script calls in conditional branch and
- *         control variables event commands
+ *      3. Plugin queries can replace skill/item damage formulae
+ *      4. Plugin queries can also replace script calls in conditional branch
+ *         and control variables event commands
  *----------------------------------------------------------------------------
  *    # Prerequisites
  *      Plugins:
@@ -32,6 +33,8 @@
  *         plugin queries registed to this RMMZ plugin as well, and in this
  *         case, the last registered plugin query having the same name will be
  *         used
+ *      2. DON'T MAKE SIDE EFFECTS IN THE SKILL/ITEM DAMAGE FORMULA PLUGIN
+ *         QUERIES UNLESS YOU REALLY KNOW WHAT YOU'RE TRULY DOING
  *----------------------------------------------------------------------------
  *    # Terms Of Use
  *      1. Commercial use's always allowed and crediting me's always optional.
@@ -49,20 +52,27 @@
  *----------------------------------------------------------------------------
  *    # Links
  *      Video:
- *      1.
+ *      1. https://www.youtube.com/watch?v=_6L8IJDiTcI
  *      This Plugin:
  *      1. https://github.com/Double-X/DoubleX-RMMZ/blob/master/DoubleX_RMMZ_Plugin_Query.js
  *      Posts:
- *      1.
- *      2.
- *      3.
- *      4.
- *      5.
- *      6.
- *      7.
- *      8.
- *      9.
- *      10.
+ *      1. https://forums.rpgmakerweb.com/index.php?threads/doublex_rmmz_plugin_query.128382/
+ *      2. https://www.rpgmakercentral.com/topic/42647-doublex_rmmz_plugin_query/
+ *      3. https://rpgmaker.net/engines/rmmz/utilities/300/
+ *      4. https://www.save-point.org/thread-8181.html
+ *      5. https://gdu.one/forums/topic/13664-doublex_rmmz_plugin_query/
+ *      6. http://www.hbgames.org/forums/viewtopic.php?f=332&t=80358
+ *      7. https://forum.chaos-project.com/index.php/topic,16089.new.html
+ *      8. https://doublexrpgmaker.wordpress.com/2020/10/07/doublex_rmmz_plugin_query/
+ *      9. https://www.patreon.com/posts/42482628
+ *      10. https://www.makerdevs.com/plugin/doublex-rmmz-plugin-query
+ *----------------------------------------------------------------------------
+ *    # Instructions
+ *      1. The default plugin parameters file name is
+ *         DoubleX_RMMZ_Plugin_Query
+ *         If you want to change that, you must edit the value of
+ *         DoubleX_RMMZ.Plugin_Query.PLUGIN_NAME, which must be done
+ *         via opening this plugin js file directly
  *----------------------------------------------------------------------------
  *    # Contributors
  *      Authors:
@@ -171,7 +181,7 @@ var DoubleX_RMMZ = DoubleX_RMMZ || {}; // var must be used or game will crash
 // Separates the version numbers with the rest to make the former more clear
 DoubleX_RMMZ.Plugin_Query = {
     PLUGIN_NAME: "DoubleX_RMMZ_Plugin_Query",
-    VERSIONS: { codebase: "1.0.2", plugin: "v1.03a" }
+    VERSIONS: { codebase: "1.0.2", plugin: "v1.00a" }
 }; // DoubleX_RMMZ.Plugin_Query
 //
 Utils.checkRMVersion(DoubleX_RMMZ.Plugin_Query.VERSIONS.codebase);
@@ -284,7 +294,7 @@ if (DoubleX_RMMZ.Enhanced_Codebase) {
     /**
      * The this pointer is Game_Action.prototype
      * Idempotent
-     * @author DoubleX @interface @since v0.00a @version v0.00a
+     * @author DoubleX @interface @since v1.00a @version v1.00a
      * @param {Game_Battler} b - The target to have damage formula applied
      * @enum @param {number} sign - Whether it's damage or recovery(1/-1)
      * @enum @param {string[]} query - The query name and argument value strings
