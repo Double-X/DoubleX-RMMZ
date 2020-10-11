@@ -94,6 +94,13 @@
  *      - None So Far
  *----------------------------------------------------------------------------
  *    # Changelog
+ *      { codebase: "1.0.2", plugin: "v1.01a" }(2020 Oct 11 GMT 0900):
+ *      1. Added the plugin query and command counterparts for the following
+ *         script calls of this plugin:
+ *         - battlerCooldown()
+ *         - isBattlerCooldown()
+ *         - skillItemCooldown(item)
+ *         - isSkillItemCooldown(item)
  *      { codebase: "1.0.0", plugin: "v1.00a" }(2020 Aug 27 GMT 0300):
  *      1. 1st version of this plugin finished
  *----------------------------------------------------------------------------
@@ -108,9 +115,10 @@
 /*:
  * @url https://www.patreon.com/doublex
  * @target MZ
- * @plugindesc Versions: { codebase: "1.0.0", plugin: "v1.00a" }
+ * @plugindesc Versions: { codebase: "1.0.0", plugin: "v1.01a" }
  * Lets you set some skills/items to have battler and skill/item cooldowns
  * @orderAfter DoubleX RMMZ Enhanced Codebase
+ * @orderAfter DoubleX_RMMZ_Plugin_Query
  * @base DoubleX RMMZ Enhanced Codebase
  * @author DoubleX
  *
@@ -249,6 +257,102 @@
  * @type number
  * @min -999999
  * @desc The new skill/item cooldown turn count of the skill/item involved
+ *
+ * @command battlerCooldown
+ * @desc Stores the battler.battlerCooldown() script call results
+ * into the game variable with id varId
+ * @arg side
+ * @type select
+ * @option Actor
+ * @value actor
+ * @option Enemy
+ * @value enemy
+ * @desc The side of the battler setting the battler cooldown
+ * @arg label
+ * @type number
+ * @desc The actor id/enemy index of the battler setting the battler cooldown
+ * @arg varId
+ * @type number
+ * @desc The id of the game variable storing the script call result
+ *
+ * @command isBattlerCooldown
+ * @desc Stores the battler.isBattlerCooldown() script call results
+ * into the game switch with id switchId
+ * @arg side
+ * @type select
+ * @option Actor
+ * @value actor
+ * @option Enemy
+ * @value enemy
+ * @desc The side of the battler setting the battler cooldown
+ * @arg label
+ * @type number
+ * @desc The actor id/enemy index of the battler setting the battler cooldown
+ * @arg switchId
+ * @type number
+ * @desc The id of the game switch storing the script call result
+ *
+ * @command skillItemCooldown
+ * @desc Stores the battler.skillItemCooldown(item) script call
+ * results into the game variable with id varId
+ * @arg side
+ * @type select
+ * @option Actor
+ * @value actor
+ * @option Enemy
+ * @value enemy
+ * @desc The side of the battler setting the skill/item cooldown
+ * with the skill/item involved
+ * @arg label
+ * @type number
+ * @desc The actor id/enemy index of the battler setting the
+ * skill/item cooldown with the skill/item involved
+ * @arg type
+ * @type select
+ * @option Skill
+ * @value skill
+ * @option Item
+ * @value item
+ * @desc The skill/item to have its skill/item cooldown set for the
+ * battler involved
+ * @arg id
+ * @type number
+ * @desc The id of the skill/item to have its skill/item cooldown
+ * set for the battler involved
+ * @arg varId
+ * @type number
+ * @desc The id of the game variable storing the script call result
+ *
+ * @command isSkillItemCooldown
+ * @desc Stores the battler.isSkillItemCooldown(item) script call
+ * results into the game switch with id switchId
+ * @arg side
+ * @type select
+ * @option Actor
+ * @value actor
+ * @option Enemy
+ * @value enemy
+ * @desc The side of the battler setting the skill/item cooldown
+ * with the skill/item involved
+ * @arg label
+ * @type number
+ * @desc The actor id/enemy index of the battler setting the
+ * skill/item cooldown with the skill/item involved
+ * @arg type
+ * @type select
+ * @option Skill
+ * @value skill
+ * @option Item
+ * @value item
+ * @desc The skill/item to have its skill/item cooldown set for the
+ * battler involved
+ * @arg id
+ * @type number
+ * @desc The id of the skill/item to have its skill/item cooldown
+ * set for the battler involved
+ * @arg switchId
+ * @type number
+ * @desc The id of the game switch storing the script call result
  *
  * @help
  *============================================================================
@@ -453,6 +557,79 @@
  *         - Applies the script call
  *           battler.setSkillItemCooldown(item, turnCount)
  *         - battler is the battler identified by side and label
+ *      5.(v1.01a+) battlerCooldown side label varId
+ *         - Stores the returned result of the script call
+ *           battler.battlerCooldown() in the game variable with id varId
+ *         - battler is the battler identified by side and label
+ *         - side is either actor or enemy
+ *         - label is the actor id for side actor and troop member index for
+ *           side enemy
+ *      6.(v1.01a+) isBattlerCooldown side label switchId
+ *         - Stores the returned result of the script call
+ *           battler.isBattlerCooldown() in the game switch with id switchId
+ *         - battler is the battler identified by side and label
+ *         - side is either actor or enemy
+ *         - label is the actor id for side actor and troop member index for
+ *           side enemy
+ *      7.(v1.01a+) skillItemCooldown side label type id varId
+ *         - Stores the returned result of the script call
+ *           battler.skillItemCooldown(item) in the game variable with id
+ *           varId
+ *         - battler is the battler identified by side and label
+ *         - side is either actor or enemy
+ *         - label is the actor id for side actor and troop member index for
+ *           side enemy
+ *         - item is the skill/item identified by type and id
+ *         - type is either skill or item
+ *         - id is the id of the skill/item
+ *      8.(v1.01a+) isSkillItemCooldown side label type id switchId
+ *         - Stores the returned result of the script call
+ *           battler.isSkillItemCooldown(item) in the game switch with id
+ *           switchId
+ *         - Applies the script call battler.isSkillItemCooldown(item)
+ *         - battler is the battler identified by side and label
+ *         - side is either actor or enemy
+ *         - label is the actor id for side actor and troop member index for
+ *           side enemy
+ *         - item is the skill/item identified by type and id
+ *         - type is either skill or item
+ *         - id is the id of the skill/item
+ *============================================================================
+ *    ## (v1.01a+)Plugin Query Info
+ *       1. You need to use DoubleX_RMMZ_Plugin_Query as well in order to use
+ *          the plugin queries of this plugin:
+ *          https://github.com/Double-X/DoubleX-RMMZ/blob/master/DoubleX_RMMZ_Plugin_Query.js
+ *----------------------------------------------------------------------------
+ *      1. battlerCooldown side label
+ *         - Applies the script call battler.battlerCooldown()
+ *         - battler is the battler identified by side and label
+ *         - side is either actor or enemy
+ *         - label is the actor id for side actor and troop member index for
+ *           side enemy
+ *      2. isBattlerCooldown side label
+ *         - Applies the script call battler.isBattlerCooldown()
+ *         - battler is the battler identified by side and label
+ *         - side is either actor or enemy
+ *         - label is the actor id for side actor and troop member index for
+ *           side enemy
+ *      3. skillItemCooldown side label type id
+ *         - Applies the script call battler.skillItemCooldown(item)
+ *         - battler is the battler identified by side and label
+ *         - side is either actor or enemy
+ *         - label is the actor id for side actor and troop member index for
+ *           side enemy
+ *         - item is the skill/item identified by type and id
+ *         - type is either skill or item
+ *         - id is the id of the skill/item
+ *      4. isSkillItemCooldown side label type id
+ *         - Applies the script call battler.isSkillItemCooldown(item)
+ *         - battler is the battler identified by side and label
+ *         - side is either actor or enemy
+ *         - label is the actor id for side actor and troop member index for
+ *           side enemy
+ *         - item is the skill/item identified by type and id
+ *         - type is either skill or item
+ *         - id is the id of the skill/item
  *============================================================================
  */
 
@@ -462,7 +639,7 @@ var DoubleX_RMMZ = DoubleX_RMMZ || {}; // var must be used or game will crash
 // Separates the version numbers with the rest to make the former more clear
 DoubleX_RMMZ.Skill_Item_Cooldown = {
     PLUGIN_NAME: "DoubleX RMMZ Skill Item Cooldown",
-    VERSIONS: { codebase: "1.0.0", plugin: "v1.00a" }
+    VERSIONS: { codebase: "1.0.2", plugin: "v1.01a" }
 }; // DoubleX_RMMZ.Skill_Item_Cooldown
 //
 Utils.checkRMVersion(DoubleX_RMMZ.Skill_Item_Cooldown.VERSIONS.codebase);
@@ -514,6 +691,85 @@ if (DoubleX_RMMZ.Enhanced_Codebase) {
         FP.PARAM_FUNCS.set(param, new Function(...args.concat(val)));
         //
     }; // FP.storeFuncParam
+
+})(DoubleX_RMMZ.Skill_Item_Cooldown);
+
+/*----------------------------------------------------------------------------*/
+
+(SIC => {
+
+    "use strict";
+
+    const PQ = SIC.Plugin_Cmd_Query = {};
+
+    PQ._SET_QUERY = (name, cmdFunc, queryFunc) => {
+        PluginManager.registerCommand(SIC.PLUGIN_NAME, name, cmdFunc);
+        if (!DoubleX_RMMZ.Plugin_Query) return;
+        PluginManager.eventCmdPluginQueries.set(name, queryFunc);
+    }; // PQ._SET_QUERY
+
+    PQ._BATTLER_ = (side, label) => {
+        switch (side) {
+            case "actor": return $gameActors.actor(+label);
+            case "enemy": return $gameTroop.members()[+label];
+            default: return undefined;
+        }
+    }; // PQ._BATTLER_
+
+    const _BATTLER_QUERY_FUNC = (name, side, label) => {
+        const battler_ = PQ._BATTLER_(side, label);
+        return battler_ && battler_[name]();
+    }; // _BATTLER_QUERY_FUNC
+    (name => {
+        PQ._SET_QUERY(name, ({ side, label, varId }) => {
+            const val = _BATTLER_QUERY_FUNC(name, side, label);
+            $gameVariables.setValue(+varId, val);
+        }, _BATTLER_QUERY_FUNC.bind(undefined, name));
+    })("battlerCooldown");
+    (name => {
+        PQ._SET_QUERY(name, ({ side, label, switchId }) => {
+            const val = _BATTLER_QUERY_FUNC(name, side, label);
+            $gameSwitches.setValue(+switchId, val);
+        }, _BATTLER_QUERY_FUNC.bind(undefined, name));
+    })("isBattlerCooldown");
+
+    PQ._ITEM_ = (type, id) => {
+        switch (type) {
+            case "skill": return $dataSkills[+id];
+            case "item": return $dataItems[+id];
+            default: return undefined;
+        }
+    }; // PQ._ITEM_
+
+    const _SKILL_ITEM_QUERY_FUNC = (name, side, label, type, id) => {
+        const battler_ = PQ._BATTLER_(side, label), item_ = PQ._ITEM_(type, id);
+        return battler_ && item_ && battler_[name](item_);
+    }; // _SKILL_ITEM_QUERY_FUNC
+    (name => {
+        PQ._SET_QUERY(name, ({ side, label, type, id, varId }) => {
+            const val = _SKILL_ITEM_QUERY_FUNC(name, side, label, type, id);
+            $gameVariables.setValue(+varId, val);
+        }, _SKILL_ITEM_QUERY_FUNC.bind(undefined, name));
+    })("skillItemCooldown");
+    (name => {
+        PQ._SET_QUERY(name, ({ side, label, type, id, switchId }) => {
+            const val = _SKILL_ITEM_QUERY_FUNC(name, side, label, type, id);
+            $gameSwitches.setValue(+switchId, val);
+        }, _SKILL_ITEM_QUERY_FUNC.bind(undefined, name));
+    })("isSkillItemCooldown");
+
+    PluginManager.registerCommand(SIC.PLUGIN_NAME, "clearBattlerSkillItemCooldowns", ({ side, label }) => {
+        const battler_ = PQ._BATTLER_(side, label);
+        if (battler_) battler_.clearBattlerSkillItemCooldowns();
+    });
+    PluginManager.registerCommand(SIC.PLUGIN_NAME, "setBattlerCooldown", ({ side, label, turnCount }) => {
+        const battler_ = PQ._BATTLER_(side, label);
+        if (battler_) battler_.setBattlerCooldown(+turnCount);
+    });
+    PluginManager.registerCommand(SIC.PLUGIN_NAME, "setSkillItemCooldown", ({ side, label, type, id, turnCount }) => {
+        const battler_ = PQ._BATTLER_(side, label), item_ = PQ._ITEM_(type, id);
+        if (battler_ && item_) battler_.setSkillItemCooldown(item_, +turnCount);
+    });
 
 })(DoubleX_RMMZ.Skill_Item_Cooldown);
 
@@ -988,35 +1244,6 @@ if (DoubleX_RMMZ.Enhanced_Codebase) {
         NEW._setBattlerCooldown.call(this);
         NEW._clearUsedSkillItems.call(this);
     }; // $.startBattlerCooldown
-
-    NEW._PLUGIN_CMD_BATTLER_ = (side, label) => {
-        switch (side) {
-            case "actor": return $gameActors.actor(+label);
-            case "enemy": return $gameTroop.members()[+label];
-            default: return undefined;
-        }
-    }; // NEW._PLUGIN_CMD_BATTLER_
-
-    PluginManager.registerCommand(SIC.PLUGIN_NAME, "clearBattlerSkillItemCooldowns", ({ side, label }) => {
-        const battler_ = NEW._PLUGIN_CMD_BATTLER_(side, label);
-        if (battler_) battler_.clearBattlerSkillItemCooldowns();
-    });
-    PluginManager.registerCommand(SIC.PLUGIN_NAME, "setBattlerCooldown", ({ side, label, turnCount }) => {
-        const battler_ = NEW._PLUGIN_CMD_BATTLER_(side, label);
-        if (battler_) battler_.setBattlerCooldown(+turnCount);
-    });
-    NEW._PLUGIN_CMD_ITEM = (type, id) => {
-        switch (type) {
-            case "skill": return $dataSkills[+id];
-            case "item": return $dataItems[+id];
-            default: return undefined;
-        }
-    }; // NEW._PLUGIN_CMD_BATTLER_
-    PluginManager.registerCommand(SIC.PLUGIN_NAME, "setSkillItemCooldown", ({ side, label, type, id, turnCount }) => {
-        const battler_ = NEW._PLUGIN_CMD_BATTLER_(side, label);
-        const item_ = NEW._PLUGIN_CMD_ITEM(type, id);
-        if (battler_ && item_) battler_.setSkillItemCooldown(item_, +turnCount);
-    });
 
     /**
      * The this pointer is Game_Battler.prototype
