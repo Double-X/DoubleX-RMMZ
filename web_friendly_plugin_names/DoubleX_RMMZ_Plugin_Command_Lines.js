@@ -133,7 +133,6 @@
 /*~struct~PluginFileCmd:
  *
  * @param pluginFilename
- * @type string
  * @desc The filename of the plugin having the plugin commands
  * The filename shouldn't include ths .js extension
  * @default
@@ -147,7 +146,6 @@
 /*~struct~PluginCmd:
  *
  * @param cmdName
- * @type string
  * @desc The name of the plugin command to be used in the RMMV ways
  * It can be either command or text of the plugin command
  * @default
@@ -162,7 +160,6 @@
 /*~struct~NewPluginFileCmd:
  *
  * @param pluginFilename
- * @type string
  * @desc Filename of the plugin having original plugin commands
  * The filename shouldn't include ths .js extension
  * @default
@@ -176,12 +173,10 @@
 /*~struct~NewPluginCmd:
  *
  * @param newCmdName
- * @type string
  * @desc The name of the new plugin command to be used in RMMV ways
  * @default
  *
  * @param origCmdName
- * @type string
  * @desc The name of the original plugin command used by new one
  * It must match cmdName of a plugin command in pluginFileCmds
  * @default
@@ -195,13 +190,11 @@
 /*~struct~NewPluginCmdArg:
  *
  * @param argName
- * @type string
  * @desc The name of the argument to have its value already set
  * It must match argNames of plugin command in pluginFileCmds
  * @default
  *
  * @param argVal
- * @type string
  * @desc The already set value of the argument with specified name
  * @default
  */
