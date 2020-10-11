@@ -103,6 +103,7 @@
  * @plugindesc Versions: { codebase: "1.0.0", plugin: "v1.01a" }
  * Lets you control some skills/items target selection AI behaviors by notetags
  * @orderAfter DoubleX RMMZ Enhanced Codebase
+ * @orderAfter DoubleX RMMZ Unit Filters
  * @base DoubleX RMMZ Enhanced Codebase
  * @base DoubleX RMMZ Unit Filters
  * @author DoubleX
