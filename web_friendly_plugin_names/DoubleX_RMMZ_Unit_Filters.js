@@ -41,6 +41,8 @@
  *         anymore if you've violated any of the above.
  *----------------------------------------------------------------------------
  *    # Links
+ *      Video:
+ *      1. https://www.youtube.com/watch?v=_6L8IJDiTcI
  *      This Plugin:
  *      1. https://github.com/Double-X/DoubleX-RMMZ/blob/master/DoubleX%20RMMZ%20Unit%20Filters.js
  *      Posts:
@@ -68,6 +70,9 @@
  *      - None So Far
  *----------------------------------------------------------------------------
  *    # Changelog
+ *      { codebase: "1.0.2", plugin: "v1.02a" }(2020 Oct 6 GMT 1600):
+ *      1. Added the plugin query and command counterparts for the script
+ *         calls of this plugin
  *      { codebase: "1.0.0", plugin: "v1.01a" }(2020 Aug 28 GMT 0000):
  *      1. Added the following battler manipulation script calls  -
  *         - hasAnyUsableSkill(skillIds)
@@ -85,7 +90,1184 @@
  * @target MZ
  * @plugindesc Versions: { codebase: "1.0.0", plugin: "v1.01a" }
  * Lets you use script calls to filter unit members with less codes and eventing
+ * @orderAfter DoubleX_RMMZ_Plugin_Query
  * @author DoubleX
+ *
+ * @command isAnyStateAffected
+ * @desc Stores the battler.isAnyStateAffected(stateIds) result in
+ * switch with id switchId
+ * @arg side
+ * @type select
+ * @option Actor
+ * @value actor
+ * @option Enemy
+ * @value enemy
+ * @desc The side of the battler using the script call
+ * @arg label
+ * @type number
+ * @desc The actor id/enemy index of the battler using the script call
+ * @arg stateIds
+ * @type number[]
+ * @desc The list of ids of the states to be checked against
+ * @arg switchId
+ * @type number
+ * @desc The id of the game switch to store the script call result
+ *
+ * @command isAllStatesAffected
+ * @desc Stores the battler.isAllStatesAffected(stateIds) result in
+ * switch with id switchId
+ * @arg side
+ * @type select
+ * @option Actor
+ * @value actor
+ * @option Enemy
+ * @value enemy
+ * @desc The side of the battler using the script call
+ * @arg label
+ * @type number
+ * @desc The actor id/enemy index of the battler using the script call
+ * @arg stateIds
+ * @type number[]
+ * @desc The list of ids of the states to be checked against
+ * @arg switchId
+ * @type number
+ * @desc The id of the game switch to store the script call result
+ *
+ * @command isAnyBuffAffected
+ * @desc Stores the battler.isAnyBuffAffected(paramIds) result in
+ * switch with id switchId
+ * @arg side
+ * @type select
+ * @option Actor
+ * @value actor
+ * @option Enemy
+ * @value enemy
+ * @desc The side of the battler using the script call
+ * @arg label
+ * @type number
+ * @desc The actor id/enemy index of the battler using the script call
+ * @arg paramIds
+ * @type number[]
+ * @desc The list of ids of the parameters to be checked against
+ * @arg switchId
+ * @type number
+ * @desc The id of the game switch to store the script call result
+ *
+ * @command isAllBuffsAffected
+ * @desc Stores the battler.isAllBuffsAffected(paramIds) result in
+ * switch with id switchId
+ * @arg side
+ * @type select
+ * @option Actor
+ * @value actor
+ * @option Enemy
+ * @value enemy
+ * @desc The side of the battler using the script call
+ * @arg label
+ * @type number
+ * @desc The actor id/enemy index of the battler using the script call
+ * @arg paramIds
+ * @type number[]
+ * @desc The list of ids of the parameters to be checked against
+ * @arg switchId
+ * @type number
+ * @desc The id of the game switch to store the script call result
+ *
+ * @command isAnyDebuffAffected
+ * @desc Stores the battler.isAnyDebuffAffected(paramIds) result in
+ * switch with id switchId
+ * @arg side
+ * @type select
+ * @option Actor
+ * @value actor
+ * @option Enemy
+ * @value enemy
+ * @desc The side of the battler using the script call
+ * @arg label
+ * @type number
+ * @desc The actor id/enemy index of the battler using the script call
+ * @arg paramIds
+ * @type number[]
+ * @desc The list of ids of the parameters to be checked against
+ * @arg switchId
+ * @type number
+ * @desc The id of the game switch to store the script call result
+ *
+ * @command isAllDebuffsAffected
+ * @desc Stores the battler.isAllDebuffsAffected(paramIds) result
+ * in switch with id switchId
+ * @arg side
+ * @type select
+ * @option Actor
+ * @value actor
+ * @option Enemy
+ * @value enemy
+ * @desc The side of the battler using the script call
+ * @arg label
+ * @type number
+ * @desc The actor id/enemy index of the battler using the script call
+ * @arg paramIds
+ * @type number[]
+ * @desc The list of ids of the parameters to be checked against
+ * @arg switchId
+ * @type number
+ * @desc The id of the game switch to store the script call result
+ *
+ * @command hasAnySkill
+ * @desc Stores the battler.hasAnySkill(skillIds) result in switch
+ * with id switchId
+ * @arg side
+ * @type select
+ * @option Actor
+ * @value actor
+ * @option Enemy
+ * @value enemy
+ * @desc The side of the battler using the script call
+ * @arg label
+ * @type number
+ * @desc The actor id/enemy index of the battler using the script call
+ * @arg skillIds
+ * @type skill[]
+ * @desc The list of ids of the skills to be checked against
+ * @arg switchId
+ * @type number
+ * @desc The id of the game switch to store the script call result
+ *
+ * @command hasAllSkills
+ * @desc Stores the battler.hasAllSkills(skillIds) result in switch
+ * with id switchId
+ * @arg side
+ * @type select
+ * @option Actor
+ * @value actor
+ * @option Enemy
+ * @value enemy
+ * @desc The side of the battler using the script call
+ * @arg label
+ * @type number
+ * @desc The actor id/enemy index of the battler using the script call
+ * @arg skillIds
+ * @type skill[]
+ * @desc The list of ids of the skills to be checked against
+ * @arg switchId
+ * @type number
+ * @desc The id of the game switch to store the script call result
+ *
+ * @command hasAnyUsableSkill
+ * @desc Stores the battler.hasAnyUsableSkill(skillIds) result in
+ * switch with id switchId
+ * @arg side
+ * @type select
+ * @option Actor
+ * @value actor
+ * @option Enemy
+ * @value enemy
+ * @desc The side of the battler using the script call
+ * @arg label
+ * @type number
+ * @desc The actor id/enemy index of the battler using the script call
+ * @arg skillIds
+ * @type skill[]
+ * @desc The list of ids of the skills to be checked against
+ * @arg switchId
+ * @type number
+ * @desc The id of the game switch to store the script call result
+ *
+ * @command hasAllUsableSkills
+ * @desc Stores the battler.hasAllUsableSkills(skillIds) result in
+ * switch with id switchId
+ * @arg side
+ * @type select
+ * @option Actor
+ * @value actor
+ * @option Enemy
+ * @value enemy
+ * @desc The side of the battler using the script call
+ * @arg label
+ * @type number
+ * @desc The actor id/enemy index of the battler using the script call
+ * @arg skillIds
+ * @type skill[]
+ * @desc The list of ids of the skills to be checked against
+ * @arg switchId
+ * @type number
+ * @desc The id of the game switch to store the script call result
+ *
+ * @command memWithAnyState
+ * @desc Stores the unit.memWithAnyState(stateIds, mems) result in
+ * variable with id varId
+ * @arg side
+ * @type select
+ * @option Game Party
+ * @value party
+ * @option Game Troop
+ * @value troop
+ * @desc The side of the unit using the script call
+ * @arg stateIds
+ * @type number[]
+ * @desc The list of ids of the states to be checked against
+ * @arg varId
+ * @type number
+ * @desc The id of the game variable to store the script call result
+ * @arg memFunc_
+ * @type select
+ * @option All members
+ * @value members
+ * @option All alive members
+ * @value aliveMembers
+ * @option All dead members
+ * @value deadMembers
+ * @option All movable members
+ * @value movableMembers
+ * @option Don't specify
+ * @value
+ * @desc The list of members in the unit to be filtered against
+ *
+ * @command memWithAllStates
+ * @desc Stores the unit.memWithAllStates(stateIds, mems) result in
+ * variable with id varId
+ * @arg side
+ * @type select
+ * @option Game Party
+ * @value party
+ * @option Game Troop
+ * @value troop
+ * @desc The side of the unit using the script call
+ * @arg stateIds
+ * @type number[]
+ * @desc The list of ids of the states to be checked against
+ * @arg varId
+ * @type number
+ * @desc The id of the game variable to store the script call result
+ * @arg memFunc_
+ * @type select
+ * @option All members
+ * @value members
+ * @option All alive members
+ * @value aliveMembers
+ * @option All dead members
+ * @value deadMembers
+ * @option All movable members
+ * @value movableMembers
+ * @option Don't specify
+ * @value
+ * @desc The list of members in the unit to be filtered against
+ *
+ * @command memWithoutAnyState
+ * @desc Stores the unit.memWithoutAnyState(stateIds, mems) result
+ * in variable with id varId
+ * @arg side
+ * @type select
+ * @option Game Party
+ * @value party
+ * @option Game Troop
+ * @value troop
+ * @desc The side of the unit using the script call
+ * @arg stateIds
+ * @type number[]
+ * @desc The list of ids of the states to be checked against
+ * @arg varId
+ * @type number
+ * @desc The id of the game variable to store the script call result
+ * @arg memFunc_
+ * @type select
+ * @option All members
+ * @value members
+ * @option All alive members
+ * @value aliveMembers
+ * @option All dead members
+ * @value deadMembers
+ * @option All movable members
+ * @value movableMembers
+ * @option Don't specify
+ * @value
+ * @desc The list of members in the unit to be filtered against
+ *
+ * @command memWithoutAllStates
+ * @desc Stores the unit.memWithoutAllStates(stateIds, mems) result
+ * in variable with id varId
+ * @arg side
+ * @type select
+ * @option Game Party
+ * @value party
+ * @option Game Troop
+ * @value troop
+ * @desc The side of the unit using the script call
+ * @arg stateIds
+ * @type number[]
+ * @desc The list of ids of the states to be checked against
+ * @arg varId
+ * @type number
+ * @desc The id of the game variable to store the script call result
+ * @arg memFunc_
+ * @type select
+ * @option All members
+ * @value members
+ * @option All alive members
+ * @value aliveMembers
+ * @option All dead members
+ * @value deadMembers
+ * @option All movable members
+ * @value movableMembers
+ * @option Don't specify
+ * @value
+ * @desc The list of members in the unit to be filtered against
+ *
+ * @command memWithAnyBuff
+ * @desc Stores the unit.memWithAnyBuff(paramIds, mems) result in
+ * variable with id varId
+ * @arg side
+ * @type select
+ * @option Game Party
+ * @value party
+ * @option Game Troop
+ * @value troop
+ * @desc The side of the unit using the script call
+ * @arg paramIds
+ * @type number[]
+ * @desc The list of ids of the parameters to be checked against
+ * @arg varId
+ * @type number
+ * @desc The id of the game variable to store the script call result
+ * @arg memFunc_
+ * @type select
+ * @option All members
+ * @value members
+ * @option All alive members
+ * @value aliveMembers
+ * @option All dead members
+ * @value deadMembers
+ * @option All movable members
+ * @value movableMembers
+ * @option Don't specify
+ * @value
+ * @desc The list of members in the unit to be filtered against
+ *
+ * @command memWithAllBuffs
+ * @desc Stores the unit.memWithAllBuffs(paramIds, mems) result in
+ * variable with id varId
+ * @arg side
+ * @type select
+ * @option Game Party
+ * @value party
+ * @option Game Troop
+ * @value troop
+ * @desc The side of the unit using the script call
+ * @arg paramIds
+ * @type number[]
+ * @desc The list of ids of the parameters to be checked against
+ * @arg varId
+ * @type number
+ * @desc The id of the game variable to store the script call result
+ * @arg memFunc_
+ * @type select
+ * @option All members
+ * @value members
+ * @option All alive members
+ * @value aliveMembers
+ * @option All dead members
+ * @value deadMembers
+ * @option All movable members
+ * @value movableMembers
+ * @option Don't specify
+ * @value
+ * @desc The list of members in the unit to be filtered against
+ *
+ * @command memWithoutAnyBuff
+ * @desc Stores the unit.memWithoutAnyBuff(paramIds, mems) result
+ * in variable with id varId
+ * @arg side
+ * @type select
+ * @option Game Party
+ * @value party
+ * @option Game Troop
+ * @value troop
+ * @desc The side of the unit using the script call
+ * @arg paramIds
+ * @type number[]
+ * @desc The list of ids of the parameters to be checked against
+ * @arg varId
+ * @type number
+ * @desc The id of the game variable to store the script call result
+ * @arg memFunc_
+ * @type select
+ * @option All members
+ * @value members
+ * @option All alive members
+ * @value aliveMembers
+ * @option All dead members
+ * @value deadMembers
+ * @option All movable members
+ * @value movableMembers
+ * @option Don't specify
+ * @value
+ * @desc The list of members in the unit to be filtered against
+ *
+ * @command memWithoutAllBuffs
+ * @desc Stores the unit.memWithoutAllBuffs(paramIds, mems) result
+ * in variable with id varId
+ * @arg side
+ * @type select
+ * @option Game Party
+ * @value party
+ * @option Game Troop
+ * @value troop
+ * @desc The side of the unit using the script call
+ * @arg paramIds
+ * @type number[]
+ * @desc The list of ids of the parameters to be checked against
+ * @arg varId
+ * @type number
+ * @desc The id of the game variable to store the script call result
+ * @arg memFunc_
+ * @type select
+ * @option All members
+ * @value members
+ * @option All alive members
+ * @value aliveMembers
+ * @option All dead members
+ * @value deadMembers
+ * @option All movable members
+ * @value movableMembers
+ * @option Don't specify
+ * @value
+ * @desc The list of members in the unit to be filtered against
+ *
+ * @command memWithAnyDebuff
+ * @desc Stores the unit.memWithAnyDebuff(paramIds, mems) result
+ * in variable with id varId
+ * @arg side
+ * @type select
+ * @option Game Party
+ * @value party
+ * @option Game Troop
+ * @value troop
+ * @desc The side of the unit using the script call
+ * @arg paramIds
+ * @type number[]
+ * @desc The list of ids of the parameters to be checked against
+ * @arg varId
+ * @type number
+ * @desc The id of the game variable to store the script call result
+ * @arg memFunc_
+ * @type select
+ * @option All members
+ * @value members
+ * @option All alive members
+ * @value aliveMembers
+ * @option All dead members
+ * @value deadMembers
+ * @option All movable members
+ * @value movableMembers
+ * @option Don't specify
+ * @value
+ * @desc The list of members in the unit to be filtered against
+ *
+ * @command memWithAllDebuffs
+ * @desc Stores the unit.memWithAllDebuffs(paramIds, mems) result
+ * in variable with id varId
+ * @arg side
+ * @type select
+ * @option Game Party
+ * @value party
+ * @option Game Troop
+ * @value troop
+ * @desc The side of the unit using the script call
+ * @arg paramIds
+ * @type number[]
+ * @desc The list of ids of the parameters to be checked against
+ * @arg varId
+ * @type number
+ * @desc The id of the game variable to store the script call result
+ * @arg memFunc_
+ * @type select
+ * @option All members
+ * @value members
+ * @option All alive members
+ * @value aliveMembers
+ * @option All dead members
+ * @value deadMembers
+ * @option All movable members
+ * @value movableMembers
+ * @option Don't specify
+ * @value
+ * @desc The list of members in the unit to be filtered against
+ *
+ * @command memWithoutAnyDebuff
+ * @desc Stores the unit.memWithoutAnyDebuff(paramIds, mems) result
+ * in variable with id varId
+ * @arg side
+ * @type select
+ * @option Game Party
+ * @value party
+ * @option Game Troop
+ * @value troop
+ * @desc The side of the unit using the script call
+ * @arg paramIds
+ * @type number[]
+ * @desc The list of ids of the parameters to be checked against
+ * @arg varId
+ * @type number
+ * @desc The id of the game variable to store the script call result
+ * @arg memFunc_
+ * @type select
+ * @option All members
+ * @value members
+ * @option All alive members
+ * @value aliveMembers
+ * @option All dead members
+ * @value deadMembers
+ * @option All movable members
+ * @value movableMembers
+ * @option Don't specify
+ * @value
+ * @desc The list of members in the unit to be filtered against
+ *
+ * @command memWithoutAllDebuffs
+ * @desc Stores the unit.memWithoutAllDebuffs(paramIds, mems)
+ * result in variable with id varId
+ * @arg side
+ * @type select
+ * @option Game Party
+ * @value party
+ * @option Game Troop
+ * @value troop
+ * @desc The side of the unit using the script call
+ * @arg paramIds
+ * @type number[]
+ * @desc The list of ids of the parameters to be checked against
+ * @arg varId
+ * @type number
+ * @desc The id of the game variable to store the script call result
+ * @arg memFunc_
+ * @type select
+ * @option All members
+ * @value members
+ * @option All alive members
+ * @value aliveMembers
+ * @option All dead members
+ * @value deadMembers
+ * @option All movable members
+ * @value movableMembers
+ * @option Don't specify
+ * @value
+ * @desc The list of members in the unit to be filtered against
+ *
+ * @command memWithAnySkill
+ * @desc Stores the unit.memWithAnySkill(skillIds, mems) result in
+ * variable with id varId
+ * @arg side
+ * @type select
+ * @option Game Party
+ * @value party
+ * @option Game Troop
+ * @value troop
+ * @desc The side of the unit using the script call
+ * @arg skillIds
+ * @type skill[]
+ * @desc The list of ids of the skills to be checked against
+ * @arg varId
+ * @type number
+ * @desc The id of the game variable to store the script call result
+ * @arg memFunc_
+ * @type select
+ * @option All members
+ * @value members
+ * @option All alive members
+ * @value aliveMembers
+ * @option All dead members
+ * @value deadMembers
+ * @option All movable members
+ * @value movableMembers
+ * @option Don't specify
+ * @value
+ * @desc The list of members in the unit to be filtered against
+ *
+ * @command memWithAllSkills
+ * @desc Stores the unit.memWithAllSkills(skillIds, mems) result in
+ * variable with id varId
+ * @arg side
+ * @type select
+ * @option Game Party
+ * @value party
+ * @option Game Troop
+ * @value troop
+ * @desc The side of the unit using the script call
+ * @arg skillIds
+ * @type skill[]
+ * @desc The list of ids of the skills to be checked against
+ * @arg varId
+ * @type number
+ * @desc The id of the game variable to store the script call result
+ * @arg memFunc_
+ * @type select
+ * @option All members
+ * @value members
+ * @option All alive members
+ * @value aliveMembers
+ * @option All dead members
+ * @value deadMembers
+ * @option All movable members
+ * @value movableMembers
+ * @option Don't specify
+ * @value
+ * @desc The list of members in the unit to be filtered against
+ *
+ * @command memWithoutAnySkill
+ * @desc Stores the unit.memWithoutAnySkill(skillIds, mems) result
+ * in variable with id varId
+ * @arg side
+ * @type select
+ * @option Game Party
+ * @value party
+ * @option Game Troop
+ * @value troop
+ * @desc The side of the unit using the script call
+ * @arg skillIds
+ * @type skill[]
+ * @desc The list of ids of the skills to be checked against
+ * @arg varId
+ * @type number
+ * @desc The id of the game variable to store the script call result
+ * @arg memFunc_
+ * @type select
+ * @option All members
+ * @value members
+ * @option All alive members
+ * @value aliveMembers
+ * @option All dead members
+ * @value deadMembers
+ * @option All movable members
+ * @value movableMembers
+ * @option Don't specify
+ * @value
+ * @desc The list of members in the unit to be filtered against
+ *
+ * @command memWithoutAllSkills
+ * @desc Stores the unit.memWithoutAllSkills(skillIds, mems) result
+ * in variable with id varId
+ * @arg side
+ * @type select
+ * @option Game Party
+ * @value party
+ * @option Game Troop
+ * @value troop
+ * @desc The side of the unit using the script call
+ * @arg skillIds
+ * @type skill[]
+ * @desc The list of ids of the skills to be checked against
+ * @arg varId
+ * @type number
+ * @desc The id of the game variable to store the script call result
+ * @arg memFunc_
+ * @type select
+ * @option All members
+ * @value members
+ * @option All alive members
+ * @value aliveMembers
+ * @option All dead members
+ * @value deadMembers
+ * @option All movable members
+ * @value movableMembers
+ * @option Don't specify
+ * @value
+ * @desc The list of members in the unit to be filtered against
+ *
+ * @command anyHighestStatMem
+ * @desc Stores the unit.anyHighestStatMem(stats, mems) result in
+ * variable with id varId
+ * @arg side
+ * @type select
+ * @option Game Party
+ * @value party
+ * @option Game Troop
+ * @value troop
+ * @desc The side of the unit using the script call
+ * @arg stats
+ * @type string[]
+ * @desc The list of the names of the getters of the battlers in the unit
+ * @arg varId
+ * @type number
+ * @desc The id of the game variable to store the script call result
+ * @arg memFunc_
+ * @type select
+ * @option All members
+ * @value members
+ * @option All alive members
+ * @value aliveMembers
+ * @option All dead members
+ * @value deadMembers
+ * @option All movable members
+ * @value movableMembers
+ * @option Don't specify
+ * @value
+ * @desc The list of members in the unit to be filtered against
+ *
+ * @command allHighestStatsMem
+ * @desc Stores the unit.allHighestStatsMem(stats, mems) result in
+ * variable with id varId
+ * @arg side
+ * @type select
+ * @option Game Party
+ * @value party
+ * @option Game Troop
+ * @value troop
+ * @desc The side of the unit using the script call
+ * @arg stats
+ * @type string[]
+ * @desc The list of the names of the getters of the battlers in the unit
+ * @arg varId
+ * @type number
+ * @desc The id of the game variable to store the script call result
+ * @arg memFunc_
+ * @type select
+ * @option All members
+ * @value members
+ * @option All alive members
+ * @value aliveMembers
+ * @option All dead members
+ * @value deadMembers
+ * @option All movable members
+ * @value movableMembers
+ * @option Don't specify
+ * @value
+ * @desc The list of members in the unit to be filtered against
+ *
+ * @command notAnyHighestStatMem
+ * @desc Stores the unit.notAnyHighestStatMem(stats, mems) result
+ * in variable with id varId
+ * @arg side
+ * @type select
+ * @option Game Party
+ * @value party
+ * @option Game Troop
+ * @value troop
+ * @desc The side of the unit using the script call
+ * @arg stats
+ * @type string[]
+ * @desc The list of the names of the getters of the battlers in the unit
+ * @arg varId
+ * @type number
+ * @desc The id of the game variable to store the script call result
+ * @arg memFunc_
+ * @type select
+ * @option All members
+ * @value members
+ * @option All alive members
+ * @value aliveMembers
+ * @option All dead members
+ * @value deadMembers
+ * @option All movable members
+ * @value movableMembers
+ * @option Don't specify
+ * @value
+ * @desc The list of members in the unit to be filtered against
+ *
+ * @command notAllHighestStatsMem
+ * @desc Stores the unit.notAllHighestStatsMem(stats, mems) result
+ * in variable with id varId
+ * @arg side
+ * @type select
+ * @option Game Party
+ * @value party
+ * @option Game Troop
+ * @value troop
+ * @desc The side of the unit using the script call
+ * @arg stats
+ * @type string[]
+ * @desc The list of the names of the getters of the battlers in the unit
+ * @arg varId
+ * @type number
+ * @desc The id of the game variable to store the script call result
+ * @arg memFunc_
+ * @type select
+ * @option All members
+ * @value members
+ * @option All alive members
+ * @value aliveMembers
+ * @option All dead members
+ * @value deadMembers
+ * @option All movable members
+ * @value movableMembers
+ * @option Don't specify
+ * @value
+ * @desc The list of members in the unit to be filtered against
+ *
+ * @command anyLowestStatMem
+ * @desc Stores the unit.anyLowestStatMem(stats, mems) result in
+ * variable with id varId
+ * @arg side
+ * @type select
+ * @option Game Party
+ * @value party
+ * @option Game Troop
+ * @value troop
+ * @desc The side of the unit using the script call
+ * @arg stats
+ * @type string[]
+ * @desc The list of the names of the getters of the battlers in the unit
+ * @arg varId
+ * @type number
+ * @desc The id of the game variable to store the script call result
+ * @arg memFunc_
+ * @type select
+ * @option All members
+ * @value members
+ * @option All alive members
+ * @value aliveMembers
+ * @option All dead members
+ * @value deadMembers
+ * @option All movable members
+ * @value movableMembers
+ * @option Don't specify
+ * @value
+ * @desc The list of members in the unit to be filtered against
+ *
+ * @command allLowestStatsMem
+ * @desc Stores the unit.allLowestStatsMem(stats, mems) result in
+ * variable with id varId
+ * @arg side
+ * @type select
+ * @option Game Party
+ * @value party
+ * @option Game Troop
+ * @value troop
+ * @desc The side of the unit using the script call
+ * @arg stats
+ * @type string[]
+ * @desc The list of the names of the getters of the battlers in the unit
+ * @arg varId
+ * @type number
+ * @desc The id of the game variable to store the script call result
+ * @arg memFunc_
+ * @type select
+ * @option All members
+ * @value members
+ * @option All alive members
+ * @value aliveMembers
+ * @option All dead members
+ * @value deadMembers
+ * @option All movable members
+ * @value movableMembers
+ * @option Don't specify
+ * @value
+ * @desc The list of members in the unit to be filtered against
+ *
+ * @command notAnyLowestStatMem
+ * @desc Stores the unit.notAnyLowestStatMem(stats, mems) result in
+ * variable with id varId
+ * @arg side
+ * @type select
+ * @option Game Party
+ * @value party
+ * @option Game Troop
+ * @value troop
+ * @desc The side of the unit using the script call
+ * @arg stats
+ * @type string[]
+ * @desc The list of the names of the getters of the battlers in the unit
+ * @arg varId
+ * @type number
+ * @desc The id of the game variable to store the script call result
+ * @arg memFunc_
+ * @type select
+ * @option All members
+ * @value members
+ * @option All alive members
+ * @value aliveMembers
+ * @option All dead members
+ * @value deadMembers
+ * @option All movable members
+ * @value movableMembers
+ * @option Don't specify
+ * @value
+ * @desc The list of members in the unit to be filtered against
+ *
+ * @command notAllLowestStatsMem
+ * @desc Stores the unit.notAllLowestStatsMem(stats, mems) result
+ * in variable with id varId
+ * @arg side
+ * @type select
+ * @option Game Party
+ * @value party
+ * @option Game Troop
+ * @value troop
+ * @desc The side of the unit using the script call
+ * @arg stats
+ * @type string[]
+ * @desc The list of the names of the getters of the battlers in the unit
+ * @arg varId
+ * @type number
+ * @desc The id of the game variable to store the script call result
+ * @arg memFunc_
+ * @type select
+ * @option All members
+ * @value members
+ * @option All alive members
+ * @value aliveMembers
+ * @option All dead members
+ * @value deadMembers
+ * @option All movable members
+ * @value movableMembers
+ * @option Don't specify
+ * @value
+ * @desc The list of members in the unit to be filtered against
+ *
+ * @command anyAboveStatMem
+ * @desc Stores the unit.anyAboveStatMem(stats, val, mems) result
+ * in variable with id varId
+ * @arg side
+ * @type select
+ * @option Game Party
+ * @value party
+ * @option Game Troop
+ * @value troop
+ * @desc The side of the unit using the script call
+ * @arg stats
+ * @type string[]
+ * @desc The list of the names of the getters of the battlers in the unit
+ * @arg val
+ * @type number
+ * @decimals 9
+ * @desc The value to be checked against the list of stats
+ * @arg varId
+ * @type number
+ * @desc The id of the game variable to store the script call result
+ * @arg memFunc_
+ * @type select
+ * @option All members
+ * @value members
+ * @option All alive members
+ * @value aliveMembers
+ * @option All dead members
+ * @value deadMembers
+ * @option All movable members
+ * @value movableMembers
+ * @option Don't specify
+ * @value
+ * @desc The list of members in the unit to be filtered against
+ *
+ * @command allAboveStatMem
+ * @desc Stores the unit.allAboveStatMem(stats, val, mems) result
+ * in variable with id varId
+ * @arg side
+ * @type select
+ * @option Game Party
+ * @value party
+ * @option Game Troop
+ * @value troop
+ * @desc The side of the unit using the script call
+ * @arg stats
+ * @type string[]
+ * @desc The list of the names of the getters of the battlers in the unit
+ * @arg val
+ * @type number
+ * @decimals 9
+ * @desc The value to be checked against the list of stats
+ * @arg varId
+ * @type number
+ * @desc The id of the game variable to store the script call result
+ * @arg memFunc_
+ * @type select
+ * @option All members
+ * @value members
+ * @option All alive members
+ * @value aliveMembers
+ * @option All dead members
+ * @value deadMembers
+ * @option All movable members
+ * @value movableMembers
+ * @option Don't specify
+ * @value
+ * @desc The list of members in the unit to be filtered against
+ *
+ * @command anyBelowStatMem
+ * @desc Stores the unit.anyBelowStatMem(stats, val, mems) result
+ * in variable with id varId
+ * @arg side
+ * @type select
+ * @option Game Party
+ * @value party
+ * @option Game Troop
+ * @value troop
+ * @desc The side of the unit using the script call
+ * @arg stats
+ * @type string[]
+ * @desc The list of the names of the getters of the battlers in the unit
+ * @arg val
+ * @type number
+ * @decimals 9
+ * @desc The value to be checked against the list of stats
+ * @arg varId
+ * @type number
+ * @desc The id of the game variable to store the script call result
+ * @arg memFunc_
+ * @type select
+ * @option All members
+ * @value members
+ * @option All alive members
+ * @value aliveMembers
+ * @option All dead members
+ * @value deadMembers
+ * @option All movable members
+ * @value movableMembers
+ * @option Don't specify
+ * @value
+ * @desc The list of members in the unit to be filtered against
+ *
+ * @command allBelowStatMem
+ * @desc Stores the unit.allBelowStatMem(stats, val, mems) result
+ * in variable with id varId
+ * @arg side
+ * @type select
+ * @option Game Party
+ * @value party
+ * @option Game Troop
+ * @value troop
+ * @desc The side of the unit using the script call
+ * @arg stats
+ * @type string[]
+ * @desc The list of the names of the getters of the battlers in the unit
+ * @arg val
+ * @type number
+ * @decimals 9
+ * @desc The value to be checked against the list of stats
+ * @arg varId
+ * @type number
+ * @desc The id of the game variable to store the script call result
+ * @arg memFunc_
+ * @type select
+ * @option All members
+ * @value members
+ * @option All alive members
+ * @value aliveMembers
+ * @option All dead members
+ * @value deadMembers
+ * @option All movable members
+ * @value movableMembers
+ * @option Don't specify
+ * @value
+ * @desc The list of members in the unit to be filtered against
+ *
+ * @command memWithAnyUsableSkill
+ * @desc Stores the unit.memWithAnyUsableSkill(skillIds, mems)
+ * result in variable with id varId
+ * @arg side
+ * @type select
+ * @option Game Party
+ * @value party
+ * @option Game Troop
+ * @value troop
+ * @desc The side of the unit using the script call
+ * @arg skillIds
+ * @type skill[]
+ * @desc The list of ids of the usable skills to be checked againt
+ * @arg varId
+ * @type number
+ * @desc The id of the game variable to store the script call result
+ * @arg memFunc_
+ * @type select
+ * @option All members
+ * @value members
+ * @option All alive members
+ * @value aliveMembers
+ * @option All dead members
+ * @value deadMembers
+ * @option All movable members
+ * @value movableMembers
+ * @option Don't specify
+ * @value
+ * @desc The list of members in the unit to be filtered against
+ *
+ * @command memWithAllUsableSkills
+ * @desc Stores the unit.memWithAllUsableSkills(skillIds, mems)
+ * result in variable with id varId
+ * @arg side
+ * @type select
+ * @option Game Party
+ * @value party
+ * @option Game Troop
+ * @value troop
+ * @desc The side of the unit using the script call
+ * @arg skillIds
+ * @type skill[]
+ * @desc The list of ids of the usable skills to be checked againt
+ * @arg varId
+ * @type number
+ * @desc The id of the game variable to store the script call result
+ * @arg memFunc_
+ * @type select
+ * @option All members
+ * @value members
+ * @option All alive members
+ * @value aliveMembers
+ * @option All dead members
+ * @value deadMembers
+ * @option All movable members
+ * @value movableMembers
+ * @option Don't specify
+ * @value
+ * @desc The list of members in the unit to be filtered against
+ *
+ * @command memWithoutAnyUsableSkill
+ * @desc Stores the unit.memWithoutAnyUsableSkill(skillIds, mems)
+ * result in variable with id varId
+ * @arg side
+ * @type select
+ * @option Game Party
+ * @value party
+ * @option Game Troop
+ * @value troop
+ * @desc The side of the unit using the script call
+ * @arg skillIds
+ * @type skill[]
+ * @desc The list of ids of the usable skills to be checked againt
+ * @arg varId
+ * @type number
+ * @desc The id of the game variable to store the script call result
+ * @arg memFunc_
+ * @type select
+ * @option All members
+ * @value members
+ * @option All alive members
+ * @value aliveMembers
+ * @option All dead members
+ * @value deadMembers
+ * @option All movable members
+ * @value movableMembers
+ * @option Don't specify
+ * @value
+ * @desc The list of members in the unit to be filtered against
+ *
+ * @command memWithoutAllUsableSkills
+ * @desc Stores the unit.memWithoutAllUsableSkills(skillIds, mems)
+ * result in variable with id varId
+ * @arg side
+ * @type select
+ * @option Game Party
+ * @value party
+ * @option Game Troop
+ * @value troop
+ * @desc The side of the unit using the script call
+ * @arg skillIds
+ * @type skill[]
+ * @desc The list of ids of the usable skills to be checked againt
+ * @arg varId
+ * @type number
+ * @desc The id of the game variable to store the script call result
+ * @arg memFunc_
+ * @type select
+ * @option All members
+ * @value members
+ * @option All alive members
+ * @value aliveMembers
+ * @option All dead members
+ * @value deadMembers
+ * @option All movable members
+ * @value movableMembers
+ * @option Don't specify
+ * @value
+ * @desc The list of members in the unit to be filtered against
  *
  * @help
  *============================================================================
@@ -278,347 +1460,1408 @@
  *           $gameParty.memWithAnyDebuff([0, 1]) returns the list of party
  *           members with any mhp or mmp debuff
  *      10. memWithAllDebuffs(paramIds, mems)
- *         - Returns the list of members with all debuffs included by
- *           paramIds, which is a list of id of corresponding parameters,
- *           among all battlers included by mems, which is a list of battlers
- *         - The return value should be an Array of Game_Battler
- *         - paramIds must be an Array of non negative numbers
- *         - mems must be an Array of Game_Battler
- *         - If mems isn't specified, it'll be default to all unit members
- *           outside battles and battle members inside battles respectively
- *         - E.g.:
- *           $gameTroop.memWithAllDebuffs([0, 1], $gameTroop.memWithAnyDebuff([2, 3]))
- *           returns the list of troop members with all mhp and mmp debuffs
- *           among those with any atk or def debuff
+ *          - Returns the list of members with all debuffs included by
+ *            paramIds, which is a list of id of corresponding parameters,
+ *            among all battlers included by mems, which is a list of battlers
+ *          - The return value should be an Array of Game_Battler
+ *          - paramIds must be an Array of non negative numbers
+ *          - mems must be an Array of Game_Battler
+ *          - If mems isn't specified, it'll be default to all unit members
+ *            outside battles and battle members inside battles respectively
+ *          - E.g.:
+ *            $gameTroop.memWithAllDebuffs([0, 1], $gameTroop.memWithAnyDebuff([2, 3]))
+ *            returns the list of troop members with all mhp and mmp debuffs
+ *            among those with any atk or def debuff
  *      11. memWithoutAnyDebuff(paramIds, mems)
- *         - Returns the list of members without any debuff included by
- *           paramIds, which is a list of id of corresponding parameters,
- *           among all battlers included by mems, which is a list of battlers
- *         - The return value should be an Array of Game_Battler
- *         - paramIds must be an Array of non negative numbers
- *         - mems must be an Array of Game_Battler
- *         - If mems isn't specified, it'll be default to all unit members
- *           outside battles and battle members inside battles respectively
- *         - E.g.:
- *           $gameParty.memWithoutAnyDebuff([0, 1]) returns the list of party
- *           members without any mhp or mmp debuff
+ *          - Returns the list of members without any debuff included by
+ *            paramIds, which is a list of id of corresponding parameters,
+ *            among all battlers included by mems, which is a list of battlers
+ *          - The return value should be an Array of Game_Battler
+ *          - paramIds must be an Array of non negative numbers
+ *          - mems must be an Array of Game_Battler
+ *          - If mems isn't specified, it'll be default to all unit members
+ *            outside battles and battle members inside battles respectively
+ *          - E.g.:
+ *            $gameParty.memWithoutAnyDebuff([0, 1]) returns the list of party
+ *            members without any mhp or mmp debuff
  *      12. memWithoutAllDebuffs(paramIds, mems)
- *         - Returns the list of members without all debuffs included by
- *           paramIds, which is a list of id of corresponding parameters,
- *           among all battlers included by mems, which is a list of battlers
- *         - The return value should be an Array of Game_Battler
- *         - paramIds must be an Array of non negative numbers
- *         - mems must be an Array of Game_Battler
- *         - If mems isn't specified, it'll be default to all unit members
- *           outside battles and battle members inside battles respectively
- *         - E.g.:
- *           $gameTroop.memWithoutAllDebuffs([0, 1], $gameTroop.memWithoutAnyDebuff([2, 3]))
- *           returns the list of troop members without all mhp and mmp debuffs
- *           among those without any atk or def debuff
+ *          - Returns the list of members without all debuffs included by
+ *            paramIds, which is a list of id of corresponding parameters,
+ *            among all battlers included by mems, which is a list of battlers
+ *          - The return value should be an Array of Game_Battler
+ *          - paramIds must be an Array of non negative numbers
+ *          - mems must be an Array of Game_Battler
+ *          - If mems isn't specified, it'll be default to all unit members
+ *            outside battles and battle members inside battles respectively
+ *          - E.g.:
+ *            $gameTroop.memWithoutAllDebuffs([0, 1], $gameTroop.memWithoutAnyDebuff([2, 3]))
+ *            returns the list of troop members without all mhp and mmp
+ *            debuffs among those without any atk or def debuff
  *      13. memWithAnySkill(skillIds, mems)
- *         - Returns the list of members with any skill included by skillIds,
- *           which is a list of id of corresponding skills, among all battlers
- *           included by mems, which is a list of battlers
- *         - The return value should be an Array of Game_Battler
- *         - skillIds must be an Array of natural numbers
- *         - mems must be an Array of Game_Battler
- *         - If mems isn't specified, it'll be default to all unit members
- *           outside battles and battle members inside battles respectively
- *         - E.g.:
- *           $gameParty.memWithAnySkill([1, 2]) returns the list of party
- *           members with skill having id 1 or 2
+ *          - Returns the list of members with any skill included by skillIds,
+ *            which is a list of id of corresponding skills, among all
+ *            battlers included by mems, which is a list of battlers
+ *          - The return value should be an Array of Game_Battler
+ *          - skillIds must be an Array of natural numbers
+ *          - mems must be an Array of Game_Battler
+ *          - If mems isn't specified, it'll be default to all unit members
+ *            outside battles and battle members inside battles respectively
+ *          - E.g.:
+ *            $gameParty.memWithAnySkill([1, 2]) returns the list of party
+ *            members with skill having id 1 or 2
  *      14. memWithAllSkills(skillIds, mems)
- *         - Returns the list of members with all skills included by skillIds,
- *           which is a list of id of corresponding skills, among all battlers
- *           included by mems, which is a list of battlers
- *         - The return value should be an Array of Game_Battler
- *         - skillIds must be an Array of natural numbers
- *         - mems must be an Array of Game_Battler
- *         - If mems isn't specified, it'll be default to all unit members
- *           outside battles and battle members inside battles respectively
- *         - E.g.:
- *           $gameTroop.memWithAllSkills([1, 2], $gameParty.memWithAnySkill([3, 4]))
- *           returns the list of troop members with skills having id 1 and 2
- *           among those with skill having id 3 or 4
+ *          - Returns the list of members with all skills included by
+ *            skillIds, which is a list of id of corresponding skills, among
+ *            all battlers included by mems, which is a list of battlers
+ *          - The return value should be an Array of Game_Battler
+ *          - skillIds must be an Array of natural numbers
+ *          - mems must be an Array of Game_Battler
+ *          - If mems isn't specified, it'll be default to all unit members
+ *            outside battles and battle members inside battles respectively
+ *          - E.g.:
+ *            $gameTroop.memWithAllSkills([1, 2], $gameParty.memWithAnySkill([3, 4]))
+ *            returns the list of troop members with skills having id 1 and 2
+ *            among those with skill having id 3 or 4
  *      15. memWithoutAnySkill(skillIds, mems)
- *         - Returns the list of members without any skill included by
- *           skillIds, which is a list of id of corresponding skills, among
- *           all battlers included by mems, which is a list of battlers
- *         - The return value should be an Array of Game_Battler
- *         - skillIds must be an Array of natural numbers
- *         - mems must be an Array of Game_Battler
- *         - If mems isn't specified, it'll be default to all unit members
- *           outside battles and battle members inside battles respectively
- *         - E.g.:
- *           $gameParty.memWithoutAnySkill([1, 2]) returns the list of party
- *           members without skills having id 1 nor 2
+ *          - Returns the list of members without any skill included by
+ *            skillIds, which is a list of id of corresponding skills, among
+ *            all battlers included by mems, which is a list of battlers
+ *          - The return value should be an Array of Game_Battler
+ *          - skillIds must be an Array of natural numbers
+ *          - mems must be an Array of Game_Battler
+ *          - If mems isn't specified, it'll be default to all unit members
+ *            outside battles and battle members inside battles respectively
+ *          - E.g.:
+ *            $gameParty.memWithoutAnySkill([1, 2]) returns the list of party
+ *            members without skills having id 1 nor 2
  *      16. memWithoutAllSkills(skillIds, mems)
- *         - Returns the list of members without all skills included by
- *           skillIds, which is a list of id of corresponding skills, among
- *           all battlers included by mems, which is a list of battlers
- *         - The return value should be an Array of Game_Battler
- *         - skillIds must be an Array of natural numbers
- *         - mems must be an Array of Game_Battler
- *         - If mems isn't specified, it'll be default to all unit members
- *           outside battles and battle members inside battles respectively
- *         - E.g.:
- *           $gameTroop.memWithoutAllSkills([1, 2], $gameParty.memWithoutAnySkill([3, 4]))
- *           returns the list of troop members without skills having id 1 and
- *           2 among those without skill having id 3 or 4
+ *          - Returns the list of members without all skills included by
+ *            skillIds, which is a list of id of corresponding skills, among
+ *            all battlers included by mems, which is a list of battlers
+ *          - The return value should be an Array of Game_Battler
+ *          - skillIds must be an Array of natural numbers
+ *          - mems must be an Array of Game_Battler
+ *          - If mems isn't specified, it'll be default to all unit members
+ *            outside battles and battle members inside battles respectively
+ *          - E.g.:
+ *            $gameTroop.memWithoutAllSkills([1, 2], $gameParty.memWithoutAnySkill([3, 4]))
+ *            returns the list of troop members without skills having id 1 and
+ *            2 among those without skill having id 3 or 4
  *      17. anyHighestStatMem(stats, mems)
- *         - Returns the list of members whose values of
- *           parameters/ex-parameters/sp-parameters included by stats, which
- *           is a list of names of corresponding
- *           parameters/ex-parameters/sp-parameters, include those being the
- *           highest among the caller, among all battlers included by mems,
- *           which is a list of battlers
- *         - The return value should be an Array of Game_Battler
- *         - stats must be an Array of strings as names of Game_Battler
- *           properties with the get function
- *         - mems must be an Array of Game_Battler
- *         - If mems isn't specified, it'll be default to all unit members
- *           outside battles and battle members inside battles respectively
- *         - E.g.:
- *           $gameParty.anyHighestStatMem(["hp", "mp"]) returns the list of
- *           party members with the highest amount of hp or mp among the party
+ *          - Returns the list of members whose values of
+ *            parameters/ex-parameters/sp-parameters included by stats, which
+ *            is a list of names of corresponding
+ *            parameters/ex-parameters/sp-parameters, include those being the
+ *            highest among the caller, among all battlers included by mems,
+ *            which is a list of battlers
+ *          - The return value should be an Array of Game_Battler
+ *          - stats must be an Array of strings as names of Game_Battler
+ *            properties with the get function
+ *          - mems must be an Array of Game_Battler
+ *          - If mems isn't specified, it'll be default to all unit members
+ *            outside battles and battle members inside battles respectively
+ *          - E.g.:
+ *            $gameParty.anyHighestStatMem(["hp", "mp"]) returns the list of
+ *            party members with the highest amount of hp or mp among the party
  *      18. allHighestStatsMem(stats, mems)
- *         - Returns the list of members whose values of
- *           parameters/ex-parameters/sp-parameters included by stats, which
- *           is a list of names of corresponding
- *           parameters/ex-parameters/sp-parameters, are all the highest among
- *           the caller, among all battlers included by mems, which is a list
- *           of battlers
- *         - The return value should be an Array of Game_Battler
- *         - stats must be an Array of strings as names of Game_Battler
- *           properties with the get function
- *         - mems must be an Array of Game_Battler
- *         - If mems isn't specified, it'll be default to all unit members
- *           outside battles and battle members inside battles respectively
- *         - E.g.:
- *           $gameTroop.allHighestStatsMem(["hp", "mp"], $gameTroop.anyHighestStatMem(["mhp", "mmp"]))
- *           returns the list of troop members with the highest amount of hp
- *           and mp among those with the highest amount of mhp or mmp among
- *           the troop
+ *          - Returns the list of members whose values of
+ *            parameters/ex-parameters/sp-parameters included by stats, which
+ *            is a list of names of corresponding
+ *            parameters/ex-parameters/sp-parameters, are all the highest
+ *            among the caller, among all battlers included by mems, which is
+ *            a list of battlers
+ *          - The return value should be an Array of Game_Battler
+ *          - stats must be an Array of strings as names of Game_Battler
+ *            properties with the get function
+ *          - mems must be an Array of Game_Battler
+ *          - If mems isn't specified, it'll be default to all unit members
+ *            outside battles and battle members inside battles respectively
+ *          - E.g.:
+ *            $gameTroop.allHighestStatsMem(["hp", "mp"], $gameTroop.anyHighestStatMem(["mhp", "mmp"]))
+ *            returns the list of troop members with the highest amount of hp
+ *            and mp among those with the highest amount of mhp or mmp among
+ *            the troop
  *      19. notAnyHighestStatMem(stats, mems)
- *         - Returns the list of members whose values of
- *           parameters/ex-parameters/sp-parameters included by stats, which
- *           is a list of names of corresponding
- *           parameters/ex-parameters/sp-parameters, don't include those being
- *           the highest among the caller, among all battlers included by
- *           mems, which is a list of battlers
- *         - The return value should be an Array of Game_Battler
- *         - stats must be an Array of strings as names of Game_Battler
- *           properties with the get function
- *         - mems must be an Array of Game_Battler
- *         - If mems isn't specified, it'll be default to all unit members
- *           outside battles and battle members inside battles respectively
- *         - E.g.:
- *           $gameParty.notAnyHighestStatMem(["hp", "mp"]) returns the list of
- *           party members with neither the highest amount of hp nor mp among
- *           the party
+ *          - Returns the list of members whose values of
+ *            parameters/ex-parameters/sp-parameters included by stats, which
+ *            is a list of names of corresponding
+ *            parameters/ex-parameters/sp-parameters, don't include those
+ *            being the highest among the caller, among all battlers included
+ *            by mems, which is a list of battlers
+ *          - The return value should be an Array of Game_Battler
+ *          - stats must be an Array of strings as names of Game_Battler
+ *            properties with the get function
+ *          - mems must be an Array of Game_Battler
+ *          - If mems isn't specified, it'll be default to all unit members
+ *            outside battles and battle members inside battles respectively
+ *          - E.g.:
+ *            $gameParty.notAnyHighestStatMem(["hp", "mp"]) returns the list of
+ *            party members with neither the highest amount of hp nor mp among
+ *            the party
  *      20. notAllHighestStatsMem(stats, mems)
- *         - Returns the list of members whose values of
- *           parameters/ex-parameters/sp-parameters included by stats, which
- *           is a list of names of corresponding
- *           parameters/ex-parameters/sp-parameters, aren't all the highest
- *           among the caller, among all battlers included by mems, which is
- *           a list of battlers
- *         - The return value should be an Array of Game_Battler
- *         - stats must be an Array of strings as names of Game_Battler
- *           properties with the get function
- *         - mems must be an Array of Game_Battler
- *         - If mems isn't specified, it'll be default to all unit members
- *           outside battles and battle members inside battles respectively
- *         - E.g.:
- *           $gameTroop.notAllHighestStatsMem(["hp", "mp"], $gameTroop.notAnyHighestStatMem(["mhp", "mmp"]))
- *           returns the list of troop members without the highest amount of
- *           both hp and mp among those with neither the highest amount of mhp
- *           nor mmp among the troop
+ *          - Returns the list of members whose values of
+ *            parameters/ex-parameters/sp-parameters included by stats, which
+ *            is a list of names of corresponding
+ *            parameters/ex-parameters/sp-parameters, aren't all the highest
+ *            among the caller, among all battlers included by mems, which is
+ *            a list of battlers
+ *          - The return value should be an Array of Game_Battler
+ *          - stats must be an Array of strings as names of Game_Battler
+ *            properties with the get function
+ *          - mems must be an Array of Game_Battler
+ *          - If mems isn't specified, it'll be default to all unit members
+ *            outside battles and battle members inside battles respectively
+ *          - E.g.:
+ *            $gameTroop.notAllHighestStatsMem(["hp", "mp"], $gameTroop.notAnyHighestStatMem(["mhp", "mmp"]))
+ *            returns the list of troop members without the highest amount of
+ *            both hp and mp among those with neither the highest amount of
+ *            mhp nor mmp among the troop
  *      21. anyLowestStatMem(stats, mems)
- *         - Returns the list of members whose values of
- *           parameters/ex-parameters/sp-parameters included by stats, which
- *           is a list of names of corresponding
- *           parameters/ex-parameters/sp-parameters, include those being the
- *           lowest among the caller, among all battlers included by mems,
- *           which is a list of battlers
- *         - The return value should be an Array of Game_Battler
- *         - stats must be an Array of strings as names of Game_Battler
- *           properties with the get function
- *         - mems must be an Array of Game_Battler
- *         - If mems isn't specified, it'll be default to all unit members
- *           outside battles and battle members inside battles respectively
- *         - E.g.:
- *           $gameParty.anyLowestStatMem(["hp", "mp"]) returns the list of
- *           party members with the lowest amount of hp or mp among the party
+ *          - Returns the list of members whose values of
+ *            parameters/ex-parameters/sp-parameters included by stats, which
+ *            is a list of names of corresponding
+ *            parameters/ex-parameters/sp-parameters, include those being the
+ *            lowest among the caller, among all battlers included by mems,
+ *            which is a list of battlers
+ *          - The return value should be an Array of Game_Battler
+ *          - stats must be an Array of strings as names of Game_Battler
+ *            properties with the get function
+ *          - mems must be an Array of Game_Battler
+ *          - If mems isn't specified, it'll be default to all unit members
+ *            outside battles and battle members inside battles respectively
+ *          - E.g.:
+ *            $gameParty.anyLowestStatMem(["hp", "mp"]) returns the list of
+ *            party members with the lowest amount of hp or mp among the party
  *      22. allLowestStatsMem(stats, mems)
- *         - Returns the list of members whose values of
- *           parameters/ex-parameters/sp-parameters included by stats, which
- *           is a list of names of corresponding
- *           parameters/ex-parameters/sp-parameters, are all the lowest among
- *           the caller, among all battlers included by mems, which is a list
- *           of battlers
- *         - The return value should be an Array of Game_Battler
- *         - stats must be an Array of strings as names of Game_Battler
- *           properties with the get function
- *         - mems must be an Array of Game_Battler
- *         - If mems isn't specified, it'll be default to all unit members
- *           outside battles and battle members inside battles respectively
- *         - E.g.:
- *           $gameTroop.allLowestStatsMem(["hp", "mp"], $gameTroop.anyLowestStatMem(["mhp", "mmp"]))
- *           returns the list of troop members with the lowest amount of hp
- *           and mp among those with the lowest amount of mhp or mmp among the
- *           troop
+ *          - Returns the list of members whose values of
+ *            parameters/ex-parameters/sp-parameters included by stats, which
+ *            is a list of names of corresponding
+ *            parameters/ex-parameters/sp-parameters, are all the lowest among
+ *            the caller, among all battlers included by mems, which is a list
+ *            of battlers
+ *          - The return value should be an Array of Game_Battler
+ *          - stats must be an Array of strings as names of Game_Battler
+ *            properties with the get function
+ *          - mems must be an Array of Game_Battler
+ *          - If mems isn't specified, it'll be default to all unit members
+ *            outside battles and battle members inside battles respectively
+ *          - E.g.:
+ *            $gameTroop.allLowestStatsMem(["hp", "mp"], $gameTroop.anyLowestStatMem(["mhp", "mmp"]))
+ *            returns the list of troop members with the lowest amount of hp
+ *            and mp among those with the lowest amount of mhp or mmp among
+ *            the troop
  *      23. notAnyLowestStatMem(stats, mems)
- *         - Returns the list of members whose values of
- *           parameters/ex-parameters/sp-parameters included by stats, which
- *           is a list of names of corresponding
- *           parameters/ex-parameters/sp-parameters, don't include those being
- *           the lowest among the caller, among all battlers included by mems,
- *           which is a list of battlers
- *         - The return value should be an Array of Game_Battler
- *         - stats must be an Array of strings as names of Game_Battler
- *           properties with the get function
- *         - mems must be an Array of Game_Battler
- *         - If mems isn't specified, it'll be default to all unit members
- *           outside battles and battle members inside battles respectively
- *         - E.g.:
- *           $gameParty.notAnyLowestStatMem(["hp", "mp"]) returns the list of
- *           party members with neither the lowest amount of hp nor mp among
- *           the party
+ *          - Returns the list of members whose values of
+ *            parameters/ex-parameters/sp-parameters included by stats, which
+ *            is a list of names of corresponding
+ *            parameters/ex-parameters/sp-parameters, don't include those
+ *            being the lowest among the caller, among all battlers included
+ *            by mems, which is a list of battlers
+ *          - The return value should be an Array of Game_Battler
+ *          - stats must be an Array of strings as names of Game_Battler
+ *            properties with the get function
+ *          - mems must be an Array of Game_Battler
+ *          - If mems isn't specified, it'll be default to all unit members
+ *            outside battles and battle members inside battles respectively
+ *          - E.g.:
+ *            $gameParty.notAnyLowestStatMem(["hp", "mp"]) returns the list of
+ *            party members with neither the lowest amount of hp nor mp among
+ *            the party
  *      24. notAllLowestStatsMem(stats, mems)
- *         - Returns the list of members whose values of
- *           parameters/ex-parameters/sp-parameters included by stats, which
- *           is a list of names of corresponding
- *           parameters/ex-parameters/sp-parameters, aren't all the lowest
- *           among the caller, among all battlers included by mems, which is a
- *           list of battlers
- *         - The return value should be an Array of Game_Battler
- *         - stats must be an Array of strings as names of Game_Battler
- *           properties with the get function
- *         - mems must be an Array of Game_Battler
- *         - If mems isn't specified, it'll be default to all unit members
- *           outside battles and battle members inside battles respectively
- *         - E.g.:
- *           $gameTroop.notAllLowestStatsMem(["hp", "mp"], $gameParty.notAnyLowestStatMem(["mhp", "mmp"]))
- *           returns the list of troop members without the lowest amount of
- *           both hp and mp among those with neither the lowest amount of mhp
- *           nor mmp among the troop
+ *          - Returns the list of members whose values of
+ *            parameters/ex-parameters/sp-parameters included by stats, which
+ *            is a list of names of corresponding
+ *            parameters/ex-parameters/sp-parameters, aren't all the lowest
+ *            among the caller, among all battlers included by mems, which is
+ *            a list of battlers
+ *          - The return value should be an Array of Game_Battler
+ *          - stats must be an Array of strings as names of Game_Battler
+ *            properties with the get function
+ *          - mems must be an Array of Game_Battler
+ *          - If mems isn't specified, it'll be default to all unit members
+ *            outside battles and battle members inside battles respectively
+ *          - E.g.:
+ *            $gameTroop.notAllLowestStatsMem(["hp", "mp"], $gameParty.notAnyLowestStatMem(["mhp", "mmp"]))
+ *            returns the list of troop members without the lowest amount of
+ *            both hp and mp among those with neither the lowest amount of mhp
+ *            nor mmp among the troop
  *      25. anyAboveStatMem(stats, val, mems)
- *         - Returns the list of members whose values of
- *           parameters/ex-parameters/sp-parameters included by stats, which
- *           is a list of names of corresponding
- *           parameters/ex-parameters/sp-parameters, include those above val,
- *           among all battlers included by mems, which is a list of battlers
- *         - The return value should be an Array of Game_Battler
- *         - stats must be an Array of strings as names of Game_Battler
- *           properties with the get function
- *         - val must be a number
- *         - mems must be an Array of Game_Battler
- *         - If mems isn't specified, it'll be default to all unit members
- *           outside battles and battle members inside battles respectively
- *         - E.g.:
- *           $gameParty.anyAboveStatMem(["hp", "mp"], 100) returns the list of
- *           party members with the value of hp or mp above 100
+ *          - Returns the list of members whose values of
+ *            parameters/ex-parameters/sp-parameters included by stats, which
+ *            is a list of names of corresponding
+ *            parameters/ex-parameters/sp-parameters, include those above val,
+ *            among all battlers included by mems, which is a list of battlers
+ *          - The return value should be an Array of Game_Battler
+ *          - stats must be an Array of strings as names of Game_Battler
+ *            properties with the get function
+ *          - val must be a number
+ *          - mems must be an Array of Game_Battler
+ *          - If mems isn't specified, it'll be default to all unit members
+ *            outside battles and battle members inside battles respectively
+ *          - E.g.:
+ *            $gameParty.anyAboveStatMem(["hp", "mp"], 100) returns the list
+ *            of party members with the value of hp or mp above 100
  *      26. allAboveStatMem(stats, val, mems)
- *         - Returns the list of members whose values of
- *           parameters/ex-parameters/sp-parameters included by stats, which
- *           is a list of names of corresponding
- *           parameters/ex-parameters/sp-parameters, are all above val, among
- *           all battlers included by mems, which is a list of battlers
- *         - The return value should be an Array of Game_Battler
- *         - stats must be an Array of strings as names of Game_Battler
- *           properties with the get function
- *         - val must be a number
- *         - mems must be an Array of Game_Battler
- *         - If mems isn't specified, it'll be default to all unit members
- *           outside battles and battle members inside battles respectively
- *         - E.g.:
- *           $gameTroop.allAboveStatMem(["hp", "mp"], 100, $gameTroop.anyAboveStatMem(["mhp", "mmp"], 1000))
- *           returns the list of troop members with the value of hp and mp
- *           above 100 among those with the value of mhp or mmp above 1000
+ *          - Returns the list of members whose values of
+ *            parameters/ex-parameters/sp-parameters included by stats, which
+ *            is a list of names of corresponding
+ *            parameters/ex-parameters/sp-parameters, are all above val, among
+ *            all battlers included by mems, which is a list of battlers
+ *          - The return value should be an Array of Game_Battler
+ *          - stats must be an Array of strings as names of Game_Battler
+ *            properties with the get function
+ *          - val must be a number
+ *          - mems must be an Array of Game_Battler
+ *          - If mems isn't specified, it'll be default to all unit members
+ *            outside battles and battle members inside battles respectively
+ *          - E.g.:
+ *            $gameTroop.allAboveStatMem(["hp", "mp"], 100, $gameTroop.anyAboveStatMem(["mhp", "mmp"], 1000))
+ *            returns the list of troop members with the value of hp and mp
+ *            above 100 among those with the value of mhp or mmp above 1000
  *      27. anyBelowStatMem(stats, val, mems)
- *         - Returns the list of members whose values of
- *           parameters/ex-parameters/sp-parameters included by stats, which
- *           is a list of names of corresponding
- *           parameters/ex-parameters/sp-parameters, include those below val,
- *           among all battlers included by mems, which is a list of battlers
- *         - The return value should be an Array of Game_Battler
- *         - stats must be an Array of strings as names of Game_Battler
- *           properties with the get function
- *         - val must be a number
- *         - mems must be an Array of Game_Battler
- *         - If mems isn't specified, it'll be default to all unit members
- *           outside battles and battle members inside battles respectively
- *         - E.g.:
- *           $gameParty.anyBelowStatMem(["hp", "mp"], 100) returns the list of
- *           party members with the value of hp or mp below 100
+ *          - Returns the list of members whose values of
+ *            parameters/ex-parameters/sp-parameters included by stats, which
+ *            is a list of names of corresponding
+ *            parameters/ex-parameters/sp-parameters, include those below val,
+ *            among all battlers included by mems, which is a list of battlers
+ *          - The return value should be an Array of Game_Battler
+ *          - stats must be an Array of strings as names of Game_Battler
+ *            properties with the get function
+ *          - val must be a number
+ *          - mems must be an Array of Game_Battler
+ *          - If mems isn't specified, it'll be default to all unit members
+ *            outside battles and battle members inside battles respectively
+ *          - E.g.:
+ *            $gameParty.anyBelowStatMem(["hp", "mp"], 100) returns the list
+ *            of party members with the value of hp or mp below 100
  *      28. allBelowStatMem(stats, val, mems)
- *         - Returns the list of members whose values of
- *           parameters/ex-parameters/sp-parameters included by stats, which
- *           is a list of names of corresponding
- *           parameters/ex-parameters/sp-parameters, are all below val, among
- *           all battlers included by mems, which is a list of battlers
- *         - The return value should be an Array of Game_Battler
- *         - stats must be an Array of strings as names of Game_Battler
- *           properties with the get function
- *         - val must be a number
- *         - mems must be an Array of Game_Battler
- *         - If mems isn't specified, it'll be default to all unit members
- *           outside battles and battle members inside battles respectively
- *         - E.g.:
- *           $gameTroop.allBelowStatMem(["hp", "mp"], 100, $gameTroop.anyBelowStatMem(["mhp", "mmp"], 1000))
- *           returns the list of troop members with the value of hp and mp
- *           below 100 among those with the value of mhp or mmp below 1000
+ *          - Returns the list of members whose values of
+ *            parameters/ex-parameters/sp-parameters included by stats, which
+ *            is a list of names of corresponding
+ *            parameters/ex-parameters/sp-parameters, are all below val, among
+ *            all battlers included by mems, which is a list of battlers
+ *          - The return value should be an Array of Game_Battler
+ *          - stats must be an Array of strings as names of Game_Battler
+ *            properties with the get function
+ *          - val must be a number
+ *          - mems must be an Array of Game_Battler
+ *          - If mems isn't specified, it'll be default to all unit members
+ *            outside battles and battle members inside battles respectively
+ *          - E.g.:
+ *            $gameTroop.allBelowStatMem(["hp", "mp"], 100, $gameTroop.anyBelowStatMem(["mhp", "mmp"], 1000))
+ *            returns the list of troop members with the value of hp and mp
+ *            below 100 among those with the value of mhp or mmp below 1000
  *      (v1.01a+)29. memWithAnyUsableSkill(skillIds, mems)
- *         - Returns the list of members with any usable skill included by
- *           skillIds, which is a list of id of corresponding skills, among
- *           all battlers included by mems, which is a list of battlers
- *         - The return value should be an Array of Game_Battler
- *         - skillIds must be an Array of natural numbers
- *         - mems must be an Array of Game_Battler
- *         - If mems isn't specified, it'll be default to all unit members
- *           outside battles and battle members inside battles respectively
- *         - E.g.:
- *           $gameParty.memWithAnyUsableSkill([1, 2]) returns the list of
- *           party members with usable skill having id 1 or 2
+ *          - Returns the list of members with any usable skill included by
+ *            skillIds, which is a list of id of corresponding skills, among
+ *            all battlers included by mems, which is a list of battlers
+ *          - The return value should be an Array of Game_Battler
+ *          - skillIds must be an Array of natural numbers
+ *          - mems must be an Array of Game_Battler
+ *          - If mems isn't specified, it'll be default to all unit members
+ *            outside battles and battle members inside battles respectively
+ *          - E.g.:
+ *            $gameParty.memWithAnyUsableSkill([1, 2]) returns the list of
+ *            party members with usable skill having id 1 or 2
  *      (v1.01a+)30. memWithAllUsableSkills(skillIds, mems)
- *         - Returns the list of members with all usable skills included by
- *           skillIds, which is a list of id of corresponding skills, among
- *           all battlers included by mems, which is a list of battlers
- *         - The return value should be an Array of Game_Battler
- *         - skillIds must be an Array of natural numbers
- *         - mems must be an Array of Game_Battler
- *         - If mems isn't specified, it'll be default to all unit members
- *           outside battles and battle members inside battles respectively
- *         - E.g.:
- *           $gameTroop.memWithAllUsableSkills([1, 2], $gameParty.memWithAnyUsableSkill([3, 4]))
- *           returns the list of troop members with usable skills having id 1
- *           and 2 among those with usable skill having id 3 or 4
+ *          - Returns the list of members with all usable skills included by
+ *            skillIds, which is a list of id of corresponding skills, among
+ *            all battlers included by mems, which is a list of battlers
+ *          - The return value should be an Array of Game_Battler
+ *          - skillIds must be an Array of natural numbers
+ *          - mems must be an Array of Game_Battler
+ *          - If mems isn't specified, it'll be default to all unit members
+ *            outside battles and battle members inside battles respectively
+ *          - E.g.:
+ *            $gameTroop.memWithAllUsableSkills([1, 2], $gameParty.memWithAnyUsableSkill([3, 4]))
+ *            returns the list of troop members with usable skills having id 1
+ *            and 2 among those with usable skill having id 3 or 4
  *      (v1.01a+)31. memWithoutAnyUsableSkill(skillIds, mems)
- *         - Returns the list of members without any usable skill included by
- *           skillIds, which is a list of id of corresponding skills, among
- *           all battlers included by mems, which is a list of battlers
- *         - The return value should be an Array of Game_Battler
- *         - skillIds must be an Array of natural numbers
- *         - mems must be an Array of Game_Battler
- *         - If mems isn't specified, it'll be default to all unit members
- *           outside battles and battle members inside battles respectively
- *         - E.g.:
- *           $gameParty.memWithoutAnyUsableSkill([1, 2]) returns the list of
- *           party members without usable skills having id 1 nor 2
+ *          - Returns the list of members without any usable skill included by
+ *            skillIds, which is a list of id of corresponding skills, among
+ *            all battlers included by mems, which is a list of battlers
+ *          - The return value should be an Array of Game_Battler
+ *          - skillIds must be an Array of natural numbers
+ *          - mems must be an Array of Game_Battler
+ *          - If mems isn't specified, it'll be default to all unit members
+ *            outside battles and battle members inside battles respectively
+ *          - E.g.:
+ *            $gameParty.memWithoutAnyUsableSkill([1, 2]) returns the list of
+ *            party members without usable skills having id 1 nor 2
  *      (v1.01a+)32. memWithoutAllUsableSkills(skillIds, mems)
- *         - Returns the list of members without all usable skills included by
- *           skillIds, which is a list of id of corresponding skills, among
- *           all battlers included by mems, which is a list of battlers
- *         - The return value should be an Array of Game_Battler
- *         - skillIds must be an Array of natural numbers
- *         - mems must be an Array of Game_Battler
- *         - If mems isn't specified, it'll be default to all unit members
- *           outside battles and battle members inside battles respectively
- *         - E.g.:
- *           $gameTroop.memWithoutAllUsableSkills([1, 2], $gameParty.memWithoutAnyUsableSkill([3, 4]))
- *           returns the list of troop members without usable skills having id
- *           1 and 2 among those without usable skill having id 3 or 4
+ *          - Returns the list of members without all usable skills included
+ *            by skillIds, which is a list of id of corresponding skills,
+ *            among all battlers included by mems, which is a list of battlers
+ *          - The return value should be an Array of Game_Battler
+ *          - skillIds must be an Array of natural numbers
+ *          - mems must be an Array of Game_Battler
+ *          - If mems isn't specified, it'll be default to all unit members
+ *            outside battles and battle members inside battles respectively
+ *          - E.g.:
+ *            $gameTroop.memWithoutAllUsableSkills([1, 2], $gameParty.memWithoutAnyUsableSkill([3, 4]))
+ *            returns the list of troop members without usable skills having
+ *            id 1 and 2 among those without usable skill having id 3 or 4
+ *----------------------------------------------------------------------------
+ *    ## (v1.02a+)Plugin Command Info
+ *----------------------------------------------------------------------------
+ *      1. isAnyStateAffected side label stateIds switchId
+ *         - Stores the returned boolean result of the script call
+ *           battler.isAnyStateAffected(stateIds) in the game switch with id
+ *           switchId
+ *         - battler is the battler identified by side and label
+ *         - side is either actor or enemy
+ *         - label is the actor id for side actor and troop member index for
+ *           side enemy
+ *         - stateIds is in the form of
+ *           stateId1_stateId2_stateId3_stateIdI_stateIdN
+ *      2. isAllStatesAffected side label stateIds switchId
+ *         - Stores the returned boolean result of the script call
+ *           battler.isAllStatesAffected(stateIds) in the game switch with id
+ *           switchId
+ *         - battler is the battler identified by side and label
+ *         - side is either actor or enemy
+ *         - label is the actor id for side actor and troop member index for
+ *           side enemy
+ *         - stateIds is in the form of
+ *           stateId1_stateId2_stateId3_stateIdI_stateIdN
+ *      3. isAnyBuffAffected side label paramIds switchId
+ *         - Stores the returned boolean result of the script call
+ *           battler.isAnyBuffAffected(paramIds) in the game switch with id
+ *           switchId
+ *         - battler is the battler identified by side and label
+ *         - side is either actor or enemy
+ *         - label is the actor id for side actor and troop member index for
+ *           side enemy
+ *         - paramIds is in the form of
+ *           paramId1_paramId2_paramId3_paramIdI_paramIdN
+ *      4. isAllBuffsAffected side label paramIds switchId
+ *         - Stores the returned boolean result of the script call
+ *           battler.isAllBuffsAffected(paramIds) in the game switch with id
+ *           switchId
+ *         - battler is the battler identified by side and label
+ *         - side is either actor or enemy
+ *         - label is the actor id for side actor and troop member index for
+ *           side enemy
+ *         - paramIds is in the form of
+ *           paramId1_paramId2_paramId3_paramIdI_paramIdN
+ *      5. isAnyDebuffAffected side label paramIds switchId
+ *         - Stores the returned boolean result of the script call
+ *           battler.isAnyDebuffAffected(paramIds) in the game switch with id
+ *           switchId
+ *         - battler is the battler identified by side and label
+ *         - side is either actor or enemy
+ *         - label is the actor id for side actor and troop member index for
+ *           side enemy
+ *         - paramIds is in the form of
+ *           paramId1_paramId2_paramId3_paramIdI_paramIdN
+ *      6. isAllDebuffsAffected side label paramIds switchId
+ *         - Stores the returned boolean result of the script call
+ *           battler.isAllDebuffsAffected(paramIds) in the game switch with id
+ *           switchId
+ *         - battler is the battler identified by side and label
+ *         - side is either actor or enemy
+ *         - label is the actor id for side actor and troop member index for
+ *           side enemy
+ *         - paramIds is in the form of
+ *           paramId1_paramId2_paramId3_paramIdI_paramIdN
+ *      7. hasAnySkill side label skillIds switchId
+ *         - Stores the returned boolean result of the script call
+ *           battler.hasAnySkill(skillIds) in the game switch with id switchId
+ *         - battler is the battler identified by side and label
+ *         - side is either actor or enemy
+ *         - label is the actor id for side actor and troop member index for
+ *           side enemy
+ *         - skillIds is in the form of
+ *           skillId1_skillId2_skillId3_skillIdI_skillIdN
+ *      8. hasAllSkills side label skillIds switchId
+ *         - Stores the returned boolean result of the script call
+ *           battler.hasAllSkills(skillIds) in the game switch with id
+ *           switchId
+ *         - battler is the battler identified by side and label
+ *         - side is either actor or enemy
+ *         - label is the actor id for side actor and troop member index for
+ *           side enemy
+ *         - skillIds is in the form of
+ *           skillId1_skillId2_skillId3_skillIdI_skillIdN
+ *      9. hasAnyUsableSkill side label skillIds switchId
+ *         - Stores the returned boolean result of the script call
+ *           battler.hasAnyUsableSkill(skillIds) in the game switch with id
+ *           switchId
+ *         - battler is the battler identified by side and label
+ *         - side is either actor or enemy
+ *         - label is the actor id for side actor and troop member index for
+ *           side enemy
+ *         - skillIds is in the form of
+ *           skillId1_skillId2_skillId3_skillIdI_skillIdN
+ *      10. hasAllUsableSkills side label skillIds switchId
+ *          - Stores the returned boolean result of the script call
+ *            battler.hasAllUsableSkills(skillIds) in the game switch with id
+ *            switchId
+ *          - battler is the battler identified by side and label
+ *          - side is either actor or enemy
+ *          - label is the actor id for side actor and troop member index for
+ *            side enemy
+ *          - skillIds is in the form of
+ *            skillId1_skillId2_skillId3_skillIdI_skillIdN
+ *      11. memWithAnyState side stateIds varId memFunc_
+ *          - Stores the returned list of battlers from the script call
+ *            unit.memWithAnyState(stateIds, mems) in the game variable with
+ *            id varId
+ *          - unit is the unit identified by side
+ *          - side is either party or troop
+ *          - stateIds is in the form of
+ *            stateId1_stateId2_stateId3_stateIdI_stateIdN
+ *          - mems is the list of unit members returned by the method with
+ *            name memFunc_, which is either of the following:
+ *            i. members - All members of the unit
+ *            ii. aliveMembers - All alive mnembers of the unit
+ *            iii. deadMembers - All dead members of the unit
+ *            iv. movableMembers - All movable members of the unit
+ *            Not specifying memFunc_ is the same as not specifying mems
+ *      12. memWithAllStates side stateIds varId memFunc_
+ *          - Stores the returned list of battlers from the script call
+ *            unit.memWithAllStates(stateIds, mems) in the game variable with
+ *            id varId
+ *          - unit is the unit identified by side
+ *          - side is either party or troop
+ *          - stateIds is in the form of
+ *            stateId1_stateId2_stateId3_stateIdI_stateIdN
+ *          - mems is the list of unit members returned by the method with
+ *            name memFunc_, which is either of the following:
+ *            i. members - All members of the unit
+ *            ii. aliveMembers - All alive mnembers of the unit
+ *            iii. deadMembers - All dead members of the unit
+ *            iv. movableMembers - All movable members of the unit
+ *            Not specifying memFunc_ is the same as not specifying mems
+ *      13. memWithoutAnyState side stateIds varId memFunc_
+ *          - Stores the returned list of battlers from the script call
+ *            unit.memWithoutAnyState(stateIds, mems) in the game variable
+ *            with id varId
+ *          - unit is the unit identified by side
+ *          - side is either party or troop
+ *          - stateIds is in the form of
+ *            stateId1_stateId2_stateId3_stateIdI_stateIdN
+ *          - mems is the list of unit members returned by the method with
+ *            name memFunc_, which is either of the following:
+ *            i. members - All members of the unit
+ *            ii. aliveMembers - All alive mnembers of the unit
+ *            iii. deadMembers - All dead members of the unit
+ *            iv. movableMembers - All movable members of the unit
+ *            Not specifying memFunc_ is the same as not specifying mems
+ *      14. memWithoutAllStates side stateIds varId memFunc_
+ *          - Stores the returned list of battlers from the script call
+ *            unit.memWithoutAllStates(stateIds, mems) in the game variable
+ *            with id varId
+ *          - unit is the unit identified by side
+ *          - side is either party or troop
+ *          - stateIds is in the form of
+ *            stateId1_stateId2_stateId3_stateIdI_stateIdN
+ *          - mems is the list of unit members returned by the method with
+ *            name memFunc_, which is either of the following:
+ *            i. members - All members of the unit
+ *            ii. aliveMembers - All alive mnembers of the unit
+ *            iii. deadMembers - All dead members of the unit
+ *            iv. movableMembers - All movable members of the unit
+ *            Not specifying memFunc_ is the same as not specifying mems
+ *      15. memWithAnyBuff side paramIds varId memFunc_
+ *          - Stores the returned list of battlers from the script call
+ *            unit.memWithAnyBuff(paramIds, mems) in the game variable with id
+ *            varId
+ *          - unit is the unit identified by side
+ *          - side is either party or troop
+ *          - paramIds is in the form of
+ *            paramId1_paramId2_paramId3_paramIdI_paramIdN
+ *          - mems is the list of unit members returned by the method with
+ *            name memFunc_, which is either of the following:
+ *            i. members - All members of the unit
+ *            ii. aliveMembers - All alive mnembers of the unit
+ *            iii. deadMembers - All dead members of the unit
+ *            iv. movableMembers - All movable members of the unit
+ *            Not specifying memFunc_ is the same as not specifying mems
+ *      16. memWithAllBuffs side paramIds varId memFunc_
+ *          - Stores the returned list of battlers from the script call
+ *            unit.memWithAllBuffs(paramIds, mems) in the game variable with
+ *            id varId
+ *          - unit is the unit identified by side
+ *          - side is either party or troop
+ *          - paramIds is in the form of
+ *            paramId1_paramId2_paramId3_paramIdI_paramIdN
+ *          - mems is the list of unit members returned by the method with
+ *            name memFunc_, which is either of the following:
+ *            i. members - All members of the unit
+ *            ii. aliveMembers - All alive mnembers of the unit
+ *            iii. deadMembers - All dead members of the unit
+ *            iv. movableMembers - All movable members of the unit
+ *            Not specifying memFunc_ is the same as not specifying mems
+ *      17. memWithoutAnyBuff side paramIds varId memFunc_
+ *          - Stores the returned list of battlers from the script call
+ *            unit.memWithoutAnyBuff(paramIds, mems) in the game variable with
+ *            id varId
+ *          - unit is the unit identified by side
+ *          - side is either party or troop
+ *          - paramIds is in the form of
+ *            paramId1_paramId2_paramId3_paramIdI_paramIdN
+ *          - mems is the list of unit members returned by the method with
+ *            name memFunc_, which is either of the following:
+ *            i. members - All members of the unit
+ *            ii. aliveMembers - All alive mnembers of the unit
+ *            iii. deadMembers - All dead members of the unit
+ *            iv. movableMembers - All movable members of the unit
+ *            Not specifying memFunc_ is the same as not specifying mems
+ *      18. memWithoutAllBuffs side paramIds varId memFunc_
+ *          - Stores the returned list of battlers from the script call
+ *            unit.memWithoutAllBuffs(paramIds, mems) in the game variable
+ *            with id varId
+ *          - unit is the unit identified by side
+ *          - side is either party or troop
+ *          - paramIds is in the form of
+ *            paramId1_paramId2_paramId3_paramIdI_paramIdN
+ *          - mems is the list of unit members returned by the method with
+ *            name memFunc_, which is either of the following:
+ *            i. members - All members of the unit
+ *            ii. aliveMembers - All alive mnembers of the unit
+ *            iii. deadMembers - All dead members of the unit
+ *            iv. movableMembers - All movable members of the unit
+ *            Not specifying memFunc_ is the same as not specifying mems
+ *      19. memWithAnyDebuff side paramIds varId memFunc_
+ *          - Stores the returned list of battlers from the script call
+ *            unit.memWithAnyDebuff(paramIds, mems) in the game variable with
+ *            id varId
+ *          - unit is the unit identified by side
+ *          - side is either party or troop
+ *          - paramIds is in the form of
+ *            paramId1_paramId2_paramId3_paramIdI_paramIdN
+ *          - mems is the list of unit members returned by the method with
+ *            name memFunc_, which is either of the following:
+ *            i. members - All members of the unit
+ *            ii. aliveMembers - All alive mnembers of the unit
+ *            iii. deadMembers - All dead members of the unit
+ *            iv. movableMembers - All movable members of the unit
+ *            Not specifying memFunc_ is the same as not specifying mems
+ *      20. memWithAllDebuffs side paramIds varId memFunc_
+ *          - Stores the returned list of battlers from the script call
+ *            unit.memWithAllDebuffs(paramIds, mems) in the game variable with
+ *            id varId
+ *          - unit is the unit identified by side
+ *          - side is either party or troop
+ *          - paramIds is in the form of
+ *            paramId1_paramId2_paramId3_paramIdI_paramIdN
+ *          - mems is the list of unit members returned by the method with
+ *            name memFunc_, which is either of the following:
+ *            i. members - All members of the unit
+ *            ii. aliveMembers - All alive mnembers of the unit
+ *            iii. deadMembers - All dead members of the unit
+ *            iv. movableMembers - All movable members of the unit
+ *            Not specifying memFunc_ is the same as not specifying mems
+ *      21. memWithoutAnyDebuff side paramIds varId memFunc_
+ *          - Stores the returned list of battlers from the script call
+ *            unit.memWithoutAnyDebuff(paramIds, mems) in the game variable
+ *            with id varId
+ *          - unit is the unit identified by side
+ *          - side is either party or troop
+ *          - paramIds is in the form of
+ *            paramId1_paramId2_paramId3_paramIdI_paramIdN
+ *          - mems is the list of unit members returned by the method with
+ *            name memFunc_, which is either of the following:
+ *            i. members - All members of the unit
+ *            ii. aliveMembers - All alive mnembers of the unit
+ *            iii. deadMembers - All dead members of the unit
+ *            iv. movableMembers - All movable members of the unit
+ *            Not specifying memFunc_ is the same as not specifying mems
+ *      22. memWithoutAllDebuffs side paramIds varId memFunc_
+ *          - Stores the returned list of battlers from the script call
+ *            unit.memWithoutAllDebuffs(paramIds, mems) in the game variable
+ *            with id varId
+ *          - unit is the unit identified by side
+ *          - side is either party or troop
+ *          - paramIds is in the form of
+ *            paramId1_paramId2_paramId3_paramIdI_paramIdN
+ *          - mems is the list of unit members returned by the method with
+ *            name memFunc_, which is either of the following:
+ *            i. members - All members of the unit
+ *            ii. aliveMembers - All alive mnembers of the unit
+ *            iii. deadMembers - All dead members of the unit
+ *            iv. movableMembers - All movable members of the unit
+ *            Not specifying memFunc_ is the same as not specifying mems
+ *      23. memWithAnySkill side skillIds varId memFunc_
+ *          - Stores the returned list of battlers from the script call
+ *            unit.memWithAnySkill(skillIds, mems) in the game variable with
+ *            id varId
+ *          - unit is the unit identified by side
+ *          - side is either party or troop
+ *          - skillIds is in the form of
+ *            skillId1_skillId2_skillId3_skillIdI_skillIdN
+ *          - mems is the list of unit members returned by the method with
+ *            name memFunc_, which is either of the following:
+ *            i. members - All members of the unit
+ *            ii. aliveMembers - All alive mnembers of the unit
+ *            iii. deadMembers - All dead members of the unit
+ *            iv. movableMembers - All movable members of the unit
+ *            Not specifying memFunc_ is the same as not specifying mems
+ *      24. memWithAllSkills side skillIds varId memFunc_
+ *          - Stores the returned list of battlers from the script call
+ *            unit.memWithAllSkills(skillIds, mems) in the game variable with
+ *            id varId
+ *          - unit is the unit identified by side
+ *          - side is either party or troop
+ *          - skillIds is in the form of
+ *            skillId1_skillId2_skillId3_skillIdI_skillIdN
+ *          - mems is the list of unit members returned by the method with
+ *            name memFunc_, which is either of the following:
+ *            i. members - All members of the unit
+ *            ii. aliveMembers - All alive mnembers of the unit
+ *            iii. deadMembers - All dead members of the unit
+ *            iv. movableMembers - All movable members of the unit
+ *            Not specifying memFunc_ is the same as not specifying mems
+ *      25. memWithoutAnySkill side skillIds varId memFunc_
+ *          - Stores the returned list of battlers from the script call
+ *            unit.memWithoutAnySkill(skillIds, mems) in the game variable
+ *            with id varId
+ *          - unit is the unit identified by side
+ *          - side is either party or troop
+ *          - skillIds is in the form of
+ *            skillId1_skillId2_skillId3_skillIdI_skillIdN
+ *          - mems is the list of unit members returned by the method with
+ *            name memFunc_, which is either of the following:
+ *            i. members - All members of the unit
+ *            ii. aliveMembers - All alive mnembers of the unit
+ *            iii. deadMembers - All dead members of the unit
+ *            iv. movableMembers - All movable members of the unit
+ *            Not specifying memFunc_ is the same as not specifying mems
+ *      26. memWithoutAllSkills side skillIds varId memFunc_
+ *          - Stores the returned list of battlers from the script call
+ *            unit.memWithoutAllSkills(skillIds, mems) in the game variable
+ *            with id varId
+ *          - unit is the unit identified by side
+ *          - side is either party or troop
+ *          - skillIds is in the form of
+ *            skillId1_skillId2_skillId3_skillIdI_skillIdN
+ *          - mems is the list of unit members returned by the method with
+ *            name memFunc_, which is either of the following:
+ *            i. members - All members of the unit
+ *            ii. aliveMembers - All alive mnembers of the unit
+ *            iii. deadMembers - All dead members of the unit
+ *            iv. movableMembers - All movable members of the unit
+ *            Not specifying memFunc_ is the same as not specifying mems
+ *      27. anyHighestStatMem side stats varId memFunc_
+ *          - Stores the returned list of battlers from the script call
+ *            unit.anyHighestStatMem(stats, mems) in the game variable with id
+ *            varId
+ *          - unit is the unit identified by side
+ *          - side is either party or troop
+ *          - stats is in the form of stat1_stat2_stat3_statI_statN
+ *          - mems is the list of unit members returned by the method with
+ *            name memFunc_, which is either of the following:
+ *            i. members - All members of the unit
+ *            ii. aliveMembers - All alive mnembers of the unit
+ *            iii. deadMembers - All dead members of the unit
+ *            iv. movableMembers - All movable members of the unit
+ *            Not specifying memFunc_ is the same as not specifying mems
+ *      28. allHighestStatsMem side stats varId memFunc_
+ *          - Stores the returned list of battlers from the script call
+ *            unit.allHighestStatsMem(stats, mems) in the game variable with
+ *            id varId
+ *          - unit is the unit identified by side
+ *          - side is either party or troop
+ *          - stats is in the form of stat1_stat2_stat3_statI_statN
+ *          - mems is the list of unit members returned by the method with
+ *            name memFunc_, which is either of the following:
+ *            i. members - All members of the unit
+ *            ii. aliveMembers - All alive mnembers of the unit
+ *            iii. deadMembers - All dead members of the unit
+ *            iv. movableMembers - All movable members of the unit
+ *            Not specifying memFunc_ is the same as not specifying mems
+ *      29. notAnyHighestStatMem side stats varId memFunc_
+ *          - Stores the returned list of battlers from the script call
+ *            unit.notAnyHighestStatMem(stats, mems) in the game variable with
+ *            id varId
+ *          - unit is the unit identified by side
+ *          - side is either party or troop
+ *          - stats is in the form of stat1_stat2_stat3_statI_statN
+ *          - mems is the list of unit members returned by the method with
+ *            name memFunc_, which is either of the following:
+ *            i. members - All members of the unit
+ *            ii. aliveMembers - All alive mnembers of the unit
+ *            iii. deadMembers - All dead members of the unit
+ *            iv. movableMembers - All movable members of the unit
+ *            Not specifying memFunc_ is the same as not specifying mems
+ *      30. notAllHighestStatsMem side stats varId memFunc_
+ *          - Stores the returned list of battlers from the script call
+ *            unit.notAllHighestStatsMem(stats, mems) in the game variable
+ *            with id varId
+ *          - unit is the unit identified by side
+ *          - side is either party or troop
+ *          - stats is in the form of stat1_stat2_stat3_statI_statN
+ *          - mems is the list of unit members returned by the method with
+ *            name memFunc_, which is either of the following:
+ *            i. members - All members of the unit
+ *            ii. aliveMembers - All alive mnembers of the unit
+ *            iii. deadMembers - All dead members of the unit
+ *            iv. movableMembers - All movable members of the unit
+ *            Not specifying memFunc_ is the same as not specifying mems
+ *      31. anyLowestStatMem side stats varId memFunc_
+ *          - Stores the returned list of battlers from the script call
+ *            unit.anyLowestStatMem(stats, mems) in the game variable with id
+ *            varId
+ *          - unit is the unit identified by side
+ *          - side is either party or troop
+ *          - stats is in the form of stat1_stat2_stat3_statI_statN
+ *          - mems is the list of unit members returned by the method with
+ *            name memFunc_, which is either of the following:
+ *            i. members - All members of the unit
+ *            ii. aliveMembers - All alive mnembers of the unit
+ *            iii. deadMembers - All dead members of the unit
+ *            iv. movableMembers - All movable members of the unit
+ *            Not specifying memFunc_ is the same as not specifying mems
+ *      32. allLowestStatsMem side stats varId memFunc_
+ *          - Stores the returned list of battlers from the script call
+ *            unit.allLowestStatsMem(stats, mems) in the game variable with id
+ *            varId
+ *          - unit is the unit identified by side
+ *          - side is either party or troop
+ *          - stats is in the form of stat1_stat2_stat3_statI_statN
+ *          - mems is the list of unit members returned by the method with
+ *            name memFunc_, which is either of the following:
+ *            i. members - All members of the unit
+ *            ii. aliveMembers - All alive mnembers of the unit
+ *            iii. deadMembers - All dead members of the unit
+ *            iv. movableMembers - All movable members of the unit
+ *            Not specifying memFunc_ is the same as not specifying mems
+ *      33. notAnyLowestStatMem side stats varId memFunc_
+ *          - Stores the returned list of battlers from the script call
+ *            unit.notAnyLowestStatMem(stats, mems) in the game variable with
+ *            id varId
+ *          - unit is the unit identified by side
+ *          - side is either party or troop
+ *          - stats is in the form of stat1_stat2_stat3_statI_statN
+ *          - mems is the list of unit members returned by the method with
+ *            name memFunc_, which is either of the following:
+ *            i. members - All members of the unit
+ *            ii. aliveMembers - All alive mnembers of the unit
+ *            iii. deadMembers - All dead members of the unit
+ *            iv. movableMembers - All movable members of the unit
+ *            Not specifying memFunc_ is the same as not specifying mems
+ *      34. notAllLowestStatsMem side stats varId memFunc_
+ *          - Stores the returned list of battlers from the script call
+ *            unit.notAllLowestStatsMem(stats, mems) in the game variable with
+ *            id varId
+ *          - unit is the unit identified by side
+ *          - side is either party or troop
+ *          - stats is in the form of stat1_stat2_stat3_statI_statN
+ *          - mems is the list of unit members returned by the method with
+ *            name memFunc_, which is either of the following:
+ *            i. members - All members of the unit
+ *            ii. aliveMembers - All alive mnembers of the unit
+ *            iii. deadMembers - All dead members of the unit
+ *            iv. movableMembers - All movable members of the unit
+ *            Not specifying memFunc_ is the same as not specifying mems
+ *      35. anyAboveStatMem side stats val varId memFunc_
+ *          - Stores the returned list of battlers from the script call
+ *            unit.anyAboveStatMem(stats, val, mems) in the game variable with
+ *            id varId
+ *          - unit is the unit identified by side
+ *          - side is either party or troop
+ *          - stats is in the form of stat1_stat2_stat3_statI_statN
+ *          - mems is the list of unit members returned by the method with
+ *            name memFunc_, which is either of the following:
+ *            i. members - All members of the unit
+ *            ii. aliveMembers - All alive mnembers of the unit
+ *            iii. deadMembers - All dead members of the unit
+ *            iv. movableMembers - All movable members of the unit
+ *            Not specifying memFunc_ is the same as not specifying mems
+ *      36. allAboveStatMem side stats val varId memFunc_
+ *          - Stores the returned list of battlers from the script call
+ *            unit.allAboveStatMem(stats, val, mems) in the game variable with
+ *            id varId
+ *          - unit is the unit identified by side
+ *          - side is either party or troop
+ *          - stats is in the form of stat1_stat2_stat3_statI_statN
+ *          - mems is the list of unit members returned by the method with
+ *            name memFunc_, which is either of the following:
+ *            i. members - All members of the unit
+ *            ii. aliveMembers - All alive mnembers of the unit
+ *            iii. deadMembers - All dead members of the unit
+ *            iv. movableMembers - All movable members of the unit
+ *            Not specifying memFunc_ is the same as not specifying mems
+ *      37. anyBelowStatMem side stats val varId memFunc_
+ *          - Stores the returned list of battlers from the script call
+ *            unit.anyBelowStatMem(stats, val, mems) in the game variable with
+ *            id varId
+ *          - unit is the unit identified by side
+ *          - side is either party or troop
+ *          - stats is in the form of stat1_stat2_stat3_statI_statN
+ *          - mems is the list of unit members returned by the method with
+ *            name memFunc_, which is either of the following:
+ *            i. members - All members of the unit
+ *            ii. aliveMembers - All alive mnembers of the unit
+ *            iii. deadMembers - All dead members of the unit
+ *            iv. movableMembers - All movable members of the unit
+ *            Not specifying memFunc_ is the same as not specifying mems
+ *      38. allBelowStatMem side stats val varId memFunc_
+ *          - Stores the returned list of battlers from the script call
+ *            unit.allBelowStatMem(stats, val, mems) in the game variable with
+ *            id varId
+ *          - unit is the unit identified by side
+ *          - side is either party or troop
+ *          - stats is in the form of stat1_stat2_stat3_statI_statN
+ *          - mems is the list of unit members returned by the method with
+ *            name memFunc_, which is either of the following:
+ *            i. members - All members of the unit
+ *            ii. aliveMembers - All alive mnembers of the unit
+ *            iii. deadMembers - All dead members of the unit
+ *            iv. movableMembers - All movable members of the unit
+ *            Not specifying memFunc_ is the same as not specifying mems
+ *      39. memWithAnyUsableSkill side skillIds varId memFunc_
+ *          - Stores the returned list of battlers from the script call
+ *            unit.memWithAnyUsableSkill(skillIds, mems) in the game variable
+ *            with id varId
+ *          - unit is the unit identified by side
+ *          - side is either party or troop
+ *          - skillIds is in the form of
+ *            skillId1_skillId2_skillId3_skillIdI_skillIdN
+ *          - mems is the list of unit members returned by the method with
+ *            name memFunc_, which is either of the following:
+ *            i. members - All members of the unit
+ *            ii. aliveMembers - All alive mnembers of the unit
+ *            iii. deadMembers - All dead members of the unit
+ *            iv. movableMembers - All movable members of the unit
+ *            Not specifying memFunc_ is the same as not specifying mems
+ *      40. memWithAllUsableSkills side skillIds varId memFunc_
+ *          - Stores the returned list of battlers from the script call
+ *            unit.memWithAllUsableSkills(skillIds, mems) in the game variable
+ *            with id varId
+ *          - unit is the unit identified by side
+ *          - side is either party or troop
+ *          - skillIds is in the form of
+ *            skillId1_skillId2_skillId3_skillIdI_skillIdN
+ *          - mems is the list of unit members returned by the method with
+ *            name memFunc_, which is either of the following:
+ *            i. members - All members of the unit
+ *            ii. aliveMembers - All alive mnembers of the unit
+ *            iii. deadMembers - All dead members of the unit
+ *            iv. movableMembers - All movable members of the unit
+ *            Not specifying memFunc_ is the same as not specifying mems
+ *      41. memWithoutAnyUsableSkill side skillIds varId memFunc_
+ *          - Stores the returned list of battlers from the script call
+ *            unit.memWithoutAnyUsableSkill(skillIds, mems) in the game
+ *            variable with id varId
+ *          - unit is the unit identified by side
+ *          - side is either party or troop
+ *          - skillIds is in the form of
+ *            skillId1_skillId2_skillId3_skillIdI_skillIdN
+ *          - mems is the list of unit members returned by the method with
+ *            name memFunc_, which is either of the following:
+ *            i. members - All members of the unit
+ *            ii. aliveMembers - All alive mnembers of the unit
+ *            iii. deadMembers - All dead members of the unit
+ *            iv. movableMembers - All movable members of the unit
+ *            Not specifying memFunc_ is the same as not specifying mems
+ *      42. memWithoutAllUsableSkills side skillIds varId memFunc_
+ *          - Stores the returned list of battlers from the script call
+ *            unit.memWithoutAllUsableSkills(skillIds, mems) in the game
+ *            variable with id varId
+ *          - unit is the unit identified by side
+ *          - side is either party or troop
+ *          - skillIds is in the form of
+ *            skillId1_skillId2_skillId3_skillIdI_skillIdN
+ *          - mems is the list of unit members returned by the method with
+ *            name memFunc_, which is either of the following:
+ *            i. members - All members of the unit
+ *            ii. aliveMembers - All alive mnembers of the unit
+ *            iii. deadMembers - All dead members of the unit
+ *            iv. movableMembers - All movable members of the unit
+ *            Not specifying memFunc_ is the same as not specifying mems
+ *----------------------------------------------------------------------------
+ *    ## (v1.02a+)Plugin Query Info
+ *       1. You need to use DoubleX_RMMZ_Plugin_Query as well in order to use
+ *          the plugin queries of this plugin:
+ *          https://github.com/Double-X/DoubleX-RMMZ/blob/master/DoubleX_RMMZ_Plugin_Query.js
+ *----------------------------------------------------------------------------
+ *      1. isAnyStateAffected side label stateIds
+ *         - Applies the script call battler.isAnyStateAffected(stateIds)
+ *         - battler is the battler identified by side and label
+ *         - side is either actor or enemy
+ *         - label is the actor id for side actor and troop member index for
+ *           side enemy
+ *         - stateIds is in the form of
+ *           stateId1_stateId2_stateId3_stateIdI_stateIdN
+ *      2. isAllStatesAffected side label stateIds
+ *         - Applies the script call battler.isAllStatesAffected(stateIds)
+ *         - battler is the battler identified by side and label
+ *         - side is either actor or enemy
+ *         - label is the actor id for side actor and troop member index for
+ *           side enemy
+ *         - stateIds is in the form of
+ *           stateId1_stateId2_stateId3_stateIdI_stateIdN
+ *      3. isAnyBuffAffected side label paramIds
+ *         - Applies the script call battler.isAnyBuffAffected(paramIds)
+ *         - battler is the battler identified by side and label
+ *         - side is either actor or enemy
+ *         - label is the actor id for side actor and troop member index for
+ *           side enemy
+ *         - paramIds is in the form of
+ *           paramId1_paramId2_paramId3_paramIdI_paramIdN
+ *      4. isAllBuffsAffected side label paramIds
+ *         - Applies the script call battler.isAllBuffsAffected(paramIds)
+ *         - battler is the battler identified by side and label
+ *         - side is either actor or enemy
+ *         - label is the actor id for side actor and troop member index for
+ *           side enemy
+ *         - paramIds is in the form of
+ *           paramId1_paramId2_paramId3_paramIdI_paramIdN
+ *      5. isAnyDebuffAffected side label paramIds
+ *         - Applies the script call battler.isAnyDebuffAffected(paramIds)
+ *         - battler is the battler identified by side and label
+ *         - side is either actor or enemy
+ *         - label is the actor id for side actor and troop member index for
+ *           side enemy
+ *         - paramIds is in the form of
+ *           paramId1_paramId2_paramId3_paramIdI_paramIdN
+ *      6. isAllDebuffsAffected side label paramIds
+ *         - Applies the script call battler.isAllDebuffsAffected(paramIds)
+ *         - battler is the battler identified by side and label
+ *         - side is either actor or enemy
+ *         - label is the actor id for side actor and troop member index for
+ *           side enemy
+ *         - paramIds is in the form of
+ *           paramId1_paramId2_paramId3_paramIdI_paramIdN
+ *      7. hasAnySkill side label skillIds
+ *         - Applies the script call battler.hasAnySkill(skillIds)
+ *         - battler is the battler identified by side and label
+ *         - side is either actor or enemy
+ *         - label is the actor id for side actor and troop member index for
+ *           side enemy
+ *         - skillIds is in the form of
+ *           skillId1_skillId2_skillId3_skillIdI_skillIdN
+ *      8. hasAllSkills side label skillIds
+ *         - Applies the script call battler.hasAllSkills(skillIds)
+ *         - battler is the battler identified by side and label
+ *         - side is either actor or enemy
+ *         - label is the actor id for side actor and troop member index for
+ *           side enemy
+ *         - skillIds is in the form of
+ *           skillId1_skillId2_skillId3_skillIdI_skillIdN
+ *      9. hasAnyUsableSkill side label skillIds
+ *         - Applies the script call battler.hasAnyUsableSkill(skillIds)
+ *         - battler is the battler identified by side and label
+ *         - side is either actor or enemy
+ *         - label is the actor id for side actor and troop member index for
+ *           side enemy
+ *         - skillIds is in the form of
+ *           skillId1_skillId2_skillId3_skillIdI_skillIdN
+ *      10. hasAllUsableSkills side label skillIds
+ *          - Applies the script call battler.hasAllUsableSkills(skillIds)
+ *          - battler is the battler identified by side and label
+ *          - side is either actor or enemy
+ *          - label is the actor id for side actor and troop member index for
+ *            side enemy
+ *          - skillIds is in the form of
+ *            skillId1_skillId2_skillId3_skillIdI_skillIdN
+ *      11. memWithAnyState side stateIds memFunc_
+ *          - Applies the script call unit.memWithAnyState(stateIds, mems)
+ *          - unit is the unit identified by side
+ *          - side is either party or troop
+ *          - stateIds is in the form of
+ *            stateId1_stateId2_stateId3_stateIdI_stateIdN
+ *          - mems is the list of unit members returned by the method with
+ *            name memFunc_, which is either of the following:
+ *            i. members - All members of the unit
+ *            ii. aliveMembers - All alive mnembers of the unit
+ *            iii. deadMembers - All dead members of the unit
+ *            iv. movableMembers - All movable members of the unit
+ *            Not specifying memFunc_ is the same as not specifying mems
+ *      12. memWithAllStates side stateIds memFunc_
+ *          - Applies the script call unit.memWithAllStates(stateIds, mems)
+ *          - unit is the unit identified by side
+ *          - side is either party or troop
+ *          - stateIds is in the form of
+ *            stateId1_stateId2_stateId3_stateIdI_stateIdN
+ *          - mems is the list of unit members returned by the method with
+ *            name memFunc_, which is either of the following:
+ *            i. members - All members of the unit
+ *            ii. aliveMembers - All alive mnembers of the unit
+ *            iii. deadMembers - All dead members of the unit
+ *            iv. movableMembers - All movable members of the unit
+ *            Not specifying memFunc_ is the same as not specifying mems
+ *      13. memWithoutAnyState side stateIds memFunc_
+ *          - Applies the script call unit.memWithoutAnyState(stateIds, mems)
+ *          - unit is the unit identified by side
+ *          - side is either party or troop
+ *          - stateIds is in the form of
+ *            stateId1_stateId2_stateId3_stateIdI_stateIdN
+ *          - mems is the list of unit members returned by the method with
+ *            name memFunc_, which is either of the following:
+ *            i. members - All members of the unit
+ *            ii. aliveMembers - All alive mnembers of the unit
+ *            iii. deadMembers - All dead members of the unit
+ *            iv. movableMembers - All movable members of the unit
+ *            Not specifying memFunc_ is the same as not specifying mems
+ *      14. memWithoutAllStates side stateIds memFunc_
+ *          - Applies the script call unit.memWithoutAllStates(stateIds, mems)
+ *          - unit is the unit identified by side
+ *          - side is either party or troop
+ *          - stateIds is in the form of
+ *            stateId1_stateId2_stateId3_stateIdI_stateIdN
+ *          - mems is the list of unit members returned by the method with
+ *            name memFunc_, which is either of the following:
+ *            i. members - All members of the unit
+ *            ii. aliveMembers - All alive mnembers of the unit
+ *            iii. deadMembers - All dead members of the unit
+ *            iv. movableMembers - All movable members of the unit
+ *            Not specifying memFunc_ is the same as not specifying mems
+ *      15. memWithAnyBuff side paramIds memFunc_
+ *          - Applies the script call unit.memWithAnyBuff(paramIds, mems)
+ *          - unit is the unit identified by side
+ *          - side is either party or troop
+ *          - paramIds is in the form of
+ *            paramId1_paramId2_paramId3_paramIdI_paramIdN
+ *          - mems is the list of unit members returned by the method with
+ *            name memFunc_, which is either of the following:
+ *            i. members - All members of the unit
+ *            ii. aliveMembers - All alive mnembers of the unit
+ *            iii. deadMembers - All dead members of the unit
+ *            iv. movableMembers - All movable members of the unit
+ *            Not specifying memFunc_ is the same as not specifying mems
+ *      16. memWithAllBuffs side paramIds memFunc_
+ *          - Applies the script call unit.memWithAllBuffs(paramIds, mems)
+ *          - unit is the unit identified by side
+ *          - side is either party or troop
+ *          - paramIds is in the form of
+ *            paramId1_paramId2_paramId3_paramIdI_paramIdN
+ *          - mems is the list of unit members returned by the method with
+ *            name memFunc_, which is either of the following:
+ *            i. members - All members of the unit
+ *            ii. aliveMembers - All alive mnembers of the unit
+ *            iii. deadMembers - All dead members of the unit
+ *            iv. movableMembers - All movable members of the unit
+ *            Not specifying memFunc_ is the same as not specifying mems
+ *      17. memWithoutAnyBuff side paramIds memFunc_
+ *          - Applies the script call unit.memWithoutAnyBuff(paramIds, mems)
+ *          - unit is the unit identified by side
+ *          - side is either party or troop
+ *          - paramIds is in the form of
+ *            paramId1_paramId2_paramId3_paramIdI_paramIdN
+ *          - mems is the list of unit members returned by the method with
+ *            name memFunc_, which is either of the following:
+ *            i. members - All members of the unit
+ *            ii. aliveMembers - All alive mnembers of the unit
+ *            iii. deadMembers - All dead members of the unit
+ *            iv. movableMembers - All movable members of the unit
+ *            Not specifying memFunc_ is the same as not specifying mems
+ *      18. memWithoutAllBuffs side paramIds memFunc_
+ *          - Applies the script call unit.memWithoutAllBuffs(paramIds, mems)
+ *          - unit is the unit identified by side
+ *          - side is either party or troop
+ *          - paramIds is in the form of
+ *            paramId1_paramId2_paramId3_paramIdI_paramIdN
+ *          - mems is the list of unit members returned by the method with
+ *            name memFunc_, which is either of the following:
+ *            i. members - All members of the unit
+ *            ii. aliveMembers - All alive mnembers of the unit
+ *            iii. deadMembers - All dead members of the unit
+ *            iv. movableMembers - All movable members of the unit
+ *            Not specifying memFunc_ is the same as not specifying mems
+ *      19. memWithAnyDebuff side paramIds memFunc_
+ *          - Applies the script call unit.memWithAnyDebuff(paramIds, mems)
+ *          - unit is the unit identified by side
+ *          - side is either party or troop
+ *          - paramIds is in the form of
+ *            paramId1_paramId2_paramId3_paramIdI_paramIdN
+ *          - mems is the list of unit members returned by the method with
+ *            name memFunc_, which is either of the following:
+ *            i. members - All members of the unit
+ *            ii. aliveMembers - All alive mnembers of the unit
+ *            iii. deadMembers - All dead members of the unit
+ *            iv. movableMembers - All movable members of the unit
+ *            Not specifying memFunc_ is the same as not specifying mems
+ *      20. memWithAllDebuffs side paramIds memFunc_
+ *          - Applies the script call unit.memWithAllDebuffs(paramIds, mems)
+ *          - unit is the unit identified by side
+ *          - side is either party or troop
+ *          - paramIds is in the form of
+ *            paramId1_paramId2_paramId3_paramIdI_paramIdN
+ *          - mems is the list of unit members returned by the method with
+ *            name memFunc_, which is either of the following:
+ *            i. members - All members of the unit
+ *            ii. aliveMembers - All alive mnembers of the unit
+ *            iii. deadMembers - All dead members of the unit
+ *            iv. movableMembers - All movable members of the unit
+ *            Not specifying memFunc_ is the same as not specifying mems
+ *      21. memWithoutAnyDebuff side paramIds memFunc_
+ *          - Applies the script call unit.memWithoutAnyDebuff(paramIds, mems)
+ *          - unit is the unit identified by side
+ *          - side is either party or troop
+ *          - paramIds is in the form of
+ *            paramId1_paramId2_paramId3_paramIdI_paramIdN
+ *          - mems is the list of unit members returned by the method with
+ *            name memFunc_, which is either of the following:
+ *            i. members - All members of the unit
+ *            ii. aliveMembers - All alive mnembers of the unit
+ *            iii. deadMembers - All dead members of the unit
+ *            iv. movableMembers - All movable members of the unit
+ *            Not specifying memFunc_ is the same as not specifying mems
+ *      22. memWithoutAllDebuffs side paramIds memFunc_
+ *          - Applies the script call
+ *            unit.memWithoutAllDebuffs(paramIds, mems)
+ *          - unit is the unit identified by side
+ *          - side is either party or troop
+ *          - paramIds is in the form of
+ *            paramId1_paramId2_paramId3_paramIdI_paramIdN
+ *          - mems is the list of unit members returned by the method with
+ *            name memFunc_, which is either of the following:
+ *            i. members - All members of the unit
+ *            ii. aliveMembers - All alive mnembers of the unit
+ *            iii. deadMembers - All dead members of the unit
+ *            iv. movableMembers - All movable members of the unit
+ *            Not specifying memFunc_ is the same as not specifying mems
+ *      23. memWithAnySkill side skillIds memFunc_
+ *          - Applies the script call unit.memWithAnySkill(skillIds, mems)
+ *          - unit is the unit identified by side
+ *          - side is either party or troop
+ *          - skillIds is in the form of
+ *            skillId1_skillId2_skillId3_skillIdI_skillIdN
+ *          - mems is the list of unit members returned by the method with
+ *            name memFunc_, which is either of the following:
+ *            i. members - All members of the unit
+ *            ii. aliveMembers - All alive mnembers of the unit
+ *            iii. deadMembers - All dead members of the unit
+ *            iv. movableMembers - All movable members of the unit
+ *            Not specifying memFunc_ is the same as not specifying mems
+ *      24. memWithAllSkills side skillIds memFunc_
+ *          - Applies the script call unit.memWithAllSkills(skillIds, mems)
+ *          - unit is the unit identified by side
+ *          - side is either party or troop
+ *          - skillIds is in the form of
+ *            skillId1_skillId2_skillId3_skillIdI_skillIdN
+ *          - mems is the list of unit members returned by the method with
+ *            name memFunc_, which is either of the following:
+ *            i. members - All members of the unit
+ *            ii. aliveMembers - All alive mnembers of the unit
+ *            iii. deadMembers - All dead members of the unit
+ *            iv. movableMembers - All movable members of the unit
+ *            Not specifying memFunc_ is the same as not specifying mems
+ *      25. memWithoutAnySkill side skillIds memFunc_
+ *          - Applies the script call unit.memWithoutAnySkill(skillIds, mems)
+ *          - unit is the unit identified by side
+ *          - side is either party or troop
+ *          - skillIds is in the form of
+ *            skillId1_skillId2_skillId3_skillIdI_skillIdN
+ *          - mems is the list of unit members returned by the method with
+ *            name memFunc_, which is either of the following:
+ *            i. members - All members of the unit
+ *            ii. aliveMembers - All alive mnembers of the unit
+ *            iii. deadMembers - All dead members of the unit
+ *            iv. movableMembers - All movable members of the unit
+ *            Not specifying memFunc_ is the same as not specifying mems
+ *      26. memWithoutAllSkills side skillIds memFunc_
+ *          - Applies the script call unit.memWithoutAllSkills(skillIds, mems)
+ *          - unit is the unit identified by side
+ *          - side is either party or troop
+ *          - skillIds is in the form of
+ *            skillId1_skillId2_skillId3_skillIdI_skillIdN
+ *          - mems is the list of unit members returned by the method with
+ *            name memFunc_, which is either of the following:
+ *            i. members - All members of the unit
+ *            ii. aliveMembers - All alive mnembers of the unit
+ *            iii. deadMembers - All dead members of the unit
+ *            iv. movableMembers - All movable members of the unit
+ *            Not specifying memFunc_ is the same as not specifying mems
+ *      27. anyHighestStatMem side stats memFunc_
+ *          - Applies the script call unit.anyHighestStatMem(stats, mems)
+ *          - unit is the unit identified by side
+ *          - side is either party or troop
+ *          - stats is in the form of stat1_stat2_stat3_statI_statN
+ *          - mems is the list of unit members returned by the method with
+ *            name memFunc_, which is either of the following:
+ *            i. members - All members of the unit
+ *            ii. aliveMembers - All alive mnembers of the unit
+ *            iii. deadMembers - All dead members of the unit
+ *            iv. movableMembers - All movable members of the unit
+ *            Not specifying memFunc_ is the same as not specifying mems
+ *      28. allHighestStatsMem side stats memFunc_
+ *          - Applies the script call unit.allHighestStatsMem(stats, mems)
+ *          - unit is the unit identified by side
+ *          - side is either party or troop
+ *          - stats is in the form of stat1_stat2_stat3_statI_statN
+ *          - mems is the list of unit members returned by the method with
+ *            name memFunc_, which is either of the following:
+ *            i. members - All members of the unit
+ *            ii. aliveMembers - All alive mnembers of the unit
+ *            iii. deadMembers - All dead members of the unit
+ *            iv. movableMembers - All movable members of the unit
+ *            Not specifying memFunc_ is the same as not specifying mems
+ *      29. notAnyHighestStatMem side stats memFunc_
+ *          - Applies the script call unit.notAnyHighestStatMem(stats, mems)
+ *          - unit is the unit identified by side
+ *          - side is either party or troop
+ *          - stats is in the form of stat1_stat2_stat3_statI_statN
+ *          - mems is the list of unit members returned by the method with
+ *            name memFunc_, which is either of the following:
+ *            i. members - All members of the unit
+ *            ii. aliveMembers - All alive mnembers of the unit
+ *            iii. deadMembers - All dead members of the unit
+ *            iv. movableMembers - All movable members of the unit
+ *            Not specifying memFunc_ is the same as not specifying mems
+ *      30. notAllHighestStatsMem side stats memFunc_
+ *          - Applies the script call unit.notAllHighestStatsMem(stats, mems)
+ *          - unit is the unit identified by side
+ *          - side is either party or troop
+ *          - stats is in the form of stat1_stat2_stat3_statI_statN
+ *          - mems is the list of unit members returned by the method with
+ *            name memFunc_, which is either of the following:
+ *            i. members - All members of the unit
+ *            ii. aliveMembers - All alive mnembers of the unit
+ *            iii. deadMembers - All dead members of the unit
+ *            iv. movableMembers - All movable members of the unit
+ *            Not specifying memFunc_ is the same as not specifying mems
+ *      31. anyLowestStatMem side stats memFunc_
+ *          - Applies the script call unit.anyLowestStatMem(stats, mems)
+ *          - unit is the unit identified by side
+ *          - side is either party or troop
+ *          - stats is in the form of stat1_stat2_stat3_statI_statN
+ *          - mems is the list of unit members returned by the method with
+ *            name memFunc_, which is either of the following:
+ *            i. members - All members of the unit
+ *            ii. aliveMembers - All alive mnembers of the unit
+ *            iii. deadMembers - All dead members of the unit
+ *            iv. movableMembers - All movable members of the unit
+ *            Not specifying memFunc_ is the same as not specifying mems
+ *      32. allLowestStatsMem side stats memFunc_
+ *          - Applies the script call unit.allLowestStatsMem(stats, mems)
+ *          - unit is the unit identified by side
+ *          - side is either party or troop
+ *          - stats is in the form of stat1_stat2_stat3_statI_statN
+ *          - mems is the list of unit members returned by the method with
+ *            name memFunc_, which is either of the following:
+ *            i. members - All members of the unit
+ *            ii. aliveMembers - All alive mnembers of the unit
+ *            iii. deadMembers - All dead members of the unit
+ *            iv. movableMembers - All movable members of the unit
+ *            Not specifying memFunc_ is the same as not specifying mems
+ *      33. notAnyLowestStatMem side stats memFunc_
+ *          - Applies the script call unit.notAnyLowestStatMem(stats, mems)
+ *          - unit is the unit identified by side
+ *          - side is either party or troop
+ *          - stats is in the form of stat1_stat2_stat3_statI_statN
+ *          - mems is the list of unit members returned by the method with
+ *            name memFunc_, which is either of the following:
+ *            i. members - All members of the unit
+ *            ii. aliveMembers - All alive mnembers of the unit
+ *            iii. deadMembers - All dead members of the unit
+ *            iv. movableMembers - All movable members of the unit
+ *            Not specifying memFunc_ is the same as not specifying mems
+ *      34. notAllLowestStatsMem side stats memFunc_
+ *          - Applies the script call unit.notAllLowestStatsMem(stats, mems)
+ *          - unit is the unit identified by side
+ *          - side is either party or troop
+ *          - stats is in the form of stat1_stat2_stat3_statI_statN
+ *          - mems is the list of unit members returned by the method with
+ *            name memFunc_, which is either of the following:
+ *            i. members - All members of the unit
+ *            ii. aliveMembers - All alive mnembers of the unit
+ *            iii. deadMembers - All dead members of the unit
+ *            iv. movableMembers - All movable members of the unit
+ *            Not specifying memFunc_ is the same as not specifying mems
+ *      35. anyAboveStatMem side stats val memFunc_
+ *          - Applies the script call unit.anyAboveStatMem(stats, val, mems)
+ *          - unit is the unit identified by side
+ *          - side is either party or troop
+ *          - stats is in the form of stat1_stat2_stat3_statI_statN
+ *          - mems is the list of unit members returned by the method with
+ *            name memFunc_, which is either of the following:
+ *            i. members - All members of the unit
+ *            ii. aliveMembers - All alive mnembers of the unit
+ *            iii. deadMembers - All dead members of the unit
+ *            iv. movableMembers - All movable members of the unit
+ *            Not specifying memFunc_ is the same as not specifying mems
+ *      36. allAboveStatMem side stats val memFunc_
+ *          - Applies the script call unit.allAboveStatMem(stats, val, mems)
+ *          - unit is the unit identified by side
+ *          - side is either party or troop
+ *          - stats is in the form of stat1_stat2_stat3_statI_statN
+ *          - mems is the list of unit members returned by the method with
+ *            name memFunc_, which is either of the following:
+ *            i. members - All members of the unit
+ *            ii. aliveMembers - All alive mnembers of the unit
+ *            iii. deadMembers - All dead members of the unit
+ *            iv. movableMembers - All movable members of the unit
+ *            Not specifying memFunc_ is the same as not specifying mems
+ *      37. anyBelowStatMem side stats val memFunc_
+ *          - Applies the script call unit.anyBelowStatMem(stats, val, mems)
+ *          - unit is the unit identified by side
+ *          - side is either party or troop
+ *          - stats is in the form of stat1_stat2_stat3_statI_statN
+ *          - mems is the list of unit members returned by the method with
+ *            name memFunc_, which is either of the following:
+ *            i. members - All members of the unit
+ *            ii. aliveMembers - All alive mnembers of the unit
+ *            iii. deadMembers - All dead members of the unit
+ *            iv. movableMembers - All movable members of the unit
+ *            Not specifying memFunc_ is the same as not specifying mems
+ *      38. allBelowStatMem side stats val memFunc_
+ *          - Applies the script call unit.allBelowStatMem(stats, val, mems)
+ *          - unit is the unit identified by side
+ *          - side is either party or troop
+ *          - stats is in the form of stat1_stat2_stat3_statI_statN
+ *          - mems is the list of unit members returned by the method with
+ *            name memFunc_, which is either of the following:
+ *            i. members - All members of the unit
+ *            ii. aliveMembers - All alive mnembers of the unit
+ *            iii. deadMembers - All dead members of the unit
+ *            iv. movableMembers - All movable members of the unit
+ *            Not specifying memFunc_ is the same as not specifying mems
+ *      39. memWithAnyUsableSkill side skillIds memFunc_
+ *          - Applies the script call unit.memWithAnyUsableSkill(skillIds, mems)
+ *          - unit is the unit identified by side
+ *          - side is either party or troop
+ *          - skillIds is in the form of
+ *            skillId1_skillId2_skillId3_skillIdI_skillIdN
+ *          - mems is the list of unit members returned by the method with
+ *            name memFunc_, which is either of the following:
+ *            i. members - All members of the unit
+ *            ii. aliveMembers - All alive mnembers of the unit
+ *            iii. deadMembers - All dead members of the unit
+ *            iv. movableMembers - All movable members of the unit
+ *            Not specifying memFunc_ is the same as not specifying mems
+ *      40. memWithAllUsableSkills side skillIds memFunc_
+ *          - Applies the script call unit.memWithAnyUsableSkill(skillIds, mems)
+ *          - unit is the unit identified by side
+ *          - side is either party or troop
+ *          - skillIds is in the form of
+ *            skillId1_skillId2_skillId3_skillIdI_skillIdN
+ *          - mems is the list of unit members returned by the method with
+ *            name memFunc_, which is either of the following:
+ *            i. members - All members of the unit
+ *            ii. aliveMembers - All alive mnembers of the unit
+ *            iii. deadMembers - All dead members of the unit
+ *            iv. movableMembers - All movable members of the unit
+ *            Not specifying memFunc_ is the same as not specifying mems
+ *      41. memWithoutAnyUsableSkill side skillIds memFunc_
+ *          - Applies the script call unit.memWithAnyUsableSkill(skillIds, mems)
+ *          - unit is the unit identified by side
+ *          - side is either party or troop
+ *          - skillIds is in the form of
+ *            skillId1_skillId2_skillId3_skillIdI_skillIdN
+ *          - mems is the list of unit members returned by the method with
+ *            name memFunc_, which is either of the following:
+ *            i. members - All members of the unit
+ *            ii. aliveMembers - All alive mnembers of the unit
+ *            iii. deadMembers - All dead members of the unit
+ *            iv. movableMembers - All movable members of the unit
+ *            Not specifying memFunc_ is the same as not specifying mems
+ *      42. memWithoutAllUsableSkills side skillIds memFunc_
+ *          - Applies the script call unit.memWithAnyUsableSkill(skillIds, mems)
+ *          - unit is the unit identified by side
+ *          - side is either party or troop
+ *          - skillIds is in the form of
+ *            skillId1_skillId2_skillId3_skillIdI_skillIdN
+ *          - mems is the list of unit members returned by the method with
+ *            name memFunc_, which is either of the following:
+ *            i. members - All members of the unit
+ *            ii. aliveMembers - All alive mnembers of the unit
+ *            iii. deadMembers - All dead members of the unit
+ *            iv. movableMembers - All movable members of the unit
+ *            Not specifying memFunc_ is the same as not specifying mems
  *============================================================================
  */
 
@@ -628,7 +2871,7 @@ var DoubleX_RMMZ = DoubleX_RMMZ || {}; // var must be used or game will crash
 // Separates the version numbers with the rest to make the former more clear
 DoubleX_RMMZ.Unit_Filters = {
     PLUGIN_NAME: "DoubleX_RMMZ_Unit_Filters",
-    VERSIONS: { codebase: "1.0.0", plugin: "v1.01a" }
+    VERSIONS: { codebase: "1.0.2", plugin: "v1.02a" }
 }; // DoubleX_RMMZ.Unit_Filters
 //
 Utils.checkRMVersion(DoubleX_RMMZ.Unit_Filters.VERSIONS.codebase);
@@ -651,6 +2894,131 @@ Utils.checkRMVersion(DoubleX_RMMZ.Unit_Filters.VERSIONS.codebase);
  *      5. Functions supposedly returning nullable values are marked with the
  *         _ suffix in their names(but their return values can be sure to be
  *         non null in some cases)
+ *----------------------------------------------------------------------------*/
+
+(UF => {
+
+    "use strict";
+
+    const PQ = UF.Plugin_Cmd_Query = {};
+
+    PQ._BATTLER_ = (side, label) => {
+        switch (side) {
+            case "actor": return $gameActors.actor(+label);
+            case "enemy": return $gameTroop.members()[+label];
+            default: return undefined;
+        }
+    }; // PQ._BATTLER_
+    PQ._NUM_ARR = arrStr => PQ._STR_ARR(arrStr).map(Number);
+    // A dirty hack to handle both plugin commands and queries
+    PQ._STR_ARR = arrStr => Array.isArray(arrStr) ? arrStr : arrStr.split(/_+/);
+    //
+    PQ._UNIT_ = side => {
+        switch (side) {
+            case "party": return $gameParty;
+            case "troop": return $gameTroop;
+            default: return undefined;
+        }
+    }; // PQ._UNIT_
+
+    PQ._SET_QUERY = (name, cmdFunc, queryFunc) => {
+        PluginManager.registerCommand(UF.PLUGIN_NAME, name, cmdFunc);
+        if (!DoubleX_RMMZ.Plugin_Query) return;
+        PluginManager.eventCmdPluginQueries.set(name, queryFunc);
+    }; // PQ._SET_QUERY
+
+    const _BATTLER_QUERY_FUNC = (name, side, label, ids) => {
+        const battler_ = PQ._BATTLER_(side, label);
+        return battler_ && battler_[name](PQ._NUM_ARR(ids));
+    }; // _BATTLER_QUERY_FUNC
+    [
+        ["hasAnySkill", "skillIds"],
+        ["hasAllSkills", "skillIds"],
+        ["hasAnyUsableSkill", "skillIds"],
+        ["hasAllUsableSkills", "skillIds"],
+        ["isAnyStateAffected", "stateIds"],
+        ["isAllStatesAffected", "stateIds"],
+        ["isAnyBuffAffected", "paramIds"],
+        ["isAllBuffsAffected", "paramIds"],
+        ["isAnyDebuffAffected", "paramIds"],
+        ["isAllDebuffsAffected", "paramIds"]
+    ].forEach(([name, idNames]) => {
+        PQ._SET_QUERY(name, ({ side, label, [idNames]: ids, switchId }) => {
+            const val = _BATTLER_QUERY_FUNC(name, side, label, JSON.parse(ids));
+            $gameSwitches.setValue(+switchId, val);
+        }, _BATTLER_QUERY_FUNC.bind(undefined, name));
+    });
+
+    const _UNIT_QUERY_FUNC = arrFunc => (name, side, arrStr, memFunc_) => {
+        const unit_ = PQ._UNIT_(side);
+        if (!unit_) return;
+        const numArr = arrFunc(arrStr);
+        if (memFunc_) unit_[name](numArr, unit_[memFunc_]());
+        return unit_[name](numArr);
+    }, _NUM_UNIT_QUERY_FUNC = _UNIT_QUERY_FUNC(PQ._NUM_ARR);
+    const _STR_UNIT_QUERY_FUNC = _UNIT_QUERY_FUNC(PQ._STR_ARR);
+    [
+        ["memWithAnyState", "stateIds", _NUM_UNIT_QUERY_FUNC],
+        ["memWithAllStates", "stateIds", _NUM_UNIT_QUERY_FUNC],
+        ["memWithoutAnyState", "stateIds", _NUM_UNIT_QUERY_FUNC],
+        ["memWithoutAllStates", "stateIds", _NUM_UNIT_QUERY_FUNC],
+        ["memWithAnyBuff", "paramIds", _NUM_UNIT_QUERY_FUNC],
+        ["memWithAllBuffs", "paramIds", _NUM_UNIT_QUERY_FUNC],
+        ["memWithoutAnyBuff", "paramIds", _NUM_UNIT_QUERY_FUNC],
+        ["memWithoutAllBuffs", "paramIds", _NUM_UNIT_QUERY_FUNC],
+        ["memWithAnyDebuff", "paramIds", _NUM_UNIT_QUERY_FUNC],
+        ["memWithAllDebuffs", "paramIds", _NUM_UNIT_QUERY_FUNC],
+        ["memWithoutAnyDebuff", "paramIds", _NUM_UNIT_QUERY_FUNC],
+        ["memWithoutAllDebuffs", "paramIds", _NUM_UNIT_QUERY_FUNC],
+        ["memWithAnySkill", "skillIds", _NUM_UNIT_QUERY_FUNC],
+        ["memWithAllSkills", "skillIds", _NUM_UNIT_QUERY_FUNC],
+        ["memWithoutAnySkill", "skillIds", _NUM_UNIT_QUERY_FUNC],
+        ["memWithoutAllSkills", "skillIds", _NUM_UNIT_QUERY_FUNC],
+        ["memWithAnyUsableSkill", "skillIds", _NUM_UNIT_QUERY_FUNC],
+        ["memWithAllUsableSkills", "skillIds", _NUM_UNIT_QUERY_FUNC],
+        ["memWithoutAnyUsableSkill", "skillIds", _NUM_UNIT_QUERY_FUNC],
+        ["memWithoutAllUsableSkills", "skillIds", _NUM_UNIT_QUERY_FUNC],
+        ["anyHighestStatMem", "stats", _STR_UNIT_QUERY_FUNC],
+        ["allHighestStatsMem", "stats", _STR_UNIT_QUERY_FUNC],
+        ["notAnyHighestStatMem", "stats", _STR_UNIT_QUERY_FUNC],
+        ["notAllHighestStatsMem", "stats", _STR_UNIT_QUERY_FUNC],
+        ["anyLowestStatMem", "stats", _STR_UNIT_QUERY_FUNC],
+        ["allLowestStatsMem", "stats", _STR_UNIT_QUERY_FUNC],
+        ["notAnyLowestStatMem", "stats", _STR_UNIT_QUERY_FUNC],
+        ["notAllLowestStatsMem", "stats", _STR_UNIT_QUERY_FUNC]
+    ].forEach(([name, arrStrName, queryFunc]) => {
+        PQ._SET_QUERY(name, ({ side, [arrStrName]: arrStr, varId, memFunc_ }) => {
+            const val = queryFunc(name, side, JSON.parse(arrStr), memFunc_);
+            $gameVariables.setValue(+varId, val);
+        }, queryFunc.bind(undefined, name));
+    });
+
+    const _VAL_UNIT_QUERY_FUNC = () => (name, side, arrStr, val, memFunc_) => {
+        const unit_ = PQ._UNIT_(side);
+        if (!unit_) return;
+        const strArr = PQ._STR_ARR(arrStr);
+        if (memFunc_) unit_[name](strArr, val, unit_[memFunc_]());
+        return unit_[name](strArr, val);
+    }; // _VAL_UNIT_QUERY_FUNC
+    [
+        "anyAboveStatMem",
+        "allAboveStatMem",
+        "anyBelowStatMem",
+        "allBelowStatMem"
+    ].forEach(name => {
+        PQ._SET_QUERY(name, ({ side, stats, val, varId, memFunc_ }) => {
+            const arrStats = JSON.parse(stats);
+            const v = _VAL_UNIT_QUERY_FUNC(name, side, arrStats, val, memFunc_);
+            $gameVariables.setValue(+varId, v);
+        }, _VAL_UNIT_QUERY_FUNC.bind(undefined, name));
+    });
+
+})(DoubleX_RMMZ.Unit_Filters);
+
+/*----------------------------------------------------------------------------*/
+
+/*----------------------------------------------------------------------------
+ *    ## Objects
  *----------------------------------------------------------------------------*/
 
 /*----------------------------------------------------------------------------
