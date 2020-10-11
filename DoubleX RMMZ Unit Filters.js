@@ -2871,7 +2871,7 @@ var DoubleX_RMMZ = DoubleX_RMMZ || {}; // var must be used or game will crash
 // Separates the version numbers with the rest to make the former more clear
 DoubleX_RMMZ.Unit_Filters = {
     PLUGIN_NAME: "DoubleX RMMZ Unit Filters",
-    VERSIONS: { codebase: "1.0.0", plugin: "v1.01a" }
+    VERSIONS: { codebase: "1.0.2", plugin: "v1.02a" }
 }; // DoubleX_RMMZ.Unit_Filters
 //
 Utils.checkRMVersion(DoubleX_RMMZ.Unit_Filters.VERSIONS.codebase);
@@ -2896,13 +2896,10 @@ Utils.checkRMVersion(DoubleX_RMMZ.Unit_Filters.VERSIONS.codebase);
  *         non null in some cases)
  *----------------------------------------------------------------------------*/
 
-/*----------------------------------------------------------------------------*/
-
 (UF => {
 
     "use strict";
 
-    const _IS_QUERY = DoubleX_RMMZ.Plugin_Query, _PLUGIN_NAME = UF.PLUGIN_NAME;
     const PQ = UF.Plugin_Cmd_Query = {};
 
     PQ._BATTLER_ = (side, label) => {
@@ -2924,6 +2921,12 @@ Utils.checkRMVersion(DoubleX_RMMZ.Unit_Filters.VERSIONS.codebase);
         }
     }; // PQ._UNIT_
 
+    PQ._SET_QUERY = (name, cmdFunc, queryFunc) => {
+        PluginManager.registerCommand(UF.PLUGIN_NAME, name, cmdFunc);
+        if (!DoubleX_RMMZ.Plugin_Query) return;
+        PluginManager.eventCmdPluginQueries.set(name, queryFunc);
+    }; // PQ._SET_QUERY
+
     const _BATTLER_QUERY_FUNC = (name, side, label, ids) => {
         const battler_ = PQ._BATTLER_(side, label);
         return battler_ && battler_[name](PQ._NUM_ARR(ids));
@@ -2940,13 +2943,10 @@ Utils.checkRMVersion(DoubleX_RMMZ.Unit_Filters.VERSIONS.codebase);
         ["isAnyDebuffAffected", "paramIds"],
         ["isAllDebuffsAffected", "paramIds"]
     ].forEach(([name, idNames]) => {
-        PluginManager.registerCommand(_PLUGIN_NAME, name, ({ side, label, [idNames]: ids, switchId }) => {
+        PQ._SET_QUERY(name, ({ side, label, [idNames]: ids, switchId }) => {
             const val = _BATTLER_QUERY_FUNC(name, side, label, JSON.parse(ids));
             $gameSwitches.setValue(+switchId, val);
-        });
-        if (!_IS_QUERY) return;
-        const queryFunc = _BATTLER_QUERY_FUNC.bind(undefined, name);
-        PluginManager.eventCmdPluginQueries.set(name, queryFunc);
+        }, _BATTLER_QUERY_FUNC.bind(undefined, name));
     });
 
     const _UNIT_QUERY_FUNC = arrFunc => (name, side, arrStr, memFunc_) => {
@@ -2987,13 +2987,10 @@ Utils.checkRMVersion(DoubleX_RMMZ.Unit_Filters.VERSIONS.codebase);
         ["notAnyLowestStatMem", "stats", _STR_UNIT_QUERY_FUNC],
         ["notAllLowestStatsMem", "stats", _STR_UNIT_QUERY_FUNC]
     ].forEach(([name, arrStrName, queryFunc]) => {
-        PluginManager.registerCommand(_PLUGIN_NAME, name, ({ side, [arrStrName]: arrStr, varId, memFunc_ }) => {
+        PQ._SET_QUERY(name, ({ side, [arrStrName]: arrStr, varId, memFunc_ }) => {
             const val = queryFunc(name, side, JSON.parse(arrStr), memFunc_);
             $gameVariables.setValue(+varId, val);
-        });
-        if (!_IS_QUERY) return;
-        const boundQueryFunc = queryFunc.bind(undefined, name);
-        PluginManager.eventCmdPluginQueries.set(name, boundQueryFunc);
+        }, queryFunc.bind(undefined, name));
     });
 
     const _VAL_UNIT_QUERY_FUNC = () => (name, side, arrStr, val, memFunc_) => {
@@ -3003,21 +3000,17 @@ Utils.checkRMVersion(DoubleX_RMMZ.Unit_Filters.VERSIONS.codebase);
         if (memFunc_) unit_[name](strArr, val, unit_[memFunc_]());
         return unit_[name](strArr, val);
     }; // _VAL_UNIT_QUERY_FUNC
-
     [
         "anyAboveStatMem",
         "allAboveStatMem",
         "anyBelowStatMem",
         "allBelowStatMem"
     ].forEach(name => {
-        PluginManager.registerCommand(_PLUGIN_NAME, name, ({ side, stats, val, varId, memFunc_ }) => {
+        PQ._SET_QUERY(name, ({ side, stats, val, varId, memFunc_ }) => {
             const arrStats = JSON.parse(stats);
             const v = _VAL_UNIT_QUERY_FUNC(name, side, arrStats, val, memFunc_);
             $gameVariables.setValue(+varId, v);
-        });
-        if (!_IS_QUERY) return;
-        const queryFunc = _VAL_UNIT_QUERY_FUNC.bind(undefined, name);
-        PluginManager.eventCmdPluginQueries.set(name, queryFunc);
+        }, _VAL_UNIT_QUERY_FUNC.bind(undefined, name));
     });
 
 })(DoubleX_RMMZ.Unit_Filters);
