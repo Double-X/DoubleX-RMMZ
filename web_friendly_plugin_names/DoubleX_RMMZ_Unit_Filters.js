@@ -90,6 +90,7 @@
  * @target MZ
  * @plugindesc Versions: { codebase: "1.0.0", plugin: "v1.01a" }
  * Lets you use script calls to filter unit members with less codes and eventing
+ * @orderAfter DoubleX RMMZ Enhanced Codebase
  * @orderAfter DoubleX_RMMZ_Plugin_Query
  * @author DoubleX
  *
@@ -2874,7 +2875,17 @@ DoubleX_RMMZ.Unit_Filters = {
     VERSIONS: { codebase: "1.0.2", plugin: "v1.02a" }
 }; // DoubleX_RMMZ.Unit_Filters
 //
-Utils.checkRMVersion(DoubleX_RMMZ.Unit_Filters.VERSIONS.codebase);
+
+(UF => {
+
+    "use strict";
+
+    const pluginCodebaseVer = UF.VERSIONS.codebase;
+    if (Utils.checkRMVersion(pluginCodebaseVer)) return;
+    console.warn(`Your codebase version is ${Utils.RPGMAKER_VERSION} but must be
+                 at least ${pluginCodebaseVer} to use ${UF.PLUGIN_NAME}`);
+
+})(DoubleX_RMMZ.Unit_Filters);
 
 /*============================================================================
  *    ## Plugin Implementations
