@@ -406,7 +406,17 @@ DoubleX_RMMZ.State_Triggers = {
     VERSIONS: { codebase: "1.0.0", plugin: "v1.00a" }
 }; // DoubleX_RMMZ.State_Triggers
 //
-Utils.checkRMVersion(DoubleX_RMMZ.State_Triggers.VERSIONS.codebase);
+
+(ST => {
+
+    "use strict";
+
+    const pluginCodebaseVer = ST.VERSIONS.codebase;
+    if (Utils.checkRMVersion(pluginCodebaseVer)) return;
+    console.warn(`Your codebase version is ${Utils.RPGMAKER_VERSION} but must be
+                 at least ${pluginCodebaseVer} to use ${ST.PLUGIN_NAME}`);
+
+})(DoubleX_RMMZ.State_Triggers);
 
 /*============================================================================
  *    ## Plugin Implementations
