@@ -612,7 +612,17 @@ DoubleX_RMMZ.Skill_Item_Triggers = {
     VERSIONS: { codebase: "1.0.0", plugin: "v1.00a" }
 }; // DoubleX_RMMZ.Skill_Item_Triggers
 //
-Utils.checkRMVersion(DoubleX_RMMZ.Skill_Item_Triggers.VERSIONS.codebase);
+
+(SIT => {
+
+    "use strict";
+
+    const pluginCodebaseVer = SIT.VERSIONS.codebase;
+    if (Utils.checkRMVersion(pluginCodebaseVer)) return;
+    console.warn(`Your codebase version is ${Utils.RPGMAKER_VERSION} but must be
+                 at least ${pluginCodebaseVer} to use ${SIT.PLUGIN_NAME}`);
+
+})(DoubleX_RMMZ.Skill_Item_Triggers);
 
 /*============================================================================
  *    ## Plugin Implementations
