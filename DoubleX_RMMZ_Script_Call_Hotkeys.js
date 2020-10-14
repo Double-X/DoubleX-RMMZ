@@ -5,9 +5,6 @@
  *      DoubleX_RMMZ_Script_Call_Hotkeys
  *----------------------------------------------------------------------------
  *    # Prerequisites
- *      Plugins:
- *      1. DoubleX RMMZ Enhanced Codebase
- *         https://github.com/Double-X/DoubleX-RMMZ/blob/master/DoubleX%20RMMZ%20Enhanced%20Codebase.js
  *      Abilities:
  *      1. Little RMMZ plugin development proficiency to fully utilize this
  *         (Elementary Javascript exposures being able to write beginner codes
@@ -34,9 +31,9 @@
  *----------------------------------------------------------------------------
  *    # Links
  *      Video:
- *      1. 
+ *      1. https://www.youtube.com/watch?v=-dwH4mOQ6nQ
  *      This Plugin:
- *      1. 
+ *      1. https://github.com/Double-X/DoubleX-RMMZ/blob/master/DoubleX_RMMZ_Script_Call_Hotkeys.js
  *      Posts:
  *      1. 
  *      2. 
@@ -115,9 +112,8 @@
  * @param hotkeys
  * @type struct<ScriptCallHotkey>[]
  * @desc The list of hotkeys with their script calls on the specified scene
- * @default []
+ * @default [] 
  */
-
 /*~struct~ScriptCallHotkey:
  *
  * @param hotkey
@@ -135,9 +131,8 @@
  * @url https://www.patreon.com/doublex
  * @target MZ
  * @plugindesc Versions: { codebase: "1.0.2", plugin: "v1.00a" }
- * Lets you set new script calls as old ones with some arguments bound
+ * Lets you set some hotkeys per scene to trigger some script calls
  * @orderAfter DoubleX RMMZ Enhanced Codebase
- * @base DoubleX RMMZ Enhanced Codebase
  * @author DoubleX
  *
  * @param scriptCallHotkeys
@@ -146,6 +141,9 @@
  * @default []
  *
  * @help
+ *============================================================================
+ *    (Advanced) The this pointer of the script calls triggered by a hotkey is
+ *               the scene having that hotkey
  *============================================================================
  */
 
@@ -190,15 +188,13 @@ DoubleX_RMMZ.Script_Call_Hotkeys = {
  *         non null in some cases)
  *----------------------------------------------------------------------------*/
 
-if (DoubleX_RMMZ.Enhanced_Codebase) {
-
 /*============================================================================*/
 
 /*----------------------------------------------------------------------------
  *    ## Scenes
  *----------------------------------------------------------------------------*/
 
-((MZ_EC, SCH) => {
+(SCH => {
 
     "use strict";
 
@@ -207,37 +203,26 @@ if (DoubleX_RMMZ.Enhanced_Codebase) {
         const hotkey = JSON.parse(rawHotkey);
         hotkey.scriptCalls = new Function(JSON.parse(hotkey.scriptCalls));
         return hotkey;
-    };
-    const _TRIGGER_SCRIPT_CALL = ({ hotkey, scriptCalls }) => {
+    }, _TRIGGER_SCRIPT_CALL = ({ hotkey, scriptCalls }) => {
         if (Input.isTriggered(hotkey)) scriptCalls.call(this);
     };
     JSON.parse(scriptCallHotkeys).map(JSON.parse).forEach(sceneHotkeys => {
+
         const { scene } = sceneHotkeys, $ = window[scene].prototype;
         const hotkeys = JSON.parse(sceneHotkeys.hotkeys).map(_SCRIPT_CALLS);
-        const { ORIG, extendFunc } = MZ_EC.setKlassContainer(scene, $, SCH);
-        extendFunc("update", function() {
+        const klass = SCH[scene] = { orig: {}, new: {} };
+        const [ORIG, NEW] = [klass.orig, klass.new];
+
+        ORIG.update = $.update;
+        NEW.update = $.update = function() { // v1.00a - v1.00a; Extended
             ORIG.update.apply(this, arguments);
             // Added to trigger script calls when the hotkey's pressed
             hotkeys.forEach(_TRIGGER_SCRIPT_CALL, this);
             //
-        }); // v1.00a - v1.00a
+        }; // $.update
 
     });
 
-})(DoubleX_RMMZ.Enhanced_Codebase, DoubleX_RMMZ.Script_Call_Hotkeys);
+})(DoubleX_RMMZ.Script_Call_Hotkeys);
 
 /*============================================================================*/
-
-    const curMZECVer = DoubleX_RMMZ.Enhanced_Codebase.VERSIONS.plugin;
-    const minMZECVer = "v0.00a";
-    if (curMZECVer < minMZECVer) {
-        console.warn(`The version of DoubleX RMMZ Enhanced Codebase is
-                     ${curMZECVer} but should be at least ${minMZECVer}`);
-    }
-
-} else {
-
-    console.warn(`DoubleX RMMZ Enhanced Codebase should be placed above
-                 ${DoubleX_RMMZ.Script_Call_Hotkeys.PLUGIN_NAME}`);
-
-} // if (DoubleX_RMMZ.Enhanced_Codebase)
