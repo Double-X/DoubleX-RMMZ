@@ -2874,7 +2874,17 @@ DoubleX_RMMZ.Unit_Filters = {
     VERSIONS: { codebase: "1.0.2", plugin: "v1.02a" }
 }; // DoubleX_RMMZ.Unit_Filters
 //
-Utils.checkRMVersion(DoubleX_RMMZ.Unit_Filters.VERSIONS.codebase);
+
+(UF => {
+
+    "use strict";
+
+    const pluginCodebaseVer = UF.VERSIONS.codebase;
+    if (Utils.checkRMVersion(pluginCodebaseVer)) return;
+    console.warn(`Your codebase version is ${Utils.RPGMAKER_VERSION} but must be
+                 at least ${pluginCodebaseVer} to use ${UF.PLUGIN_NAME}`);
+
+})(DoubleX_RMMZ.Unit_Filters);
 
 /*============================================================================
  *    ## Plugin Implementations

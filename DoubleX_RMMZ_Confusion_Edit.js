@@ -156,7 +156,17 @@ DoubleX_RMMZ.Confusion_Edit = {
     VERSIONS: { codebase: "1.0.2", plugin: "v1.00a" }
 }; // DoubleX_RMMZ.Confusion_Edit
 //
-Utils.checkRMVersion(DoubleX_RMMZ.Confusion_Edit.VERSIONS.codebase);
+
+(CE => {
+
+    "use strict";
+
+    const pluginCodebaseVer = CE.VERSIONS.codebase;
+    if (Utils.checkRMVersion(pluginCodebaseVer)) return;
+    console.warn(`Your codebase version is ${Utils.RPGMAKER_VERSION} but must be
+                 at least ${pluginCodebaseVer} to use ${CE.PLUGIN_NAME}`);
+
+})(DoubleX_RMMZ.Confusion_Edit);
 
 /*============================================================================
  *    ## Plugin Implementations

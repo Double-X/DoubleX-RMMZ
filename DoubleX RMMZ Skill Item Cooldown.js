@@ -642,7 +642,17 @@ DoubleX_RMMZ.Skill_Item_Cooldown = {
     VERSIONS: { codebase: "1.0.2", plugin: "v1.01a" }
 }; // DoubleX_RMMZ.Skill_Item_Cooldown
 //
-Utils.checkRMVersion(DoubleX_RMMZ.Skill_Item_Cooldown.VERSIONS.codebase);
+
+(SIC => {
+
+    "use strict";
+
+    const pluginCodebaseVer = SIC.VERSIONS.codebase;
+    if (Utils.checkRMVersion(pluginCodebaseVer)) return;
+    console.warn(`Your codebase version is ${Utils.RPGMAKER_VERSION} but must be
+                 at least ${pluginCodebaseVer} to use ${SIC.PLUGIN_NAME}`);
+
+})(DoubleX_RMMZ.Skill_Item_Cooldown);
 
 /*============================================================================
  *    ## Plugin Implementations

@@ -96,7 +96,17 @@ DoubleX_RMMZ.Test_Helper = {
     VERSIONS: { codebase: "1.0.2", plugin: "v1.00a" }
 }; // DoubleX_RMMZ.Test_Helper
 //
-Utils.checkRMVersion(DoubleX_RMMZ.Test_Helper.VERSIONS.codebase);
+
+(TH => {
+
+    "use strict";
+
+    const pluginCodebaseVer = TH.VERSIONS.codebase;
+    if (Utils.checkRMVersion(pluginCodebaseVer)) return;
+    console.warn(`Your codebase version is ${Utils.RPGMAKER_VERSION} but must be
+                 at least ${pluginCodebaseVer} to use ${TH.PLUGIN_NAME}`);
+
+})(DoubleX_RMMZ.Test_Helper);
 
 /*============================================================================
  *    ## Plugin Implementations

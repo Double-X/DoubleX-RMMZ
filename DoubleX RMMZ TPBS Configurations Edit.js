@@ -1124,7 +1124,17 @@ DoubleX_RMMZ.TPBS_Configurations_Edit = {
     VERSIONS: { codebase: "1.0.0", plugin: "v1.00a" }
 }; // DoubleX_RMMZ.TPBS_Configurations_Edit
 //
-Utils.checkRMVersion(DoubleX_RMMZ.TPBS_Configurations_Edit.VERSIONS.codebase);
+
+(TPBSCE => {
+
+    "use strict";
+
+    const pluginCodebaseVer = TPBSCE.VERSIONS.codebase;
+    if (Utils.checkRMVersion(pluginCodebaseVer)) return;
+    console.warn(`Your codebase version is ${Utils.RPGMAKER_VERSION} but must be
+                 at least ${pluginCodebaseVer} to use ${TPBSCE.PLUGIN_NAME}`);
+
+})(DoubleX_RMMZ.TPBS_Configurations_Edit);
 
 /*============================================================================
  *    ## Plugin Implementations

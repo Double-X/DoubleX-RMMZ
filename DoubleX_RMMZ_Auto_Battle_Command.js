@@ -135,7 +135,17 @@ DoubleX_RMMZ.Auto_Battle_Command = {
     VERSIONS: { codebase: "1.0.2", plugin: "v1.00a" }
 }; // DoubleX_RMMZ.Auto_Battle_Command
 //
-Utils.checkRMVersion(DoubleX_RMMZ.Auto_Battle_Command.VERSIONS.codebase);
+
+(ABC => {
+
+    "use strict";
+
+    const pluginCodebaseVer = ABC.VERSIONS.codebase;
+    if (Utils.checkRMVersion(pluginCodebaseVer)) return;
+    console.warn(`Your codebase version is ${Utils.RPGMAKER_VERSION} but must be
+                 at least ${pluginCodebaseVer} to use ${ABC.PLUGIN_NAME}`);
+
+})(DoubleX_RMMZ.Auto_Battle_Command);
 
 /*============================================================================
  *    ## Plugin Implementations

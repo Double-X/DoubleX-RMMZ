@@ -284,7 +284,17 @@ DoubleX_RMMZ.Plugin_Command_Lines = {
     VERSIONS: { codebase: "1.0.2", plugin: "v1.03a" }
 }; // DoubleX_RMMZ.Plugin_Command_Lines
 //
-Utils.checkRMVersion(DoubleX_RMMZ.Plugin_Command_Lines.VERSIONS.codebase);
+
+(PCL => {
+
+    "use strict";
+
+    const pluginCodebaseVer = PCL.VERSIONS.codebase;
+    if (Utils.checkRMVersion(pluginCodebaseVer)) return;
+    console.warn(`Your codebase version is ${Utils.RPGMAKER_VERSION} but must be
+                 at least ${pluginCodebaseVer} to use ${PCL.PLUGIN_NAME}`);
+
+})(DoubleX_RMMZ.Plugin_Command_Lines);
 
 /*============================================================================
  *    ## Plugin Implementations

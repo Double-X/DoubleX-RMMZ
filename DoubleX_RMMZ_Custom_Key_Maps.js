@@ -340,7 +340,17 @@ DoubleX_RMMZ.Custom_Key_Maps = {
     VERSIONS: { codebase: "1.0.2", plugin: "v1.00a" }
 }; // DoubleX_RMMZ.Custom_Key_Maps
 //
-Utils.checkRMVersion(DoubleX_RMMZ.Custom_Key_Maps.VERSIONS.codebase);
+
+(CKM => {
+
+    "use strict";
+
+    const pluginCodebaseVer = CKM.VERSIONS.codebase;
+    if (Utils.checkRMVersion(pluginCodebaseVer)) return;
+    console.warn(`Your codebase version is ${Utils.RPGMAKER_VERSION} but must be
+                 at least ${pluginCodebaseVer} to use ${CKM.PLUGIN_NAME}`);
+
+})(DoubleX_RMMZ.Custom_Key_Maps);
 
 /*============================================================================
  *    ## Plugin Implementations
@@ -503,10 +513,9 @@ Utils.checkRMVersion(DoubleX_RMMZ.Custom_Key_Maps.VERSIONS.codebase);
 
     NEW._KEY_MAPPER = new Map();
     const { keyMaps } = PluginManager.parameters(CKM.PLUGIN_NAME);
-    JSON.parse(keyMaps).forEach(rawKeyMap => {
-        const keyMap = JSON.parse(rawKeyMap), { keyName } = keyMap;
+    JSON.parse(keyMaps).map(JSON.parse).forEach(keyMap => {
+        const { keyName } = keyMap, keyMapper = NEW._KEY_MAPPER;
         const keyCode = NEW._KEY_CODES.get(keyMap.keyCode);
-        const keyMapper = NEW._KEY_MAPPER;
         if (!keyMapper.has(keyCode)) return keyMapper.set(keyCode, [keyName]);
         const keyNames = keyMapper.get(keyCode);
         if (!keyNames.includes(keyName)) keyNames.push(keyName);

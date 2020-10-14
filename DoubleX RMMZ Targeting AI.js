@@ -913,7 +913,17 @@ DoubleX_RMMZ.Targeting_AI = {
     VERSIONS: { codebase: "1.0.0", plugin: "v1.01a" }
 }; // DoubleX_RMMZ.Targeting_AI
 //
-Utils.checkRMVersion(DoubleX_RMMZ.Targeting_AI.VERSIONS.codebase);
+
+(TA => {
+
+    "use strict";
+
+    const pluginCodebaseVer = TA.VERSIONS.codebase;
+    if (Utils.checkRMVersion(pluginCodebaseVer)) return;
+    console.warn(`Your codebase version is ${Utils.RPGMAKER_VERSION} but must be
+                 at least ${pluginCodebaseVer} to use ${TA.PLUGIN_NAME}`);
+
+})(DoubleX_RMMZ.Targeting_AI);
 
 /*============================================================================
  *    ## Plugin Implementations

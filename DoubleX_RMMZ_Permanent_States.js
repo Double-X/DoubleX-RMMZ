@@ -154,7 +154,17 @@ DoubleX_RMMZ.Permanent_States = {
     VERSIONS: { codebase: "1.0.2", plugin: "v1.00a" }
 }; // DoubleX_RMMZ.Permanent_States
 //
-Utils.checkRMVersion(DoubleX_RMMZ.Permanent_States.VERSIONS.codebase);
+
+(PS => {
+
+    "use strict";
+
+    const pluginCodebaseVer = PS.VERSIONS.codebase;
+    if (Utils.checkRMVersion(pluginCodebaseVer)) return;
+    console.warn(`Your codebase version is ${Utils.RPGMAKER_VERSION} but must be
+                 at least ${pluginCodebaseVer} to use ${PS.PLUGIN_NAME}`);
+
+})(DoubleX_RMMZ.Permanent_States);
 
 /*============================================================================
  *    ## Plugin Implementations

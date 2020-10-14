@@ -184,7 +184,17 @@ DoubleX_RMMZ.Plugin_Query = {
     VERSIONS: { codebase: "1.0.2", plugin: "v1.00a" }
 }; // DoubleX_RMMZ.Plugin_Query
 //
-Utils.checkRMVersion(DoubleX_RMMZ.Plugin_Query.VERSIONS.codebase);
+
+(PQ => {
+
+    "use strict";
+
+    const pluginCodebaseVer = PQ.VERSIONS.codebase;
+    if (Utils.checkRMVersion(pluginCodebaseVer)) return;
+    console.warn(`Your codebase version is ${Utils.RPGMAKER_VERSION} but must be
+                 at least ${pluginCodebaseVer} to use ${PQ.PLUGIN_NAME}`);
+
+})(DoubleX_RMMZ.Plugin_Query);
 
 /*============================================================================
  *    ## Plugin Implementations
@@ -242,8 +252,7 @@ if (DoubleX_RMMZ.Enhanced_Codebase) {
         ],
         ["newEventCmdPluginQueries", "eventCmdPluginQueries", []]
     ].forEach(([param, queryContainer, fixedArgs]) => {
-        JSON.parse(params[param]).forEach(rawPluginQuery => {
-            const pluginQuery = JSON.parse(rawPluginQuery);
+        JSON.parse(params[param]).map(JSON.parse).forEach(pluginQuery => {
             const args = fixedArgs.concat(JSON.parse(pluginQuery.args));
             args.push(JSON.parse(pluginQuery.funcContents));
             $[queryContainer].set(pluginQuery.name, new Function(...args));

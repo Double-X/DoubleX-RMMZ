@@ -407,7 +407,17 @@ DoubleX_RMMZ.Enhanced_Codebase = {
     VERSIONS: { codebase: "1.0.2", plugin: "v0.00a" }
 }; // DoubleX_RMMZ.Enhanced_Codebase
 //
-Utils.checkRMVersion(DoubleX_RMMZ.Enhanced_Codebase.VERSIONS.codebase);
+
+(EC => {
+
+    "use strict";
+
+    const pluginCodebaseVer = EC.VERSIONS.codebase;
+    if (Utils.checkRMVersion(pluginCodebaseVer)) return;
+    console.warn(`Your codebase version is ${Utils.RPGMAKER_VERSION} but must be
+                 at least ${pluginCodebaseVer} to use ${EC.PLUGIN_NAME}`);
+
+})(DoubleX_RMMZ.Enhanced_Codebase);
 
 /*============================================================================
  *    ## Plugin Implementations
