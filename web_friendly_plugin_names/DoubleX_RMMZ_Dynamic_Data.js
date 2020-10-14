@@ -125,7 +125,17 @@ DoubleX_RMMZ.Dynamic_Data = {
     VERSIONS: { codebase: "1.0.0", plugin: "v1.00a" }
 }; // DoubleX_RMMZ.Dynamic_Data
 //
-Utils.checkRMVersion(DoubleX_RMMZ.Dynamic_Data.VERSIONS.codebase);
+
+(DC => {
+
+    "use strict";
+
+    const pluginCodebaseVer = DC.VERSIONS.codebase;
+    if (Utils.checkRMVersion(pluginCodebaseVer)) return;
+    console.warn(`Your codebase version is ${Utils.RPGMAKER_VERSION} but must be
+                 at least ${pluginCodebaseVer} to use ${DC.PLUGIN_NAME}`);
+
+})(DoubleX_RMMZ.Dynamic_Data);
 
 /*============================================================================
  *    ## Plugin Implementations
