@@ -35,16 +35,16 @@
  *      This Plugin:
  *      1. https://github.com/Double-X/DoubleX-RMMZ/blob/master/DoubleX_RMMZ_Script_Call_Hotkeys.js
  *      Posts:
- *      1. 
- *      2. 
- *      3. 
- *      4. 
- *      5. 
- *      6. 
- *      7. 
- *      8. 
- *      9. 
- *      10. 
+ *      1. https://forums.rpgmakerweb.com/index.php?threads/doublex_rmmz_script_call_hotkeys.128675/
+ *      2. https://www.rpgmakercentral.com/topic/42654-doublex_rmmz_script_call_hotkeys/
+ *      3. https://rpgmaker.net/engines/rmmz/utilities/302/
+ *      4. https://www.save-point.org/thread-8184.html
+ *      5. https://gdu.one/forums/topic/13665-doublex_rmmz_script_call_hotkeys/
+ *      6. http://www.hbgames.org/forums/viewtopic.php?f=332&t=80367
+ *      7. https://forum.chaos-project.com/index.php/topic,16090.new.html
+ *      8. https://doublexrpgmaker.wordpress.com/2020/10/14/doublex_rmmz_script_call_hotkeys/
+ *      9. https://www.patreon.com/posts/42734896
+ *      10. https://www.makerdevs.com/plugin/doublex-rmmz-script-call-hotkeys
  *----------------------------------------------------------------------------
  *    # Instructions
  *      1. The default plugin parameters file name is
@@ -66,7 +66,7 @@
  *      - None So Far
  *----------------------------------------------------------------------------
  *    # Changelog
- *      { codebase: "1.0.2", plugin: "v1.00a" }(2020 Oct 14 GMT 1300):
+ *      { codebase: "1.0.2", plugin: "v1.00a" }(2020 Oct 14 GMT 0700):
  *      1. 1st version of this plugin finished
  *============================================================================*/
 
