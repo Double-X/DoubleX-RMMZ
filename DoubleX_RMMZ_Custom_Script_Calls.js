@@ -282,7 +282,6 @@ if (DoubleX_RMMZ.Enhanced_Codebase) {
     }); // v1.00a - v1.00a
 
     /**
-     * The this pointer is Game_System.prototype
      * Script Call/Idempotent
      * @author DoubleX @interface @since v1.00a @version v1.00a
      * @param {string} newScriptCallFullName - The new script call full name
@@ -304,7 +303,6 @@ if (DoubleX_RMMZ.Enhanced_Codebase) {
     }; // $.setNewScriptCall
 
     /**
-     * The this pointer is Game_System.prototype
      * Idempotent
      * @author DoubleX @interface @since v1.00a @version v1.00a
      */

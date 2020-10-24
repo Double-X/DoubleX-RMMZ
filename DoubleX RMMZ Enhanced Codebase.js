@@ -2517,13 +2517,6 @@ DoubleX_RMMZ.Enhanced_Codebase = {
         rewriteFunc,
     } = MZ_EC.setKlassContainer("DataManager", $, MZ_EC);
 
-    extendFunc("onLoad", function(obj, objName) {
-        ORIG.onLoad.apply(this, arguments);
-        // Added to help plugins load notetags with known data container type
-        NEW.loadDataNotetags.call(this, obj, objName);
-        //
-    }); // v0.00a - v0.00a
-
     extendFunc("extractSaveContents", function(contents) {
         ORIG.extractSaveContents.apply(this, arguments);
         // Added to ensure all parameter functions uses the parameters in saves
@@ -2537,6 +2530,47 @@ DoubleX_RMMZ.Enhanced_Codebase = {
         //
         this.onXhrError(name, src, url);
     }); // v0.00a - v0.00a
+
+    rewriteFunc("onLoad", function(obj, objName) {
+        NEW.loadObj.call(this, obj, objName);
+        // Added to help plugins load notetags with known data container type
+        NEW.loadDataNotetags.call(this, obj, objName);
+        //
+    }); // v0.00a - v0.00a
+
+    /**
+     * The this pointer is DataManager
+     * Idempotent
+     * @author DoubleX @interface @since v0.00a @version v0.00a
+     * @param {{*}} obj - The raw data from the database to be loaded
+     * @param {string} objName - The name of the data container having notetags
+     */
+    NEW.loadObj = function(obj, objName) {
+        if (this.isMapObject(obj)) return NEW.loadMapObj.call(this, obj);
+        NEW.loadOtherObj.call(this, obj, objName);
+    }; // NEW.loadObj
+
+    /**
+     * The this pointer is DataManager
+     * Idempotent
+     * @author DoubleX @interface @since v0.00a @version v0.00a
+     * @param {{*}} obj - The raw data from the database to be loaded
+     */
+    NEW.loadMapObj = function(obj) {
+        this.extractMetadata(obj);
+        this.extractArrayMetadata(obj.events);
+    }; // NEW.loadMapObj
+
+    /**
+     * The this pointer is DataManager
+     * Idempotent
+     * @author DoubleX @interface @since v0.00a @version v0.00a
+     * @param {{*}} obj - The raw data from the database to be loaded
+     * @param {string} objName - The name of the data container having notetags
+     */
+    NEW.loadOtherObj = function(obj, objName) {
+        this.extractArrayMetadata(obj);
+    }; // NEW.loadOtherObj
 
     /**
      * The this pointer is DataManager

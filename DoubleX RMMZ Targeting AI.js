@@ -1244,7 +1244,6 @@ if (DoubleX_RMMZ.Enhanced_Codebase && DoubleX_RMMZ.Unit_Filters) {
     }); // v1.00a - v1.00a
 
     /**
-     * The this pointer is Game_System.prototype
      * Script Call/Idempotent
      * @author DoubleX @interface @since v1.00a @version v1.00a
      * @enum @param {string} param - The name of parameter to be stored in saves
@@ -1255,7 +1254,6 @@ if (DoubleX_RMMZ.Enhanced_Codebase && DoubleX_RMMZ.Unit_Filters) {
     }; // $.setTargetingAIParam
 
     /**
-     * The this pointer is Game_System.prototype
      * Script Call/Nullipotent
      * @author DoubleX @interface @since v1.00a @version v1.00a
      * @enum @param {string} param - The name of parameter to be stored in saves
