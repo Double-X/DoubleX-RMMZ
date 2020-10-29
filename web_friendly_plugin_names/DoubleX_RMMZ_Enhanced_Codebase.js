@@ -73,7 +73,7 @@
  *         opening this plugin js file directly
  *      4. (Plugin developers only)The version numbers of this plugin are
  *         stored in DoubleX_RMMZ.Enhanced_Codebase.VERSIONS, which should be
- *         { codebase: "1.0.2", plugin: "v0.00a" }
+ *         { codebase: "1.1.0", plugin: "v0.00a" }
  *         If it's falsy, it means this plugin's not loaded at the moment of
  *         querying its version numbers
  *      5. (Plugin developers only)Please use the following search tag to
@@ -131,7 +131,7 @@
 /*:
  * @url https://www.patreon.com/doublex
  * @target MZ
- * @plugindesc Versions: { codebase: "1.0.2", plugin: "v0.00a" }
+ * @plugindesc Versions: { codebase: "1.1.0", plugin: "v0.00a" }
  * Fixes bugs, improves codebase quality, boosts performance and gives new APIs
  * @author DoubleX
  *
@@ -404,7 +404,7 @@ var DoubleX_RMMZ = DoubleX_RMMZ || {}; // var must be used or game will crash
 // Separates the version numbers with the rest to make the former more clear
 DoubleX_RMMZ.Enhanced_Codebase = {
     PLUGIN_NAME: "DoubleX_RMMZ_Enhanced_Codebase",
-    VERSIONS: { codebase: "1.0.2", plugin: "v0.00a" }
+    VERSIONS: { codebase: "1.1.0", plugin: "v0.00a" }
 }; // DoubleX_RMMZ.Enhanced_Codebase
 //
 
@@ -2517,13 +2517,6 @@ DoubleX_RMMZ.Enhanced_Codebase = {
         rewriteFunc,
     } = MZ_EC.setKlassContainer("DataManager", $, MZ_EC);
 
-    extendFunc("onLoad", function(obj, objName) {
-        ORIG.onLoad.apply(this, arguments);
-        // Added to help plugins load notetags with known data container type
-        NEW.loadDataNotetags.call(this, obj, objName);
-        //
-    }); // v0.00a - v0.00a
-
     extendFunc("extractSaveContents", function(contents) {
         ORIG.extractSaveContents.apply(this, arguments);
         // Added to ensure all parameter functions uses the parameters in saves
@@ -2537,6 +2530,47 @@ DoubleX_RMMZ.Enhanced_Codebase = {
         //
         this.onXhrError(name, src, url);
     }); // v0.00a - v0.00a
+
+    rewriteFunc("onLoad", function(obj, objName) {
+        NEW.loadObj.call(this, obj, objName);
+        // Added to help plugins load notetags with known data container type
+        NEW.loadDataNotetags.call(this, obj, objName);
+        //
+    }); // v0.00a - v0.00a
+
+    /**
+     * The this pointer is DataManager
+     * Idempotent
+     * @author DoubleX @interface @since v0.00a @version v0.00a
+     * @param {{*}} obj - The raw data from the database to be loaded
+     * @param {string} objName - The name of the data container having notetags
+     */
+    NEW.loadObj = function(obj, objName) {
+        if (this.isMapObject(obj)) return NEW.loadMapObj.call(this, obj);
+        NEW.loadOtherObj.call(this, obj, objName);
+    }; // NEW.loadObj
+
+    /**
+     * The this pointer is DataManager
+     * Idempotent
+     * @author DoubleX @interface @since v0.00a @version v0.00a
+     * @param {{*}} obj - The raw data from the database to be loaded
+     */
+    NEW.loadMapObj = function(obj) {
+        this.extractMetadata(obj);
+        this.extractArrayMetadata(obj.events);
+    }; // NEW.loadMapObj
+
+    /**
+     * The this pointer is DataManager
+     * Idempotent
+     * @author DoubleX @interface @since v0.00a @version v0.00a
+     * @param {{*}} obj - The raw data from the database to be loaded
+     * @param {string} objName - The name of the data container having notetags
+     */
+    NEW.loadOtherObj = function(obj, objName) {
+        this.extractArrayMetadata(obj);
+    }; // NEW.loadOtherObj
 
     /**
      * The this pointer is DataManager
@@ -5224,11 +5258,10 @@ DoubleX_RMMZ.Enhanced_Codebase = {
      * @returns {boolean} Whether the actor's turn has ended on the game map
      */
     NEW._autoBattleAct = function() {
-        let maxValue = Number.MIN_VALUE, bestAct;
+        let maxValue = -Number.MAX_VALUE, bestAct;
         this.makeActionList().forEach(action => {
             const value = action.evaluate();
-            if (value <= maxValue) return;
-            [maxValue, bestAct] = [value, action];
+            if (value > maxValue) [maxValue, bestAct] = [value, action];
         });
         return bestAct;
     }; // NEW._autoBattleAct
