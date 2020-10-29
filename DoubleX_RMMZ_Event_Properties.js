@@ -28,7 +28,9 @@
  *    # Author Notes
  *      1. All other plugins using this plugin should be placed under this
  *         plugin
- *      2. (Plugin Developers)PLUGIN COMMANDS AS EVENT PROPERTIES IN COMMON
+ *      2. (Plugin Developers)PLUGIN COMMANDS AS EVENT PROPERTIES IN AN MAP
+ *         EVENT WILL ONLY BE APPLIED TO THAT EVENT INSTANCE
+ *      3. (Plugin Developers)PLUGIN COMMANDS AS EVENT PROPERTIES IN COMMON
  *         EVENTS WILL BE APPLIED TO ALL EVENT INSTANCES CALLING THOSE COMMON
  *         EVENTS
  *----------------------------------------------------------------------------

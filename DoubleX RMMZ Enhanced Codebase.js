@@ -73,7 +73,7 @@
  *         opening this plugin js file directly
  *      4. (Plugin developers only)The version numbers of this plugin are
  *         stored in DoubleX_RMMZ.Enhanced_Codebase.VERSIONS, which should be
- *         { codebase: "1.0.2", plugin: "v0.00a" }
+ *         { codebase: "1.1.0", plugin: "v0.00a" }
  *         If it's falsy, it means this plugin's not loaded at the moment of
  *         querying its version numbers
  *      5. (Plugin developers only)Please use the following search tag to
@@ -131,7 +131,7 @@
 /*:
  * @url https://www.patreon.com/doublex
  * @target MZ
- * @plugindesc Versions: { codebase: "1.0.2", plugin: "v0.00a" }
+ * @plugindesc Versions: { codebase: "1.1.0", plugin: "v0.00a" }
  * Fixes bugs, improves codebase quality, boosts performance and gives new APIs
  * @author DoubleX
  *
@@ -404,7 +404,7 @@ var DoubleX_RMMZ = DoubleX_RMMZ || {}; // var must be used or game will crash
 // Separates the version numbers with the rest to make the former more clear
 DoubleX_RMMZ.Enhanced_Codebase = {
     PLUGIN_NAME: "DoubleX RMMZ Enhanced Codebase",
-    VERSIONS: { codebase: "1.0.2", plugin: "v0.00a" }
+    VERSIONS: { codebase: "1.1.0", plugin: "v0.00a" }
 }; // DoubleX_RMMZ.Enhanced_Codebase
 //
 
@@ -5258,11 +5258,10 @@ DoubleX_RMMZ.Enhanced_Codebase = {
      * @returns {boolean} Whether the actor's turn has ended on the game map
      */
     NEW._autoBattleAct = function() {
-        let maxValue = Number.MIN_VALUE, bestAct;
+        let maxValue = -Number.MAX_VALUE, bestAct;
         this.makeActionList().forEach(action => {
             const value = action.evaluate();
-            if (value <= maxValue) return;
-            [maxValue, bestAct] = [value, action];
+            if (value > maxValue) [maxValue, bestAct] = [value, action];
         });
         return bestAct;
     }; // NEW._autoBattleAct
