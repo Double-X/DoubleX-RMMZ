@@ -357,7 +357,6 @@ if (DoubleX_RMMZ.Enhanced_Codebase) {
         });
     }; // NEW._NEW_PLUGIN_CMD_ARGS
     /**
-     * The this pointer is Game_System.prototype
      * Script Call/Idempotent
      * @author DoubleX @interface @since v1.01a @version v1.02a
      * @param {string} pluginFilename - Filename of plugin having origCmdName
@@ -392,7 +391,6 @@ if (DoubleX_RMMZ.Enhanced_Codebase) {
     }; // $.setNewPluginCmd
 
     /**
-     * The this pointer is Game_System.prototype
      * Nullipotent
      * @author DoubleX @interface @since v1.00a @version v1.02a
      * @param {string} cmdName - The name of the plugin command
