@@ -90,6 +90,7 @@
  * @target MZ
  * @plugindesc Versions: { codebase: "1.0.0", plugin: "v1.01a" }
  * Lets you use script calls to filter unit members with less codes and eventing
+ * @orderAfter DoubleX_RMMZ_Enhanced_Codebase
  * @orderAfter DoubleX RMMZ Enhanced Codebase
  * @orderAfter DoubleX_RMMZ_Plugin_Query
  * @author DoubleX
