@@ -4,6 +4,12 @@
  *    # Plugin Name
  *      DoubleX_RMMZ_TPBS_Actor_Hotkeys
  *----------------------------------------------------------------------------
+ *    # Introduction
+ *      1. By default, the TPBS only lets you select the next inputable actors
+ *         by pressing the cancel key
+ *      2. This plugin lets you set some hotkeys to select the previous
+ *         counterparts as well as those with specified party member indices
+ *----------------------------------------------------------------------------
  *    # Prerequisites
  *      Plugins:
  *      1. DoubleX RMMZ Enhanced Codebase
@@ -38,16 +44,16 @@
  *      This Plugin:
  *      1. https://github.com/Double-X/DoubleX-RMMZ/blob/master/DoubleX_RMMZ_TPBS_Actor_Hotkeys.js
  *      Posts:
- *      1. 
- *      2. 
- *      3. 
- *      4. 
- *      5. 
- *      6. 
- *      7. 
- *      8. 
- *      9. 
- *      10. 
+ *      1. https://forums.rpgmakerweb.com/index.php?threads/doublex_rmmz_tpbs_actor_hotkeys.129346/
+ *      2. https://www.rpgmakercentral.com/topic/42673-doublex_rmmz_tpbs_actor_hotkeys/
+ *      3. https://rpgmaker.net/engines/rmmz/utilities/307/
+ *      4. https://www.save-point.org/thread-8192.html
+ *      5. https://gdu.one/forums/topic/13677-doublex_rmmz_tpbs_actor_hotkeys/
+ *      6. http://www.hbgames.org/forums/viewtopic.php?f=332&t=80396
+ *      7. https://forum.chaos-project.com/index.php/topic,16093.0.html
+ *      8. https://doublexrpgmaker.wordpress.com/2020/10/30/doublex_rmmz_tpbs_actor_hotkeys/
+ *      9. https://www.patreon.com/posts/43321038
+ *      10. https://www.makerdevs.com/plugin/doublex-rmmz-tpbs-actor-hotkeys
  *----------------------------------------------------------------------------
  *    # Instructions
  *      1. The default plugin parameters file name is
