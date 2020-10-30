@@ -132,6 +132,7 @@
  * @target MZ
  * @plugindesc Versions: { codebase: "1.0.2", plugin: "v1.00a" }
  * Lets you set some hotkeys per scene to trigger some script calls
+ * @orderAfter DoubleX_RMMZ_Enhanced_Codebase
  * @orderAfter DoubleX RMMZ Enhanced Codebase
  * @author DoubleX
  *

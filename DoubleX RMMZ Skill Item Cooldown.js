@@ -117,6 +117,7 @@
  * @target MZ
  * @plugindesc Versions: { codebase: "1.0.0", plugin: "v1.01a" }
  * Lets you set some skills/items to have battler and skill/item cooldowns
+ * @orderAfter DoubleX_RMMZ_Enhanced_Codebase
  * @orderAfter DoubleX RMMZ Enhanced Codebase
  * @orderAfter DoubleX_RMMZ_Plugin_Query
  * @base DoubleX RMMZ Enhanced Codebase

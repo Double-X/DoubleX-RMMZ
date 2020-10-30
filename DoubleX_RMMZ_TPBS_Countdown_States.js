@@ -20,8 +20,6 @@
  *         https://github.com/Double-X/DoubleX-RMMZ/blob/master/DoubleX%20RMMZ%20State%20Triggers.js
  *         Can be useful when setting some events to happen upon updating the
  *         countdown state turn counters
- *      2. The TPBS inputable actor selection hotkeys shouldn't be changed
- *         inside battles
  *----------------------------------------------------------------------------
  *    # Terms Of Use
  *      1. Commercial use's always allowed and crediting me's always optional.
@@ -43,16 +41,16 @@
  *      This Plugin:
  *      1. https://github.com/Double-X/DoubleX-RMMZ/blob/master/DoubleX_RMMZ_TPBS_Countdown_States.js
  *      Posts:
- *      1.
- *      2.
- *      3.
- *      4.
- *      5.
- *      6.
- *      7.
- *      8.
- *      9.
- *      10.
+ *      1. https://forums.rpgmakerweb.com/index.php?threads/doublex_rmmz_tpbs_countdown_states.129352/
+ *      2. https://www.rpgmakercentral.com/topic/42674-doublex_rmmz_tpbs_countdown_states/
+ *      3. https://rpgmaker.net/engines/rmmz/utilities/308/
+ *      4. https://www.save-point.org/thread-8193.html
+ *      5. https://gdu.one/forums/topic/13678-doublex_rmmz_tpbs_countdown_states/
+ *      6. http://www.hbgames.org/forums/viewtopic.php?f=332&t=80397
+ *      7. https://forum.chaos-project.com/index.php/topic,16094.new.html
+ *      8. https://doublexrpgmaker.wordpress.com/2020/10/30/doublex_rmmz_tpbs_countdown_states/
+ *      9. https://www.patreon.com/posts/43327703
+ *      10. https://www.makerdevs.com/plugin/doublex-rmmz-tpbs-countdown-states
  *----------------------------------------------------------------------------
  *    # Instructions
  *      1. The default plugin parameters file name is
@@ -84,6 +82,7 @@
  * Lets you set some states to update its turn after some seconds in TPBS
  * @orderBefore DoubleX_RMMZ_State_Triggers
  * @orderBefore DoubleX RMMZ State Triggers
+ * @orderAfter DoubleX_RMMZ_Enhanced_Codebase
  * @orderAfter DoubleX RMMZ Enhanced Codebase
  * @base DoubleX RMMZ Enhanced Codebase
  * @author DoubleX

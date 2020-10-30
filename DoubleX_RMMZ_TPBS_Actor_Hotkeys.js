@@ -96,6 +96,7 @@
  * @target MZ
  * @plugindesc Versions: { codebase: "1.1.0", plugin: "v1.00a" }
  * Lets you set some custom hotkeys to select some inputable actors in TPBS
+ * @orderAfter DoubleX_RMMZ_Enhanced_Codebase
  * @orderAfter DoubleX RMMZ Enhanced Codebase
  * @base DoubleX RMMZ Enhanced Codebase
  * @author DoubleX

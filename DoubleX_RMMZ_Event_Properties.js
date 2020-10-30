@@ -94,6 +94,7 @@
  * @target MZ
  * @plugindesc Versions: { codebase: "1.1.0", plugin: "v1.00a" }
  * Lets other plugins use RMMZ plugin commands as individual event notetags
+ * @orderAfter DoubleX_RMMZ_Enhanced_Codebase
  * @orderAfter DoubleX RMMZ Enhanced Codebase
  * @base DoubleX RMMZ Enhanced Codebase
  * @author DoubleX
