@@ -84,6 +84,7 @@
  * @target MZ
  * @plugindesc Versions: { codebase: "1.0.0", plugin: "v1.00a" }
  * Lets you run some codes set by your notetags on some action execution cases
+ * @orderAfter DoubleX_RMMZ_Enhanced_Codebase
  * @orderAfter DoubleX RMMZ Enhanced Codebase
  * @base DoubleX RMMZ Enhanced Codebase
  * @author DoubleX
@@ -830,6 +831,7 @@ if (DoubleX_RMMZ.Enhanced_Codebase) {
         const t = $gameSystem.skillItemTriggersParam(`${notetagName}${suffix}`);
         MZ_EC.runCondEventNotetags(battler, t, containerName, [notetagName]);
         battler.latestSkillItems = latestSkillItem;
+        MZ_EC.clearBattlerNotetagCache(battler, containerName);
     }; // NEW.runTriggers
 
 })(BattleManager, DoubleX_RMMZ.Enhanced_Codebase,
