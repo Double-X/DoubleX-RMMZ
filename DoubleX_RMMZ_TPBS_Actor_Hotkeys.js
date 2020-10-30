@@ -15,6 +15,8 @@
  *      1. A custom key map plugin, like DoubleX_RMMZ_Custom_Key_Maps:
  *         https://github.com/Double-X/DoubleX-RMMZ/blob/master/DoubleX_RMMZ_Custom_Key_Maps.js
  *         Can be useful when setting hotkeys to select targets in this plugin
+ *      2. The TPBS inputable actor selection hotkeys shouldn't be changed
+ *         inside battles
  *----------------------------------------------------------------------------
  *    # Terms Of Use
  *      1. Commercial use's always allowed and crediting me's always optional.
@@ -32,9 +34,9 @@
  *----------------------------------------------------------------------------
  *    # Links
  *      Video:
- *      1. 
+ *      1. https://www.youtube.com/watch?v=oJkwC0fmI2o
  *      This Plugin:
- *      1. 
+ *      1. https://github.com/Double-X/DoubleX-RMMZ/blob/master/DoubleX_RMMZ_TPBS_Actor_Hotkeys.js
  *      Posts:
  *      1. 
  *      2. 
@@ -104,7 +106,8 @@
  *
  * @param indexHotkeys
  * @type struct<IndexHotkey>[]
- * @desc Sets the list of hotkeys selecting inputable actors in TPBS
+ * @desc Sets the list of hotkeys selecting inputable actors in
+ * TPBS
  * @default []
  *
  * @command setTPBSActorPrevHotkey
@@ -396,6 +399,7 @@ if (DoubleX_RMMZ.Enhanced_Codebase) {
      * @author DoubleX @since v1.00a @version v1.00a
      */
     NEW._setHandlers = function() {
+        if (!BattleManager.isTpb()) return;
         NEW._setPrevHandler.call(this);
         NEW._setNextHandler.call(this);
         NEW._setIndexHandlers.call(this);
