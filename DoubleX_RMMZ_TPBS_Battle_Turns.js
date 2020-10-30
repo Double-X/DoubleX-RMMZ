@@ -37,7 +37,7 @@
  *----------------------------------------------------------------------------
  *    # Links
  *      Video:
- *      1. 
+ *      1. https://www.youtube.com/watch?v=cegl2cC0XDM
  *      This Plugin:
  *      1. https://github.com/Double-X/DoubleX-RMMZ/blob/master/DoubleX_RMMZ_TPBS_Battle_Turns.js
  *      Posts:
