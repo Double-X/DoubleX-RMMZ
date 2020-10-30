@@ -39,18 +39,18 @@
  *      Video:
  *      1. 
  *      This Plugin:
- *      1. 
+ *      1. https://github.com/Double-X/DoubleX-RMMZ/blob/master/DoubleX_RMMZ_TPBS_Battle_Turns.js
  *      Posts:
- *      1. 
- *      2. 
- *      3. 
- *      4. 
- *      5. 
- *      6. 
- *      7. 
- *      8. 
- *      9. 
- *      10. 
+ *      1. https://forums.rpgmakerweb.com/index.php?threads/doublex_rmmz_tpbs_battle_turns.129340/
+ *      2. https://www.rpgmakercentral.com/topic/42672-doublex_rmmz_tpbs_battle_turns/
+ *      3. https://rpgmaker.net/engines/rmmz/utilities/306/
+ *      4. https://www.save-point.org/thread-8191.html
+ *      5. https://gdu.one/forums/topic/13676-doublex_rmmz_tpbs_battle_turns/
+ *      6. http://www.hbgames.org/forums/viewtopic.php?f=332&t=80395
+ *      7. https://forum.chaos-project.com/index.php/topic,16092.new.html
+ *      8. https://doublexrpgmaker.wordpress.com/2020/10/30/doublex_rmmz_tpbs_battle_turns/
+ *      9. https://www.patreon.com/posts/43317432
+ *      10. https://www.makerdevs.com/plugin/doublex-rmmz-tpbs-battle-turns
  *----------------------------------------------------------------------------
  *    # Instructions
  *      1. The default plugin parameters file name is
@@ -72,7 +72,7 @@
  *      - None So Far
  *----------------------------------------------------------------------------
  *    # Changelog
- *      { codebase: "1.1.0", plugin: "v1.00a" }(2020 Oct 30 GMT 1400):
+ *      { codebase: "1.1.0", plugin: "v1.00a" }(2020 Oct 30 GMT 0600):
  *      1. 1st version of this plugin finished
  *============================================================================*/
 
