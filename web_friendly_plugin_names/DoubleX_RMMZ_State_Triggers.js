@@ -82,6 +82,7 @@
  * @target MZ
  * @plugindesc Versions: { codebase: "1.0.0", plugin: "v1.00a" }
  * Lets you run some codes set by your notetags on some important state timings
+ * @orderAfter DoubleX_RMMZ_Enhanced_Codebase
  * @orderAfter DoubleX RMMZ Enhanced Codebase
  * @base DoubleX RMMZ Enhanced Codebase
  * @author DoubleX
@@ -679,6 +680,7 @@ if (DoubleX_RMMZ.Enhanced_Codebase) {
         this.thisState = state;
         MZ_EC.runCondEventNotetags(this, types, "stateTriggers", [notetagName]);
         this.thisState = thisState;
+        MZ_EC.clearBattlerNotetagCache(this, "stateTriggers");
     }; // NEW.runTriggers
 
 })(Game_BattlerBase.prototype, DoubleX_RMMZ.Enhanced_Codebase,
