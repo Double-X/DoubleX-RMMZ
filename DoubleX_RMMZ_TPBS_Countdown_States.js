@@ -15,6 +15,14 @@
  *      Abilities:
  *      1. Nothing special
  *----------------------------------------------------------------------------
+ *    # Author Notes
+ *      1. DoubleX RMMZ State Triggers:
+ *         https://github.com/Double-X/DoubleX-RMMZ/blob/master/DoubleX%20RMMZ%20State%20Triggers.js
+ *         Can be useful when setting some events to happen upon updating the
+ *         countdown state turn counters
+ *      2. The TPBS inputable actor selection hotkeys shouldn't be changed
+ *         inside battles
+ *----------------------------------------------------------------------------
  *    # Terms Of Use
  *      1. Commercial use's always allowed and crediting me's always optional.
  *      2. You shall keep this plugin's Plugin Info part's contents intact.
@@ -31,9 +39,9 @@
  *----------------------------------------------------------------------------
  *    # Links
  *      Video:
- *      1.
+ *      1. https://www.youtube.com/watch?v=5fJcE6ZINMs
  *      This Plugin:
- *      1.
+ *      1. https://github.com/Double-X/DoubleX-RMMZ/blob/master/DoubleX_RMMZ_TPBS_Countdown_States.js
  *      Posts:
  *      1.
  *      2.
@@ -351,6 +359,7 @@ if (DoubleX_RMMZ.Enhanced_Codebase) {
      * @returns {boolean} Whether the specified state is a countdown state
      */
     $.isTPBSCountdownState = function(stateId) {
+        if (!BattleManager.isTpb()) return false;
         return !isNaN(this._tpbsCountdownStates[stateId]);
     }; // $.isTPBSCountdownState
 
