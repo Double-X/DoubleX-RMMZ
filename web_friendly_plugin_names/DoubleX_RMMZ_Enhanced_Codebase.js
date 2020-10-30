@@ -986,7 +986,7 @@ DoubleX_RMMZ.Enhanced_Codebase = {
         CORE._battlerNotetagCache.get(battlerKey).forEach((container) => {
             container.delete(containerName_);
         });
-    }; // MZ_EC.clearBattlerNotetagCacheCache
+    }; // MZ_EC.clearBattlerNotetagCache
 
 })(DoubleX_RMMZ.Enhanced_Codebase);
 
