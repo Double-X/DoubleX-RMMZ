@@ -1314,6 +1314,7 @@ if (DoubleX_RMMZ.Enhanced_Codebase) {
         this.latestSkillItems = [item];
         const skillItemTurnCount = NEW._skillItemCooldownTurnCount.call(this);
         this.latestSkillItems = lastLatestSkillItems;
+        MZ_EC.clearBattlerNotetagCache(this, "cooldown");
         this.setSkillItemCooldown(item, skillItemTurnCount);
     }; // NEW._setSkillItemCooldown
 
@@ -1341,6 +1342,7 @@ if (DoubleX_RMMZ.Enhanced_Codebase) {
         this.latestSkillItems = this._skillItemCooldown.usedSkillItems;
         const battlerTurnCount = NEW._battlerCooldownTurnCount.call(this);
         this.latestSkillItems = lastLatestSkillItems;
+        MZ_EC.clearBattlerNotetagCache(this, "cooldown");
         this.setBattlerCooldown(battlerTurnCount);
     }; // NEW._setBattlerCooldown
 

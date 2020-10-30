@@ -830,6 +830,7 @@ if (DoubleX_RMMZ.Enhanced_Codebase) {
         const t = $gameSystem.skillItemTriggersParam(`${notetagName}${suffix}`);
         MZ_EC.runCondEventNotetags(battler, t, containerName, [notetagName]);
         battler.latestSkillItems = latestSkillItem;
+        MZ_EC.clearBattlerNotetagCache(battler, containerName);
     }; // NEW.runTriggers
 
 })(BattleManager, DoubleX_RMMZ.Enhanced_Codebase,

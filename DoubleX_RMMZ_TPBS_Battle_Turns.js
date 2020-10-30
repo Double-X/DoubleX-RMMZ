@@ -218,6 +218,13 @@ if (DoubleX_RMMZ.Enhanced_Codebase) {
         ORIG
     } = MZ_EC.setKlassContainer("BattleManager", $, TPBSBT);
 
+    /*------------------------------------------------------------------------
+     *    New private variables
+     *------------------------------------------------------------------------*/
+    // {{*}} _battleTurns: The container of all other new variables
+    //       {number} sec: The number of seconds elapsed in the current turn
+    //       {number} act: The number of actions executed in the current turn
+
     extendFunc("initMembers", function() {
         ORIG.initMembers.apply(this, arguments);
         // Added to initialize the battle turn sec/act counters

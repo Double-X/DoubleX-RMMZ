@@ -85,14 +85,14 @@
  *      - None So Far
  *----------------------------------------------------------------------------
  *    # Changelog
- *      { codebase: "1.0.2", plugin: "v1.00a" }(2020 Sep 20 GMT 1400):
+ *      { codebase: "1.1.0", plugin: "v1.00a" }(2020 Oct 20 GMT 1400):
  *      1. 1st version of this plugin finished
  *============================================================================*/
 
 /*:
  * @url https://www.patreon.com/doublex
  * @target MZ
- * @plugindesc Versions: { codebase: "1.0.2", plugin: "v1.00a" }
+ * @plugindesc Versions: { codebase: "1.1.0", plugin: "v1.00a" }
  * Lets other plugins use RMMZ plugin commands as individual event notetags
  * @orderAfter DoubleX RMMZ Enhanced Codebase
  * @base DoubleX RMMZ Enhanced Codebase
@@ -149,7 +149,7 @@ var DoubleX_RMMZ = DoubleX_RMMZ || {}; // var must be used or game will crash
 // Separates the version numbers with the rest to make the former more clear
 DoubleX_RMMZ.Event_Properties = {
     PLUGIN_NAME: "DoubleX_RMMZ_Event_Properties",
-    VERSIONS: { codebase: "1.0.2", plugin: "v1.00a" }
+    VERSIONS: { codebase: "1.1.0", plugin: "v1.00a" }
 }; // DoubleX_RMMZ.Event_Properties
 //
 

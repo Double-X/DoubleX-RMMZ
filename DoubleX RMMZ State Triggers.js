@@ -679,6 +679,7 @@ if (DoubleX_RMMZ.Enhanced_Codebase) {
         this.thisState = state;
         MZ_EC.runCondEventNotetags(this, types, "stateTriggers", [notetagName]);
         this.thisState = thisState;
+        MZ_EC.clearBattlerNotetagCache(this, "stateTriggers");
     }; // NEW.runTriggers
 
 })(Game_BattlerBase.prototype, DoubleX_RMMZ.Enhanced_Codebase,

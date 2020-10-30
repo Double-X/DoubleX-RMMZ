@@ -236,8 +236,8 @@ if (DoubleX_RMMZ.Enhanced_Codebase) {
  *----------------------------------------------------------------------------*/
 
 /*----------------------------------------------------------------------------
- *    # Edited class: Window_PartyCommand
- *      - Adds the party command that adds an auto battle state to the party
+ *    # Edited class: Window_BattleActor/Window_BattleEnemy
+ *      - Processes the targeting hotkeys in the target selection windows
  *----------------------------------------------------------------------------*/
 
 ((MZ_EC, TH) => {

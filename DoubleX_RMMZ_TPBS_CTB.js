@@ -170,9 +170,11 @@ if (DoubleX_RMMZ.Enhanced_Codebase) {
     } = MZ_EC.setKlassContainer("BattleManager", $, TPBSCTB);
 
     extendFunc("updateTurn", function() {
+        // Edited to skip all TPBS frame updates that can be skipped
         do {
             ORIG.updateTurn.apply(this, arguments);
         } while (NEW._canUpdateTpb.call(this));
+        //
     }); // v1.00a - v1.00a
 
     /**
