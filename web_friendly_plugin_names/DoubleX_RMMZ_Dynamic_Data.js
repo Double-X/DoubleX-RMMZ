@@ -77,6 +77,7 @@
  * @target MZ
  * @plugindesc Versions: { codebase: "1.0.0", plugin: "v1.00a" }
  * Lets you edit some database data on the fly and such edits will be saved
+ * @orderAfter DoubleX_RMMZ_Enhanced_Codebase
  * @orderAfter DoubleX RMMZ Enhanced Codebase
  * @base DoubleX RMMZ Enhanced Codebase
  * @author DoubleX
