@@ -117,6 +117,7 @@
  * @target MZ
  * @plugindesc Versions: { codebase: "1.0.0", plugin: "v1.01a" }
  * Lets you set some skills/items to have battler and skill/item cooldowns
+ * @orderAfter DoubleX_RMMZ_Enhanced_Codebase
  * @orderAfter DoubleX RMMZ Enhanced Codebase
  * @orderAfter DoubleX_RMMZ_Plugin_Query
  * @base DoubleX RMMZ Enhanced Codebase
@@ -1314,6 +1315,7 @@ if (DoubleX_RMMZ.Enhanced_Codebase) {
         this.latestSkillItems = [item];
         const skillItemTurnCount = NEW._skillItemCooldownTurnCount.call(this);
         this.latestSkillItems = lastLatestSkillItems;
+        MZ_EC.clearBattlerNotetagCache(this, "cooldown");
         this.setSkillItemCooldown(item, skillItemTurnCount);
     }; // NEW._setSkillItemCooldown
 
@@ -1341,6 +1343,7 @@ if (DoubleX_RMMZ.Enhanced_Codebase) {
         this.latestSkillItems = this._skillItemCooldown.usedSkillItems;
         const battlerTurnCount = NEW._battlerCooldownTurnCount.call(this);
         this.latestSkillItems = lastLatestSkillItems;
+        MZ_EC.clearBattlerNotetagCache(this, "cooldown");
         this.setBattlerCooldown(battlerTurnCount);
     }; // NEW._setBattlerCooldown
 
