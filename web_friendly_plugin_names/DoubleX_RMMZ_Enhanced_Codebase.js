@@ -5801,7 +5801,7 @@ DoubleX_RMMZ.Enhanced_Codebase = {
 
     rewriteFunc("command122", function(params) {
         const [startId, endId, operationType] = params;
-        const [value, randomMax] = NEW._varValRandMax.call(params);
+        const [value, randomMax] = NEW._varValRandMax.call(this, params);
         for (let i = startId; i <= endId; i++) {
             if (!isNaN(value)) {
                 const realValue = value + Math.randomInt(randomMax);
