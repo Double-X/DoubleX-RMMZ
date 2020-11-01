@@ -1212,18 +1212,12 @@ if (DoubleX_RMMZ.Enhanced_Codebase) {
  *      - Loads all notetags of this plugin
  *----------------------------------------------------------------------------*/
 
-(($, MZ_EC, TPBSCE) => {
+((MZ_EC, TPBSCE) => {
 
     "use strict";
 
-    const klassName = "DataManager", {
-        NEW,
-        ORIG
-    } = MZ_EC.setKlassContainer(klassName, $, TPBSCE);
-    const EC_DM = MZ_EC[klassName].new, DM = TPBSCE[klassName];
-
     // Search tag: NOTE_TYPE
-    NEW.NOTETAG_PAIRS = new Map(Object.entries({
+    MZ_EC.loadDataManagerNotetags(TPBSCE, new Map(Object.entries({
         tpbAcceleration: new Map(Object.entries({
             suffix1: MZ_EC.BOOL_SUFFIXES, // condSuffix
             suffix2: MZ_EC.VAL_SUFFIXES, // opSuffix
@@ -1328,10 +1322,7 @@ if (DoubleX_RMMZ.Enhanced_Codebase) {
             entry2: MZ_EC.STRING_ENTRY, // opEntry
             entry3: MZ_EC.NUM_ENTRY // valEntry
         })) // normStartTpbChargeTime
-    })); // NEW.NOTETAG_PAIRS
-    //
-
-    NEW.NOTETAG_DATA_CONTAINER_NAMES = new Map(Object.entries({
+    })), new Map(Object.entries({
         $dataActors: "actor",
         $dataClasses: "class",
         $dataSkills: "skill",
@@ -1340,32 +1331,10 @@ if (DoubleX_RMMZ.Enhanced_Codebase) {
         $dataArmors: "armor",
         $dataEnemies: "enemy",
         $dataStates: "state"
-    })); // NEW.NOTETAG_DATA_CONTAINER_NAMES
-    NEW._REG_EXP_NOTE = "tpbs cfgs edit";
-    MZ_EC.extendFunc(EC_DM, DM, "loadDataNotetags", function(obj, objName) {
-        ORIG.loadDataNotetags.apply(this, arguments);
-        // Added to load all notetags of this plugin
-        NEW._loadDataNotetags.call(this, obj, objName);
-        //
-    }); // v1.00a - v1.00a
+    })), "tpbs cfgs edit", "tpbsCfgEdit");
+    //
 
-    /**
-     * The this pointer is DataManager
-     * Idempotent
-     * @author DoubleX @since v1.00a @version v1.00a
-     * @param {[Datum]} obj - The data container having notetags to be loaded
-     * @param {string} objName - The name of the data container having notetags
-     */
-    NEW._loadDataNotetags = function(obj, objName) {
-        if (!NEW.NOTETAG_DATA_CONTAINER_NAMES.has(objName)) return;
-        const datumType = NEW.NOTETAG_DATA_CONTAINER_NAMES.get(objName);
-        const [regex, notePairs] = [NEW._REG_EXP_NOTE, NEW.NOTETAG_PAIRS];
-        MZ_EC.onLoadDataNotetags.call(
-                this, obj, datumType, regex, notePairs, "tpbsCfgEdit");
-    }; // NEW._loadDataNotetags
-
-})(DataManager, DoubleX_RMMZ.Enhanced_Codebase,
-        DoubleX_RMMZ.TPBS_Configurations_Edit);
+})(DoubleX_RMMZ.Enhanced_Codebase, DoubleX_RMMZ.TPBS_Configurations_Edit);
 
 /*----------------------------------------------------------------------------*/
 
@@ -1434,37 +1403,13 @@ if (DoubleX_RMMZ.Enhanced_Codebase) {
  *      - Reloads all notetags upon variable change to keep scripts updated
  *----------------------------------------------------------------------------*/
 
-(($, MZ_EC, TPBSCE) => {
+((MZ_EC, TPBSCE) => {
 
     "use strict";
 
-    const DM = TPBSCE.DataManager.new, klassName = "Game_Variables";
-    const { NEW, ORIG } = MZ_EC.setKlassContainer(klassName, $, TPBSCE);
-    const EC_GV = MZ_EC[klassName].new, GV = TPBSCE[klassName];
+    MZ_EC.updateGameVarsDataNotetags(TPBSCE, "tpbsCfgEdit");
 
-    MZ_EC.extendFunc(EC_GV, GV, "updateDataNotetags", function(varId, val) {
-        ORIG.updateDataNotetags.apply(this, arguments);
-        // Added to reload all notetags of this plugin to keep script updated
-        NEW._updateDataNotetags.call(this, varId, val);
-        //
-    }); // v1.00a - v1.00a
-
-    /**
-     * The this pointer is Game_Variables.prototype
-     * Idempotent
-     * @author DoubleX @since v1.00a @version v1.00a
-     * @param {id} varId - The id of the variable to have its values set
-     * @param {*} val - The new value of the variable to have its values set
-     */
-    NEW._updateDataNotetags = function(varId, val) {
-        DM.NOTETAG_DATA_CONTAINER_NAMES.forEach((objType, objName) => {
-            const obj = window[objName];
-            MZ_EC.updateDataNotetags(obj, "tpbsCfgEdit", varId, val);
-        });
-    }; // NEW._updateDataNotetags
-
-})(Game_Variables.prototype, DoubleX_RMMZ.Enhanced_Codebase,
-        DoubleX_RMMZ.TPBS_Configurations_Edit);
+})(DoubleX_RMMZ.Enhanced_Codebase, DoubleX_RMMZ.TPBS_Configurations_Edit);
 
 /*----------------------------------------------------------------------------
  *    # Edited class: Game_Battler
