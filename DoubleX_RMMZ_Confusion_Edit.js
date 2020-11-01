@@ -205,18 +205,12 @@ if (DoubleX_RMMZ.Enhanced_Codebase) {
  *      - Loads all notetags of this plugin
  *----------------------------------------------------------------------------*/
 
-(($, MZ_EC, CE) => {
+((MZ_EC, CE) => {
 
     "use strict";
 
-    const klassName = "DataManager", {
-        NEW,
-        ORIG
-    } = MZ_EC.setKlassContainer(klassName, $, CE);
-    const EC_DM = MZ_EC[klassName].new, DM = CE[klassName];
-
     // Search tag: NOTE_TYPE
-    NEW.NOTETAG_PAIRS = new Map(Object.entries({
+    MZ_EC.loadDataManagerNotetags(CE, new Map(Object.entries({
         reverse: new Map(Object.entries({
             suffix1: MZ_EC.BOOL_SUFFIXES, // condSuffix
             entry1: MZ_EC.BOOL_ENTRY // condEntry
@@ -225,42 +219,31 @@ if (DoubleX_RMMZ.Enhanced_Codebase) {
             suffix1: MZ_EC.BOOL_SUFFIXES, // condSuffix
             entry1: MZ_EC.BOOL_ENTRY // condEntry
         })) // excludeSelf
-    })); // NEW.NOTETAG_PAIRS
+    })), new Map(Object.entries({
+        $dataStates: "state"
+    })), "confusion edit", "confusionEdit");
     //
 
-    NEW.NOTETAG_DATA_CONTAINER_NAMES = new Map(Object.entries({
-        $dataStates: "state"
-    })); // NEW.NOTETAG_DATA_CONTAINER_NAMES
-    NEW._REG_EXP_NOTE = "confusion edit";
-    MZ_EC.extendFunc(EC_DM, DM, "loadDataNotetags", function(obj, objName) {
-        ORIG.loadDataNotetags.apply(this, arguments);
-        // Added to load all notetags of this plugin
-        NEW._loadDataNotetags.call(this, obj, objName);
-        //
-    }); // v1.00a - v1.00a
-
-    /**
-     * The this pointer is DataManager
-     * Idempotent
-     * @author DoubleX @since v1.00a @version v1.00a
-     * @param {[Datum]} obj - The data container having notetags to be loaded
-     * @param {string} objName - The name of the data container having notetags
-     */
-    NEW._loadDataNotetags = function(obj, objName) {
-        if (!NEW.NOTETAG_DATA_CONTAINER_NAMES.has(objName)) return;
-        const datumType = NEW.NOTETAG_DATA_CONTAINER_NAMES.get(objName);
-        const [regex, notePairs] = [NEW._REG_EXP_NOTE, NEW.NOTETAG_PAIRS];
-        MZ_EC.onLoadDataNotetags.call(
-                this, obj, datumType, regex, notePairs, "confusionEdit");
-    }; // NEW._loadDataNotetags
-
-})(DataManager, DoubleX_RMMZ.Enhanced_Codebase, DoubleX_RMMZ.Confusion_Edit);
+})(DoubleX_RMMZ.Enhanced_Codebase, DoubleX_RMMZ.Confusion_Edit);
 
 /*----------------------------------------------------------------------------*/
 
 /*----------------------------------------------------------------------------
  *    ## Objects
  *----------------------------------------------------------------------------*/
+
+/*----------------------------------------------------------------------------
+ *    # Edited class: Game_Variables
+ *      - Reloads all notetags upon variable change to keep scripts updated
+ *----------------------------------------------------------------------------*/
+
+((MZ_EC, CE) => {
+
+    "use strict";
+
+    MZ_EC.updateGameVarsDataNotetags(CE, "confusionEdit");
+
+})(DoubleX_RMMZ.Enhanced_Codebase, DoubleX_RMMZ.Confusion_Edit);
 
 /*----------------------------------------------------------------------------
  *    # Edited class: Game_Action

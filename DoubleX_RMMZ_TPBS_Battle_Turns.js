@@ -341,8 +341,8 @@ if (DoubleX_RMMZ.Enhanced_Codebase) {
     }; // $.tpbsBattleTurnsParam
 
     const pluginName = TPBSBT.PLUGIN_NAME;
-    PluginManager.registerCommand(pluginName, "setIsTPBSBT", ({ isCTB }) => {
-        $gameSystem.setTPBSBattleTurnsParam("isCTB", JSON.parse(isCTB));
+    PluginManager.registerCommand(pluginName, "setTPBSBattleTurnsParam", ({ param, val }) => {
+        $gameSystem.setTPBSBattleTurnsParam("param", JSON.parse(val));
     });
 
 })(Game_System.prototype, DoubleX_RMMZ.Enhanced_Codebase,

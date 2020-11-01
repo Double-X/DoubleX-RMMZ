@@ -202,55 +202,24 @@ if (DoubleX_RMMZ.Enhanced_Codebase) {
  *      - Loads all notetags of this plugin
  *----------------------------------------------------------------------------*/
 
-(($, MZ_EC, TPBSCS) => {
+((MZ_EC, TPBSCS) => {
 
     "use strict";
 
-    const klassName = "DataManager", {
-        NEW,
-        ORIG
-    } = MZ_EC.setKlassContainer(klassName, $, TPBSCS);
-    const EC_DM = MZ_EC[klassName].new, DM = TPBSCS[klassName];
-
     // Search tag: NOTE_TYPE
-    NEW.NOTETAG_PAIRS = new Map(Object.entries({
+    MZ_EC.loadDataManagerNotetags(TPBSCS, new Map(Object.entries({
         interval: new Map(Object.entries({
             suffix1: MZ_EC.BOOL_SUFFIXES, // condSuffix
             suffix2: MZ_EC.VAL_SUFFIXES, // intervalSuffix
             entry1: MZ_EC.BOOL_ENTRY, // condEntry
             entry2: MZ_EC.NUM_ENTRY // intervalEntry
         })) // interval
-    })); // NEW.NOTETAG_PAIRS
+    })), new Map(Object.entries({
+        $dataStates: "state"
+    })), "countdown states", "tpbsCountdownStates");
     //
 
-    NEW.NOTETAG_DATA_CONTAINER_NAMES = new Map(Object.entries({
-        $dataStates: "state"
-    })); // NEW.NOTETAG_DATA_CONTAINER_NAMES
-    NEW._REG_EXP_NOTE = "countdown states";
-    MZ_EC.extendFunc(EC_DM, DM, "loadDataNotetags", function(obj, objName) {
-        ORIG.loadDataNotetags.apply(this, arguments);
-        // Added to load all notetags of this plugin
-        NEW._loadDataNotetags.call(this, obj, objName);
-        //
-    }); // v1.00a - v1.00a
-
-    /**
-     * The this pointer is DataManager
-     * Idempotent
-     * @author DoubleX @since v1.00a @version v1.00a
-     * @param {[Datum]} obj - The data container having notetags to be loaded
-     * @param {string} objName - The name of the data container having notetags
-     */
-    NEW._loadDataNotetags = function(obj, objName) {
-        if (!NEW.NOTETAG_DATA_CONTAINER_NAMES.has(objName)) return;
-        const datumType = NEW.NOTETAG_DATA_CONTAINER_NAMES.get(objName);
-        const [regex, notePairs] = [NEW._REG_EXP_NOTE, NEW.NOTETAG_PAIRS];
-        MZ_EC.onLoadDataNotetags.call(
-                this, obj, datumType, regex, notePairs, "tpbsCountdownStates");
-    }; // NEW._loadDataNotetags
-
-})(DataManager, DoubleX_RMMZ.Enhanced_Codebase,
-        DoubleX_RMMZ.TPBS_Countdown_States);
+})(DoubleX_RMMZ.Enhanced_Codebase, DoubleX_RMMZ.TPBS_Countdown_States);
 
 /*----------------------------------------------------------------------------*/
 
@@ -263,37 +232,13 @@ if (DoubleX_RMMZ.Enhanced_Codebase) {
  *      - Reloads all notetags upon variable change to keep scripts updated
  *----------------------------------------------------------------------------*/
 
-(($, MZ_EC, TPBSCS) => {
+((MZ_EC, TPBSCS) => {
 
     "use strict";
 
-    const DM = TPBSCS.DataManager.new, klassName = "Game_Variables";
-    const { NEW, ORIG } = MZ_EC.setKlassContainer(klassName, $, TPBSCS);
-    const EC_GV = MZ_EC[klassName].new, GV = TPBSCS[klassName];
+    MZ_EC.updateGameVarsDataNotetags(TPBSCS, "tpbsCountdownStates");
 
-    MZ_EC.extendFunc(EC_GV, GV, "updateDataNotetags", function(varId, val) {
-        ORIG.updateDataNotetags.apply(this, arguments);
-        // Added to reload all notetags of this plugin to keep script updated
-        NEW._updateDataNotetags.call(this, varId, val);
-        //
-    }); // v1.00a - v1.00a
-
-    /**
-     * The this pointer is Game_Variables.prototype
-     * Idempotent
-     * @author DoubleX @since v1.00a @version v1.00a
-     * @param {id} varId - The id of the variable to have its values set
-     * @param {*} val - The new value of the variable to have its values set
-     */
-    NEW._updateDataNotetags = function(varId, val) {
-        DM.NOTETAG_DATA_CONTAINER_NAMES.forEach((objType, objName) => {
-            const obj = window[objName];
-            MZ_EC.updateDataNotetags(obj, "tpbsCountdownStates", varId, val);
-        });
-    }; // NEW._updateDataNotetags
-
-})(Game_Variables.prototype, DoubleX_RMMZ.Enhanced_Codebase,
-        DoubleX_RMMZ.TPBS_Countdown_States);
+})(DoubleX_RMMZ.Enhanced_Codebase, DoubleX_RMMZ.TPBS_Countdown_States);
 
 /*----------------------------------------------------------------------------
  *    # Edited class: Game_BattlerBase

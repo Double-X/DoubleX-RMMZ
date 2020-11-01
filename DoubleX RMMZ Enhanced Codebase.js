@@ -2510,12 +2510,12 @@ DoubleX_RMMZ.Enhanced_Codebase = {
 
     "use strict";
 
-    const {
+    const klassName = "DataManager", {
         NEW,
         ORIG,
         extendFunc,
         rewriteFunc,
-    } = MZ_EC.setKlassContainer("DataManager", $, MZ_EC);
+    } = MZ_EC.setKlassContainer(klassName, $, MZ_EC);
 
     extendFunc("extractSaveContents", function(contents) {
         ORIG.extractSaveContents.apply(this, arguments);
@@ -2592,6 +2592,42 @@ DoubleX_RMMZ.Enhanced_Codebase = {
         window[name] = JSON.parse(xhr.responseText);
         this.onLoad(window[name], name);
     }; // NEW._onXhrLoadSuc
+
+    MZ_EC.loadDataManagerNotetags = (pluginName, notePairs, containerNames, regex, containerName = regex) => {
+
+        const {
+            NEW,
+            ORIG
+        } = MZ_EC.setKlassContainer(klassName, $, pluginName);
+        const EC_DM = MZ_EC[klassName].new, DM = pluginName[klassName];
+
+        NEW.NOTETAG_PAIRS = notePairs;
+        NEW.NOTETAG_DATA_CONTAINER_NAMES = containerNames;
+
+        NEW._REG_EXP_NOTE = regex;
+
+        MZ_EC.extendFunc(EC_DM, DM, "loadDataNotetags", function(obj, objName) {
+            ORIG.loadDataNotetags.apply(this, arguments);
+            // Added to load all notetags of this plugin
+            NEW._loadDataNotetags.call(this, obj, objName);
+            //
+        }); // v0.00a - v0.00a
+
+        /**
+         * The this pointer is DataManager
+         * Idempotent
+         * @author DoubleX @since v0.00a @version v0.00a
+         * @param {[Datum]} obj - Data container having notetags to be loaded
+         * @param {string} objName - The name of data container having notetags
+         */
+        NEW._loadDataNotetags = function(obj, objName) {
+            if (!containerNames.has(objName)) return;
+            const datumType = containerNames.get(objName);
+            MZ_EC.onLoadDataNotetags.call(
+                    this, obj, datumType, regex, notePairs, containerName);
+        }; // NEW._loadDataNotetags
+
+    }; // MZ_EC.loadDataManagerNotetags
 
 })(DataManager, DoubleX_RMMZ.Enhanced_Codebase);
 
@@ -3097,12 +3133,12 @@ DoubleX_RMMZ.Enhanced_Codebase = {
 
     "use strict";
 
-    const {
+    const klassName = "Game_System", {
         NEW,
         ORIG,
         extendFunc,
         rewriteFunc
-    } = MZ_EC.setKlassContainer("Game_System", $, MZ_EC);
+    } = MZ_EC.setKlassContainer(klassName, $, MZ_EC);
 
     /*------------------------------------------------------------------------
      *    New private variables
@@ -3221,6 +3257,51 @@ DoubleX_RMMZ.Enhanced_Codebase = {
         return this._enhancedCodebase[containerName][param];
     }; // NEW.storedParamVal
 
+    MZ_EC.setupGameSystemParamsIOs = (pluginName, containerName) => {
+
+        const { ORIG } = MZ_EC.setKlassContainer(klassName, $, pluginName);
+        const EC_GS = MZ_EC[klassName].new, GS = pluginName[klassName];
+
+        const PLUGIN_NAME = pluginName.PLUGIN_NAME;
+
+        MZ_EC.extendFunc(EC_GS, GS, "storeParams", function() {
+            ORIG.storeParams.apply(this, arguments);
+            // Added to store all parameters of this plugin
+            EC_GS.onStoreParams.call(this, PLUGIN_NAME, containerName);
+            //
+        }); // v0.00a - v0.00a
+
+        const UPPER_CASE_NAME = name => {
+            return `${name[0].toUpperCase()}${name.slice(1)}`;
+        }; // UPPER_CASE_NAME
+        const CMD_NAME = `set${UPPER_CASE_NAME(containerName)}Param`;
+
+        /**
+         * Script Call/Idempotent
+         * @author DoubleX @interface @since v0.00a @version v0.00a
+         * @enum @param {string} param - Name of parameter to be stored in saves
+         * @param {*} val - The value of the parameter to be stored in saves
+         */
+        $[CMD_NAME] = function(param, val) {
+            EC_GS.storeParamVal.call(this, containerName, param, val);
+        }; // $$[CMD_NAME]
+
+        /**
+         * Script Call/Nullipotent
+         * @author DoubleX @interface @since v0.00a @version v0.00a
+         * @enum @param {string} param - Name of parameter to be stored in saves
+         * @returns {*} The value of the parameter to be stored in game saves
+         */
+        $[`${containerName}Param`] = function(param) {
+            return EC_GS.storedParamVal.call(this, containerName, param);
+        }; // $[`${containerName}Param`]
+
+        PluginManager.registerCommand(PLUGIN_NAME, CMD_NAME, ({ param, val }) => {
+            $gameSystem[CMD_NAME](param, JSON.parse(val));
+        });
+
+    }; // MZ_EC.setupGameSystemParamsIOs
+
 })(Game_System.prototype, DoubleX_RMMZ.Enhanced_Codebase);
 
 /*----------------------------------------------------------------------------
@@ -3257,11 +3338,11 @@ DoubleX_RMMZ.Enhanced_Codebase = {
 
     "use strict";
 
-    const {
+    const klassName = "Game_Variables", {
         NEW,
         ORIG,
         extendFunc
-    } = MZ_EC.setKlassContainer("Game_Variables", $, MZ_EC);
+    } = MZ_EC.setKlassContainer(klassName, $, MZ_EC);
 
     extendFunc("setValue", function(variableId, value) {
         ORIG.setValue.apply(this, arguments);
@@ -3280,6 +3361,35 @@ DoubleX_RMMZ.Enhanced_Codebase = {
     NEW.updateDataNotetags = function(varId, val) {
         MZ_EC.clearAllBattlerNotetagCaches();
     }; // NEW.updateDataNotetags
+
+    MZ_EC.updateGameVarsDataNotetags = (pluginName, containerName) => {
+
+        const DM = pluginName.DataManager.new;
+        const { NEW, ORIG } = MZ_EC.setKlassContainer(klassName, $, pluginName);
+        const EC_GV = MZ_EC[klassName].new, GV = pluginName[klassName];
+
+        MZ_EC.extendFunc(EC_GV, GV, "updateDataNotetags", function(varId, val) {
+            ORIG.updateDataNotetags.apply(this, arguments);
+            // Added to reload all notetag of this plugin to keep script updated
+            NEW._updateDataNotetags.call(this, varId, val);
+            //
+        }); // v0.00a - v0.00a
+
+        /**
+         * The this pointer is Game_Variables.prototype
+         * Idempotent
+         * @author DoubleX @since v0.00a @version v0.00a
+         * @param {id} varId - The id of the variable to have its values set
+         * @param {*} val - The new value of the variable to have its values set
+         */
+        NEW._updateDataNotetags = function(varId, val) {
+            DM.NOTETAG_DATA_CONTAINER_NAMES.forEach((objType, objName) => {
+                const obj = window[objName];
+                MZ_EC.updateDataNotetags(obj, containerName, varId, val);
+            });
+        }; // NEW._updateDataNotetags
+
+    }; // MZ_EC.updateGameVarsDataNotetags
 
 })(Game_Variables.prototype, DoubleX_RMMZ.Enhanced_Codebase);
 

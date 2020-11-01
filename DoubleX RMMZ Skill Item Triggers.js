@@ -658,18 +658,12 @@ if (DoubleX_RMMZ.Enhanced_Codebase) {
  *      - Loads all notetags of this plugin
  *----------------------------------------------------------------------------*/
 
-(($, MZ_EC, SIT) => {
+((MZ_EC, SIT) => {
 
     "use strict";
 
-    const klassName = "DataManager", {
-        NEW,
-        ORIG
-    } = MZ_EC.setKlassContainer(klassName, $, SIT);
-    const EC_DM = MZ_EC[klassName].new, DM = SIT[klassName];
-
     // Search tag: NOTE_TYPE
-    NEW.NOTETAG_PAIRS = new Map(Object.entries({
+    MZ_EC.loadDataManagerNotetags(SIT, new Map(Object.entries({
         miss: new Map(Object.entries({
             suffix1: MZ_EC.BOOL_SUFFIXES, // condSuffix
             suffix2: MZ_EC.VAL_SUFFIXES, // eventSuffix
@@ -724,10 +718,7 @@ if (DoubleX_RMMZ.Enhanced_Codebase) {
             entry1: MZ_EC.BOOL_ENTRY, // condEntry
             entry2: MZ_EC.NUM_ENTRY // eventEntry
         })) // post
-    })); // NEW.NOTETAG_PAIRS
-    //
-
-    NEW.NOTETAG_DATA_CONTAINER_NAMES = new Map(Object.entries({
+    })), new Map(Object.entries({
         $dataActors: "actor",
         $dataClasses: "class",
         $dataSkills: "skill",
@@ -736,32 +727,10 @@ if (DoubleX_RMMZ.Enhanced_Codebase) {
         $dataArmors: "armor",
         $dataEnemies: "enemy",
         $dataStates: "state"
-    })); // NEW.NOTETAG_DATA_CONTAINER_NAMES
-    NEW._REG_EXP_NOTE = "skill item triggers";
-    MZ_EC.extendFunc(EC_DM, DM, "loadDataNotetags", function(obj, objName) {
-        ORIG.loadDataNotetags.apply(this, arguments);
-        // Added to load all notetags of this plugin
-        NEW._loadDataNotetags.call(this, obj, objName);
-        //
-    }); // v1.00a - v1.00a
+    })), "skill item triggers", "skillItemTriggers");
+    //
 
-    /**
-     * The this pointer is DataManager
-     * Idempotent
-     * @author DoubleX @since v1.00a @version v1.00a
-     * @param {[Datum]} obj - The data container having notetags to be loaded
-     * @param {string} objName - The name of the data container having notetags
-     */
-    NEW._loadDataNotetags = function(obj, objName) {
-        if (!NEW.NOTETAG_DATA_CONTAINER_NAMES.has(objName)) return;
-        const datumType = NEW.NOTETAG_DATA_CONTAINER_NAMES.get(objName);
-        const [regex, notePairs] = [NEW._REG_EXP_NOTE, NEW.NOTETAG_PAIRS];
-        MZ_EC.onLoadDataNotetags.call(
-                this, obj, datumType, regex, notePairs, "skillItemTriggers");
-    }; // NEW._loadDataNotetags
-
-})(DataManager, DoubleX_RMMZ.Enhanced_Codebase,
-        DoubleX_RMMZ.Skill_Item_Triggers);
+})(DoubleX_RMMZ.Enhanced_Codebase, DoubleX_RMMZ.Skill_Item_Triggers);
 
 /*----------------------------------------------------------------------------
  *    # Edited class: BattleManager
@@ -848,86 +817,26 @@ if (DoubleX_RMMZ.Enhanced_Codebase) {
  *      - Lets you access the parameters of this plugin and store them in save
  *----------------------------------------------------------------------------*/
 
-(($, MZ_EC, SIT) => {
+((MZ_EC, SIT) => {
 
     "use strict";
 
-    const klassName = "Game_System";
-    const { ORIG } = MZ_EC.setKlassContainer(klassName, $, SIT);
-    const EC_GS = MZ_EC[klassName].new, GS = SIT[klassName];
+    MZ_EC.setupGameSystemParamsIOs(SIT, "skillItemTriggers");
 
-    MZ_EC.extendFunc(EC_GS, GS, "storeParams", function() {
-        ORIG.storeParams.apply(this, arguments);
-        // Added to store all parameters of this plugin
-        EC_GS.onStoreParams.call(this, SIT.PLUGIN_NAME, "skillItemTriggers");
-        //
-    }); // v1.00a - v1.00a
-
-    /**
-     * Script Call/Idempotent
-     * @author DoubleX @interface @since v1.00a @version v1.00a
-     * @enum @param {string} param - The name of parameter to be stored in saves
-     * @param {*} val - The value of the parameter to be stored in game saves
-     */
-    $.setSkillItemTriggersParam = function(param, val) {
-        EC_GS.storeParamVal.call(this, "skillItemTriggers", param, val);
-    }; // $.setSkillItemTriggersParam
-
-    /**
-     * Script Call/Nullipotent
-     * @author DoubleX @interface @since v1.00a @version v1.00a
-     * @enum @param {string} param - The name of parameter to be stored in saves
-     * @returns {*} The value of the parameter to be stored in game saves
-     */
-    $.skillItemTriggersParam = function(param) {
-        return EC_GS.storedParamVal.call(this, "skillItemTriggers", param);
-    }; // $.skillItemTriggersParam
-
-    const pluginName = SIT.PLUGIN_NAME;
-    const commandName = "setSkillItemTriggersParam";
-    PluginManager.registerCommand(pluginName, commandName, ({ param, val }) => {
-        $gameSystem.setSkillItemTriggersParam(param, JSON.parse(val));
-    });
-
-})(Game_System.prototype, DoubleX_RMMZ.Enhanced_Codebase,
-        DoubleX_RMMZ.Skill_Item_Triggers);
+})(DoubleX_RMMZ.Enhanced_Codebase, DoubleX_RMMZ.Skill_Item_Triggers);
 
 /*----------------------------------------------------------------------------
  *    # Edited class: Game_Variables
  *      - Reloads all notetags upon variable change to keep scripts updated
  *----------------------------------------------------------------------------*/
 
-(($, MZ_EC, SIT) => {
+((MZ_EC, SIT) => {
 
     "use strict";
 
-    const DM = SIT.DataManager.new, klassName = "Game_Variables";
-    const { NEW, ORIG } = MZ_EC.setKlassContainer(klassName, $, SIT);
-    const EC_GV = MZ_EC[klassName].new, GV = SIT[klassName];
+    MZ_EC.updateGameVarsDataNotetags(SIT, "skillItemTriggers");
 
-    MZ_EC.extendFunc(EC_GV, GV, "updateDataNotetags", function(varId, val) {
-        ORIG.updateDataNotetags.apply(this, arguments);
-        // Added to reload all notetags of this plugin to keep script updated
-        NEW._updateDataNotetags.call(this, varId, val);
-        //
-    }); // v1.00a - v1.00a
-
-    /**
-     * The this pointer is Game_Variables.prototype
-     * Idempotent
-     * @author DoubleX @since v1.00a @version v1.00a
-     * @param {id} varId - The id of the variable to have its values set
-     * @param {*} val - The new value of the variable to have its values set
-     */
-    NEW._updateDataNotetags = function(varId, val) {
-        DM.NOTETAG_DATA_CONTAINER_NAMES.forEach((objType, objName) => {
-            const obj = window[objName];
-            MZ_EC.updateDataNotetags(obj, "skillItemTriggers", varId, val);
-        });
-    }; // NEW._updateDataNotetags
-
-})(Game_Variables.prototype, DoubleX_RMMZ.Enhanced_Codebase,
-        DoubleX_RMMZ.Skill_Item_Triggers);
+})(DoubleX_RMMZ.Enhanced_Codebase, DoubleX_RMMZ.Skill_Item_Triggers);
 
 /*----------------------------------------------------------------------------
  *    # Edited class: Game_Action
