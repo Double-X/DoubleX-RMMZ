@@ -3302,6 +3302,48 @@ DoubleX_RMMZ.Enhanced_Codebase = {
 
     }; // MZ_EC.setupGameSystemParamsIOs
 
+    MZ_EC.setupGameSystemTPBSParamsIOs = (pluginName, containerName) => {
+
+        const { ORIG } = MZ_EC.setKlassContainer(klassName, $, pluginName);
+        const EC_GS = MZ_EC[klassName].new, GS = pluginName[klassName];
+
+        const PLUGIN_NAME = pluginName.PLUGIN_NAME;
+
+        MZ_EC.extendFunc(EC_GS, GS, "storeParams", function() {
+            ORIG.storeParams.apply(this, arguments);
+            // Added to store all parameters of this plugin
+            EC_GS.onStoreParams.call(this, PLUGIN_NAME, containerName);
+            //
+        }); // v0.00a - v0.00a
+
+        const CMD_NAME = `setTPBS${containerName.slice(4)}Param`;
+
+        /**
+         * Script Call/Idempotent
+         * @author DoubleX @interface @since v0.00a @version v0.00a
+         * @enum @param {string} param - Name of parameter to be stored in saves
+         * @param {*} val - The value of the parameter to be stored in saves
+         */
+        $[CMD_NAME] = function(param, val) {
+            EC_GS.storeParamVal.call(this, containerName, param, val);
+        }; // $$[CMD_NAME]
+
+        /**
+         * Script Call/Nullipotent
+         * @author DoubleX @interface @since v0.00a @version v0.00a
+         * @enum @param {string} param - Name of parameter to be stored in saves
+         * @returns {*} The value of the parameter to be stored in game saves
+         */
+        $[`${containerName}Param`] = function(param) {
+            return EC_GS.storedParamVal.call(this, containerName, param);
+        }; // $[`${containerName}Param`]
+
+        PluginManager.registerCommand(PLUGIN_NAME, CMD_NAME, ({ param, val }) => {
+            $gameSystem[CMD_NAME](param, JSON.parse(val));
+        });
+
+    }; // MZ_EC.setupGameSystemParamsIOs
+
 })(Game_System.prototype, DoubleX_RMMZ.Enhanced_Codebase);
 
 /*----------------------------------------------------------------------------

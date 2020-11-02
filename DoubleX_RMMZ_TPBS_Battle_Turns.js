@@ -305,48 +305,13 @@ if (DoubleX_RMMZ.Enhanced_Codebase) {
  *      - Lets you access the parameters of this plugin and store them in save
  *----------------------------------------------------------------------------*/
 
-(($, MZ_EC, TPBSBT) => {
+((MZ_EC, TPBSBT) => {
 
     "use strict";
 
-    const klassName = "Game_System";
-    const { ORIG } = MZ_EC.setKlassContainer(klassName, $, TPBSBT);
-    const EC_GS = MZ_EC[klassName].new, GS = TPBSBT[klassName];
+    MZ_EC.setupGameSystemTPBSParamsIOs = (TPBSBT, "tpbsBattleTurns");
 
-    MZ_EC.extendFunc(EC_GS, GS, "storeParams", function() {
-        ORIG.storeParams.apply(this, arguments);
-        // Added to store all parameters of this plugin
-        EC_GS.onStoreParams.call(this, TPBSBT.PLUGIN_NAME, "tpbsBattleTurns");
-        //
-    }); // v1.00a - v1.00a
-
-    /**
-     * Idempotent
-     * @author DoubleX @interface @since v1.00a @version v1.00a
-     * @enum @param {string} param - The name of parameter to be stored in saves
-     * @param {*} val - The value of the parameter to be stored in game saves
-     */
-    $.setTPBSBattleTurnsParam = function(param, val) {
-        EC_GS.storeParamVal.call(this, "tpbsBattleTurns", param, val);
-    }; // $.setTPBSBattleTurnsParam
-
-    /**
-     * Nullipotent
-     * @author DoubleX @interface @since v1.00a @version v1.00a
-     * @enum @param {string} param - The name of parameter to be stored in saves
-     * @returns {*} The value of the parameter to be stored in game saves
-     */
-    $.tpbsBattleTurnsParam = function(param) {
-        return EC_GS.storedParamVal.call(this, "tpbsBattleTurns", param);
-    }; // $.tpbsBattleTurnsParam
-
-    const pluginName = TPBSBT.PLUGIN_NAME;
-    PluginManager.registerCommand(pluginName, "setTPBSBattleTurnsParam", ({ param, val }) => {
-        $gameSystem.setTPBSBattleTurnsParam("param", JSON.parse(val));
-    });
-
-})(Game_System.prototype, DoubleX_RMMZ.Enhanced_Codebase,
-        DoubleX_RMMZ.TPBS_Battle_Turns);
+})(DoubleX_RMMZ.Enhanced_Codebase, DoubleX_RMMZ.TPBS_Battle_Turns);
 
 /*----------------------------------------------------------------------------
  *    # Edited class: Game_Troop
