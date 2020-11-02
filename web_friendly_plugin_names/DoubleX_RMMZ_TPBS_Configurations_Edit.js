@@ -1347,20 +1347,14 @@ if (DoubleX_RMMZ.Enhanced_Codebase) {
  *      - Lets you access the parameters of this plugin and store them in save
  *----------------------------------------------------------------------------*/
 
-(($, MZ_EC, TPBSCE) => {
+((MZ_EC, TPBSCE) => {
 
     "use strict";
 
-    const FP = TPBSCE.FUNC_PARAMS, klassName = "Game_System";
-    const { ORIG } = MZ_EC.setKlassContainer(klassName, $, TPBSCE);
-    const EC_GS = MZ_EC[klassName].new, GS = TPBSCE[klassName];
+    MZ_EC.setupGameSystemTPBSParamsIOs = (TPBSCE, "tpbsCfgEdit");
 
-    MZ_EC.extendFunc(EC_GS, GS, "storeParams", function() {
-        ORIG.storeParams.apply(this, arguments);
-        // Added to store all parameters of this plugin
-        EC_GS.onStoreParams.call(this, TPBSCE.PLUGIN_NAME, "tpbsCfgEdit");
-        //
-    }); // v1.00a - v1.00a
+    const FP = TPBSCE.FUNC_PARAMS, klassName = "Game_System";
+    const EC_GS = MZ_EC[klassName].new, GS = TPBSCE[klassName];
 
     MZ_EC.extendFunc(EC_GS, GS, "storeParamVal", function(containerName, param, val) {
         ORIG.storeParamVal.apply(this, arguments);
@@ -1369,34 +1363,7 @@ if (DoubleX_RMMZ.Enhanced_Codebase) {
         //
     }); // v1.00a - v1.00a
 
-    /**
-     * Script Call/Idempotent
-     * @author DoubleX @interface @since v1.00a @version v1.00a
-     * @enum @param {string} param - The name of parameter to be stored in saves
-     * @param {*} val - The value of the parameter to be stored in game saves
-     */
-    $.setTPBSCfgEditParam = function(param, val) {
-        EC_GS.storeParamVal.call(this, "tpbsCfgEdit", param, val);
-    }; // $.setTPBSCfgEditParam
-
-    /**
-     * Script Call/Nullipotent
-     * @author DoubleX @interface @since v1.00a @version v1.00a
-     * @enum @param {string} param - The name of parameter to be stored in saves
-     * @returns {*} The value of the parameter to be stored in game saves
-     */
-    $.tpbsCfgEditParam = function(param) {
-        return EC_GS.storedParamVal.call(this, "tpbsCfgEdit", param);
-    }; // $.tpbsCfgEditParam
-
-    const pluginName = TPBSCE.PLUGIN_NAME;
-    const commandName = "setTPBSCfgEditParam";
-    PluginManager.registerCommand(pluginName, commandName, ({ param, val }) => {
-        $gameSystem.setTPBSCfgEditParam(param, JSON.parse(val));
-    });
-
-})(Game_System.prototype, DoubleX_RMMZ.Enhanced_Codebase,
-        DoubleX_RMMZ.TPBS_Configurations_Edit);
+})(DoubleX_RMMZ.Enhanced_Codebase, DoubleX_RMMZ.TPBS_Configurations_Edit);
 
 /*----------------------------------------------------------------------------
  *    # Edited class: Game_Variables
