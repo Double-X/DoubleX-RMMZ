@@ -1351,13 +1351,13 @@ if (DoubleX_RMMZ.Enhanced_Codebase) {
 
     "use strict";
 
-    MZ_EC.setupGameSystemTPBSParamsIOs = (TPBSCE, "tpbsCfgEdit");
+    MZ_EC.setupGameSystemTPBSParamsIOs(TPBSCE, "tpbsCfgEdit");
 
     const FP = TPBSCE.FUNC_PARAMS, klassName = "Game_System";
     const EC_GS = MZ_EC[klassName].new, GS = TPBSCE[klassName];
 
     MZ_EC.extendFunc(EC_GS, GS, "storeParamVal", function(containerName, param, val) {
-        ORIG.storeParamVal.apply(this, arguments);
+        GS.orig.storeParamVal.apply(this, arguments);
         // Added to update the functions of parameters storing function contents
         FP.storeFuncParam(param, val);
         //

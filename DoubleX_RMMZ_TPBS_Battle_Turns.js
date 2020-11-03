@@ -309,7 +309,7 @@ if (DoubleX_RMMZ.Enhanced_Codebase) {
 
     "use strict";
 
-    MZ_EC.setupGameSystemTPBSParamsIOs = (TPBSBT, "tpbsBattleTurns");
+    MZ_EC.setupGameSystemTPBSParamsIOs(TPBSBT, "tpbsBattleTurns");
 
 })(DoubleX_RMMZ.Enhanced_Codebase, DoubleX_RMMZ.TPBS_Battle_Turns);
 
