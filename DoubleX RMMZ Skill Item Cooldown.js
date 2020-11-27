@@ -74,13 +74,6 @@
  *      9. https://www.patreon.com/posts/40913611
  *      10. https://www.makerdevs.com/plugin/doublex-rmmz-skill-item-cooldown
  *----------------------------------------------------------------------------
- *    # Instructions
- *      1. The default plugin parameters file name is
- *         DoubleX RMMZ Skill Item Cooldown
- *         If you want to change that, you must edit the value of
- *         DoubleX_RMMZ.Skill_Item_Cooldown.PLUGIN_NAME, which must be done
- *         via opening this plugin js file directly
- *----------------------------------------------------------------------------
  *    # Contributors
  *      Authors:
  *      1. DoubleX
@@ -94,6 +87,10 @@
  *      - None So Far
  *----------------------------------------------------------------------------
  *    # Changelog
+ *      { codebase: "1.1.0", plugin: "v1.01b" }(2020 Nov 27 GMT 0500):
+ *      1. You no longer have to edit the value of
+ *         DoubleX_RMMZ.Skill_Item_Cooldown.PLUGIN_NAME when changing this
+ *         plugin file name
  *      { codebase: "1.0.2", plugin: "v1.01a" }(2020 Oct 11 GMT 0900):
  *      1. Added the plugin query and command counterparts for the following
  *         script calls of this plugin:
@@ -115,7 +112,7 @@
 /*:
  * @url https://www.patreon.com/doublex
  * @target MZ
- * @plugindesc Versions: { codebase: "1.0.0", plugin: "v1.01a" }
+ * @plugindesc Versions: { codebase: "1.1.0", plugin: "v1.01b" }
  * Lets you set some skills/items to have battler and skill/item cooldowns
  * @orderAfter DoubleX_RMMZ_Enhanced_Codebase
  * @orderAfter DoubleX RMMZ Enhanced Codebase
@@ -637,12 +634,23 @@
 // jshint esversion: 6
 
 var DoubleX_RMMZ = DoubleX_RMMZ || {}; // var must be used or game will crash
-// Separates the version numbers with the rest to make the former more clear
-DoubleX_RMMZ.Skill_Item_Cooldown = {
-    PLUGIN_NAME: "DoubleX RMMZ Skill Item Cooldown",
-    VERSIONS: { codebase: "1.0.2", plugin: "v1.01a" }
-}; // DoubleX_RMMZ.Skill_Item_Cooldown
-//
+
+(() => {
+
+    "use strict";
+
+    const src = document.currentScript.src;
+    const name = src.split("/").slice(-1)[0].split(".")[0].replace(/%20/g, " ");
+    console.info(src, name);
+
+    // Separates the version numbers with the rest to make the former more clear
+    DoubleX_RMMZ.Skill_Item_Cooldown = {
+        PLUGIN_NAME: name,
+        VERSIONS: { codebase: "1.1.0", plugin: "v1.01b" }
+    }; // DoubleX_RMMZ.Skill_Item_Cooldown
+    //
+
+})();
 
 (SIC => {
 
