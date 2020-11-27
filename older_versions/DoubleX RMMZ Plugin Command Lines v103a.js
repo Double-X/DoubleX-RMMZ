@@ -82,6 +82,13 @@
  *      9. https://www.patreon.com/posts/41227340
  *      10. https://www.makerdevs.com/plugin/doublex-rmmz-plugin-command-lines
  *----------------------------------------------------------------------------
+ *    # Instructions
+ *      1. The default plugin parameters file name is
+ *         DoubleX RMMZ Plugin Command Lines
+ *         If you want to change that, you must edit the value of
+ *         DoubleX_RMMZ.Plugin_Command_Lines.PLUGIN_NAME, which must be done
+ *         via opening this plugin js file directly
+ *----------------------------------------------------------------------------
  *    # Contributors
  *      Authors:
  *      1. DoubleX
@@ -95,10 +102,6 @@
  *      - None So Far
  *----------------------------------------------------------------------------
  *    # Changelog
- *      { codebase: "1.1.0", plugin: "v1.03b" }(2020 Nov 27 GMT 0400):
- *      1. You no longer have to edit the value of
- *         DoubleX_RMMZ.Plugin_Command_Lines.PLUGIN_NAME when changing this
- *         plugin file name
  *      { codebase: "1.0.2", plugin: "v1.03a" }(2020 Sep 24 GMT 0900):
  *      1. Game_Interpreter.prototype.pluginCommand can now use RMMZ plugin
  *         commands in parameter pluginFileCmds or new ones in parameter
@@ -199,7 +202,7 @@
 /*:
  * @url https://www.patreon.com/doublex
  * @target MZ
- * @plugindesc Versions: { codebase: "1.1.0", plugin: "v1.03b" }
+ * @plugindesc Versions: { codebase: "1.0.2", plugin: "v1.03a" }
  * Lets you use plugin commands in the RMMV styles by typing them as scripts
  * @orderAfter DoubleX_RMMZ_Enhanced_Codebase
  * @orderAfter DoubleX RMMZ Enhanced Codebase
@@ -276,22 +279,12 @@
 // jshint esversion: 6
 
 var DoubleX_RMMZ = DoubleX_RMMZ || {}; // var must be used or game will crash
-
-(() => {
-
-    "use strict";
-
-    const src = document.currentScript.src;
-    const name = src.split("/").slice(-1)[0].split(".")[0].replace(/%20/g, " ");
-    console.info(src, name);
-
-    // Separates the version numbers with the rest to make the former more clear
-    DoubleX_RMMZ.Plugin_Command_Lines = {
-        PLUGIN_NAME: name,
-        VERSIONS: { codebase: "1.1.0", plugin: "v1.03b" }
-    }; // DoubleX_RMMZ.Plugin_Command_Lines
-
-})();
+// Separates the version numbers with the rest to make the former more clear
+DoubleX_RMMZ.Plugin_Command_Lines = {
+    PLUGIN_NAME: "DoubleX RMMZ Plugin Command Lines",
+    VERSIONS: { codebase: "1.0.2", plugin: "v1.03a" }
+}; // DoubleX_RMMZ.Plugin_Command_Lines
+//
 
 (PCL => {
 
