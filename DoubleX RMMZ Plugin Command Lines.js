@@ -199,7 +199,7 @@
 /*:
  * @url https://www.patreon.com/doublex
  * @target MZ
- * @plugindesc Versions: { codebase: "1.0.2", plugin: "v1.03a" }
+ * @plugindesc Versions: { codebase: "1.1.0", plugin: "v1.03b" }
  * Lets you use plugin commands in the RMMV styles by typing them as scripts
  * @orderAfter DoubleX_RMMZ_Enhanced_Codebase
  * @orderAfter DoubleX RMMZ Enhanced Codebase
