@@ -66,17 +66,12 @@
  *      2. The version number of this plugin's consists of 2 parts, with 1
  *         being the targeted default RMMZ codebase versions, so this plugin
  *         must be outdated if those version numbers are indeed different
- *      3. The default plugin parameters file name is
- *         DoubleX RMMZ Enhanced Codebase
- *         If you want to change that, you must edit the value of
- *         DoubleX_RMMZ.Enhanced_Codebase.PLUGIN_NAME, which must be done via
- *         opening this plugin js file directly
- *      4. (Plugin developers only)The version numbers of this plugin are
+ *      3. (Plugin developers only)The version numbers of this plugin are
  *         stored in DoubleX_RMMZ.Enhanced_Codebase.VERSIONS, which should be
  *         { codebase: "1.1.0", plugin: "v0.00a" }
  *         If it's falsy, it means this plugin's not loaded at the moment of
  *         querying its version numbers
- *      5. (Plugin developers only)Please use the following search tag to
+ *      4. (Plugin developers only)Please use the following search tag to
  *         check how this plugin extends and rewrites functions:
  *         - Enhanced_Codebase_Extend_Rewrite_Funcs
  *         Note that the original function will still be stored in the plugin
@@ -401,12 +396,23 @@
 // jshint esversion: 6
 
 var DoubleX_RMMZ = DoubleX_RMMZ || {}; // var must be used or game will crash
-// Separates the version numbers with the rest to make the former more clear
-DoubleX_RMMZ.Enhanced_Codebase = {
-    PLUGIN_NAME: "DoubleX RMMZ Enhanced Codebase",
-    VERSIONS: { codebase: "1.1.0", plugin: "v0.00a" }
-}; // DoubleX_RMMZ.Enhanced_Codebase
-//
+
+(() => {
+
+    "use strict";
+
+    const src = document.currentScript.src;
+    const name = src.split("/").slice(-1)[0].split(".")[0].replace(/%20/g, " ");
+    console.info(src, name);
+
+    // Separates the version numbers with the rest to make the former more clear
+    DoubleX_RMMZ.Enhanced_Codebase = {
+        PLUGIN_NAME: name,
+        VERSIONS: { codebase: "1.1.0", plugin: "v0.00a" }
+    }; // DoubleX_RMMZ.Enhanced_Codebase
+    //
+
+})();
 
 (EC => {
 
