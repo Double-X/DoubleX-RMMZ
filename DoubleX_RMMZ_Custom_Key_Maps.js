@@ -343,7 +343,7 @@ var DoubleX_RMMZ = DoubleX_RMMZ || {}; // var must be used or game will crash
 
     // Separates the version numbers with the rest to make the former more clear
     DoubleX_RMMZ.Custom_Key_Maps = {
-        PLUGIN_NAME: "DoubleX_RMMZ_Custom_Key_Maps",
+        PLUGIN_NAME: name,
         VERSIONS: { codebase: "1.1.0", plugin: "v1.00b" }
     }; // DoubleX_RMMZ.Custom_Key_Maps
     //

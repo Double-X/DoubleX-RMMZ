@@ -2881,7 +2881,7 @@ var DoubleX_RMMZ = DoubleX_RMMZ || {}; // var must be used or game will crash
 
     // Separates the version numbers with the rest to make the former more clear
     DoubleX_RMMZ.Unit_Filters = {
-        PLUGIN_NAME: "DoubleX RMMZ Unit Filters",
+        PLUGIN_NAME: name,
         VERSIONS: { codebase: "1.0.2", plugin: "v1.02a" }
     }; // DoubleX_RMMZ.Unit_Filters
     //

@@ -162,7 +162,7 @@ var DoubleX_RMMZ = DoubleX_RMMZ || {}; // var must be used or game will crash
 
     // Separates the version numbers with the rest to make the former more clear
     DoubleX_RMMZ.Confusion_Edit = {
-        PLUGIN_NAME: "DoubleX_RMMZ_Confusion_Edit",
+        PLUGIN_NAME: name,
         VERSIONS: { codebase: "1.0.2", plugin: "v1.00a" }
     }; // DoubleX_RMMZ.Confusion_Edit
     //
