@@ -466,38 +466,38 @@ if (DoubleX_RMMZ.Enhanced_Codebase) {
     "use strict";
 
     // Search tag: NOTE_TYPE
-    MZ_EC.loadDataManagerNotetags(ST, new Map(Object.entries({
-        add: new Map(Object.entries({
+    MZ_EC.loadDataManagerNotetags(ST, {
+        add: {
             suffix1: MZ_EC.BOOL_SUFFIXES, // condSuffix
             suffix2: MZ_EC.VAL_SUFFIXES, // eventSuffix
             entry1: MZ_EC.BOOL_ENTRY, // condEntry
             entry2: MZ_EC.NUM_ENTRY // eventEntry
-        })), // add
-        remove: new Map(Object.entries({
+        }, // add
+        remove: {
             suffix1: MZ_EC.BOOL_SUFFIXES, // condSuffix
             suffix2: MZ_EC.VAL_SUFFIXES, // eventSuffix
             entry1: MZ_EC.BOOL_ENTRY, // condEntry
             entry2: MZ_EC.NUM_ENTRY // eventEntry
-        })), // remove
-        reset: new Map(Object.entries({
+        }, // remove
+        reset: {
             suffix1: MZ_EC.BOOL_SUFFIXES, // condSuffix
             suffix2: MZ_EC.VAL_SUFFIXES, // eventSuffix
             entry1: MZ_EC.BOOL_ENTRY, // condEntry
             entry2: MZ_EC.NUM_ENTRY // eventEntry
-        })), // reset
-        expire: new Map(Object.entries({
+        }, // reset
+        expire: {
             suffix1: MZ_EC.BOOL_SUFFIXES, // condSuffix
             suffix2: MZ_EC.VAL_SUFFIXES, // eventSuffix
             entry1: MZ_EC.BOOL_ENTRY, // condEntry
             entry2: MZ_EC.NUM_ENTRY // eventEntry
-        })), // expire
-        turn: new Map(Object.entries({
+        }, // expire
+        turn: {
             suffix1: MZ_EC.BOOL_SUFFIXES, // condSuffix
             suffix2: MZ_EC.VAL_SUFFIXES, // eventSuffix
             entry1: MZ_EC.BOOL_ENTRY, // condEntry
             entry2: MZ_EC.NUM_ENTRY // eventEntry
-        })) // turn
-    })), new Map(Object.entries({
+        } // turn
+    }, {
         $dataActors: "actor",
         $dataClasses: "class",
         $dataSkills: "skill",
@@ -506,7 +506,7 @@ if (DoubleX_RMMZ.Enhanced_Codebase) {
         $dataArmors: "armor",
         $dataEnemies: "enemy",
         $dataStates: "state"
-    })), "state triggers", "stateTriggers");
+    }, "state triggers", "stateTriggers");
     //
 
 })(DoubleX_RMMZ.Enhanced_Codebase, DoubleX_RMMZ.State_Triggers);
