@@ -808,24 +808,24 @@ if (DoubleX_RMMZ.Enhanced_Codebase) {
     "use strict";
 
     // Search tag: NOTE_TYPE
-    MZ_EC.loadDataManagerNotetags(SIC, new Map(Object.entries({
-        battler: new Map(Object.entries({
+    MZ_EC.loadDataManagerNotetags(SIC, {
+        battler: {
             suffix1: MZ_EC.BOOL_SUFFIXES, // condSuffix
             suffix2: MZ_EC.VAL_SUFFIXES, // opSuffix
             suffix3: MZ_EC.VAL_SUFFIXES, // valSuffix
             entry1: MZ_EC.BOOL_ENTRY, // condEntry
             entry2: MZ_EC.STRING_ENTRY, // opEntry
             entry3: MZ_EC.NUM_ENTRY // valEntry
-        })), // battler
-        skillItem: new Map(Object.entries({
+        }, // battler
+        skillItem: {
             suffix1: MZ_EC.BOOL_SUFFIXES, // condSuffix
             suffix2: MZ_EC.VAL_SUFFIXES, // opSuffix
             suffix3: MZ_EC.VAL_SUFFIXES, // valSuffix
             entry1: MZ_EC.BOOL_ENTRY, // condEntry
             entry2: MZ_EC.STRING_ENTRY, // opEntry
             entry3: MZ_EC.NUM_ENTRY // valEntry
-        })) // skillItem
-    })), new Map(Object.entries({
+        } // skillItem
+    }, {
         $dataActors: "actor",
         $dataClasses: "class",
         $dataSkills: "skill",
@@ -834,7 +834,7 @@ if (DoubleX_RMMZ.Enhanced_Codebase) {
         $dataArmors: "armor",
         $dataEnemies: "enemy",
         $dataStates: "state"
-    })), "cooldown");
+    }, "cooldown");
     //
 
 })(DoubleX_RMMZ.Enhanced_Codebase, DoubleX_RMMZ.Skill_Item_Cooldown);
