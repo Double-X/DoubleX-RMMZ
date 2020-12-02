@@ -117,12 +117,23 @@
 // jshint esversion: 6
 
 var DoubleX_RMMZ = DoubleX_RMMZ || {}; // var must be used or game will crash
-// Separates the version numbers with the rest to make the former more clear
-DoubleX_RMMZ.Targeting_Hotkeys = {
-    PLUGIN_NAME: name,
-    VERSIONS: { codebase: "1.1.0", plugin: "v1.00b" }
-}; // DoubleX_RMMZ.Targeting_Hotkeys
-//
+
+(() => {
+
+    "use strict";
+
+    const src = document.currentScript.src;
+    const name = src.split("/").slice(-1)[0].split(".")[0].replace(/%20/g, " ");
+    console.info(src, name);
+
+    // Separates the version numbers with the rest to make the former more clear
+    DoubleX_RMMZ.Targeting_Hotkeys = {
+        PLUGIN_NAME: name,
+        VERSIONS: { codebase: "1.1.0", plugin: "v1.00b" }
+    }; // DoubleX_RMMZ.Targeting_Hotkeys
+    //
+
+})();
 
 (TH => {
 
