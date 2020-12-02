@@ -791,6 +791,7 @@ var DoubleX_RMMZ = DoubleX_RMMZ || {}; // var must be used or game will crash
           const validNotetagData = notetagData.filter(CORE._IS_VALID_DATUM);
           return validNotetagData.reduce((notes, { meta }) => {
               const { enhancedCodebase } = meta;
+              console.log(enhancedCodebase, containerName)
               return notes.fastMerge(enhancedCodebase[containerName].notetags);
           }, []);
     }; // CORE._DATA_NOTETAGS
@@ -2611,8 +2612,8 @@ var DoubleX_RMMZ = DoubleX_RMMZ || {}; // var must be used or game will crash
         Object.entries(notePairs).forEach(([noteName, pairs]) => {
             NEW.NOTETAG_PAIRS.set(noteName, new Map(Object.entries(pairs)));
         });
-
-        NEW.NOTETAG_DATA_CONTAINER_NAMES = containerNames;
+        NEW.NOTETAG_DATA_CONTAINER_NAMES =
+                new Map(Object.entries(containerNames));
 
         NEW._REG_EXP_NOTE = regex;
 
@@ -2631,10 +2632,10 @@ var DoubleX_RMMZ = DoubleX_RMMZ || {}; // var must be used or game will crash
          * @param {string} objName - The name of data container having notetags
          */
         NEW._loadDataNotetags = function(obj, objName) {
-            if (!containerNames.has(objName)) return;
-            const datumType = containerNames.get(objName);
-            MZ_EC.onLoadDataNotetags.call(
-                    this, obj, datumType, regex, notePairs, containerName);
+            if (!NEW.NOTETAG_DATA_CONTAINER_NAMES.has(objName)) return;
+            const datumType = NEW.NOTETAG_DATA_CONTAINER_NAMES.get(objName);
+            MZ_EC.onLoadDataNotetags.call(this, obj, datumType, regex,
+                    NEW.NOTETAG_PAIRS, containerName);
         }; // NEW._loadDataNotetags
 
     }; // MZ_EC.loadDataManagerNotetags
