@@ -976,214 +976,214 @@ if (DoubleX_RMMZ.Enhanced_Codebase && DoubleX_RMMZ.Unit_Filters) {
     "use strict";
 
     // Search tag: NOTE_TYPE
-    MZ_EC.loadDataManagerNotetags(TA, new Map(Object.entries({
-        memWithAnyState: new Map(Object.entries({
+    MZ_EC.loadDataManagerNotetags(TA, {
+        memWithAnyState: {
             suffix1: MZ_EC.BOOL_SUFFIXES, // condSuffix
             suffix2: MZ_EC.VAL_SUFFIXES, // stateIdsSuffix
             entry1: MZ_EC.BOOL_ENTRY, // condEntry
             entry2: MZ_EC.NUM_ARRAY_ENTRY // stateIdsEntry
-        })), // memWithAnyState
-        memWithAllStates: new Map(Object.entries({
+        }, // memWithAnyState
+        memWithAllStates: {
             suffix1: MZ_EC.BOOL_SUFFIXES, // condSuffix
             suffix2: MZ_EC.VAL_SUFFIXES, // stateIdsSuffix
             entry1: MZ_EC.BOOL_ENTRY, // condEntry
             entry2: MZ_EC.NUM_ARRAY_ENTRY // stateIdsEntry
-        })), // memWithAllStates
-        memWithoutAnyState: new Map(Object.entries({
+        }, // memWithAllStates
+        memWithoutAnyState: {
             suffix1: MZ_EC.BOOL_SUFFIXES, // condSuffix
             suffix2: MZ_EC.VAL_SUFFIXES, // stateIdsSuffix
             entry1: MZ_EC.BOOL_ENTRY, // condEntry
             entry2: MZ_EC.NUM_ARRAY_ENTRY // stateIdsEntry
-        })), // memWithoutAnyState
-        memWithoutAllStates: new Map(Object.entries({
+        }, // memWithoutAnyState
+        memWithoutAllStates: {
             suffix1: MZ_EC.BOOL_SUFFIXES, // condSuffix
             suffix2: MZ_EC.VAL_SUFFIXES, // stateIdsSuffix
             entry1: MZ_EC.BOOL_ENTRY, // condEntry
             entry2: MZ_EC.NUM_ARRAY_ENTRY // stateIdsEntry
-        })), // memWithoutAllStates
-        memWithAnyBuff: new Map(Object.entries({
+        }, // memWithoutAllStates
+        memWithAnyBuff: {
             suffix1: MZ_EC.BOOL_SUFFIXES, // condSuffix
             suffix2: MZ_EC.VAL_SUFFIXES, // paramIdsSuffix
             entry1: MZ_EC.BOOL_ENTRY, // condEntry
             entry2: MZ_EC.NUM_ARRAY_ENTRY // paramIdsEntry
-        })), // memWithAnyBuff
-        memWithAllBuffs: new Map(Object.entries({
+        }, // memWithAnyBuff
+        memWithAllBuffs: {
             suffix1: MZ_EC.BOOL_SUFFIXES, // condSuffix
             suffix2: MZ_EC.VAL_SUFFIXES, // paramIdsSuffix
             entry1: MZ_EC.BOOL_ENTRY, // condEntry
             entry2: MZ_EC.NUM_ARRAY_ENTRY // paramIdsEntry
-        })), // memWithAllBuffs
-        memWithoutAnyBuff: new Map(Object.entries({
+        }, // memWithAllBuffs
+        memWithoutAnyBuff: {
             suffix1: MZ_EC.BOOL_SUFFIXES, // condSuffix
             suffix2: MZ_EC.VAL_SUFFIXES, // paramIdsSuffix
             entry1: MZ_EC.BOOL_ENTRY, // condEntry
             entry2: MZ_EC.NUM_ARRAY_ENTRY // paramIdsEntry
-        })), // memWithoutAnyBuff
-        memWithoutAllBuffs: new Map(Object.entries({
+        }, // memWithoutAnyBuff
+        memWithoutAllBuffs: {
             suffix1: MZ_EC.BOOL_SUFFIXES, // condSuffix
             suffix2: MZ_EC.VAL_SUFFIXES, // paramIdsSuffix
             entry1: MZ_EC.BOOL_ENTRY, // condEntry
             entry2: MZ_EC.NUM_ARRAY_ENTRY // paramIdsEntry
-        })), // memWithoutAllBuffs
-        memWithAnyDebuff: new Map(Object.entries({
+        }, // memWithoutAllBuffs
+        memWithAnyDebuff: {
             suffix1: MZ_EC.BOOL_SUFFIXES, // condSuffix
             suffix2: MZ_EC.VAL_SUFFIXES, // paramIdsSuffix
             entry1: MZ_EC.BOOL_ENTRY, // condEntry
             entry2: MZ_EC.NUM_ARRAY_ENTRY // paramIdsEntry
-        })), // memWithAnyDebuff
-        memWithAllDebuffs: new Map(Object.entries({
+        }, // memWithAnyDebuff
+        memWithAllDebuffs: {
             suffix1: MZ_EC.BOOL_SUFFIXES, // condSuffix
             suffix2: MZ_EC.VAL_SUFFIXES, // paramIdsSuffix
             entry1: MZ_EC.BOOL_ENTRY, // condEntry
             entry2: MZ_EC.NUM_ARRAY_ENTRY // paramIdsEntry
-        })), // memWithAllDebuffs
-        memWithoutAnyDebuff: new Map(Object.entries({
+        }, // memWithAllDebuffs
+        memWithoutAnyDebuff: {
             suffix1: MZ_EC.BOOL_SUFFIXES, // condSuffix
             suffix2: MZ_EC.VAL_SUFFIXES, // paramIdsSuffix
             entry1: MZ_EC.BOOL_ENTRY, // condEntry
             entry2: MZ_EC.NUM_ARRAY_ENTRY // paramIdsEntry
-        })), // memWithoutAnyDebuff
-        memWithoutAllDebuffs: new Map(Object.entries({
+        }, // memWithoutAnyDebuff
+        memWithoutAllDebuffs: {
             suffix1: MZ_EC.BOOL_SUFFIXES, // condSuffix
             suffix2: MZ_EC.VAL_SUFFIXES, // paramIdsSuffix
             entry1: MZ_EC.BOOL_ENTRY, // condEntry
             entry2: MZ_EC.NUM_ARRAY_ENTRY // paramIdsEntry
-        })), // memWithoutAllDebuffs
-        memWithAnySkill: new Map(Object.entries({
+        }, // memWithoutAllDebuffs
+        memWithAnySkill: {
             suffix1: MZ_EC.BOOL_SUFFIXES, // condSuffix
             suffix2: MZ_EC.VAL_SUFFIXES, // skillIdsSuffix
             entry1: MZ_EC.BOOL_ENTRY, // condEntry
             entry2: MZ_EC.NUM_ARRAY_ENTRY // skillIdsEntry
-        })), // memWithAnySkill
-        memWithAllSkills: new Map(Object.entries({
+        }, // memWithAnySkill
+        memWithAllSkills: {
             suffix1: MZ_EC.BOOL_SUFFIXES, // condSuffix
             suffix2: MZ_EC.VAL_SUFFIXES, // skillIdsSuffix
             entry1: MZ_EC.BOOL_ENTRY, // condEntry
             entry2: MZ_EC.NUM_ARRAY_ENTRY // skillIdsEntry
-        })), // memWithAllSkills
-        memWithoutAnySkill: new Map(Object.entries({
+        }, // memWithAllSkills
+        memWithoutAnySkill: {
             suffix1: MZ_EC.BOOL_SUFFIXES, // condSuffix
             suffix2: MZ_EC.VAL_SUFFIXES, // skillIdsSuffix
             entry1: MZ_EC.BOOL_ENTRY, // condEntry
             entry2: MZ_EC.NUM_ARRAY_ENTRY // skillIdsEntry
-        })), // memWithoutAnySkill
-        memWithoutAllSkills: new Map(Object.entries({
+        }, // memWithoutAnySkill
+        memWithoutAllSkills: {
             suffix1: MZ_EC.BOOL_SUFFIXES, // condSuffix
             suffix2: MZ_EC.VAL_SUFFIXES, // skillIdsSuffix
             entry1: MZ_EC.BOOL_ENTRY, // condEntry
             entry2: MZ_EC.NUM_ARRAY_ENTRY // skillIdsEntry
-        })), // memWithoutAllSkills
-        anyHighestStatMem: new Map(Object.entries({
+        }, // memWithoutAllSkills
+        anyHighestStatMem: {
             suffix1: MZ_EC.BOOL_SUFFIXES, // condSuffix
             suffix2: MZ_EC.VAL_SUFFIXES, // statsSuffix
             entry1: MZ_EC.BOOL_ENTRY, // condEntry
             entry2: MZ_EC.STRING_ARRAY_ENTRY // statsEntry
-        })), // anyHighestStatMem
-        allHighestStatsMem: new Map(Object.entries({
+        }, // anyHighestStatMem
+        allHighestStatsMem: {
             suffix1: MZ_EC.BOOL_SUFFIXES, // condSuffix
             suffix2: MZ_EC.VAL_SUFFIXES, // statsSuffix
             entry1: MZ_EC.BOOL_ENTRY, // condEntry
             entry2: MZ_EC.STRING_ARRAY_ENTRY // statsEntry
-        })), // allHighestStatsMem
-        notAnyHighestStatMem: new Map(Object.entries({
+        }, // allHighestStatsMem
+        notAnyHighestStatMem: {
             suffix1: MZ_EC.BOOL_SUFFIXES, // condSuffix
             suffix2: MZ_EC.VAL_SUFFIXES, // statsSuffix
             entry1: MZ_EC.BOOL_ENTRY, // condEntry
             entry2: MZ_EC.STRING_ARRAY_ENTRY // statsEntry
-        })), // notAnyHighestStatMem
-        notAllHighestStatsMem: new Map(Object.entries({
+        }, // notAnyHighestStatMem
+        notAllHighestStatsMem: {
             suffix1: MZ_EC.BOOL_SUFFIXES, // condSuffix
             suffix2: MZ_EC.VAL_SUFFIXES, // statsSuffix
             entry1: MZ_EC.BOOL_ENTRY, // condEntry
             entry2: MZ_EC.STRING_ARRAY_ENTRY // statsEntry
-        })), // notAllHighestStatsMem
-        anyLowestStatMem: new Map(Object.entries({
+        }, // notAllHighestStatsMem
+        anyLowestStatMem: {
             suffix1: MZ_EC.BOOL_SUFFIXES, // condSuffix
             suffix2: MZ_EC.VAL_SUFFIXES, // statsSuffix
             entry1: MZ_EC.BOOL_ENTRY, // condEntry
             entry2: MZ_EC.STRING_ARRAY_ENTRY // statsEntry
-        })), // anyLowestStatMem
-        allLowestStatsMem: new Map(Object.entries({
+        }, // anyLowestStatMem
+        allLowestStatsMem: {
             suffix1: MZ_EC.BOOL_SUFFIXES, // condSuffix
             suffix2: MZ_EC.VAL_SUFFIXES, // statsSuffix
             entry1: MZ_EC.BOOL_ENTRY, // condEntry
             entry2: MZ_EC.STRING_ARRAY_ENTRY // statsEntry
-        })), // allLowestStatsMem
-        notAnyLowestStatsMem: new Map(Object.entries({
+        }, // allLowestStatsMem
+        notAnyLowestStatsMem: {
             suffix1: MZ_EC.BOOL_SUFFIXES, // condSuffix
             suffix2: MZ_EC.VAL_SUFFIXES, // statsSuffix
             entry1: MZ_EC.BOOL_ENTRY, // condEntry
             entry2: MZ_EC.STRING_ARRAY_ENTRY // statsEntry
-        })), // notAnyLowestStatsMem
-        notAllLowestStatsMem: new Map(Object.entries({
+        }, // notAnyLowestStatsMem
+        notAllLowestStatsMem: {
             suffix1: MZ_EC.BOOL_SUFFIXES, // condSuffix
             suffix2: MZ_EC.VAL_SUFFIXES, // statsSuffix
             entry1: MZ_EC.BOOL_ENTRY, // condEntry
             entry2: MZ_EC.STRING_ARRAY_ENTRY // statsEntry
-        })), // notAllLowestStatsMem
-        anyAboveStatMem: new Map(Object.entries({
+        }, // notAllLowestStatsMem
+        anyAboveStatMem: {
             suffix1: MZ_EC.BOOL_SUFFIXES, // condSuffix
             suffix2: MZ_EC.VAL_SUFFIXES, // statsSuffix
             suffix3: MZ_EC.VAL_SUFFIXES, // valSuffix
             entry1: MZ_EC.BOOL_ENTRY, // condEntry
             entry2: MZ_EC.STRING_ARRAY_ENTRY, // statsEntry
             entry3: MZ_EC.NUM_ENTRY // valEntry
-        })), // anyAboveStatMem
-        allAboveStatMem: new Map(Object.entries({
+        }, // anyAboveStatMem
+        allAboveStatMem: {
             suffix1: MZ_EC.BOOL_SUFFIXES, // condSuffix
             suffix2: MZ_EC.VAL_SUFFIXES, // statsSuffix
             suffix3: MZ_EC.VAL_SUFFIXES, // valSuffix
             entry1: MZ_EC.BOOL_ENTRY, // condEntry
             entry2: MZ_EC.STRING_ARRAY_ENTRY, // statsEntry
             entry3: MZ_EC.NUM_ENTRY // valEntry
-        })), // allAboveStatMem
-        anyBelowStatMem: new Map(Object.entries({
+        }, // allAboveStatMem
+        anyBelowStatMem: {
             suffix1: MZ_EC.BOOL_SUFFIXES, // condSuffix
             suffix2: MZ_EC.VAL_SUFFIXES, // statsSuffix
             suffix3: MZ_EC.VAL_SUFFIXES, // valSuffix
             entry1: MZ_EC.BOOL_ENTRY, // condEntry
             entry2: MZ_EC.STRING_ARRAY_ENTRY, // statsEntry
             entry3: MZ_EC.NUM_ENTRY // valEntry
-        })), // anyBelowStatMem
-        allBelowStatMem: new Map(Object.entries({
+        }, // anyBelowStatMem
+        allBelowStatMem: {
             suffix1: MZ_EC.BOOL_SUFFIXES, // condSuffix
             suffix2: MZ_EC.VAL_SUFFIXES, // statsSuffix
             suffix3: MZ_EC.VAL_SUFFIXES, // valSuffix
             entry1: MZ_EC.BOOL_ENTRY, // condEntry
             entry2: MZ_EC.STRING_ARRAY_ENTRY, // statsEntry
             entry3: MZ_EC.NUM_ENTRY // valEntry
-        })), // allBelowStatMem
-        or: new Map(Object.entries({
+        }, // allBelowStatMem
+        or: {
             suffix1: MZ_EC.BOOL_SUFFIXES, // condSuffix
             entry1: MZ_EC.BOOL_ENTRY // condEntry
-        })), // or
+        }, // or
         // v1.01a+
-        memWithAnyUsableSkill: new Map(Object.entries({
+        memWithAnyUsableSkill: {
             suffix1: MZ_EC.BOOL_SUFFIXES, // condSuffix
             suffix2: MZ_EC.VAL_SUFFIXES, // skillIdsSuffix
             entry1: MZ_EC.BOOL_ENTRY, // condEntry
             entry2: MZ_EC.NUM_ARRAY_ENTRY // skillIdsEntry
-        })), // memWithAnyUsableSkill
-        memWithAllUsableSkills: new Map(Object.entries({
+        }, // memWithAnyUsableSkill
+        memWithAllUsableSkills: {
             suffix1: MZ_EC.BOOL_SUFFIXES, // condSuffix
             suffix2: MZ_EC.VAL_SUFFIXES, // skillIdsSuffix
             entry1: MZ_EC.BOOL_ENTRY, // condEntry
             entry2: MZ_EC.NUM_ARRAY_ENTRY // skillIdsEntry
-        })), // memWithAllUsableSkills
-        memWithoutAnyUsableSkill: new Map(Object.entries({
+        }, // memWithAllUsableSkills
+        memWithoutAnyUsableSkill: {
             suffix1: MZ_EC.BOOL_SUFFIXES, // condSuffix
             suffix2: MZ_EC.VAL_SUFFIXES, // skillIdsSuffix
             entry1: MZ_EC.BOOL_ENTRY, // condEntry
             entry2: MZ_EC.NUM_ARRAY_ENTRY // skillIdsEntry
-        })), // memWithoutAnyUsableSkill
-        memWithoutAllUsableSkills: new Map(Object.entries({
+        }, // memWithoutAnyUsableSkill
+        memWithoutAllUsableSkills: {
             suffix1: MZ_EC.BOOL_SUFFIXES, // condSuffix
             suffix2: MZ_EC.VAL_SUFFIXES, // skillIdsSuffix
             entry1: MZ_EC.BOOL_ENTRY, // condEntry
             entry2: MZ_EC.NUM_ARRAY_ENTRY // skillIdsEntry
-        })) // memWithoutAllUsableSkills
+        } // memWithoutAllUsableSkills
         //
-    })), new Map(Object.entries({
+    }, {
         $dataActors: "actor",
         $dataClasses: "class",
         $dataSkills: "skill",
@@ -1192,7 +1192,7 @@ if (DoubleX_RMMZ.Enhanced_Codebase && DoubleX_RMMZ.Unit_Filters) {
         $dataArmors: "armor",
         $dataEnemies: "enemy",
         $dataStates: "state"
-    })), "targeting ai", "targetingAI");
+    }, "targeting ai", "targetingAI");
     //
 
 })(DoubleX_RMMZ.Enhanced_Codebase, DoubleX_RMMZ.Targeting_AI);
