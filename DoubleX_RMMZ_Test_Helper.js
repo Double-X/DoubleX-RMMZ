@@ -92,12 +92,23 @@
 // jshint esversion: 6
 
 var DoubleX_RMMZ = DoubleX_RMMZ || {}; // var must be used or game will crash
-// Separates the version numbers with the rest to make the former more clear
-DoubleX_RMMZ.Test_Helper = {
-    PLUGIN_NAME: "DoubleX_RMMZ_Test_Helper",
-    VERSIONS: { codebase: "1.0.2", plugin: "v1.00a" }
-}; // DoubleX_RMMZ.Test_Helper
-//
+
+(() => {
+
+    "use strict";
+
+    const src = document.currentScript.src;
+    const name = src.split("/").slice(-1)[0].split(".")[0].replace(/%20/g, " ");
+    console.info(src, name);
+
+    // Separates the version numbers with the rest to make the former more clear
+    DoubleX_RMMZ.Test_Helper = {
+        PLUGIN_NAME: name,
+        VERSIONS: { codebase: "1.0.2", plugin: "v1.00a" }
+    }; // DoubleX_RMMZ.Test_Helper
+    //
+
+})();
 
 (TH => {
 
