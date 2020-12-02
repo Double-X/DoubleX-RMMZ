@@ -52,13 +52,6 @@
  *      9. https://www.patreon.com/posts/43317432
  *      10. https://www.makerdevs.com/plugin/doublex-rmmz-tpbs-battle-turns
  *----------------------------------------------------------------------------
- *    # Instructions
- *      1. The default plugin parameters file name is
- *         DoubleX_RMMZ_TPBS_Battle_Turns
- *         If you want to change that, you must edit the value of
- *         DoubleX_RMMZ.TPBS_Battle_Turns.PLUGIN_NAME, which must be done via
- *         opening this plugin js file directly
- *----------------------------------------------------------------------------
  *    # Contributors
  *      Authors:
  *      1. DoubleX
@@ -72,6 +65,10 @@
  *      - None So Far
  *----------------------------------------------------------------------------
  *    # Changelog
+ *      { codebase: "1.1.0", plugin: "v1.00b" }(2020 Dec 2 GMT 1000):
+ *      1. You no longer have to edit the value of
+ *         DoubleX_RMMZ.TPBS_Battle_Turns.PLUGIN_NAME when changing this
+ *         plugin file name
  *      { codebase: "1.1.0", plugin: "v1.00a" }(2020 Oct 30 GMT 0600):
  *      1. 1st version of this plugin finished
  *============================================================================*/
@@ -79,7 +76,7 @@
 /*:
  * @url https://www.patreon.com/doublex
  * @target MZ
- * @plugindesc Versions: { codebase: "1.1.0", plugin: "v1.00a" }
+ * @plugindesc Versions: { codebase: "1.1.0", plugin: "v1.00b" }
  * Lets you set a TPBS battle turn as number of seconds or actions executed
  * @orderAfter DoubleX_RMMZ_Enhanced_Codebase
  * @orderAfter DoubleX RMMZ Enhanced Codebase
@@ -155,12 +152,23 @@
 // jshint esversion: 6
 
 var DoubleX_RMMZ = DoubleX_RMMZ || {}; // var must be used or game will crash
-// Separates the version numbers with the rest to make the former more clear
-DoubleX_RMMZ.TPBS_Battle_Turns = {
-    PLUGIN_NAME: "DoubleX_RMMZ_TPBS_Battle_Turns",
-    VERSIONS: { codebase: "1.1.0", plugin: "v1.00a" }
-}; // DoubleX_RMMZ.TPBS_Battle_Turns
-//
+
+(() => {
+
+    "use strict";
+
+    const src = document.currentScript.src;
+    const name = src.split("/").slice(-1)[0].split(".")[0].replace(/%20/g, " ");
+    console.info(src, name);
+
+    // Separates the version numbers with the rest to make the former more clear
+    DoubleX_RMMZ.TPBS_Battle_Turns = {
+        PLUGIN_NAME: name,
+        VERSIONS: { codebase: "1.1.0", plugin: "v1.00b" }
+    }; // DoubleX_RMMZ.TPBS_Battle_Turns
+    //
+
+})();
 
 (TPBSBT => {
 
