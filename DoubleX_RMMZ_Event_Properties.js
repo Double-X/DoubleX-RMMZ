@@ -65,13 +65,6 @@
  *      9.
  *      10.
  *----------------------------------------------------------------------------
- *    # Instructions
- *      1. The default plugin parameters file name is
- *         DoubleX_RMMZ_Event_Properties
- *         If you want to change that, you must edit the value of
- *         DoubleX_RMMZ.Event_Properties.PLUGIN_NAME, which must be done
- *         via opening this plugin js file directly
- *----------------------------------------------------------------------------
  *    # Contributors
  *      Authors:
  *      1. DoubleX
@@ -147,12 +140,23 @@
 // jshint esversion: 6
 
 var DoubleX_RMMZ = DoubleX_RMMZ || {}; // var must be used or game will crash
-// Separates the version numbers with the rest to make the former more clear
-DoubleX_RMMZ.Event_Properties = {
-    PLUGIN_NAME: "DoubleX_RMMZ_Event_Properties",
-    VERSIONS: { codebase: "1.1.0", plugin: "v1.00a" }
-}; // DoubleX_RMMZ.Event_Properties
-//
+
+(() => {
+
+    "use strict";
+
+    const src = document.currentScript.src;
+    const name = src.split("/").slice(-1)[0].split(".")[0].replace(/%20/g, " ");
+    console.info(src, name);
+
+    // Separates the version numbers with the rest to make the former more clear
+    DoubleX_RMMZ.Event_Properties = {
+        PLUGIN_NAME: name,
+        VERSIONS: { codebase: "1.1.0", plugin: "v1.00a" }
+    }; // DoubleX_RMMZ.Event_Properties
+    //
+
+})();
 
 (EP => {
 
