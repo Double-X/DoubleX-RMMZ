@@ -2607,7 +2607,11 @@ var DoubleX_RMMZ = DoubleX_RMMZ || {}; // var must be used or game will crash
         } = MZ_EC.setKlassContainer(klassName, $, pluginName);
         const EC_DM = MZ_EC[klassName].new, DM = pluginName[klassName];
 
-        NEW.NOTETAG_PAIRS = notePairs;
+        NEW.NOTETAG_PAIRS = new Map();
+        Object.entries(notePairs).forEach(([noteName, pairs]) => {
+            NEW.NOTETAG_PAIRS.set(noteName, new Map(Object.entries(pairs)));
+        });
+
         NEW.NOTETAG_DATA_CONTAINER_NAMES = containerNames;
 
         NEW._REG_EXP_NOTE = regex;
