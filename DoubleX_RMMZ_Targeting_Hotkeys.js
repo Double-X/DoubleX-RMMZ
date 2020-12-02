@@ -47,13 +47,6 @@
  *      9. https://www.patreon.com/posts/42155629
  *      10. https://www.makerdevs.com/plugin/doublex-rmmz-targeting-hotkeys
  *----------------------------------------------------------------------------
- *    # Instructions
- *      1. The default plugin parameters file name is
- *         DoubleX_RMMZ_Targeting_Hotkeys
- *         If you want to change that, you must edit the value of
- *         DoubleX_RMMZ.Targeting_Hotkeys.PLUGIN_NAME, which must be done
- *         via opening this plugin js file directly
- *----------------------------------------------------------------------------
  *    # Contributors
  *      Authors:
  *      1. DoubleX
@@ -67,6 +60,10 @@
  *      - None So Far
  *----------------------------------------------------------------------------
  *    # Changelog
+ *      { codebase: "1.1.0", plugin: "v1.00b" }(2020 Dec 2 GMT 0900):
+ *      1. You no longer have to edit the value of
+ *         DoubleX_RMMZ.Targeting_Hotkeys.PLUGIN_NAME when changing this
+ *         plugin file name
  *      { codebase: "1.0.2", plugin: "v1.00a" }(2020 Sep 29 GMT 0400):
  *      1. 1st version of this plugin finished
  *============================================================================*/
@@ -86,7 +83,7 @@
 /*:
  * @url https://www.patreon.com/doublex
  * @target MZ
- * @plugindesc Versions: { codebase: "1.0.2", plugin: "v1.00a" }
+ * @plugindesc Versions: { codebase: "1.1.0", plugin: "v1.00b" }
  * Lets you set some custom hotkeys to select some skill/item targets
  * @orderAfter DoubleX_RMMZ_Enhanced_Codebase
  * @orderAfter DoubleX RMMZ Enhanced Codebase
@@ -123,7 +120,7 @@ var DoubleX_RMMZ = DoubleX_RMMZ || {}; // var must be used or game will crash
 // Separates the version numbers with the rest to make the former more clear
 DoubleX_RMMZ.Targeting_Hotkeys = {
     PLUGIN_NAME: "DoubleX_RMMZ_Targeting_Hotkeys",
-    VERSIONS: { codebase: "1.0.2", plugin: "v1.00a" }
+    VERSIONS: { codebase: "1.1.0", plugin: "v1.00b" }
 }; // DoubleX_RMMZ.Targeting_Hotkeys
 //
 
