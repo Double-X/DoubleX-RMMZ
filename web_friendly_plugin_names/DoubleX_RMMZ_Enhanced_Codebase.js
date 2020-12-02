@@ -791,7 +791,6 @@ var DoubleX_RMMZ = DoubleX_RMMZ || {}; // var must be used or game will crash
           const validNotetagData = notetagData.filter(CORE._IS_VALID_DATUM);
           return validNotetagData.reduce((notes, { meta }) => {
               const { enhancedCodebase } = meta;
-              console.log(enhancedCodebase, containerName)
               return notes.fastMerge(enhancedCodebase[containerName].notetags);
           }, []);
     }; // CORE._DATA_NOTETAGS
