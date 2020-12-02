@@ -1225,112 +1225,112 @@ if (DoubleX_RMMZ.Enhanced_Codebase) {
     "use strict";
 
     // Search tag: NOTE_TYPE
-    MZ_EC.loadDataManagerNotetags(TPBSCE, new Map(Object.entries({
-        tpbAcceleration: new Map(Object.entries({
+    MZ_EC.loadDataManagerNotetags(TPBSCE, {
+        tpbAcceleration: {
             suffix1: MZ_EC.BOOL_SUFFIXES, // condSuffix
             suffix2: MZ_EC.VAL_SUFFIXES, // opSuffix
             suffix3: MZ_EC.VAL_SUFFIXES, // valSuffix
             entry1: MZ_EC.BOOL_ENTRY, // condEntry
             entry2: MZ_EC.STRING_ENTRY, // opEntry
             entry3: MZ_EC.NUM_ENTRY // valEntry
-        })), // tpbAcceleration
-        tpbRelativeSpeed: new Map(Object.entries({
+        }, // tpbAcceleration
+        tpbRelativeSpeed: {
             suffix1: MZ_EC.BOOL_SUFFIXES, // condSuffix
             suffix2: MZ_EC.VAL_SUFFIXES, // opSuffix
             suffix3: MZ_EC.VAL_SUFFIXES, // valSuffix
             entry1: MZ_EC.BOOL_ENTRY, // condEntry
             entry2: MZ_EC.STRING_ENTRY, // opEntry
             entry3: MZ_EC.NUM_ENTRY // valEntry
-        })), // tpbRelativeSpeed
-        tpbSpeed: new Map(Object.entries({
+        }, // tpbRelativeSpeed
+        tpbSpeed: {
             suffix1: MZ_EC.BOOL_SUFFIXES, // condSuffix
             suffix2: MZ_EC.VAL_SUFFIXES, // opSuffix
             suffix3: MZ_EC.VAL_SUFFIXES, // valSuffix
             entry1: MZ_EC.BOOL_ENTRY, // condEntry
             entry2: MZ_EC.STRING_ENTRY, // opEntry
             entry3: MZ_EC.NUM_ENTRY // valEntry
-        })), // tpbSpeed
-        tpbBaseSpeed: new Map(Object.entries({
+        }, // tpbSpeed
+        tpbBaseSpeed: {
             suffix1: MZ_EC.BOOL_SUFFIXES, // condSuffix
             suffix2: MZ_EC.VAL_SUFFIXES, // opSuffix
             suffix3: MZ_EC.VAL_SUFFIXES, // valSuffix
             entry1: MZ_EC.BOOL_ENTRY, // condEntry
             entry2: MZ_EC.STRING_ENTRY, // opEntry
             entry3: MZ_EC.NUM_ENTRY // valEntry
-        })), // tpbBaseSpeed
-        tpbRequiredCastTime: new Map(Object.entries({
+        }, // tpbBaseSpeed
+        tpbRequiredCastTime: {
             suffix1: MZ_EC.BOOL_SUFFIXES, // condSuffix
             suffix2: MZ_EC.VAL_SUFFIXES, // opSuffix
             suffix3: MZ_EC.VAL_SUFFIXES, // valSuffix
             entry1: MZ_EC.BOOL_ENTRY, // condEntry
             entry2: MZ_EC.STRING_ENTRY, // opEntry
             entry3: MZ_EC.NUM_ENTRY // valEntry
-        })), // tpbRequiredCastTime
-        tpbChargeTimeWithPenalty: new Map(Object.entries({
+        }, // tpbRequiredCastTime
+        tpbChargeTimeWithPenalty: {
             suffix1: MZ_EC.BOOL_SUFFIXES, // condSuffix
             suffix2: MZ_EC.VAL_SUFFIXES, // opSuffix
             suffix3: MZ_EC.VAL_SUFFIXES, // valSuffix
             entry1: MZ_EC.BOOL_ENTRY, // condEntry
             entry2: MZ_EC.STRING_ENTRY, // opEntry
             entry3: MZ_EC.NUM_ENTRY // valEntry
-        })), // tpbChargeTimeWithPenalty
-        updatedTpbChargeTime: new Map(Object.entries({
+        }, // tpbChargeTimeWithPenalty
+        updatedTpbChargeTime: {
             suffix1: MZ_EC.BOOL_SUFFIXES, // condSuffix
             suffix2: MZ_EC.VAL_SUFFIXES, // opSuffix
             suffix3: MZ_EC.VAL_SUFFIXES, // valSuffix
             entry1: MZ_EC.BOOL_ENTRY, // condEntry
             entry2: MZ_EC.STRING_ENTRY, // opEntry
             entry3: MZ_EC.NUM_ENTRY // valEntry
-        })), // updatedTpbChargeTime
-        updatedTpbCastTime: new Map(Object.entries({
+        }, // updatedTpbChargeTime
+        updatedTpbCastTime: {
             suffix1: MZ_EC.BOOL_SUFFIXES, // condSuffix
             suffix2: MZ_EC.VAL_SUFFIXES, // opSuffix
             suffix3: MZ_EC.VAL_SUFFIXES, // valSuffix
             entry1: MZ_EC.BOOL_ENTRY, // condEntry
             entry2: MZ_EC.STRING_ENTRY, // opEntry
             entry3: MZ_EC.NUM_ENTRY // valEntry
-        })), // updatedTpbCastTime
-        updatedTpbIdleTime: new Map(Object.entries({
+        }, // updatedTpbCastTime
+        updatedTpbIdleTime: {
             suffix1: MZ_EC.BOOL_SUFFIXES, // condSuffix
             suffix2: MZ_EC.VAL_SUFFIXES, // opSuffix
             suffix3: MZ_EC.VAL_SUFFIXES, // valSuffix
             entry1: MZ_EC.BOOL_ENTRY, // condEntry
             entry2: MZ_EC.STRING_ENTRY, // opEntry
             entry3: MZ_EC.NUM_ENTRY // valEntry
-        })), // updatedTpbIdleTime
-        tpbCastDelay: new Map(Object.entries({
+        }, // updatedTpbIdleTime
+        tpbCastDelay: {
             suffix1: MZ_EC.BOOL_SUFFIXES, // condSuffix
             suffix2: MZ_EC.VAL_SUFFIXES, // opSuffix
             suffix3: MZ_EC.VAL_SUFFIXES, // valSuffix
             entry1: MZ_EC.BOOL_ENTRY, // condEntry
             entry2: MZ_EC.STRING_ENTRY, // opEntry
             entry3: MZ_EC.NUM_ENTRY // valEntry
-        })), // tpbCastDelay
-        advantageousStartTpbChargeTime: new Map(Object.entries({
+        }, // tpbCastDelay
+        advantageousStartTpbChargeTime: {
             suffix1: MZ_EC.BOOL_SUFFIXES, // condSuffix
             suffix2: MZ_EC.VAL_SUFFIXES, // opSuffix
             suffix3: MZ_EC.VAL_SUFFIXES, // valSuffix
             entry1: MZ_EC.BOOL_ENTRY, // condEntry
             entry2: MZ_EC.STRING_ENTRY, // opEntry
             entry3: MZ_EC.NUM_ENTRY // valEntry
-        })), // advantageousStartTpbChargeTime
-        disadvantageousStartTpbChargeTime: new Map(Object.entries({
+        }, // advantageousStartTpbChargeTime
+        disadvantageousStartTpbChargeTime: {
             suffix1: MZ_EC.BOOL_SUFFIXES, // condSuffix
             suffix2: MZ_EC.VAL_SUFFIXES, // opSuffix
             suffix3: MZ_EC.VAL_SUFFIXES, // valSuffix
             entry1: MZ_EC.BOOL_ENTRY, // condEntry
             entry2: MZ_EC.STRING_ENTRY, // opEntry
             entry3: MZ_EC.NUM_ENTRY // valEntry
-        })), // disadvantageousStartTpbChargeTime
-        normStartTpbChargeTime: new Map(Object.entries({
+        }, // disadvantageousStartTpbChargeTime
+        normStartTpbChargeTime: {
             suffix1: MZ_EC.BOOL_SUFFIXES, // condSuffix
             suffix2: MZ_EC.VAL_SUFFIXES, // opSuffix
             suffix3: MZ_EC.VAL_SUFFIXES, // valSuffix
             entry1: MZ_EC.BOOL_ENTRY, // condEntry
             entry2: MZ_EC.STRING_ENTRY, // opEntry
             entry3: MZ_EC.NUM_ENTRY // valEntry
-        })) // normStartTpbChargeTime
-    })), new Map(Object.entries({
+        } // normStartTpbChargeTime
+    }, {
         $dataActors: "actor",
         $dataClasses: "class",
         $dataSkills: "skill",
@@ -1339,7 +1339,7 @@ if (DoubleX_RMMZ.Enhanced_Codebase) {
         $dataArmors: "armor",
         $dataEnemies: "enemy",
         $dataStates: "state"
-    })), "tpbs cfgs edit", "tpbsCfgEdit");
+    }, "tpbs cfgs edit", "tpbsCfgEdit");
     //
 
 })(DoubleX_RMMZ.Enhanced_Codebase, DoubleX_RMMZ.TPBS_Configurations_Edit);

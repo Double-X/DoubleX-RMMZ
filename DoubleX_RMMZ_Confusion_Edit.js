@@ -221,18 +221,18 @@ if (DoubleX_RMMZ.Enhanced_Codebase) {
     "use strict";
 
     // Search tag: NOTE_TYPE
-    MZ_EC.loadDataManagerNotetags(CE, new Map(Object.entries({
-        reverse: new Map(Object.entries({
+    MZ_EC.loadDataManagerNotetags(CE, {
+        reverse: {
             suffix1: MZ_EC.BOOL_SUFFIXES, // condSuffix
             entry1: MZ_EC.BOOL_ENTRY // condEntry
-        })), // reverse
-        excludeSelf: new Map(Object.entries({
+        }, // reverse
+        excludeSelf: {
             suffix1: MZ_EC.BOOL_SUFFIXES, // condSuffix
             entry1: MZ_EC.BOOL_ENTRY // condEntry
-        })) // excludeSelf
-    })), new Map(Object.entries({
+        } // excludeSelf
+    }, {
         $dataStates: "state"
-    })), "confusion edit", "confusionEdit");
+    }, "confusion edit", "confusionEdit");
     //
 
 })(DoubleX_RMMZ.Enhanced_Codebase, DoubleX_RMMZ.Confusion_Edit);

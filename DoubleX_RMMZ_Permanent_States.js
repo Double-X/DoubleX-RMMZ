@@ -220,22 +220,20 @@ if (DoubleX_RMMZ.Enhanced_Codebase) {
     "use strict";
 
     // Search tag: NOTE_TYPE
-    MZ_EC.loadDataManagerNotetags(PS, new Map(Object.entries({
-        battle: new Map(Object.entries({
+    MZ_EC.loadDataManagerNotetags(PS, {
+        battle: {
             suffix1: MZ_EC.BOOL_SUFFIXES, // condSuffix
             suffix2: MZ_EC.VAL_SUFFIXES, // typeSuffix
             entry1: MZ_EC.BOOL_ENTRY, // condEntry
             entry2: MZ_EC.STRING_ENTRY // typeEntry
-        })), // battle
-        map: new Map(Object.entries({
+        }, // battle
+        map: {
             suffix1: MZ_EC.BOOL_SUFFIXES, // condSuffix
             suffix2: MZ_EC.VAL_SUFFIXES, // typeSuffix
             entry1: MZ_EC.BOOL_ENTRY, // condEntry
             entry2: MZ_EC.STRING_ENTRY // typeEntry
-        })) // map
-    })), new Map(Object.entries({
-        $dataStates: "state"
-    })), "permanent states", "permanentStates");
+        } // map
+    }, { $dataStates: "state" }, "permanent states", "permanentStates");
     //
 
 })(DoubleX_RMMZ.Enhanced_Codebase, DoubleX_RMMZ.Permanent_States);
