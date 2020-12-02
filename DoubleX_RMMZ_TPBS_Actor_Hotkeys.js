@@ -55,13 +55,6 @@
  *      9. https://www.patreon.com/posts/43321038
  *      10. https://www.makerdevs.com/plugin/doublex-rmmz-tpbs-actor-hotkeys
  *----------------------------------------------------------------------------
- *    # Instructions
- *      1. The default plugin parameters file name is
- *         DoubleX_RMMZ_TPBS_Actor_Hotkeys
- *         If you want to change that, you must edit the value of
- *         DoubleX_RMMZ.TPBS_Actor_Hotkeys.PLUGIN_NAME, which must be done
- *         via opening this plugin js file directly
- *----------------------------------------------------------------------------
  *    # Contributors
  *      Authors:
  *      1. DoubleX
@@ -75,6 +68,10 @@
  *      - None So Far
  *----------------------------------------------------------------------------
  *    # Changelog
+ *      { codebase: "1.1.0", plugin: "v1.00b" }(2020 Dec 2 GMT 1000):
+ *      1. You no longer have to edit the value of
+ *         DoubleX_RMMZ.TPBS_Actor_Hotkeys.PLUGIN_NAME when changing this
+ *         plugin file name
  *      { codebase: "1.1.0", plugin: "v1.00a" }(2020 Sep 30 GMT 0900):
  *      1. 1st version of this plugin finished
  *============================================================================*/
@@ -94,7 +91,7 @@
 /*:
  * @url https://www.patreon.com/doublex
  * @target MZ
- * @plugindesc Versions: { codebase: "1.1.0", plugin: "v1.00a" }
+ * @plugindesc Versions: { codebase: "1.1.0", plugin: "v1.00b" }
  * Lets you set some custom hotkeys to select some inputable actors in TPBS
  * @orderAfter DoubleX_RMMZ_Enhanced_Codebase
  * @orderAfter DoubleX RMMZ Enhanced Codebase
@@ -156,12 +153,23 @@
 // jshint esversion: 6
 
 var DoubleX_RMMZ = DoubleX_RMMZ || {}; // var must be used or game will crash
-// Separates the version numbers with the rest to make the former more clear
-DoubleX_RMMZ.TPBS_Actor_Hotkeys = {
-    PLUGIN_NAME: "DoubleX_RMMZ_TPBS_Actor_Hotkeys",
-    VERSIONS: { codebase: "1.1.0", plugin: "v1.00a" }
-}; // DoubleX_RMMZ.TPBS_Actor_Hotkeys
-//
+
+(() => {
+
+    "use strict";
+
+    const src = document.currentScript.src;
+    const name = src.split("/").slice(-1)[0].split(".")[0].replace(/%20/g, " ");
+    console.info(src, name);
+
+    // Separates the version numbers with the rest to make the former more clear
+    DoubleX_RMMZ.TPBS_Actor_Hotkeys = {
+        PLUGIN_NAME: name,
+        VERSIONS: { codebase: "1.1.0", plugin: "v1.00b" }
+    }; // DoubleX_RMMZ.TPBS_Actor_Hotkeys
+    //
+
+})();
 
 (TPBSAH => {
 
