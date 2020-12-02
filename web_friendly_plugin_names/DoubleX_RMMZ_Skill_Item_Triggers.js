@@ -671,62 +671,62 @@ if (DoubleX_RMMZ.Enhanced_Codebase) {
     "use strict";
 
     // Search tag: NOTE_TYPE
-    MZ_EC.loadDataManagerNotetags(SIT, new Map(Object.entries({
-        miss: new Map(Object.entries({
+    MZ_EC.loadDataManagerNotetags(SIT, {
+        miss: {
             suffix1: MZ_EC.BOOL_SUFFIXES, // condSuffix
             suffix2: MZ_EC.VAL_SUFFIXES, // eventSuffix
             entry1: MZ_EC.BOOL_ENTRY, // condEntry
             entry2: MZ_EC.NUM_ENTRY // eventEntry
-        })), // miss
-        eva: new Map(Object.entries({
+        }, // miss
+        eva: {
             suffix1: MZ_EC.BOOL_SUFFIXES, // condSuffix
             suffix2: MZ_EC.VAL_SUFFIXES, // eventSuffix
             entry1: MZ_EC.BOOL_ENTRY, // condEntry
             entry2: MZ_EC.NUM_ENTRY // eventEntry
-        })), // eva
-        cnt: new Map(Object.entries({
+        }, // eva
+        cnt: {
             suffix1: MZ_EC.BOOL_SUFFIXES, // condSuffix
             suffix2: MZ_EC.VAL_SUFFIXES, // eventSuffix
             entry1: MZ_EC.BOOL_ENTRY, // condEntry
             entry2: MZ_EC.NUM_ENTRY // eventEntry
-        })), // cnt
-        mrf: new Map(Object.entries({
+        }, // cnt
+        mrf: {
             suffix1: MZ_EC.BOOL_SUFFIXES, // condSuffix
             suffix2: MZ_EC.VAL_SUFFIXES, // eventSuffix
             entry1: MZ_EC.BOOL_ENTRY, // condEntry
             entry2: MZ_EC.NUM_ENTRY // eventEntry
-        })), // mrf
-        cri: new Map(Object.entries({
+        }, // mrf
+        cri: {
             suffix1: MZ_EC.BOOL_SUFFIXES, // condSuffix
             suffix2: MZ_EC.VAL_SUFFIXES, // eventSuffix
             entry1: MZ_EC.BOOL_ENTRY, // condEntry
             entry2: MZ_EC.NUM_ENTRY // eventEntry
-        })), // cri
-        norm: new Map(Object.entries({
+        }, // cri
+        norm: {
             suffix1: MZ_EC.BOOL_SUFFIXES, // condSuffix
             suffix2: MZ_EC.VAL_SUFFIXES, // eventSuffix
             entry1: MZ_EC.BOOL_ENTRY, // condEntry
             entry2: MZ_EC.NUM_ENTRY // eventEntry
-        })), // norm
-        substitute: new Map(Object.entries({
+        }, // norm
+        substitute: {
             suffix1: MZ_EC.BOOL_SUFFIXES, // condSuffix
             suffix2: MZ_EC.VAL_SUFFIXES, // eventSuffix
             entry1: MZ_EC.BOOL_ENTRY, // condEntry
             entry2: MZ_EC.NUM_ENTRY // eventEntry
-        })), // substitute
-        pre: new Map(Object.entries({
+        }, // substitute
+        pre: {
             suffix1: MZ_EC.BOOL_SUFFIXES, // condSuffix
             suffix2: MZ_EC.VAL_SUFFIXES, // eventSuffix
             entry1: MZ_EC.BOOL_ENTRY, // condEntry
             entry2: MZ_EC.NUM_ENTRY // eventEntry
-        })), // pre
-        post: new Map(Object.entries({
+        }, // pre
+        post: {
             suffix1: MZ_EC.BOOL_SUFFIXES, // condSuffix
             suffix2: MZ_EC.VAL_SUFFIXES, // eventSuffix
             entry1: MZ_EC.BOOL_ENTRY, // condEntry
             entry2: MZ_EC.NUM_ENTRY // eventEntry
-        })) // post
-    })), new Map(Object.entries({
+        } // post
+    }, {
         $dataActors: "actor",
         $dataClasses: "class",
         $dataSkills: "skill",
@@ -735,7 +735,7 @@ if (DoubleX_RMMZ.Enhanced_Codebase) {
         $dataArmors: "armor",
         $dataEnemies: "enemy",
         $dataStates: "state"
-    })), "skill item triggers", "skillItemTriggers");
+    }, "skill item triggers", "skillItemTriggers");
     //
 
 })(DoubleX_RMMZ.Enhanced_Codebase, DoubleX_RMMZ.Skill_Item_Triggers);
