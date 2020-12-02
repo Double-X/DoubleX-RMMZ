@@ -68,13 +68,6 @@
  *      9. https://www.patreon.com/posts/40832897
  *      10. https://www.makerdevs.com/plugin/doublex-rmmz-targeting-ai
  *----------------------------------------------------------------------------
- *    # Instructions
- *      1. The default plugin parameters file name is
- *         DoubleX RMMZ Targeting AI
- *         If you want to change that, you must edit the value of
- *         DoubleX_RMMZ.Targeting_AI.PLUGIN_NAME, which must be done via
- *         opening this plugin js file directly
- *----------------------------------------------------------------------------
  *    # Contributors
  *      Authors:
  *      1. DoubleX
@@ -88,6 +81,10 @@
  *      - None So Far
  *----------------------------------------------------------------------------
  *    # Changelog
+ *      { codebase: "1.1.0", plugin: "v1.01b" }(2020 Dec 2 GMT 0400):
+ *      1. You no longer have to edit the value of
+ *         DoubleX_RMMZ.Targeting_AI.PLUGIN_NAME when changing this plugin
+ *         file name
  *      { codebase: "1.0.0", plugin: "v1.01a" }(2020 Aug 28 GMT 0100):
  *      1. Added the following notetags -
  *         - memWithAnyUsableSkill
@@ -100,7 +97,7 @@
 /*:
  * @url https://www.patreon.com/doublex
  * @target MZ
- * @plugindesc Versions: { codebase: "1.0.0", plugin: "v1.01a" }
+ * @plugindesc Versions: { codebase: "1.1.0", plugin: "v1.01b" }
  * Lets you control some skills/items target selection AI behaviors by notetags
  * @orderAfter DoubleX_RMMZ_Enhanced_Codebase
  * @orderAfter DoubleX RMMZ Enhanced Codebase
@@ -909,12 +906,23 @@
 // jshint esversion: 6
 
 var DoubleX_RMMZ = DoubleX_RMMZ || {}; // var must be used or game will crash
-// Separates the version numbers with the rest to make the former more clear
-DoubleX_RMMZ.Targeting_AI = {
-    PLUGIN_NAME: "DoubleX RMMZ Targeting AI",
-    VERSIONS: { codebase: "1.0.0", plugin: "v1.01a" }
-}; // DoubleX_RMMZ.Targeting_AI
-//
+
+(() => {
+
+    "use strict";
+
+    const src = document.currentScript.src;
+    const name = src.split("/").slice(-1)[0].split(".")[0].replace(/%20/g, " ");
+    console.info(src, name);
+
+    // Separates the version numbers with the rest to make the former more clear
+    DoubleX_RMMZ.Targeting_AI = {
+        PLUGIN_NAME: "DoubleX RMMZ Targeting AI",
+        VERSIONS: { codebase: "1.1.0", plugin: "v1.01b" }
+    }; // DoubleX_RMMZ.Targeting_AI
+    //
+
+})();
 
 (TA => {
 
