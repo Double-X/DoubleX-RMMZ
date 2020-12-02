@@ -54,6 +54,13 @@
  *      9. https://www.patreon.com/posts/doublex-rmmz-40988080
  *      10. https://www.makerdevs.com/plugin/doublex-rmmz-state-triggers
  *----------------------------------------------------------------------------
+ *    # Instructions
+ *      1. The default plugin parameters file name is
+ *         DoubleX RMMZ State Triggers
+ *         If you want to change that, you must edit the value of
+ *         DoubleX_RMMZ.State_Triggers.PLUGIN_NAME, which must be done via
+ *         opening this plugin js file directly
+ *----------------------------------------------------------------------------
  *    # Contributors
  *      Authors:
  *      1. DoubleX
@@ -67,17 +74,13 @@
  *      - None So Far
  *----------------------------------------------------------------------------
  *    # Changelog
- *      { codebase: "1.1.0", plugin: "v1.00b" }(2020 Dec 2 GMT 0400):
- *      1. You no longer have to edit the value of
- *         DoubleX_RMMZ.State_Triggers.PLUGIN_NAME when changing this plugin
- *         file name
  *      { codebase: "1.0.0", plugin: "v1.00a" }(2020 Aug 29 GMT 1300):
  *      1. 1st version of this plugin finished
  *============================================================================*/
 /*:
  * @url https://www.patreon.com/doublex
  * @target MZ
- * @plugindesc Versions: { codebase: "1.1.0", plugin: "v1.00b" }
+ * @plugindesc Versions: { codebase: "1.0.0", plugin: "v1.00a" }
  * Lets you run some codes set by your notetags on some important state timings
  * @orderAfter DoubleX_RMMZ_Enhanced_Codebase
  * @orderAfter DoubleX RMMZ Enhanced Codebase
