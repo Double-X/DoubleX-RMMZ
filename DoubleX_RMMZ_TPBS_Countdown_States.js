@@ -52,13 +52,6 @@
  *      9. https://www.patreon.com/posts/43327703
  *      10. https://www.makerdevs.com/plugin/doublex-rmmz-tpbs-countdown-states
  *----------------------------------------------------------------------------
- *    # Instructions
- *      1. The default plugin parameters file name is
- *         DoubleX_RMMZ_TPBS_Countdown_States
- *         If you want to change that, you must edit the value of
- *         DoubleX_RMMZ.TPBS_Countdown_States.PLUGIN_NAME, which must be done
- *         via opening this plugin js file directly
- *----------------------------------------------------------------------------
  *    # Contributors
  *      Authors:
  *      1. DoubleX
@@ -147,12 +140,23 @@
 // jshint esversion: 6
 
 var DoubleX_RMMZ = DoubleX_RMMZ || {}; // var must be used or game will crash
-// Separates the version numbers with the rest to make the former more clear
-DoubleX_RMMZ.TPBS_Countdown_States = {
-    PLUGIN_NAME: "DoubleX_RMMZ_TPBS_Countdown_States",
-    VERSIONS: { codebase: "1.1.0", plugin: "v1.00a" }
-}; // DoubleX_RMMZ.TPBS_Countdown_States
-//
+
+(() => {
+
+    "use strict";
+
+    const src = document.currentScript.src;
+    const name = src.split("/").slice(-1)[0].split(".")[0].replace(/%20/g, " ");
+    console.info(src, name);
+
+    // Separates the version numbers with the rest to make the former more clear
+    DoubleX_RMMZ.TPBS_Countdown_States = {
+        PLUGIN_NAME: name,
+        VERSIONS: { codebase: "1.1.0", plugin: "v1.00a" }
+    }; // DoubleX_RMMZ.TPBS_Countdown_States
+    //
+
+})();
 
 (TPBSCS => {
 
@@ -207,16 +211,14 @@ if (DoubleX_RMMZ.Enhanced_Codebase) {
     "use strict";
 
     // Search tag: NOTE_TYPE
-    MZ_EC.loadDataManagerNotetags(TPBSCS, new Map(Object.entries({
-        interval: new Map(Object.entries({
+    MZ_EC.loadDataManagerNotetags(TPBSCS, {
+        interval: {
             suffix1: MZ_EC.BOOL_SUFFIXES, // condSuffix
             suffix2: MZ_EC.VAL_SUFFIXES, // intervalSuffix
             entry1: MZ_EC.BOOL_ENTRY, // condEntry
             entry2: MZ_EC.NUM_ENTRY // intervalEntry
-        })) // interval
-    })), new Map(Object.entries({
-        $dataStates: "state"
-    })), "countdown states", "tpbsCountdownStates");
+        } // interval
+    }, { $dataStates: "state" }, "countdown states", "tpbsCountdownStates");
     //
 
 })(DoubleX_RMMZ.Enhanced_Codebase, DoubleX_RMMZ.TPBS_Countdown_States);
