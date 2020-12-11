@@ -65,13 +65,17 @@
  *      - None So Far
  *----------------------------------------------------------------------------
  *    # Changelog
+ *      { codebase: "1.1.0", plugin: "v1.00b" }(2020 Dec 11 GMT 0400):
+ *      1. Documented the isTPBSCountdownState battler manipulation
+ *      2. Fixed the bug of not removing countdown states nor triggering
+ *         effects from plugin DoubleX RMMZ State Triggers
  *      { codebase: "1.1.0", plugin: "v1.00a" }(2020 Oct 30 GMT 1300):
  *      1. 1st version of this plugin finished
  *============================================================================*/
 /*:
  * @url https://www.patreon.com/doublex
  * @target MZ
- * @plugindesc Versions: { codebase: "1.1.0", plugin: "v1.00a" }
+ * @plugindesc Versions: { codebase: "1.1.0", plugin: "v1.00b" }
  * Lets you set some states to update its turn after some seconds in TPBS
  * @orderBefore DoubleX_RMMZ_State_Triggers
  * @orderBefore DoubleX RMMZ State Triggers
@@ -79,6 +83,27 @@
  * @orderAfter DoubleX RMMZ Enhanced Codebase
  * @base DoubleX RMMZ Enhanced Codebase
  * @author DoubleX
+ *
+ * @command isTPBSCountdownState
+ * @desc Stores the battler.isTPBSCountdownState(stateId) script call results
+ * into the game switch with id switchId
+ * @arg side
+ * @type select
+ * @option Actor
+ * @value actor
+ * @option Enemy
+ * @value enemy
+ * @desc The side of the battler querying the specified countdown state
+ * @arg label
+ * @type number
+ * @desc The actor id/enemy index of the battler querying the specified
+ * countdown state
+ * @arg stateId
+ * @type number
+ * @desc The id of the state to be queried for the battler involved
+ * @arg switchId
+ * @type number
+ * @desc The id of the game switch storing the script call result
  *
  * @help
  *============================================================================
@@ -135,6 +160,38 @@
  *           to be a countdown state having its turn counter decreased every
  *           2 seconds if the game switch with id 1 is on
  *============================================================================
+ *    ## (v1.00b+)Script Call Info
+ *----------------------------------------------------------------------------
+ *    # Battler manipulations
+ *      1. isTPBSCountdownState(stateId)
+ *         - Returns if the battler has the countdown state with id stateId
+ *         - E.g.:
+ *           $gameParty.aliveMembers(1).isTPBSCountdownState(2) will return if
+ *           the 2nd alive game party member has countdown state with id 2
+ *============================================================================
+ *    ## Plugin Command Info
+ *----------------------------------------------------------------------------
+ *      1.isTPBSCountdownState side label stateId switchId
+ *         - Stores the returned result of the script call
+ *           battler.isTPBSCountdownState(stateId) in the game switch with id
+ *           switchId
+ *         - battler is the battler identified by side and label
+ *         - side is either actor or enemy
+ *         - label is the actor id for side actor and troop member index for
+ *           side enemy
+ *============================================================================
+ *    ## (v1.01a+)Plugin Query Info
+ *       1. You need to use DoubleX_RMMZ_Plugin_Query as well in order to use
+ *          the plugin queries of this plugin:
+ *          https://github.com/Double-X/DoubleX-RMMZ/blob/master/DoubleX_RMMZ_Plugin_Query.js
+ *----------------------------------------------------------------------------
+ *      1. isTPBSCountdownState side label stateId
+ *         - Applies the script call battler.isTPBSCountdownState(stateId)
+ *         - battler is the battler identified by side and label
+ *         - side is either actor or enemy
+ *         - label is the actor id for side actor and troop member index for
+ *           side enemy
+ *============================================================================
  */
 
 // jshint esversion: 6
@@ -152,7 +209,7 @@ var DoubleX_RMMZ = DoubleX_RMMZ || {}; // var must be used or game will crash
     // Separates the version numbers with the rest to make the former more clear
     DoubleX_RMMZ.TPBS_Countdown_States = {
         PLUGIN_NAME: name,
-        VERSIONS: { codebase: "1.1.0", plugin: "v1.00a" }
+        VERSIONS: { codebase: "1.1.0", plugin: "v1.00b" }
     }; // DoubleX_RMMZ.TPBS_Countdown_States
     //
 
@@ -196,6 +253,41 @@ var DoubleX_RMMZ = DoubleX_RMMZ || {}; // var must be used or game will crash
 if (DoubleX_RMMZ.Enhanced_Codebase) {
 
 /*============================================================================*/
+
+(TPBSCS => {
+
+    "use strict";
+
+    const PQ = TPBSCS.Plugin_Cmd_Query = {};
+
+    PQ._SET_QUERY = (name, cmdFunc, queryFunc) => {
+        PluginManager.registerCommand(TPBSCS.PLUGIN_NAME, name, cmdFunc);
+        if (!DoubleX_RMMZ.Plugin_Query) return;
+        PluginManager.eventCmdPluginQueries.set(name, queryFunc);
+    }; // PQ._SET_QUERY
+
+    PQ._BATTLER_ = (side, label) => {
+        switch (side) {
+            case "actor": return $gameActors.actor(+label);
+            case "enemy": return $gameTroop.members()[+label];
+            default: return undefined;
+        }
+    }; // PQ._BATTLER_
+
+    const _BATTLER_QUERY_FUNC = (name, side, label) => {
+        const battler_ = PQ._BATTLER_(side, label);
+        return battler_ && battler_[name]();
+    }; // _BATTLER_QUERY_FUNC
+    (name => {
+        PQ._SET_QUERY(name, ({ side, label, stateId, switchId }) => {
+            const val = _BATTLER_QUERY_FUNC(name, side, label);
+            $gameSwitches.setValue(+switchId, val);
+        }, _BATTLER_QUERY_FUNC.bind(undefined, name));
+    })("isTPBSCountdownState");
+
+})(DoubleX_RMMZ.TPBS_Countdown_States);
+
+/*----------------------------------------------------------------------------*/
 
 /*----------------------------------------------------------------------------
  *    ## Managers
@@ -384,7 +476,7 @@ if (DoubleX_RMMZ.Enhanced_Codebase) {
      * @param {id} stateId - The id of the state to have its counter updated
      */
     NEW._updateCountdown = function(stateId) {
-        const notetag_ = NEW._countdownNotetag_.call(this, stateId);
+        const notetag_ = NEW._countdownNotetag_.call(this, +stateId);
         if (!notetag_) return;
         const { pairs } = notetag_;
         if (!pairs.get("func1").call(this)) return;
@@ -420,8 +512,8 @@ if (DoubleX_RMMZ.Enhanced_Codebase) {
         this._tpbsCountdownStates[stateId] += increment * sign;
         if (this._tpbsCountdownStates[stateId] * sign < interval * sign) return;
         // Expired states should've been no longer counter states
-        NEW._onUpdateStateTurn.call(this, stateId, sign);
-        if (this._stateTurns[stateId] <= 0) return this.removeState(stateId);
+        NEW._onUpdateStateTurn.call(this, +stateId, sign);
+        if (this._stateTurns[stateId] <= 0) this.removeState(+stateId);
         //
     }; // NEW._onUpdateCountdown
 
