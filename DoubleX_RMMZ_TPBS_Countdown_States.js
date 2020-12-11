@@ -66,8 +66,10 @@
  *----------------------------------------------------------------------------
  *    # Changelog
  *      { codebase: "1.1.0", plugin: "v1.00b" }(2020 Dec 11 GMT 0400):
- *      1. Documented the isTPBSCountdownState battler manipulation
- *      2. Fixed the bug of not removing countdown states nor triggering
+ *      1. Adding the plugin command and query counterpart of the
+ *         isTPBSCountdownState battler manipulation
+ *      2. Documented the isTPBSCountdownState battler manipulation
+ *      3. Fixed the bug of not removing countdown states nor triggering
  *         effects from plugin DoubleX RMMZ State Triggers
  *      { codebase: "1.1.0", plugin: "v1.00a" }(2020 Oct 30 GMT 1300):
  *      1. 1st version of this plugin finished
