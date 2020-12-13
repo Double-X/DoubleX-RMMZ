@@ -266,6 +266,11 @@
  *           Do note that this plugin doesn't provide such notetags for you,
  *           so you'll have to use the default RMMZ notetags, which is of this
  *           format: <notetagName:notetagValue>
+ *      5. The active TPBS will have an extremely rare chance to crash the
+ *         game when trying to select the inputting actor, the inputting
+ *         actions, or its targets
+ *         - Please refer to this link for details:
+ *           https://forums.rpgmakerweb.com/index.php?threads/bug-extremely-rare-but-fatal-active-tpbs-bug-crashing-the-game.126144/
  *============================================================================
  *    ## Plugin Developers Info
  *----------------------------------------------------------------------------
@@ -1015,8 +1020,8 @@ var DoubleX_RMMZ = DoubleX_RMMZ || {}; // var must be used or game will crash
      * Potential Hotspot/Nullipotent
      * @author DoubleX @interface @since v0.00a @version v0.00a
      * @memberof JsExtensions
-     * @param {(*, <T>, index, [<T>]) -> *} mapCallback - The callback in the
-     *                                                    Array map method
+     * @param {(<T>, index, [<T>]) -> *} mapCallback - The callback in the Array
+     *                                                 map method
      * @param {*?} mapThis_ - The context of mapCallback
      * @returns {[*]} - The fully mapped array from this
      */
@@ -1055,14 +1060,14 @@ var DoubleX_RMMZ = DoubleX_RMMZ || {}; // var must be used or game will crash
      * Potential Hotspot/Nullipotent
      * @author DoubleX @interface @since v0.00a @version v0.00a
      * @memberof JsExtensions
-     * @param {(*, <T>, index, [<T>]) -> boolean} filterCallback - The callback
-     *                                                             in the Array
-     *                                                             filter method
-     * @param {(*, *, index) -> *} mapCallback - The callback in the Array map
-     *                                           method
+     * @param {(<T>, index, [<T>]) -> boolean} filterCallback - The callback in
+     *                                                          the Array filter
+     *                                                          method
+     * @param {(<T>, index) -> <U>} mapCallback - The callback in the Array map
+     *                                          method
      * @param {*?} filterThis_ - The context of filterCallback
      * @param {*?} mapThis_ - The context of mapCallback
-     * @returns {[*]} - The fully filtered then mapped array from this
+     * @returns {[<U>]} - The fully filtered then mapped array from this
      */
     $.filterMap = function(filterCallback, mapCallback, filterThis_, mapThis_) {
         if (this == null) throw new TypeError("this is null or not defined");
@@ -1089,13 +1094,13 @@ var DoubleX_RMMZ = DoubleX_RMMZ || {}; // var must be used or game will crash
      * Potential Hotspot/Nullipotent
      * @author DoubleX @interface @since v0.00a @version v0.00a
      * @memberof JsExtensions
-     * @param {(*, <T>, index, [<T>]) -> *} mapCallback - The callback in the
-     *                                                    Array map method
-     * @param {(*, *, index) -> boolean} filterCallback - The callback in the
-     *                                                    Array filter method
+     * @param {(<T>, index, [<T>]) -> <U>} mapCallback - The callback in the
+     *                                                   Array map method
+     * @param {(<U>, index) -> boolean} filterCallback - The callback in the
+     *                                                   Array filter method
      * @param {*?} mapThis_ - The context of mapCallback
      * @param {*?} filterThis_ - The context of filterCallback
-     * @returns {[*]} - The fully mapped then filtered array from this
+     * @returns {[<U>]} - The fully mapped then filtered array from this
      */
     $.mapFilter = function(mapCallback, filterCallback, mapThis_, filterThis_) {
         if (this == null) throw new TypeError("this is null or not defined");
@@ -1123,14 +1128,14 @@ var DoubleX_RMMZ = DoubleX_RMMZ || {}; // var must be used or game will crash
      * Potential Hotspot/Nullipotent
      * @author DoubleX @interface @since v0.00a @version v0.00a
      * @memberof JsExtensions
-     * @param {(*, <T>, index, [<T>]) -> *} mapCallback - The callback in the
-     *                                                    Array map method
-     * @param {(*, *, *, index) -> *} reduceCallback - The callback in the Array
-     *                                                 reduce method
-     * @param {*?} initVal_ - The initial value of reduceCallback
+     * @param {(<T>, index, [<T>]) -> <U>} mapCallback - The callback in the
+     *                                                   Array map method
+     * @param {(<V>, <U>, index) -> <V>} reduceCallback - The callback in the
+     *                                                    Array reduce method
+     * @param {<V>?} initVal_ - The initial value of reduceCallback
      * @param {*?} mapThis_ - The context of mapCallback
      * @param {*?} reduceThis_ - The context of reduceCallback
-     * @returns {*} - The fully mapped then reduced array result from this
+     * @returns {<V>} - The fully mapped then reduced result from this
      */
     $.mapReduce = function(mapCallback, reduceCallback, initVal_, mapThis_, reduceThis_) {
         if (this == null) throw new TypeError("this is null or not defined");
@@ -6154,5 +6159,83 @@ var DoubleX_RMMZ = DoubleX_RMMZ || {}; // var must be used or game will crash
     }; // NEW.evalScript_
 
 })(Game_Interpreter, DoubleX_RMMZ.Enhanced_Codebase);
+
+/*----------------------------------------------------------------------------*/
+
+/*----------------------------------------------------------------------------
+ *    ## Scenes
+ *----------------------------------------------------------------------------*/
+
+/*----------------------------------------------------------------------------
+ *    # Edited class: Scene_Battle
+ *      - Fixes some manifestations of the very rare but game-crashing bug
+ *----------------------------------------------------------------------------*/
+
+(($, MZ_EC) => {
+
+    "use strict";
+
+    const {
+        NEW,
+        ORIG,
+        extendFunc,
+        rewriteFunc,
+    } = MZ_EC.setKlassContainer("Scene_Battle", $.prototype, MZ_EC);
+
+    [
+        "commandAttack",
+        "commandGuard",
+        "onActorOk",
+        "onEnemyOk",
+        "onSkillOk",
+        "onItemOk",
+        "onSelectAction"
+    ].forEach(funcName => {
+        extendFunc(funcName, function() {
+            // Added to stop the bug when the inputting action doesn't exist
+            if (!BattleManager.inputtingAction()) return;
+            //
+            ORIG[funcName].apply(this, arguments);
+        }); // v0.00a - v0.00a
+    });
+
+    extendFunc("commandSkill", function() {
+        // Edited to stop the bug when the inputting actor doesn't exist
+        if (BattleManager.actor()) ORIG.commandSkill.apply(this, arguments);
+        //
+    }); // v0.00a - v0.00a
+
+    rewriteFunc("updateStatusWindowPosition", function() {
+        // Edited to remove the redundant check as at most 1 check can be true
+        const statusWindow = this._statusWindow, targetX = this.statusWindowX();
+        if (statusWindow.x < targetX) {
+            statusWindow.x = Math.min(statusWindow.x + 16, targetX);
+        } else if (statusWindow.x > targetX) {
+            statusWindow.x = Math.max(statusWindow.x - 16, targetX);
+        }
+        /** @todo Figures out where does this magic literal 16 come from */
+    }); // v0.00a - v0.00a
+
+    rewriteFunc("startActorCommandSelection", function() {
+        // Edited to stop the bug when the inputting action doesn't exist
+        const actor_ = BattleManager.actor();
+        if (actor_) NEW._startActorCmdSelection.call(this, actor_);
+        //
+    }); // v0.00a - v0.00a
+
+    /**
+     * The this pointer is Scene_Battle.prototype
+     * @author DoubleX @since v0.00a @version v0.00a
+     * @param {Game_Actor} actor - The currently inputable actor
+     */
+    NEW._startActorCmdSelection = function(actor) {
+        this._statusWindow.show();
+        this._statusWindow.selectActor(actor);
+        this._partyCommandWindow.close();
+        this._actorCommandWindow.show();
+        this._actorCommandWindow.setup(actor);
+    }; // NEW._startActorCmdSelection
+
+})(Scene_Battle, DoubleX_RMMZ.Enhanced_Codebase);
 
 /*============================================================================*/
