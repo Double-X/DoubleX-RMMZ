@@ -1003,6 +1003,32 @@ var DoubleX_RMMZ = DoubleX_RMMZ || {}; // var must be used or game will crash
 
 /*----------------------------------------------------------------------------*/
 
+(MZ_EC => {
+
+    "use strict";
+
+    MZ_EC.setupFuncParams = (pluginName, paramFuncArgs) => {
+
+        const FP = pluginName.FUNC_PARAMS = {};
+
+        FP.PARAM_FUNCS = new Map();
+
+        FP._PARAM_FUNC_ARGS = new Map(Object.entries(paramFuncArgs));
+
+        FP.storeFuncParam = (param, val) => {
+            if (!FP._PARAM_FUNC_ARGS.has(param)) return;
+            const args = FP._PARAM_FUNC_ARGS.get(param);
+            // Using fastMerge would mutate the parameter function argument list
+            FP.PARAM_FUNCS.set(param, new Function(...args.concat(val)));
+            //
+        }; // FP.storeFuncParam
+
+    }; // MZ_EC.setupFuncParams
+
+})(DoubleX_RMMZ.Enhanced_Codebase);
+
+/*----------------------------------------------------------------------------*/
+
 /*----------------------------------------------------------------------------
  *    ## Core
  *----------------------------------------------------------------------------*/
@@ -4572,6 +4598,16 @@ var DoubleX_RMMZ = DoubleX_RMMZ || {}; // var must be used or game will crash
      * The this pointer is Game_Battler.prototype
      * Hotspot/Nullipotent
      * @author DoubleX @interface @since v0.00a @version v0.00a
+     * @returns {boolean} Whether the tpb battler's idling
+     */
+    $.isTpbIdling = function() {
+        return this.isTpbCharged() && this._tpbIdleTime > 0;
+    }; // $.isTpbIdling
+
+    /**
+     * The this pointer is Game_Battler.prototype
+     * Hotspot/Nullipotent
+     * @author DoubleX @interface @since v0.00a @version v0.00a
      * @returns {boolean} Whether the tpb battler's casting tpb actions
      */
     $.isTpbCasting = function() { return this._tpbState === "casting"; };
@@ -6237,5 +6273,465 @@ var DoubleX_RMMZ = DoubleX_RMMZ || {}; // var must be used or game will crash
     }; // NEW._startActorCmdSelection
 
 })(Scene_Battle, DoubleX_RMMZ.Enhanced_Codebase);
+
+/*----------------------------------------------------------------------------*/
+
+/*----------------------------------------------------------------------------
+ *    ## Sprites
+ *----------------------------------------------------------------------------*/
+
+/*----------------------------------------------------------------------------
+ *    # Edited class: Sprite_Gauge
+ *      - Makes this class better at adding bar types/editing their behaviors
+ *----------------------------------------------------------------------------*/
+
+(($, MZ_EC) => {
+
+    "use strict";
+
+    const {
+        NEW,
+        rewriteFunc
+    } = MZ_EC.setKlassContainer("Sprite_Gauge", $.prototype, MZ_EC);
+
+    rewriteFunc("gaugeX", function() {
+        // Edited to break different bar type behaviors into separate methods
+        const gaugeXFunc = NEW._GAUGE_X_FUNCS[this._statusType];
+        return NEW[gaugeXFunc || "defaultGaugeX"].call(this);
+        //
+    }); // v0.00a - v0.00a
+
+    rewriteFunc("smoothness", function() {
+        // Edited to break different bar type behaviors into separate methods
+        const smoothnessFunc = NEW._SMOOTHNESS_FUNCS[this._statusType];
+        return NEW[smoothnessFunc || "defaultSmoothness"].call(this);
+        //
+    }); // v0.00a - v0.00a
+
+    rewriteFunc("updateFlashing", function() {
+        // Edited to break different bar type behaviors into separate methods
+        const updateFlashingFunc = NEW._UPDATE_FLASHING_FUNCS[this._statusType];
+        NEW[updateFlashingFunc || "updateDefaultFlashing"].call(this);
+        //
+    }); // v0.00a - v0.00a
+
+    rewriteFunc("isValid", function() {
+        // Edited to break different bar type behaviors into separate methods
+        if (!this._battler) return false;
+        const isValidFunc = NEW._IS_VALID_FUNCS[this._statusType];
+        return NEW[isValidFunc || "isDefaultValid"].call(this);
+        //
+    }); // v0.00a - v0.00a
+
+    rewriteFunc("currentValue", function() {
+        // Edited to break different bar type behaviors into separate methods
+        if (!this._battler) return NEW._INVALID_VAL;
+        const validCurValFunc = NEW._VALID_CUR_VAL_FUNCS[this._statusType];
+        if (!validCurValFunc) return NEW._INVALID_VAL;
+        return NEW[validCurValFunc].call(this);
+        //
+    }); // v0.00a - v0.00a
+
+    rewriteFunc("currentMaxValue", function() {
+        // Edited to break different bar type behaviors into separate methods
+        if (!this._battler) return NEW._INVALID_VAL;
+        const validMaxValFunc = NEW._VALID_CUR_MAX_VAL_FUNCS[this._statusType];
+        if (!validMaxValFunc)  return NEW._INVALID_VAL;
+        return NEW[validMaxValFunc].call(this);
+        //
+    }); // v0.00a - v0.00a
+
+    rewriteFunc("label", function() {
+        // Edited to break different bar type behaviors into separate methods
+        const labelFunc = NEW._LABEL_FUNCS[this._statusType];
+        return NEW[labelFunc || "defaultLabel"].call(this);
+        //
+    }); // v0.00a - v0.00a
+
+    rewriteFunc("gaugeColor1", function() {
+        // Edited to break different bar type behaviors into separate methods
+        const gaugeColor1Func = NEW._GAUGE_COLOR_1_FUNCS[this._statusType];
+        return NEW[gaugeColor1Func || "defaultGaugeColor1"].call(this);
+        //
+    }); // v0.00a - v0.00a
+
+    rewriteFunc("gaugeColor2", function() {
+        // Edited to break different bar type behaviors into separate methods
+        const gaugeColor2 = NEW._GAUGE_COLOR_2_FUNCS[this._statusType];
+        return NEW[gaugeColor2 || "defaultGaugeColor2"].call(this);
+        //
+    }); // v0.00a - v0.00a
+
+    rewriteFunc("valueColor", function() {
+        // Edited to break different bar type behaviors into separate methods
+        const valueColor = NEW._VALUE_COLOR_FUNCS[this._statusType];
+        return NEW[valueColor || "defaultvalueColor"].call(this);
+        //
+    }); // v0.00a - v0.00a
+
+    rewriteFunc("redraw", function() {
+        // Edited to break different bar type behaviors into separate methods
+        this.bitmap.clear();
+        if (!isNaN(this.currentValue())) NEW._redraw.call(this);
+        //
+    }); // v0.00a - v0.00a
+
+    NEW._INVALID_VAL = NaN;
+    NEW._STATUS_TYPE_HP = "hp", NEW._STATUS_TYPE_MP = "mp";
+    NEW._STATUS_TYPE_TP = "tp", NEW._STATUS_TYPE_TIME = "time";
+
+    NEW._GAUGE_X_FUNCS = { [NEW._STATUS_TYPE_TIME]: "timeGaugeX" };
+    NEW._SMOOTHNESS_FUNCS = { [NEW._STATUS_TYPE_TIME]: "timeSmoothness" };
+    NEW._UPDATE_FLASHING_FUNCS = {
+        [NEW._STATUS_TYPE_TIME]: "updateTimeFlashing"
+    }; // NEW._UPDATE_FLASHING_FUNCS
+    NEW._IS_VALID_FUNCS = { [NEW._STATUS_TYPE_TP]: "isTpValid" };
+    NEW._VALID_CUR_VAL_FUNCS = {
+        [NEW._STATUS_TYPE_HP]: "validCurHPVal",
+        [NEW._STATUS_TYPE_MP]: "validCurMPVal",
+        [NEW._STATUS_TYPE_TP]: "validCurTPVal",
+        [NEW._STATUS_TYPE_TIME]: "validCurTimeVal"
+    }; // NEW._VALID_CUR_VAL_FUNCS
+    NEW._VALID_CUR_MAX_VAL_FUNCS = {
+        [NEW._STATUS_TYPE_HP]: "validCurMaxHPVal",
+        [NEW._STATUS_TYPE_MP]: "validCurMaxMPVal",
+        [NEW._STATUS_TYPE_TP]: "validCurMaxTPVal",
+        [NEW._STATUS_TYPE_TIME]: "validCurMaxTimeVal"
+    }; // NEW._VALID_CUR_MAX_VAL_FUNCS
+    NEW._LABEL_FUNCS = {
+        [NEW._STATUS_TYPE_HP]: "hpLabel",
+        [NEW._STATUS_TYPE_MP]: "mpLabel",
+        [NEW._STATUS_TYPE_TP]: "tpLabel"
+    }; // NEW._LABEL_FUNCS
+    NEW._GAUGE_COLOR_1_FUNCS = {
+        [NEW._STATUS_TYPE_HP]: "hpGaugeColor1",
+        [NEW._STATUS_TYPE_MP]: "mpGaugeColor1",
+        [NEW._STATUS_TYPE_TP]: "tpGaugeColor1",
+        [NEW._STATUS_TYPE_TIME]: "timeGaugeColor1"
+    }; // NEW._GAUGE_COLOR_1_FUNCS
+    NEW._GAUGE_COLOR_2_FUNCS = {
+        [NEW._STATUS_TYPE_HP]: "hpGaugeColor2",
+        [NEW._STATUS_TYPE_MP]: "mpGaugeColor2",
+        [NEW._STATUS_TYPE_TP]: "tpGaugeColor2",
+        [NEW._STATUS_TYPE_TIME]: "timeGaugeColor2"
+    }; // NEW._GAUGE_COLOR_2_FUNCS
+    NEW._VALUE_COLOR_FUNCS = {
+        [NEW._STATUS_TYPE_HP]: "hpValueColor",
+        [NEW._STATUS_TYPE_MP]: "mpValueColor",
+        [NEW._STATUS_TYPE_TP]: "tpValueColor"
+    }; // NEW._VALUE_COLOR_FUNCS
+    NEW._DRAW_TEXT_FUNCS = {
+        [NEW._STATUS_TYPE_HP]: "drawDefaultTexts",
+        [NEW._STATUS_TYPE_MP]: "drawDefaultTexts",
+        [NEW._STATUS_TYPE_TP]: "drawDefaultTexts"
+    }; // NEW._DRAW_TEXT_FUNCS
+
+    /**
+     * The this pointer is Sprite_Gauge.prototype
+     * Hotspot/Nullipotent
+     * @author DoubleX @interface @since v0.00a @version v0.00a
+     * @returns {number} The x position of the time sprite gauge
+     */
+    NEW.timeGaugeX = function() { return 0; };
+
+    /**
+     * The this pointer is Sprite_Gauge.prototype
+     * Nullipotent
+     * @author DoubleX @interface @since v0.00a @version v0.00a
+     * @returns {number} The default x position of the other sprite gauges
+     */
+    NEW.defaultGaugeX = function() { return this.measureLabelWidth() + 6; };
+
+    /**
+     * The this pointer is Sprite_Gauge.prototype
+     * Hotspot/Nullipotent
+     * @author DoubleX @interface @since v0.00a @version v0.00a
+     * @returns {number} The smoothness of the time sprite gauge
+     */
+    NEW.timeSmoothness = function() { return 5; };
+
+    /**
+     * The this pointer is Sprite_Gauge.prototype
+     * Nullipotent
+     * @author DoubleX @interface @since v0.00a @version v0.00a
+     * @returns {number} The default smoothness of the other sprite gauges
+     */
+    NEW.defaultSmoothness = function() { return 20; };
+
+    /**
+     * The this pointer is Sprite_Gauge.prototype
+     * Hotspot
+     * @author DoubleX @interface @since v0.00a @version v0.00a
+     * @todo Figures out where do these magic literals 40 and 15 come from
+     */
+    NEW.updateTimeFlashing = function() {
+        this._flashingCount++;
+        if (!this._battler.isInputting()) {
+            this.setBlendColor([0, 0, 0, 0]);
+        } else if (this._flashingCount % 30 < 15) {
+            this.setBlendColor(this.flashingColor1());
+        } else this.setBlendColor(this.flashingColor2());
+    }; // NEW.updateTimeFlashing
+
+    /**
+     * The this pointer is Sprite_Gauge.prototype
+     * @author DoubleX @interface @since v0.00a @version v0.00a
+     */
+    NEW.updateDefaultFlashing = function() {};
+
+    /**
+     * The this pointer is Sprite_Gauge.prototype
+     * Hotspot/Nullipotent
+     * @author DoubleX @interface @since v0.00a @version v0.00a
+     * @returns {boolean} Whether this tp sprite gauge's valid right now
+     */
+    NEW.isTpValid = function() {
+        return this._battler.isPreserveTp() || $gameParty.inBattle();
+    }; // NEW.isTpValid
+
+    /**
+     * The this pointer is Sprite_Gauge.prototype
+     * Nullipotent
+     * @author DoubleX @interface @since v0.00a @version v0.00a
+     * @returns {boolean} Whether the other sprite gauges' valid by default
+     */
+    NEW.isDefaultValid = function() { return true; };
+
+    /**
+     * The this pointer is Sprite_Gauge.prototype
+     * Nullipotent
+     * @author DoubleX @interface @since v0.00a @version v0.00a
+     * @returns {number} The current value of the hp gauge sprite
+     */
+    NEW.validCurHPVal = function() { return this._battler.hp; };
+
+    /**
+     * The this pointer is Sprite_Gauge.prototype
+     * Nullipotent
+     * @author DoubleX @interface @since v0.00a @version v0.00a
+     * @returns {number} The current value of the mp gauge sprite
+     */
+    NEW.validCurMPVal = function() { return this._battler.mp; };
+
+    /**
+     * The this pointer is Sprite_Gauge.prototype
+     * Nullipotent
+     * @author DoubleX @interface @since v0.00a @version v0.00a
+     * @returns {number} The current value of the tp gauge sprite
+     */
+    NEW.validCurTPVal = function() { return this._battler.tp; };
+
+    /**
+     * The this pointer is Sprite_Gauge.prototype
+     * Hotspot/Nullipotent
+     * @author DoubleX @interface @since v0.00a @version v0.00a
+     * @returns {number} The current value of the TPB gauge sprite
+     */
+    NEW.validCurTimeVal = function() { return this._battler.tpbChargeTime(); };
+
+    /**
+     * The this pointer is Sprite_Gauge.prototype
+     * Nullipotent
+     * @author DoubleX @interface @since v0.00a @version v0.00a
+     * @returns {number} The maximum value of the hp gauge sprite
+     */
+    NEW.validCurMaxHPVal = function() { return this._battler.mhp; };
+
+    /**
+     * The this pointer is Sprite_Gauge.prototype
+     * Nullipotent
+     * @author DoubleX @interface @since v0.00a @version v0.00a
+     * @returns {number} The maximum value of the mp gauge sprite
+     */
+    NEW.validCurMaxMPVal = function() { return this._battler.mmp; };
+
+    /**
+     * The this pointer is Sprite_Gauge.prototype
+     * Nullipotent
+     * @author DoubleX @interface @since v0.00a @version v0.00a
+     * @returns {number} The maximum value of the tp gauge sprite
+     */
+    NEW.validCurMaxTPVal = function() { return this._battler.maxTp(); };
+
+    /**
+     * The this pointer is Sprite_Gauge.prototype
+     * Hotspot/Nullipotent
+     * @author DoubleX @interface @since v0.00a @version v0.00a
+     * @returns {number} The maximum value of the TPB gauge sprite
+     */
+    NEW.validCurMaxTimeVal = function() { return 1; };
+
+    /**
+     * The this pointer is Sprite_Gauge.prototype
+     * Nullipotent
+     * @author DoubleX @interface @since v0.00a @version v0.00a
+     * @returns {string} The label of the hp sprite gauge
+     */
+    NEW.hpLabel = function() { return TextManager.hpA; };
+
+    /**
+     * The this pointer is Sprite_Gauge.prototype
+     * Nullipotent
+     * @author DoubleX @interface @since v0.00a @version v0.00a
+     * @returns {string} The label of the mp sprite gauge
+     */
+    NEW.mpLabel = function() { return TextManager.mpA; };
+
+    /**
+     * The this pointer is Sprite_Gauge.prototype
+     * Nullipotent
+     * @author DoubleX @interface @since v0.00a @version v0.00a
+     * @returns {string} The label of the tp sprite gauge
+     */
+    NEW.tpLabel = function() { return TextManager.tpA; };
+
+    /**
+     * The this pointer is Sprite_Gauge.prototype
+     * Nullipotent
+     * @author DoubleX @interface @since v0.00a @version v0.00a
+     * @returns {string} The default label of the other sprite gauges
+     */
+    NEW.defaultLabel = function() { return ""; };
+
+    /**
+     * The this pointer is Sprite_Gauge.prototype
+     * Nullipotent
+     * @author DoubleX @interface @since v0.00a @version v0.00a
+     * @returns {number} The 1st color of the hp gauge sprite
+     */
+    NEW.hpGaugeColor1 = function() { return ColorManager.hpGaugeColor1(); };
+
+    /**
+     * The this pointer is Sprite_Gauge.prototype
+     * Nullipotent
+     * @author DoubleX @interface @since v0.00a @version v0.00a
+     * @returns {number} The 1st color of the mp gauge sprite
+     */
+    NEW.mpGaugeColor1 = function() { return ColorManager.mpGaugeColor1(); };
+
+    /**
+     * The this pointer is Sprite_Gauge.prototype
+     * Nullipotent
+     * @author DoubleX @interface @since v0.00a @version v0.00a
+     * @returns {number} The 1st color of the tp gauge sprite
+     */
+    NEW.tpGaugeColor1 = function() { return ColorManager.tpGaugeColor1(); };
+
+    /**
+     * The this pointer is Sprite_Gauge.prototype
+     * Hotspot/Nullipotent
+     * @author DoubleX @interface @since v0.00a @version v0.00a
+     * @returns {number} The 1st color of the TPB gauge sprite
+     */
+    NEW.timeGaugeColor1 = function() { return ColorManager.ctGaugeColor1(); };
+
+    /**
+     * The this pointer is Sprite_Gauge.prototype
+     * Hotspot/Nullipotent
+     * @author DoubleX @interface @since v0.00a @version v0.00a
+     * @returns {number} The default 1st color of the other gauge sprites
+     */
+    NEW.defaultGaugeColor1 = function() { return ColorManager.normalColor(); };
+
+    /**
+     * The this pointer is Sprite_Gauge.prototype
+     * Nullipotent
+     * @author DoubleX @interface @since v0.00a @version v0.00a
+     * @returns {number} The 1st color of the hp gauge sprite
+     */
+    NEW.hpGaugeColor2 = function() { return ColorManager.hpGaugeColor2(); };
+
+    /**
+     * The this pointer is Sprite_Gauge.prototype
+     * Nullipotent
+     * @author DoubleX @interface @since v0.00a @version v0.00a
+     * @returns {number} The 1st color of the mp gauge sprite
+     */
+    NEW.mpGaugeColor2 = function() { return ColorManager.mpGaugeColor2(); };
+
+    /**
+     * The this pointer is Sprite_Gauge.prototype
+     * Nullipotent
+     * @author DoubleX @interface @since v0.00a @version v0.00a
+     * @returns {number} The 1st color of the tp gauge sprite
+     */
+    NEW.tpGaugeColor2 = function() { return ColorManager.tpGaugeColor2(); };
+
+    /**
+     * The this pointer is Sprite_Gauge.prototype
+     * Hotspot/Nullipotent
+     * @author DoubleX @interface @since v0.00a @version v0.00a
+     * @returns {number} The 1st color of the TPB gauge sprite
+     */
+    NEW.timeGaugeColor2 = function() { return ColorManager.ctGaugeColor2(); };
+
+    /**
+     * The this pointer is Sprite_Gauge.prototype
+     * Hotspot/Nullipotent
+     * @author DoubleX @interface @since v0.00a @version v0.00a
+     * @returns {number} The default 1st color of the other gauge sprites
+     */
+    NEW.defaultGaugeColor2 = function() { return ColorManager.normalColor(); };
+
+    /**
+     * The this pointer is Sprite_Gauge.prototype
+     * Nullipotent
+     * @author DoubleX @interface @since v0.00a @version v0.00a
+     * @returns {string} The value color of the hp sprite gauge
+     */
+    NEW.hpValueColor = function() {
+        return ColorManager.hpColor(this._battler);
+    }; // NEW.hpValueColor
+
+    /**
+     * The this pointer is Sprite_Gauge.prototype
+     * Nullipotent
+     * @author DoubleX @interface @since v0.00a @version v0.00a
+     * @returns {string} The value color of the mp sprite gauge
+     */
+    NEW.mpValueColor = function() {
+        return ColorManager.mpColor(this._battler);
+    }; // NEW.mpValueColor
+
+    /**
+     * The this pointer is Sprite_Gauge.prototype
+     * Nullipotent
+     * @author DoubleX @interface @since v0.00a @version v0.00a
+     * @returns {string} The value color of the tp sprite gauge
+     */
+    NEW.tpValueColor = function() {
+        return ColorManager.tpColor(this._battler);
+    }; // NEW.tpValueColor
+
+    /**
+     * The this pointer is Sprite_Gauge.prototype
+     * Nullipotent
+     * @author DoubleX @interface @since v0.00a @version v0.00a
+     * @returns {string} The default value color of the other sprite gauges
+     */
+    NEW.defaultValueColor = function() { return ColorManager.normalColor(); };
+
+    /**
+     * The this pointer is Sprite_Gauge.prototype
+     * Idempotent
+     * @author DoubleX @interface @since v0.00a @version v0.00a
+     */
+    NEW.drawDefaultTexts = function() {
+        this.drawLabel();
+        if (this.isValid()) this.drawValue();
+    }; // NEW.drawDefaultTexts
+
+    /**
+     * The this pointer is Sprite_Gauge.prototype
+     * Idempotent
+     * @author DoubleX @since v0.00a @version v0.00a
+     */
+    NEW._redraw = function() {
+        this.drawGauge();
+        const drawTextFunc = NEW._DRAW_TEXT_FUNCS[this._statusType];
+        if (drawTextFunc) NEW[drawTextFunc].call(this);
+    }; // NEW._redraw
+
+})(Sprite_Gauge, DoubleX_RMMZ.Enhanced_Codebase);
 
 /*============================================================================*/
