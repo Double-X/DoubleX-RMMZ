@@ -2,7 +2,7 @@
  *    ## Plugin Info
  *----------------------------------------------------------------------------
  *    # Plugin Name
- *      DoubleX RMMZ Enhanced Codebase
+ *      DoubleX_RMMZ_Enhanced_Codebase
  *----------------------------------------------------------------------------
  *    # Introduction
  *    1. This plugin's supposed to be fully compatible with those not written
