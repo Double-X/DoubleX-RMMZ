@@ -65,6 +65,17 @@
  *      - None So Far
  *----------------------------------------------------------------------------
  *    # Changelog
+ *      { codebase: "1.1.1", plugin: "v1.01a" }(2020 Dec 25 GMT 1100):
+ *      1. Added tpbChargeGaugeColor1 and tpbChargeGaugeColor2 to let you
+ *         configure the TPB charging bar colors inside battles
+ *      2. Added tpbIdleGaugeColor1 and tpbIdleGaugeColor2 to let you show the
+ *         TPB idling bar inside battles with configurable colors
+ *      3. Added tpbCastGaugeColor1 and tpbCastGaugeColor2 to let you show the
+ *         TPB casting bar inside battles with configurable colors
+ *      4. Added tpbReadyGaugeColor1 and tpbCastGaugeColor2 to let you show
+ *         the TPB cast ready bar inside battles with configurable colors
+ *      5. Added isTpbTimeActive to let you set the TPBS wait conditions more
+ *         precisely
  *      { codebase: "1.1.0", plugin: "v1.00b" }(2020 Dec 2 GMT 0400):
  *      1. You no longer have to edit the value of
  *         DoubleX_RMMZ.TPBS_Configurations_Edit.PLUGIN_NAME when changing
@@ -73,15 +84,13 @@
  *      1. 1st version of this plugin finished
  *----------------------------------------------------------------------------
  *    # Todo
- *      1. Shows the TPB casting bar inside battles(with configurable colors)
- *      2. Shows the TPB required cast time for all skills/items of all actors
- *      3. Lets you set the TPBS wait conditions more precisely
- *      4. Lets you set hotkeys to choose among any inputable actor
+ *      1. Shows the TPB required cast time for all skills/items of all actors
+ *      2. Lets you update the TPB time frames while executing actions as well
  *============================================================================*/
 /*:
  * @url https://www.patreon.com/doublex
  * @target MZ
- * @plugindesc Versions: { codebase: "1.1.0", plugin: "v1.00b" }
+ * @plugindesc Versions: { codebase: "1.1.1", plugin: "v1.01a" }
  * Lets you change some effectively hardcoded TPBS configurations on the fly
  * @orderAfter DoubleX_RMMZ_Enhanced_Codebase
  * @orderAfter DoubleX RMMZ Enhanced Codebase
@@ -576,6 +585,64 @@
  * The game unit involved can be referred by the this keyword
  * @default "const fps = Graphics.gameFps;\nreturn BattleManager.isActiveTpb() ? 4 * fps : fps;"
  *
+ * @param Party
+ *
+ * @param tpbChargeGaugeColor1
+ * @parent Party
+ * @type note
+ * @desc Returns the 1st actor TPB charge gague sprite color
+ * The gauge sprite involved can be referred by the this keyword
+ * @default "return ColorManager.ctGaugeColor1();"
+ *
+ * @param tpbChargeGaugeColor2
+ * @parent Party
+ * @type note
+ * @desc Returns the 2nd actor TPB charge gague sprite color
+ * The gauge sprite involved can be referred by the this keyword
+ * @default "return ColorManager.ctGaugeColor2();"
+ *
+ * @param tpbIdleGaugeColor1
+ * @parent Party
+ * @type note
+ * @desc Returns the 1st actor TPB idle gague sprite color
+ * The gauge sprite involved can be referred by the this keyword
+ * @default "return ColorManager.textColor(30);"
+ *
+ * @param tpbIdleGaugeColor2
+ * @parent Party
+ * @type note
+ * @desc Returns the 2nd actor TPB idle gague sprite color
+ * The gauge sprite involved can be referred by the this keyword
+ * @default "return ColorManager.textColor(31);"
+ *
+ * @param tpbCastGaugeColor1
+ * @parent Party
+ * @type note
+ * @desc Returns the 1st actor TPB cast gague sprite color
+ * The gauge sprite involved can be referred by the this keyword
+ * @default "return ColorManager.textColor(18);"
+ *
+ * @param tpbCastGaugeColor2
+ * @parent Party
+ * @type note
+ * @desc Returns the 2nd actor TPB cast gague sprite color
+ * The gauge sprite involved can be referred by the this keyword
+ * @default "return ColorManager.textColor(10);"
+ *
+ * @param tpbReadyGaugeColor1
+ * @parent Party
+ * @type note
+ * @desc Returns the 1st actor TPB cast ready gague sprite color
+ * The gauge sprite involved can be referred by the this keyword
+ * @default "return ColorManager.textColor(18);"
+ *
+ * @param tpbReadyGaugeColor2
+ * @parent Party
+ * @type note
+ * @desc Returns the 2nd actor TPB cast ready gague sprite color
+ * The gauge sprite involved can be referred by the this keyword
+ * @default "return ColorManager.textColor(10);"
+ *
  * @param Troop
  *
  * @param isTroopTpbTurnEnd
@@ -584,6 +651,15 @@
  * @desc Returns whether the battle turn has ended
  * The game troop involved can be referred by the this keyword
  * @default "return Math.max(...this.members().fastMap(mem => {\n    return mem.turnCount();\n})) > this._turnCount;"
+ *
+ * @param Battle
+ *
+ * @param isTpbTimeActive
+ * @parent Battle
+ * @type note
+ * @desc Returns whether the TPB time frame update will be active
+ * The battle scene involved can be referred by the this keyword
+ * @default "if (BattleManager.isActiveTpb()) return true;\nreturn !this.isAnyInputWindowActive();"
  *
  * @command setTPBSCfgEditParam
  * @desc Applies script call $gameSystem.setTPBSCfgEditParam(param, val)
@@ -1128,7 +1204,7 @@ var DoubleX_RMMZ = DoubleX_RMMZ || {}; // var must be used or game will crash
     // Separates the version numbers with the rest to make the former more clear
     DoubleX_RMMZ.TPBS_Configurations_Edit = {
         PLUGIN_NAME: name,
-        VERSIONS: { codebase: "1.1.0", plugin: "v1.00b" }
+        VERSIONS: { codebase: "1.1.1", plugin: "v1.01a" }
     }; // DoubleX_RMMZ.TPBS_Configurations_Edit
     //
 
@@ -1172,15 +1248,11 @@ if (DoubleX_RMMZ.Enhanced_Codebase) {
 
 /*============================================================================*/
 
-(TPBSCE => {
+((MZ_EC, TPBSCE) => {
 
     "use strict";
 
-    const FP = TPBSCE.FUNC_PARAMS = {};
-
-    FP.PARAM_FUNCS = new Map();
-
-    FP._PARAM_FUNC_ARGS = new Map(Object.entries({
+    MZ_EC.setupFuncParams(TPBSCE, {
         tpbAcceleration: [],
         tpbRelativeSpeed: [],
         tpbSpeed: [],
@@ -1196,18 +1268,21 @@ if (DoubleX_RMMZ.Enhanced_Codebase) {
         normStartTpbChargeTime: [],
         unitTPBBaseSpeed: [],
         unitTPBReferenceTime: [],
-        isTroopTpbTurnEnd: []
-    }));
-
-    FP.storeFuncParam = (param, val) => {
-        if (!FP._PARAM_FUNC_ARGS.has(param)) return;
-        const args = FP._PARAM_FUNC_ARGS.get(param);
-        // Using fastMerge would mutate the parameter function argument lists
-        FP.PARAM_FUNCS.set(param, new Function(...args.concat(val)));
+        // v1.01a+
+        tpbChargeGaugeColor1: [],
+        tpbChargeGaugeColor2: [],
+        tpbIdleGaugeColor1: [],
+        tpbIdleGaugeColor2: [],
+        tpbCastGaugeColor1: [],
+        tpbCastGaugeColor2: [],
+        tpbReadyGaugeColor1: [],
+        tpbReadyGaugeColor2: [],
         //
-    }; // FP.storeFuncParam
+        isTroopTpbTurnEnd: [],
+        isTpbTimeActive: [] // v1.01a+
+    });
 
-})(DoubleX_RMMZ.TPBS_Configurations_Edit);
+})(DoubleX_RMMZ.Enhanced_Codebase, DoubleX_RMMZ.TPBS_Configurations_Edit);
 
 /*----------------------------------------------------------------------------*/
 
@@ -1628,6 +1703,76 @@ if (DoubleX_RMMZ.Enhanced_Codebase) {
     }); // v1.00a - v1.00a
 
 })(Game_Troop.prototype, DoubleX_RMMZ.Enhanced_Codebase,
+        DoubleX_RMMZ.TPBS_Configurations_Edit);
+
+/*----------------------------------------------------------------------------
+ *    # (v1.01a+)Edited class: Scene_Battle
+ *      - Uses the edited configurations from this plugin instead of default
+ *----------------------------------------------------------------------------*/
+
+(($, MZ_EC, TPBSCE) => {
+
+    "use strict";
+
+    const PF = TPBSCE.FUNC_PARAMS.PARAM_FUNCS;
+    const { rewriteFunc } = MZ_EC.setKlassContainer("Scene_Battle", $, TPBSCE);
+
+    rewriteFunc("isTimeActive", function() {
+        // Edited to use the customized tpb time frame update conditions instead
+        return PF.get("isTpbTimeActive").call(this);
+        //
+    }); // v1.01a - v1.01a
+
+})(Scene_Battle.prototype, DoubleX_RMMZ.Enhanced_Codebase,
+        DoubleX_RMMZ.TPBS_Configurations_Edit);
+
+/*----------------------------------------------------------------------------
+ *    # (v1.01a+)Edited class: Sprite_Gauge
+ *      - Uses the edited configurations from this plugin instead of default
+ *----------------------------------------------------------------------------*/
+
+(($, MZ_EC, TPBSCE) => {
+
+    "use strict";
+
+    const PF = TPBSCE.FUNC_PARAMS.PARAM_FUNCS, klassName = "Sprite_Gauge";
+    const { ORIG } = MZ_EC.setKlassContainer(klassName, $, TPBSCE);
+    const EC_SG = MZ_EC[klassName].new, SG = TPBSCE[klassName];
+
+    MZ_EC.rewriteFunc(EC_SG, SG, "validCurTimeVal", function() {
+        // Added to show the tpb casting progress as well
+        if (this._battler.isTpbCasting()) return this._battler.tpbCastTime();
+        //
+        return ORIG.validCurTimeVal.apply(this, arguments);
+    }); // v1.01a - v1.01a
+
+    MZ_EC.rewriteFunc(EC_SG, SG, "validCurMaxTimeVal", function() {
+        // Edited to show the tpb casting progress as well
+        if (this._battler.isTpbCasting()) {
+            return this._battler.tpbRequiredCastTime();
+        } else return ORIG.validCurMaxTimeVal.apply(this, arguments);
+        //
+    }); // v1.01a - v1.01a
+
+    ["1", "2"].forEach(num => {
+        MZ_EC.rewriteFunc(EC_SG, SG, `timeGaugeColor${num}`, function() {
+            // Edited to use the customized tpb gauge sprite color instead
+            if (this._battler.isTpbCharging()) {
+                return PF.get(`tpbChargeGaugeColor${num}`).call(this);
+            } else if (this._battler.isTpbIdling()) {
+                return PF.get(`tpbIdleGaugeColor${num}`).call(this);
+            } else if (this._battler.isTpbCasting()) {
+                return PF.get(`tpbCastGaugeColor${num}`).call(this);
+            } else if (this._battler.isActing()) {
+                // The state will be from casting to ready then instantly acting
+                return PF.get(`tpbReadyGaugeColor${num}`).call(this);
+                //
+            } else return ORIG[`timeGaugeColor${num}`].apply(this, arguments);
+            //
+        }); // v1.01a - v1.01a
+    });
+
+})(Sprite_Gauge.prototype, DoubleX_RMMZ.Enhanced_Codebase,
         DoubleX_RMMZ.TPBS_Configurations_Edit);
 
 /*============================================================================*/
