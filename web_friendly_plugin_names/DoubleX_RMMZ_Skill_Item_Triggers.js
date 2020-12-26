@@ -69,6 +69,25 @@
  *      - None So Far
  *----------------------------------------------------------------------------
  *    # Changelog
+ *      { codebase: "1.1.1", plugin: "v1.01a" }(2020 Dec 26 GMT 1300):
+ *      1. Added the following notetag types:
+ *         subjectMiss
+ *         subjectEva
+ *         subjectCnt
+ *         subjectMrf
+ *         subjectCri
+ *         subjectNorm
+ *         subjectSubstitute
+ *      2. Added the following parameters:
+ *         subjectMissNotetagDataTypePriorities
+ *         subjectEvaNotetagDataTypePriorities
+ *         subjectCntNotetagDataTypePriorities
+ *         subjectMrfNotetagDataTypePriorities
+ *         subjectCriNotetagDataTypePriorities
+ *         subjectNormNotetagDataTypePriorities
+ *         subjectSubstituteNotetagDataTypePriorities
+ *      3. Fixed the eventEntry of all notetags not correctly accepting all
+ *         intended suffixes and rejecting the unintended ones
  *      { codebase: "1.1.0", plugin: "v1.00b" }(2020 Dec 2 GMT 0300):
  *      1. You no longer have to edit the value of
  *         DoubleX_RMMZ.Skill_Item_Triggers.PLUGIN_NAME when changing this
@@ -79,7 +98,7 @@
 /*:
  * @url https://www.patreon.com/doublex
  * @target MZ
- * @plugindesc Versions: { codebase: "1.1.0", plugin: "v1.00b" }
+ * @plugindesc Versions: { codebase: "1.1.1", plugin: "v1.01a" }
  * Lets you run some codes set by your notetags on some action execution cases
  * @orderAfter DoubleX_RMMZ_Enhanced_Codebase
  * @orderAfter DoubleX RMMZ Enhanced Codebase
@@ -112,7 +131,7 @@
  * @value states
  * @desc Sets data type priorities of the miss notetags
  * You can use script calls/plugin commands to change this
- * @default ["latestSkillItem"]
+ * @default ["actor", "class", "latestSkillItem", "weapons", "armors", "enemy", "states"]
  *
  * @param evaNotetagDataTypePriorities
  * @type select[]
@@ -140,7 +159,7 @@
  * @value states
  * @desc Sets data type priorities of the eva notetags
  * You can use script calls/plugin commands to change this
- * @default ["latestSkillItem"]
+ * @default ["actor", "class", "latestSkillItem", "weapons", "armors", "enemy", "states"]
  *
  * @param cntNotetagDataTypePriorities
  * @type select[]
@@ -168,7 +187,7 @@
  * @value states
  * @desc Sets data type priorities of the cnt notetags
  * You can use script calls/plugin commands to change this
- * @default ["latestSkillItem"]
+ * @default ["actor", "class", "latestSkillItem", "weapons", "armors", "enemy", "states"]
  *
  * @param mrfNotetagDataTypePriorities
  * @type select[]
@@ -196,7 +215,7 @@
  * @value states
  * @desc Sets data type priorities of the mrf notetags
  * You can use script calls/plugin commands to change this
- * @default ["latestSkillItem"]
+ * @default ["actor", "class", "latestSkillItem", "weapons", "armors", "enemy", "states"]
  *
  * @param criNotetagDataTypePriorities
  * @type select[]
@@ -224,7 +243,7 @@
  * @value states
  * @desc Sets data type priorities of the cri notetags
  * You can use script calls/plugin commands to change this
- * @default ["latestSkillItem"]
+ * @default ["actor", "class", "latestSkillItem", "weapons", "armors", "enemy", "states"]
  *
  * @param normNotetagDataTypePriorities
  * @type select[]
@@ -252,7 +271,7 @@
  * @value states
  * @desc Sets data type priorities of the norm notetags
  * You can use script calls/plugin commands to change this
- * @default ["latestSkillItem"]
+ * @default ["actor", "class", "latestSkillItem", "weapons", "armors", "enemy", "states"]
  *
  * @param substituteNotetagDataTypePriorities
  * @type select[]
@@ -280,7 +299,7 @@
  * @value states
  * @desc Sets data type priorities of the substitute notetags
  * You can use script calls/plugin commands to change this
- * @default ["latestSkillItem"]
+ * @default ["actor", "class", "latestSkillItem", "weapons", "armors", "enemy", "states"]
  *
  * @param preNotetagDataTypePriorities
  * @type select[]
@@ -308,7 +327,7 @@
  * @value states
  * @desc Sets data type priorities of the pre notetags
  * You can use script calls/plugin commands to change this
- * @default ["latestSkillItem"]
+ * @default ["actor", "class", "latestSkillItem", "weapons", "armors", "enemy", "states"]
  *
  * @param postNotetagDataTypePriorities
  * @type select[]
@@ -336,7 +355,203 @@
  * @value states
  * @desc Sets data type priorities of the post notetags
  * You can use script calls/plugin commands to change this
- * @default ["latestSkillItem"]
+ * @default ["actor", "class", "latestSkillItem", "weapons", "armors", "enemy", "states"]
+ *
+ * @param subjectMissNotetagDataTypePriorities
+ * @type select[]
+ * @option Data of the actor
+ * @value actor
+ * @option Data of the current class
+ * @value class
+ * @option Data of learnt skills/action list(Shouldn't be used with Data of usable skills)
+ * @value skills
+ * @option Data of usable skills(Shouldn't be used with Data of learnt skills)
+ * @value usableSkills
+ * @option Data of possessed items(Shouldn't be used with Data of usable items)
+ * @value items
+ * @option Data of usable items(Shouldn't be used with Data of possessed items)
+ * @value usableItems
+ * @option Data of the latest skill/item being used(Can double-count with skills/items/usableSkills/usableItems)
+ * @value latestSkillItem
+ * @option Data of equipped weapons
+ * @value weapons
+ * @option Data of equipped armors
+ * @value armors
+ * @option Data of the enemy
+ * @value enemy
+ * @option Data of effective states
+ * @value states
+ * @desc Sets data type priorities of the subjectMiss notetags
+ * You can use script calls/plugin commands to change this
+ * @default ["actor", "class", "latestSkillItem", "weapons", "armors", "enemy", "states"]
+ *
+ * @param subjectEvaNotetagDataTypePriorities
+ * @type select[]
+ * @option Data of the actor
+ * @value actor
+ * @option Data of the current class
+ * @value class
+ * @option Data of learnt skills/action list(Shouldn't be used with Data of usable skills)
+ * @value skills
+ * @option Data of usable skills(Shouldn't be used with Data of learnt skills)
+ * @value usableSkills
+ * @option Data of possessed items(Shouldn't be used with Data of usable items)
+ * @value items
+ * @option Data of usable items(Shouldn't be used with Data of possessed items)
+ * @value usableItems
+ * @option Data of the latest skill/item being used(Can double-count with skills/items/usableSkills/usableItems)
+ * @value latestSkillItem
+ * @option Data of equipped weapons
+ * @value weapons
+ * @option Data of equipped armors
+ * @value armors
+ * @option Data of the enemy
+ * @value enemy
+ * @option Data of effective states
+ * @value states
+ * @desc Sets data type priorities of the subjectEva notetags
+ * You can use script calls/plugin commands to change this
+ * @default ["actor", "class", "latestSkillItem", "weapons", "armors", "enemy", "states"]
+ *
+ * @param subjectCntNotetagDataTypePriorities
+ * @type select[]
+ * @option Data of the actor
+ * @value actor
+ * @option Data of the current class
+ * @value class
+ * @option Data of learnt skills/action list(Shouldn't be used with Data of usable skills)
+ * @value skills
+ * @option Data of usable skills(Shouldn't be used with Data of learnt skills)
+ * @value usableSkills
+ * @option Data of possessed items(Shouldn't be used with Data of usable items)
+ * @value items
+ * @option Data of usable items(Shouldn't be used with Data of possessed items)
+ * @value usableItems
+ * @option Data of the latest skill/item being used(Can double-count with skills/items/usableSkills/usableItems)
+ * @value latestSkillItem
+ * @option Data of equipped weapons
+ * @value weapons
+ * @option Data of equipped armors
+ * @value armors
+ * @option Data of the enemy
+ * @value enemy
+ * @option Data of effective states
+ * @value states
+ * @desc Sets data type priorities of the subjectCnt notetags
+ * You can use script calls/plugin commands to change this
+ * @default ["actor", "class", "latestSkillItem", "weapons", "armors", "enemy", "states"]
+ *
+ * @param subjectMrfNotetagDataTypePriorities
+ * @type select[]
+ * @option Data of the actor
+ * @value actor
+ * @option Data of the current class
+ * @value class
+ * @option Data of learnt skills/action list(Shouldn't be used with Data of usable skills)
+ * @value skills
+ * @option Data of usable skills(Shouldn't be used with Data of learnt skills)
+ * @value usableSkills
+ * @option Data of possessed items(Shouldn't be used with Data of usable items)
+ * @value items
+ * @option Data of usable items(Shouldn't be used with Data of possessed items)
+ * @value usableItems
+ * @option Data of the latest skill/item being used(Can double-count with skills/items/usableSkills/usableItems)
+ * @value latestSkillItem
+ * @option Data of equipped weapons
+ * @value weapons
+ * @option Data of equipped armors
+ * @value armors
+ * @option Data of the enemy
+ * @value enemy
+ * @option Data of effective states
+ * @value states
+ * @desc Sets data type priorities of the subjectMrf notetags
+ * You can use script calls/plugin commands to change this
+ * @default ["actor", "class", "latestSkillItem", "weapons", "armors", "enemy", "states"]
+ *
+ * @param subjectCriNotetagDataTypePriorities
+ * @type select[]
+ * @option Data of the actor
+ * @value actor
+ * @option Data of the current class
+ * @value class
+ * @option Data of learnt skills/action list(Shouldn't be used with Data of usable skills)
+ * @value skills
+ * @option Data of usable skills(Shouldn't be used with Data of learnt skills)
+ * @value usableSkills
+ * @option Data of possessed items(Shouldn't be used with Data of usable items)
+ * @value items
+ * @option Data of usable items(Shouldn't be used with Data of possessed items)
+ * @value usableItems
+ * @option Data of the latest skill/item being used(Can double-count with skills/items/usableSkills/usableItems)
+ * @value latestSkillItem
+ * @option Data of equipped weapons
+ * @value weapons
+ * @option Data of equipped armors
+ * @value armors
+ * @option Data of the enemy
+ * @value enemy
+ * @option Data of effective states
+ * @value states
+ * @desc Sets data type priorities of the subjectCri notetags
+ * You can use script calls/plugin commands to change this
+ * @default ["actor", "class", "latestSkillItem", "weapons", "armors", "enemy", "states"]
+ *
+ * @param subjectNormNotetagDataTypePriorities
+ * @type select[]
+ * @option Data of the actor
+ * @value actor
+ * @option Data of the current class
+ * @value class
+ * @option Data of learnt skills/action list(Shouldn't be used with Data of usable skills)
+ * @value skills
+ * @option Data of usable skills(Shouldn't be used with Data of learnt skills)
+ * @value usableSkills
+ * @option Data of possessed items(Shouldn't be used with Data of usable items)
+ * @value items
+ * @option Data of usable items(Shouldn't be used with Data of possessed items)
+ * @value usableItems
+ * @option Data of the latest skill/item being used(Can double-count with skills/items/usableSkills/usableItems)
+ * @value latestSkillItem
+ * @option Data of equipped weapons
+ * @value weapons
+ * @option Data of equipped armors
+ * @value armors
+ * @option Data of the enemy
+ * @value enemy
+ * @option Data of effective states
+ * @value states
+ * @desc Sets data type priorities of the subjectNorm notetags
+ * You can use script calls/plugin commands to change this
+ * @default ["actor", "class", "latestSkillItem", "weapons", "armors", "enemy", "states"]
+ *
+ * @param subjectSubstituteNotetagDataTypePriorities
+ * @type select[]
+ * @option Data of the actor
+ * @value actor
+ * @option Data of the current class
+ * @value class
+ * @option Data of learnt skills/action list(Shouldn't be used with Data of usable skills)
+ * @value skills
+ * @option Data of usable skills(Shouldn't be used with Data of learnt skills)
+ * @value usableSkills
+ * @option Data of possessed items(Shouldn't be used with Data of usable items)
+ * @value items
+ * @option Data of usable items(Shouldn't be used with Data of possessed items)
+ * @value usableItems
+ * @option Data of the latest skill/item being used(Can double-count with skills/items/usableSkills/usableItems)
+ * @value latestSkillItem
+ * @option Data of equipped weapons
+ * @value weapons
+ * @option Data of equipped armors
+ * @value armors
+ * @option Data of the enemy
+ * @value enemy
+ * @option Data of effective states
+ * @value states
+ * @desc Sets data type priorities of the subjectSubstitute notetags
+ * You can use script calls/plugin commands to change this
+ * @default ["actor", "class", "latestSkillItem", "weapons", "armors", "enemy", "states"]
  *
  * @command setSkillItemTriggersParam
  * @desc Applies script call $gameSystem.setSkillItemTriggersParam(param, val)
@@ -368,6 +583,13 @@
  *            7. substitute
  *            8. pre
  *            9. post
+ *            (v1.01a+)10. subjectMiss
+ *            (v1.01a+)11. subjectEva
+ *            (v1.01a+)12. subjectCnt
+ *            (v1.01a+)13. subjectMrf
+ *            (v1.01a+)14. subjectCri
+ *            (v1.01a+)15. subjectNorm
+ *            (v1.01a+)16. subjectSubstitute
  *          - suffixes is the list of suffixes in the form of:
  *            suffix1 suffix2 suffix3 ... suffixn
  *            Where each suffix is either of the following:
@@ -389,9 +611,9 @@
  *    # Actor/Class/Learnt Skills/Usable Skills/Posessed Items/Usable Items/
  *      Inputted Skill Or Item/Weapon/Armor/Enemy/States/This State Notetags
  *      1. miss condSuffix eventSuffix: condEntry, eventEntry
- *         - Triggers what specified in eventEntry when the action involved
- *           just missed the target involved if condEntry returns a truthy
- *           result
+ *         - Triggers what specified in eventEntry on the target involved when
+ *           the action involved just missed the target involved if condEntry
+ *           returns a truthy result
  *         - condSuffix can be val, switch or script
  *         - eventEntry can be event or script
  *         - The result of condEntry can be anything as only whether it's
@@ -400,21 +622,22 @@
  *           discarded upon such use cases
  *         - The result of eventEntry can be anything as it's supposed to run
  *           commands instead of returning results
- *         - The miss skill/item trigger also applies counter attack, but with
- *           the target involved being that being hit by the counter attack
+ *         - The miss skill/item trigger also applies to counter attack, but
+ *           with the target involved being that being hit by the counter
+ *           attack
  *         - The miss skill/item trigger also applies to magic reflection, but
- *           with the target involved being the action execution subject
- *           instead
+ *           with the target involved being the original action execution
+ *           subject instead
  *         - (Advanced)The this pointer of the script suffix is the target
  *           involved
  *         - E.g.:
  *           <skill item triggers miss switch event: 1, 2> will reserve the
  *           common event with id 2 when the action involved just missed the
- *           target if the game switch with id 1 is on
+ *           target involved if the game switch with id 1 is on
  *      2. eva condSuffix eventSuffix: condEntry, eventEntry
- *         - Triggers what specified in eventEntry when the action involved is
- *           just evaded by the target involved if condEntry returns a truthy
- *           result
+ *         - Triggers what specified in eventEntry on the target involved when
+ *           the action involved is just evaded by the target involved if
+ *           condEntry returns a truthy result
  *         - condSuffix can be val, switch or script
  *         - eventEntry can be event or script
  *         - The result of condEntry can be anything as only whether it's
@@ -423,10 +646,12 @@
  *           discarded upon such use cases
  *         - The result of eventEntry can be anything as it's supposed to run
  *           commands instead of returning results
- *         - The eva skill/item trigger also applies counter attack, but with
- *           the target involved being that being hit by the counter attack
+ *         - The eva skill/item trigger also applies to counter attack, but
+ *           with the target involved being that being hit by the counter
+ *           attack
  *         - The eva skill/item trigger also applies to magic reflection, but
- *           with the target involved being the action execution subject
+ *           with the target involved being the original action execution
+ *           subject
  *         - (Advanced)The this pointer of the script suffix is the target
  *           involved
  *         - E.g.:
@@ -434,9 +659,9 @@
  *           JavaScript codes stored as a string in variable with id 3 when
  *           the action involved is just evaded by the target involved
  *      3. cnt condSuffix eventSuffix: condEntry, eventEntry
- *         - Triggers what specified in eventEntry when the action involved is
- *           just countered by the attack of the target involved if condEntry
- *           returns a truthy result
+ *         - Triggers what specified in eventEntry on the target involved when
+ *           the action involved is just countered by the attack of the target
+ *           involved if condEntry returns a truthy result
  *         - condSuffix can be val, switch or script
  *         - eventEntry can be event or script
  *         - The result of condEntry can be anything as only whether it's
@@ -453,9 +678,9 @@
  *           by the attack of the target involved if the game switch with id 1
  *           is on
  *      4. mrf condSuffix eventSuffix: condEntry, eventEntry
- *         - Triggers what specified in eventEntry when the action involved is
- *           just reflected by the target involved if condEntry returns a
- *           truthy result
+ *         - Triggers what specified in eventEntry on the target involved when
+ *           the action involved is just reflected by the target involved if
+ *           condEntry returns a truthy result
  *         - condSuffix can be val, switch or script
  *         - eventEntry can be event or script
  *         - The result of condEntry can be anything as only whether it's
@@ -471,9 +696,9 @@
  *           JavaScript codes stored as a string in variable with id 3 when
  *           the action involved is just reflected by the target involved
  *      5. cri condSuffix eventSuffix: condEntry, eventEntry
- *         - Triggers what specified in eventEntry when the action involved
- *           just critically hit the target involved if condEntry returns a
- *           truthy result
+ *         - Triggers what specified in eventEntry on the target involved when
+ *           the action involved just critically hit the target involved if
+ *           condEntry returns a truthy result
  *         - condSuffix can be val, switch or script
  *         - eventEntry can be event or script
  *         - The result of condEntry can be anything as only whether it's
@@ -482,10 +707,12 @@
  *           discarded upon such use cases
  *         - The result of eventEntry can be anything as it's supposed to run
  *           commands instead of returning results
- *         - The cri skill/item trigger also applies counter attack, but with
- *           the target involved being that being hit by the counter attack
+ *         - The cri skill/item trigger also applies to counter attack, but
+ *           with the target involved being that being hit by the counter
+ *           attack
  *         - The cri skill/item trigger also applies to magic reflection, but
- *           with the target involved being the action execution subject
+ *           with the target involved being the original action execution
+ *           subject
  *         - (Advanced)The this pointer of the script suffix is the target
  *           involved
  *         - E.g.:
@@ -493,9 +720,9 @@
  *           common event with id 2 when the action involved just critically
  *           hit the target involved if the game switch with id 1 is on
  *      6. norm condSuffix eventSuffix: condEntry, eventEntry
- *         - Triggers what specified in eventEntry when the action involved is
- *           just executed normally on the target involved if condEntry
- *           returns a truthy result
+ *         - Triggers what specified in eventEntry on the target involved when
+ *           the action involved is just executed normally on the target
+ *           involved if condEntry returns a truthy result
  *         - condSuffix can be val, switch or script
  *         - eventEntry can be event or script
  *         - The result of condEntry can be anything as only whether it's
@@ -504,10 +731,12 @@
  *           discarded upon such use cases
  *         - The result of eventEntry can be anything as it's supposed to run
  *           commands instead of returning results
- *         - The norm skill/item trigger also applies counter attack, but with
- *           the target involved being that being hit by the counter attack
+ *         - The norm skill/item trigger also applies to counter attack, but
+ *           with the target involved being that being hit by the counter
+ *           attack
  *         - The norm skill/item trigger also applies to magic reflection, but
- *           with the target involved being the action execution subject
+ *           with the target involved being the original action execution
+ *           subject
  *         - (Advanced)The this pointer of the script suffix is the target
  *           involved
  *         - E.g.:
@@ -516,9 +745,10 @@
  *           when the action involved is just executed normally on the target
  *           involved
  *      7. substitute condSuffix eventSuffix: condEntry, eventEntry
- *         - Triggers what specified in eventEntry when the action involved
- *           just hit the substitute instead of the original target involved
- *           if condEntry returns a truthy result
+ *         - Triggers what specified in eventEntry on the substitute target
+ *           involved when the action involved just hit the substitute
+ *           instead of the original target involved if condEntry returns a
+ *           truthy result
  *         - condSuffix can be val, switch or script
  *         - eventEntry can be event or script
  *         - The result of condEntry can be anything as only whether it's
@@ -535,9 +765,10 @@
  *           substitute instead of the original target involved if the game
  *           switch with id 1 is on
  *      8. pre condSuffix eventSuffix: condEntry, eventEntry
- *         - Triggers what specified in eventEntry right before starting to
- *           execute the action involved if condEntry returns a truthy
- *           result
+ *         - Triggers what specified in eventEntry on the action execution
+ *           subject involved right before starting to execute the action
+ *           involved by the action execution subject involved if condEntry
+ *           returns a truthy result
  *         - condSuffix can be val, switch or script
  *         - eventEntry can be event or script
  *         - The result of condEntry can be anything as only whether it's
@@ -547,15 +778,18 @@
  *         - The result of eventEntry can be anything as it's supposed to run
  *           commands instead of returning results
  *         - (Advanced)The this pointer of the script suffix is the action
- *           execution subject involved
+ *           execution subject involved by the action execution subject
+ *           involved
  *         - E.g.:
  *           <skill item triggers pre switch event: 1, 2> will reserve the
  *           common event with id 2 before starting to execute the action
- *           involved if the game switch with id 1 is on
+ *           involved by the action execution subject involved if the game
+ *           switch with id 1 is on
  *      9. post condSuffix eventSuffix: condEntry, eventEntry
- *         - Triggers what specified in eventEntry right after finished
- *           executing the action involved if condEntry returns a truthy
- *           result
+ *         - Triggers what specified in eventEntry on the action execution
+ *           subject involved right after finished executing the action
+ *           involved by the action execution subject involved if condEntry
+ *           returns a truthy result
  *         - condSuffix can be val, switch or script
  *         - eventEntry can be event or script
  *         - The result of condEntry can be anything as only whether it's
@@ -569,7 +803,165 @@
  *         - E.g.:
  *           <skill item triggers post val script: true, 3> will always run
  *           the JavaScript codes stored as a string in variable with id 3
- *           right after finished executing the action involved
+ *           right after finished executing the action involved by the action
+ *           execution subject involved
+ *      (v1.01a+)10. subjectMiss condSuffix eventSuffix: condEntry, eventEntry
+ *         - Triggers what specified in eventEntry on the action execution
+ *           subject involved when the action involved just missed a target if
+ *           condEntry returns a truthy result
+ *         - condSuffix can be val, switch or script
+ *         - eventEntry can be event or script
+ *         - The result of condEntry can be anything as only whether it's
+ *           truthy matters
+ *         - If the result of condEntry is falsy, this notetag will be
+ *           discarded upon such use cases
+ *         - The result of eventEntry can be anything as it's supposed to run
+ *           commands instead of returning results
+ *         - The subjectMiss skill/item trigger also applies to counter
+ *           attack, but with the action execution subject involved being that
+ *           countering the attack
+ *         - The subjectMiss skill/item trigger also applies to magic
+ *           reflection, but with the action execution subject involved being
+ *           that reflecting the magic
+ *         - (Advanced)The this pointer of the script suffix is the action
+ *           execution subject involved
+ *         - E.g.:
+ *           <skill item triggers subjectMiss switch event: 1, 2> will reserve
+ *           the common event with id 2 when the action involved executed by
+ *           the action execution subject involved just missed a target if the
+ *           game switch with id 1 is on
+ *      (v1.01a+)11. subjectEva condSuffix eventSuffix: condEntry, eventEntry
+ *         - Triggers what specified in eventEntry on the action execution
+ *           subject involved when the action involved is just evaded by a
+ *           target involved if condEntry returns a truthy result
+ *         - condSuffix can be val, switch or script
+ *         - eventEntry can be event or script
+ *         - The result of condEntry can be anything as only whether it's
+ *           truthy matters
+ *         - If the result of condEntry is falsy, this notetag will be
+ *           discarded upon such use cases
+ *         - The result of eventEntry can be anything as it's supposed to run
+ *           commands instead of returning results
+ *         - The subjectEva skill/item trigger also applies to counter
+ *           attack, but with the action execution subject involved being that
+ *           countering the attack
+ *         - The subjectEva skill/item trigger also applies to magic
+ *           reflection, but with the action execution subject involved being
+ *           that reflecting the magic
+ *         - (Advanced)The this pointer of the script suffix is the action
+ *           execution subject involved
+ *         - E.g.:
+ *           <skill item triggers subjectEva val script: true, 3> will always
+ *           run the JavaScript codes stored as a string in variable with id 3
+ *           when the action involved executed by the action execution subject
+ *           involved is just evaded by a target
+ *      (v1.01a+)12. subjectCnt condSuffix eventSuffix: condEntry, eventEntry
+ *         - Triggers what specified in eventEntry on the action execution
+ *           subject involved when the action involved is just countered by
+ *           the attack of a target if condEntry returns a truthy result
+ *         - condSuffix can be val, switch or script
+ *         - eventEntry can be event or script
+ *         - The result of condEntry can be anything as only whether it's
+ *           truthy matters
+ *         - If the result of condEntry is falsy, this notetag will be
+ *           discarded upon such use cases
+ *         - The result of eventEntry can be anything as it's supposed to run
+ *           commands instead of returning results
+ *         - (Advanced)The this pointer of the script suffix is the action
+ *           execution subject involved
+ *         - E.g.:
+ *           <skill item triggers subjectCnt switch event: 1, 2> will reserve
+ *           the common event with id 2 when the action involved executed by
+ *           the action execution subject involved is just countered by the
+ *           attack of a target if the game switch with id 1 is on
+ *      (v1.01a+)13. subjectMrf condSuffix eventSuffix: condEntry, eventEntry
+ *         - Triggers what specified in eventEntry on the action execution
+ *           subject involved when the action involved is just reflected by a
+ *           target if condEntry returns a truthy result
+ *         - condSuffix can be val, switch or script
+ *         - eventEntry can be event or script
+ *         - The result of condEntry can be anything as only whether it's
+ *           truthy matters
+ *         - If the result of condEntry is falsy, this notetag will be
+ *           discarded upon such use cases
+ *         - The result of eventEntry can be anything as it's supposed to run
+ *           commands instead of returning results
+ *         - (Advanced)The this pointer of the script suffix is the action
+ *           execution subject involved
+ *         - E.g.:
+ *           <skill item triggers subjectMrf val script: true, 3> will always
+ *           run the JavaScript codes stored as a string in variable with id 3
+ *           when the action involved executed by the action execution subject
+ *           involved is just reflected by a target
+ *      (v1.01a+)14. subjectCri condSuffix eventSuffix: condEntry, eventEntry
+ *         - Triggers what specified in eventEntry on the action execution
+ *           subject involved when the action involved just critically hit a
+ *           target if condEntry returns a truthy result
+ *         - condSuffix can be val, switch or script
+ *         - eventEntry can be event or script
+ *         - The result of condEntry can be anything as only whether it's
+ *           truthy matters
+ *         - If the result of condEntry is falsy, this notetag will be
+ *           discarded upon such use cases
+ *         - The result of eventEntry can be anything as it's supposed to run
+ *           commands instead of returning results
+ *         - The subjectCri skill/item trigger also applies to counter
+ *           attack, but with the action execution subject involved being that
+ *           countering the attack
+ *         - The subjectCri skill/item trigger also applies to magic
+ *           reflection, but with the action execution subject involved being
+ *           that reflecting the magic
+ *         - (Advanced)The this pointer of the script suffix is the action
+ *           execution subject involved
+ *         - E.g.:
+ *           <skill item triggers subjectCri switch event: 1, 2> will reserve
+ *           the common event with id 2 when the action involved executed by
+ *           the action execution subject involved just critically hit a
+ *           target if the game switch with id 1 is on
+ *      (v1.01a+)15. subjectNorm condSuffix eventSuffix: condEntry, eventEntry
+ *         - Triggers what specified in eventEntry on the action execution
+ *           subject involved when the action involved is just executed
+ *           normally on a target if condEntry returns a truthy result
+ *         - condSuffix can be val, switch or script
+ *         - eventEntry can be event or script
+ *         - The result of condEntry can be anything as only whether it's
+ *           truthy matters
+ *         - If the result of condEntry is falsy, this notetag will be
+ *           discarded upon such use cases
+ *         - The result of eventEntry can be anything as it's supposed to run
+ *           commands instead of returning results
+ *         - The subjectNorm skill/item trigger also applies to counter
+ *           attack, but with the action execution subject involved being that
+ *           countering the attack
+ *         - The subjectNorm skill/item trigger also applies to magic
+ *           reflection, but with the action execution subject involved being
+ *           that reflecting the magic
+ *         - (Advanced)The this pointer of the script suffix is the action
+ *           execution subject involved
+ *         - E.g.:
+ *           <skill item triggers subjectNorm val script: true, 3> will always
+ *           run the JavaScript codes stored as a string in variable with id 3
+ *           when the action involved executed by the action execution subject
+ *           involved is just executed normally on a target
+ *      (v1.01a+)16. subjectSubstitute condSuffix eventSuffix: condEntry, eventEntry
+ *         - Triggers what specified in eventEntry on the action execution
+ *           subject involved when the action involved just hit a substitute
+ *           if condEntry returns a truthy result
+ *         - condSuffix can be val, switch or script
+ *         - eventEntry can be event or script
+ *         - The result of condEntry can be anything as only whether it's
+ *           truthy matters
+ *         - If the result of condEntry is falsy, this notetag will be
+ *           discarded upon such use cases
+ *         - The result of eventEntry can be anything as it's supposed to run
+ *           commands instead of returning results
+ *         - (Advanced)The this pointer of the script suffix is the action
+ *           execution subject involved
+ *         - E.g.:
+ *           <skill item triggers subjectSubstitute switch event: 1, 2> will
+ *           reserve the common event with id 2 when the action involved
+ *           executed by the action execution subject just hit a substitute if
+ *           the game switch with id 1 is on
  *============================================================================
  *    ## Script Call Info
  *----------------------------------------------------------------------------
@@ -616,7 +1008,7 @@ var DoubleX_RMMZ = DoubleX_RMMZ || {}; // var must be used or game will crash
     // Separates the version numbers with the rest to make the former more clear
     DoubleX_RMMZ.Skill_Item_Triggers = {
         PLUGIN_NAME: name,
-        VERSIONS: { codebase: "1.1.0", plugin: "v1.00b" }
+        VERSIONS: { codebase: "1.1.1", plugin: "v1.01a" }
     }; // DoubleX_RMMZ.Skill_Item_Triggers
     //
 
@@ -674,58 +1066,100 @@ if (DoubleX_RMMZ.Enhanced_Codebase) {
     MZ_EC.loadDataManagerNotetags(SIT, {
         miss: {
             suffix1: MZ_EC.BOOL_SUFFIXES, // condSuffix
-            suffix2: MZ_EC.VAL_SUFFIXES, // eventSuffix
+            suffix2: MZ_EC.EVENT_SUFFIXES, // eventSuffix
             entry1: MZ_EC.BOOL_ENTRY, // condEntry
             entry2: MZ_EC.NUM_ENTRY // eventEntry
         }, // miss
         eva: {
             suffix1: MZ_EC.BOOL_SUFFIXES, // condSuffix
-            suffix2: MZ_EC.VAL_SUFFIXES, // eventSuffix
+            suffix2: MZ_EC.EVENT_SUFFIXES, // eventSuffix
             entry1: MZ_EC.BOOL_ENTRY, // condEntry
             entry2: MZ_EC.NUM_ENTRY // eventEntry
         }, // eva
         cnt: {
             suffix1: MZ_EC.BOOL_SUFFIXES, // condSuffix
-            suffix2: MZ_EC.VAL_SUFFIXES, // eventSuffix
+            suffix2: MZ_EC.EVENT_SUFFIXES, // eventSuffix
             entry1: MZ_EC.BOOL_ENTRY, // condEntry
             entry2: MZ_EC.NUM_ENTRY // eventEntry
         }, // cnt
         mrf: {
             suffix1: MZ_EC.BOOL_SUFFIXES, // condSuffix
-            suffix2: MZ_EC.VAL_SUFFIXES, // eventSuffix
+            suffix2: MZ_EC.EVENT_SUFFIXES, // eventSuffix
             entry1: MZ_EC.BOOL_ENTRY, // condEntry
             entry2: MZ_EC.NUM_ENTRY // eventEntry
         }, // mrf
         cri: {
             suffix1: MZ_EC.BOOL_SUFFIXES, // condSuffix
-            suffix2: MZ_EC.VAL_SUFFIXES, // eventSuffix
+            suffix2: MZ_EC.EVENT_SUFFIXES, // eventSuffix
             entry1: MZ_EC.BOOL_ENTRY, // condEntry
             entry2: MZ_EC.NUM_ENTRY // eventEntry
         }, // cri
         norm: {
             suffix1: MZ_EC.BOOL_SUFFIXES, // condSuffix
-            suffix2: MZ_EC.VAL_SUFFIXES, // eventSuffix
+            suffix2: MZ_EC.EVENT_SUFFIXES, // eventSuffix
             entry1: MZ_EC.BOOL_ENTRY, // condEntry
             entry2: MZ_EC.NUM_ENTRY // eventEntry
         }, // norm
         substitute: {
             suffix1: MZ_EC.BOOL_SUFFIXES, // condSuffix
-            suffix2: MZ_EC.VAL_SUFFIXES, // eventSuffix
+            suffix2: MZ_EC.EVENT_SUFFIXES, // eventSuffix
             entry1: MZ_EC.BOOL_ENTRY, // condEntry
             entry2: MZ_EC.NUM_ENTRY // eventEntry
         }, // substitute
         pre: {
             suffix1: MZ_EC.BOOL_SUFFIXES, // condSuffix
-            suffix2: MZ_EC.VAL_SUFFIXES, // eventSuffix
+            suffix2: MZ_EC.EVENT_SUFFIXES, // eventSuffix
             entry1: MZ_EC.BOOL_ENTRY, // condEntry
             entry2: MZ_EC.NUM_ENTRY // eventEntry
         }, // pre
         post: {
             suffix1: MZ_EC.BOOL_SUFFIXES, // condSuffix
-            suffix2: MZ_EC.VAL_SUFFIXES, // eventSuffix
+            suffix2: MZ_EC.EVENT_SUFFIXES, // eventSuffix
             entry1: MZ_EC.BOOL_ENTRY, // condEntry
             entry2: MZ_EC.NUM_ENTRY // eventEntry
-        } // post
+        }, // post
+        subjectMiss: {
+            suffix1: MZ_EC.BOOL_SUFFIXES, // condSuffix
+            suffix2: MZ_EC.EVENT_SUFFIXES, // eventSuffix
+            entry1: MZ_EC.BOOL_ENTRY, // condEntry
+            entry2: MZ_EC.NUM_ENTRY // eventEntry
+        }, // subjectMiss
+        subjectEva: {
+            suffix1: MZ_EC.BOOL_SUFFIXES, // condSuffix
+            suffix2: MZ_EC.EVENT_SUFFIXES, // eventSuffix
+            entry1: MZ_EC.BOOL_ENTRY, // condEntry
+            entry2: MZ_EC.NUM_ENTRY // eventEntry
+        }, // subjectEva
+        subjectCnt: {
+            suffix1: MZ_EC.BOOL_SUFFIXES, // condSuffix
+            suffix2: MZ_EC.EVENT_SUFFIXES, // eventSuffix
+            entry1: MZ_EC.BOOL_ENTRY, // condEntry
+            entry2: MZ_EC.NUM_ENTRY // eventEntry
+        }, // subjectCnt
+        subjectMrf: {
+            suffix1: MZ_EC.BOOL_SUFFIXES, // condSuffix
+            suffix2: MZ_EC.EVENT_SUFFIXES, // eventSuffix
+            entry1: MZ_EC.BOOL_ENTRY, // condEntry
+            entry2: MZ_EC.NUM_ENTRY // eventEntry
+        }, // subjectMrf
+        subjectCri: {
+            suffix1: MZ_EC.BOOL_SUFFIXES, // condSuffix
+            suffix2: MZ_EC.EVENT_SUFFIXES, // eventSuffix
+            entry1: MZ_EC.BOOL_ENTRY, // condEntry
+            entry2: MZ_EC.NUM_ENTRY // eventEntry
+        }, // subjectCri
+        subjectNorm: {
+            suffix1: MZ_EC.BOOL_SUFFIXES, // condSuffix
+            suffix2: MZ_EC.EVENT_SUFFIXES, // eventSuffix
+            entry1: MZ_EC.BOOL_ENTRY, // condEntry
+            entry2: MZ_EC.NUM_ENTRY // eventEntry
+        }, // subjectNorm
+        subjectSubstitute: {
+            suffix1: MZ_EC.BOOL_SUFFIXES, // condSuffix
+            suffix2: MZ_EC.EVENT_SUFFIXES, // eventSuffix
+            entry1: MZ_EC.BOOL_ENTRY, // condEntry
+            entry2: MZ_EC.NUM_ENTRY // eventEntry
+        } // subjectSubstitute
     }, {
         $dataActors: "actor",
         $dataClasses: "class",
@@ -749,7 +1183,7 @@ if (DoubleX_RMMZ.Enhanced_Codebase) {
 
     "use strict";
 
-    const {
+    const NOTES = Array.from(SIT.DataManager.new.NOTETAG_PAIRS.keys()), {
         NEW,
         ORIG,
         extendFunc
@@ -793,23 +1227,45 @@ if (DoubleX_RMMZ.Enhanced_Codebase) {
         return realTarget;
     }); // v1.00a - v1.00a
 
+    NEW._SUBJECT_NOTETAG_NAME = notetagName => {
+        return `subject${notetagName[0].toUpperCase()}${notetagName.slice(1)}`;
+    }; // NEW._SUBJECT_NOTETAG_NAME
     /**
-     * @author DoubleX @interface @since v1.00a @version v1.00a
+     * @author DoubleX @interface @since v1.00a @version v1.01a
      * @param {Game_Battler} battler - The battler as the context of the scripts
      * @enum @param {string} notetagName - Check DataManager NEW.NOTETAG_PAIRS
      * @param {Game_Action} act - The currently executing action
      */
     NEW.runTriggers = function(battler, notetagName, act) {
+        const [item, subject] = [act.item(), act.subject()];
+        NEW._runBattlerTriggers.call(this, battler, notetagName, item);
+        // Notetags without subject counterparts
+        if (battler === subject) return;
+        //
+        const subjectNotetagName = NEW._SUBJECT_NOTETAG_NAME(notetagName);
+        /** @todo Figures out why pre and post notetags can even reach here */
+        if (!NOTES.includes(subjectNotetagName)) return; // Just to play safe
+        //
+        NEW._runBattlerTriggers.call(this, subject, subjectNotetagName, item);
+    }; // NEW.runTriggers
+
+    /**
+     * @author DoubleX @since v1.01a @version v1.01a
+     * @param {Game_Battler} battler - The battler as the context of the scripts
+     * @enum @param {string} notetagName - Check DataManager NEW.NOTETAG_PAIRS
+     * @param {DataSkill/DataItem} item - The currently executing skill/item
+     */
+    NEW._runBattlerTriggers = function(battler, notetagName, item) {
         const containerName = "skillItemTriggers";
         MZ_EC.clearBattlerNotetagCache(battler, containerName);
         const latestSkillItem = battler.latestSkillItems;
-        battler.latestSkillItems = [act.item()];
+        battler.latestSkillItems = [item];
         const suffix = "NotetagDataTypePriorities";
         const t = $gameSystem.skillItemTriggersParam(`${notetagName}${suffix}`);
         MZ_EC.runCondEventNotetags(battler, t, containerName, [notetagName]);
         battler.latestSkillItems = latestSkillItem;
         MZ_EC.clearBattlerNotetagCache(battler, containerName);
-    }; // NEW.runTriggers
+    }; // NEW._runBattlerTriggers
 
 })(BattleManager, DoubleX_RMMZ.Enhanced_Codebase,
         DoubleX_RMMZ.Skill_Item_Triggers);
