@@ -1739,14 +1739,14 @@ if (DoubleX_RMMZ.Enhanced_Codebase) {
     const { ORIG } = MZ_EC.setKlassContainer(klassName, $, TPBSCE);
     const EC_SG = MZ_EC[klassName].new, SG = TPBSCE[klassName];
 
-    MZ_EC.rewriteFunc(EC_SG, SG, "validCurTimeVal", function() {
+    MZ_EC.extendFunc(EC_SG, SG, "validCurTimeVal", function() {
         // Added to show the tpb casting progress as well
         if (this._battler.isTpbCasting()) return this._battler.tpbCastTime();
         //
         return ORIG.validCurTimeVal.apply(this, arguments);
     }); // v1.01a - v1.01a
 
-    MZ_EC.rewriteFunc(EC_SG, SG, "validCurMaxTimeVal", function() {
+    MZ_EC.extendFunc(EC_SG, SG, "validCurMaxTimeVal", function() {
         // Edited to show the tpb casting progress as well
         if (this._battler.isTpbCasting()) {
             return this._battler.tpbRequiredCastTime();
@@ -1755,7 +1755,7 @@ if (DoubleX_RMMZ.Enhanced_Codebase) {
     }); // v1.01a - v1.01a
 
     ["1", "2"].forEach(num => {
-        MZ_EC.rewriteFunc(EC_SG, SG, `timeGaugeColor${num}`, function() {
+        MZ_EC.extendFunc(EC_SG, SG, `timeGaugeColor${num}`, function() {
             // Edited to use the customized tpb gauge sprite color instead
             if (this._battler.isTpbCharging()) {
                 return PF.get(`tpbChargeGaugeColor${num}`).call(this);
