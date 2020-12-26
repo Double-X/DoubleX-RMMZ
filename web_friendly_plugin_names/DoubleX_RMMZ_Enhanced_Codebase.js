@@ -557,15 +557,27 @@ var DoubleX_RMMZ = DoubleX_RMMZ || {}; // var must be used or game will crash
     }; // CORE._RETURNED_ENTRY_VAL
     CORE._RETURNED_ENTRY_SWITCH = entry => {
         const switchId = +entry;
-        return function() { return $gameSwitches.value(switchId); };
+        return () => $gameSwitches.value(switchId);
     }; // CORE._RETURNED_ENTRY_SWITCH
     CORE._RETURNED_ENTRY_VAR = entry => {
         const varId = +entry;
-        return function() { return $gameVariables.value(varId); };
+        return () => $gameVariables.value(varId);
     }; // CORE._RETURNED_ENTRY_VAR
     // The script function will be reloaded upon setting the variables anyway
     CORE._RETURNED_ENTRY_SCRIPT = () => () => {};
     //
+    CORE._ENTRY_EVENT = entry => {
+        const eventId = +entry;
+        return () => {
+            /** @todo Verifies whether running common events instantly's safe */
+            $gameTemp.reserveCommonEvent(eventId);
+            const interpreter = new Game_Interpreter();
+            interpreter.clear();
+            interpreter.setupReservedCommonEvent();
+            interpreter.update();
+            //
+        };
+    }; // CORE._ENTRY_EVENT
     CORE._SUFFIX_ENTRY_FUNC = function(notePairs, notetagType, suffix, entry, count) {
         switch (suffix) {
             case "val": return CORE._RETURNED_ENTRY_VAL(
@@ -573,6 +585,7 @@ var DoubleX_RMMZ = DoubleX_RMMZ || {}; // var must be used or game will crash
             case "switch": return CORE._RETURNED_ENTRY_SWITCH(entry);
             case "var": return CORE._RETURNED_ENTRY_VAR(entry);
             case "script": return CORE._RETURNED_ENTRY_SCRIPT();
+            case "event": return CORE._ENTRY_EVENT(entry);
             // There's not enough context to throw errors meaningfully
             default: return CORE._STRING_VAL;
             //
@@ -5826,7 +5839,7 @@ var DoubleX_RMMZ = DoubleX_RMMZ || {}; // var must be used or game will crash
 
     const {
         rewriteFunc
-    } = MZ_EC.setKlassContainer("Game_Map", $.prototype, MZ_EC);
+    } = MZ_EC.setKlassContainer("Game_Map", $, MZ_EC);
 
     rewriteFunc("roundXWithDirection", function(x, d) {
         // Edited to help plugins alter round x with direction in better ways
@@ -5840,7 +5853,7 @@ var DoubleX_RMMZ = DoubleX_RMMZ || {}; // var must be used or game will crash
         //
     }); // v0.00a - v0.00a
 
-})(Game_Map, DoubleX_RMMZ.Enhanced_Codebase);
+})(Game_Map.prototype, DoubleX_RMMZ.Enhanced_Codebase);
 
 /*----------------------------------------------------------------------------
  *    # Edited class: Game_CharacterBase
@@ -5854,7 +5867,7 @@ var DoubleX_RMMZ = DoubleX_RMMZ || {}; // var must be used or game will crash
     const {
         rewriteFunc,
         NEW
-    } = MZ_EC.setKlassContainer("Game_CharacterBase", $.prototype, MZ_EC);
+    } = MZ_EC.setKlassContainer("Game_CharacterBase", $, MZ_EC);
 
     rewriteFunc("moveStraight", function(d) {
         this.setMovementSuccess(this.canPass(this._x, this._y, d));
@@ -5939,7 +5952,7 @@ var DoubleX_RMMZ = DoubleX_RMMZ || {}; // var must be used or game will crash
         this._realY = $gameMap.yWithDirection(this._y, this.reverseDir(vert));
     }; // NEW._updateDiagonalXY
 
-})(Game_CharacterBase, DoubleX_RMMZ.Enhanced_Codebase);
+})(Game_CharacterBase.prototype, DoubleX_RMMZ.Enhanced_Codebase);
 
 /*----------------------------------------------------------------------------
  *    # Edited class: Game_Player
@@ -5953,7 +5966,7 @@ var DoubleX_RMMZ = DoubleX_RMMZ || {}; // var must be used or game will crash
     const $$ = Game_Character.prototype, {
         rewriteFunc,
         NEW
-    } = MZ_EC.setKlassContainer("Game_Player", $.prototype, MZ_EC);
+    } = MZ_EC.setKlassContainer("Game_Player", $, MZ_EC);
 
     rewriteFunc("update", function(sceneActive) {
         const lastScrolledX = this.scrolledX();
@@ -5980,7 +5993,7 @@ var DoubleX_RMMZ = DoubleX_RMMZ || {}; // var must be used or game will crash
         this.increaseSteps();
     }; // NEW._onMoveDiagonallySuc
 
-})(Game_Player, DoubleX_RMMZ.Enhanced_Codebase);
+})(Game_Player.prototype, DoubleX_RMMZ.Enhanced_Codebase);
 
 /*----------------------------------------------------------------------------
  *    # Edited class: Game_Interpreter
@@ -6216,7 +6229,7 @@ var DoubleX_RMMZ = DoubleX_RMMZ || {}; // var must be used or game will crash
         ORIG,
         extendFunc,
         rewriteFunc,
-    } = MZ_EC.setKlassContainer("Scene_Battle", $.prototype, MZ_EC);
+    } = MZ_EC.setKlassContainer("Scene_Battle", $, MZ_EC);
 
     [
         "commandAttack",
@@ -6272,7 +6285,7 @@ var DoubleX_RMMZ = DoubleX_RMMZ || {}; // var must be used or game will crash
         this._actorCommandWindow.setup(actor);
     }; // NEW._startActorCmdSelection
 
-})(Scene_Battle, DoubleX_RMMZ.Enhanced_Codebase);
+})(Scene_Battle.prototype, DoubleX_RMMZ.Enhanced_Codebase);
 
 /*----------------------------------------------------------------------------*/
 
@@ -6292,12 +6305,24 @@ var DoubleX_RMMZ = DoubleX_RMMZ || {}; // var must be used or game will crash
     const {
         NEW,
         rewriteFunc
-    } = MZ_EC.setKlassContainer("Sprite_Gauge", $.prototype, MZ_EC);
+    } = MZ_EC.setKlassContainer("Sprite_Gauge", $, MZ_EC);
 
     rewriteFunc("gaugeX", function() {
         // Edited to break different bar type behaviors into separate methods
         const gaugeXFunc = NEW._GAUGE_X_FUNCS[this._statusType];
         return NEW[gaugeXFunc || "defaultGaugeX"].call(this);
+        //
+    }); // v0.00a - v0.00a
+
+    rewriteFunc("updateBitmap", function() {
+        const [val, maxVal] = [this.currentValue(), this.currentMaxValue()];
+        // Edited to help plugins alter update bitmap behaviors in better ways
+        if (NEW._isUpdateTargetVal.call(val, maxVal)) {
+            this.updateTargetValue(val, maxVal);
+        }
+        //
+        this.updateGaugeAnimation();
+        this.updateFlashing();
         //
     }); // v0.00a - v0.00a
 
@@ -6723,6 +6748,18 @@ var DoubleX_RMMZ = DoubleX_RMMZ || {}; // var must be used or game will crash
 
     /**
      * The this pointer is Sprite_Gauge.prototype
+     * Hotspot/Nullipotent
+     * @author DoubleX @since v0.00a @version v0.00a
+     * @param {number} val - The target value of the bitmap to be updated
+     * @param {number} maxVal - The target max value of the bitmap to be updated
+     * @returns {boolean} Whether the target value of the bitmap's to be updated
+     */
+    NEW._isUpdateTargetVal = function(val, maxVal) {
+        return val !== this._targetValue || maxVal !== this._targetMaxValue;
+    }; // NEW._isUpdateTargetVal
+
+    /**
+     * The this pointer is Sprite_Gauge.prototype
      * Idempotent
      * @author DoubleX @since v0.00a @version v0.00a
      */
@@ -6732,6 +6769,100 @@ var DoubleX_RMMZ = DoubleX_RMMZ || {}; // var must be used or game will crash
         if (drawTextFunc) NEW[drawTextFunc].call(this);
     }; // NEW._redraw
 
-})(Sprite_Gauge, DoubleX_RMMZ.Enhanced_Codebase);
+})(Sprite_Gauge.prototype, DoubleX_RMMZ.Enhanced_Codebase);
+
+/*----------------------------------------------------------------------------*/
+
+/*----------------------------------------------------------------------------
+ *    ## Sprites
+ *----------------------------------------------------------------------------*/
+
+/*----------------------------------------------------------------------------
+ *    # Edited class: Window_Selectable
+ *      - Makes this class better at adding bar types/editing their behaviors
+ *----------------------------------------------------------------------------*/
+
+(($, MZ_EC) => {
+
+    "use strict";
+
+    const {
+        NEW,
+        rewriteFunc
+    } = MZ_EC.setKlassContainer("Window_Selectable", $, MZ_EC);
+
+    rewriteFunc("processCursorMove", function() {
+        // Edited to help plugins alter process cursor move in better ways
+        if (this.isCursorMovable()) NEW._procMovableCursor.call(this);
+        //
+    }); // v0.00a - v0.00a
+
+    rewriteFunc("processHandling", function() {
+        // Edited to help plugins alter process handling behavior in better ways
+        if (this.isOpenAndActive()) this.procOpenActiveHandling();
+        //
+    }); // v0.00a - v0.00a
+
+    rewriteFunc("processTouch", function() {
+        // Edited to help plugins alter process touch behaviors in better ways
+        if (this.isOpenAndActive()) this.procOpenActiveTouch();
+        //
+    }); // v0.00a - v0.00a
+
+    /**
+     * Hotspot
+     * @author DoubleX @interface @since v0.00a @version v0.00a
+     */
+    $.procOpenActiveHandling = function() {
+        if (this.isOkEnabled() && this.isOkTriggered()) return this.processOk();
+        if (this.isCancelEnabled() && this.isCancelTriggered()) {
+            return this.processCancel();
+        }
+        if (this.isHandled("pagedown") && Input.isTriggered("pagedown")) {
+            return this.processPagedown();
+        } else if (this.isHandled("pageup") && Input.isTriggered("pageup")) {
+            return this.processPageup();
+        }
+    }; // $.procOpenActiveHandling
+
+    /**
+     * Hotspot
+     * @author DoubleX @interface @since v0.00a @version v0.00a
+     */
+    $.procOpenActiveTouch = function() {
+        if (this.isHoverEnabled() && TouchInput.isHovered()) {
+            this.onTouchSelect(false);
+        } else if (TouchInput.isTriggered()) this.onTouchSelect(true);
+        if (TouchInput.isClicked()) return this.onTouchOk();
+        if (TouchInput.isCancelled()) this.onTouchCancel();
+    }; // $.procOpenActiveTouch
+
+    /**
+     * The this pointer is Window_Selectable.prototype
+     * Hotspot
+     * @author DoubleX @since v0.00a @version v0.00a
+     */
+    NEW._procMovableCursor = function() {
+        const lastIndex = this.index();
+        if (Input.isRepeated("down")) {
+            this.cursorDown(Input.isTriggered("down"));
+        }
+        if (Input.isRepeated("up")) this.cursorUp(Input.isTriggered("up"));
+        if (Input.isRepeated("right")) {
+            this.cursorRight(Input.isTriggered("right"));
+        }
+        if (Input.isRepeated("left")) {
+            this.cursorLeft(Input.isTriggered("left"));
+        }
+        if (!this.isHandled("pagedown") && Input.isTriggered("pagedown")) {
+            this.cursorPagedown();
+        }
+        if (!this.isHandled("pageup") && Input.isTriggered("pageup")) {
+            this.cursorPageup();
+        }
+        if (this.index() !== lastIndex) this.playCursorSound();
+    }; // NEW._procMovableCursor
+
+})(Window_Selectable.prototype, DoubleX_RMMZ.Enhanced_Codebase);
 
 /*============================================================================*/
