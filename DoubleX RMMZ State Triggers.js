@@ -469,31 +469,31 @@ if (DoubleX_RMMZ.Enhanced_Codebase) {
     MZ_EC.loadDataManagerNotetags(ST, {
         add: {
             suffix1: MZ_EC.BOOL_SUFFIXES, // condSuffix
-            suffix2: MZ_EC.VAL_SUFFIXES, // eventSuffix
+            suffix2: MZ_EC.EVENT_SUFFIXES, // eventSuffix
             entry1: MZ_EC.BOOL_ENTRY, // condEntry
             entry2: MZ_EC.NUM_ENTRY // eventEntry
         }, // add
         remove: {
             suffix1: MZ_EC.BOOL_SUFFIXES, // condSuffix
-            suffix2: MZ_EC.VAL_SUFFIXES, // eventSuffix
+            suffix2: MZ_EC.EVENT_SUFFIXES, // eventSuffix
             entry1: MZ_EC.BOOL_ENTRY, // condEntry
             entry2: MZ_EC.NUM_ENTRY // eventEntry
         }, // remove
         reset: {
             suffix1: MZ_EC.BOOL_SUFFIXES, // condSuffix
-            suffix2: MZ_EC.VAL_SUFFIXES, // eventSuffix
+            suffix2: MZ_EC.EVENT_SUFFIXES, // eventSuffix
             entry1: MZ_EC.BOOL_ENTRY, // condEntry
             entry2: MZ_EC.NUM_ENTRY // eventEntry
         }, // reset
         expire: {
             suffix1: MZ_EC.BOOL_SUFFIXES, // condSuffix
-            suffix2: MZ_EC.VAL_SUFFIXES, // eventSuffix
+            suffix2: MZ_EC.EVENT_SUFFIXES, // eventSuffix
             entry1: MZ_EC.BOOL_ENTRY, // condEntry
             entry2: MZ_EC.NUM_ENTRY // eventEntry
         }, // expire
         turn: {
             suffix1: MZ_EC.BOOL_SUFFIXES, // condSuffix
-            suffix2: MZ_EC.VAL_SUFFIXES, // eventSuffix
+            suffix2: MZ_EC.EVENT_SUFFIXES, // eventSuffix
             entry1: MZ_EC.BOOL_ENTRY, // condEntry
             entry2: MZ_EC.NUM_ENTRY // eventEntry
         } // turn
