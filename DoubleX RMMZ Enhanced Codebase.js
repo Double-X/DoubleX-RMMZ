@@ -987,6 +987,34 @@ var DoubleX_RMMZ = DoubleX_RMMZ || {}; // var must be used or game will crash
                 battler, priorities, containerName, notetagTypes_, initVal);
     }; // MZ_EC.condOpValNotetagVal
 
+    MZ_EC._IS_RUN_EVENTS = (battler, pairs, isRunEvents) => {
+        // The cond op pairs are invalid so the whole notetag's skipped
+        if (!pairs.has("func1") || !pairs.has("func2")) return isRunEvents;
+        //
+        const isCondMet = pairs.get("func1").call(battler);
+        switch (pairs.get("func2").call(battler).toUpperCase()) {
+            case "AND": return isRunEvents && isCondMet;
+            case "OR": return isRunEvents || isCondMet;
+            // The op's invalid so the whole notetag's skipped
+            default: return isRunEvents;
+            //
+        }
+    }; // MZ_EC._IS_RUN_EVENTS
+    MZ_EC.condOpEventNotetags = (battler, priorities, containerName, notetagTypes_) => {
+        const events = [], notetags = MZ_EC.notetags(
+                battler, priorities, containerName, notetagTypes_);
+        let isRunEvents = false;
+        for (const { pairs } of notetags) {
+            isRunEvents = MZ_EC._IS_RUN_EVENTS(battler, pairs, isRunEvents);
+            // If just the events are invalid then no need to skip whole notetag
+            if (pairs.has("func3")) events.push(pairs.get("func3"));
+            //
+        }
+        // Either all events are run or no events are run
+        return isRunEvents && events;
+        // Returning array means the conditions are met when combined
+    }; // MZ_EC.condOpEventNotetags
+
     MZ_EC.runCondEventNotetags = (battler, priorities, containerName, notetagTypes_) => {
         const notetags = MZ_EC.notetags(
                 battler, priorities, containerName, notetagTypes_);
@@ -6791,6 +6819,28 @@ var DoubleX_RMMZ = DoubleX_RMMZ || {}; // var must be used or game will crash
         rewriteFunc
     } = MZ_EC.setKlassContainer("Window_Selectable", $, MZ_EC);
 
+    rewriteFunc("cursorDown", function(wrap) {
+        // Edited to help plugins alter cursor down behaviors in better ways
+        const index = this.index();
+        const [maxItems, maxCols] = [this.maxItems(), this.maxCols()];
+        const isSmoothSelectDown = NEW._isSmoothSelectDown.call(
+                this, index, maxItems, maxCols, wrap);
+        if (isSmoothSelectDown) this.smoothSelect(
+              NEW._smoothSelectDownIndex.call(this, index, maxItems, maxCols));
+        //
+    }); // v0.00a - v0.00a
+
+    rewriteFunc("cursorUp", function(wrap) {
+        // Edited to help plugins alter cursor up behaviors in better ways
+        const index = Math.max(0, this.index());
+        const [maxItems, maxCols] = [this.maxItems(), this.maxCols()];
+        const isSmoothSelectUp = NEW._isSmoothSelectUp.call(
+                this, index, maxItems, maxCols, wrap);
+        if (isSmoothSelectUp) this.smoothSelect(
+              NEW._smoothSelectUpIndex.call(this, index, maxItems, maxCols));
+        //
+    }); // v0.00a - v0.00a
+
     rewriteFunc("processCursorMove", function() {
         // Edited to help plugins alter process cursor move in better ways
         if (this.isCursorMovable()) NEW._procMovableCursor.call(this);
@@ -6836,6 +6886,60 @@ var DoubleX_RMMZ = DoubleX_RMMZ || {}; // var must be used or game will crash
         if (TouchInput.isClicked()) return this.onTouchOk();
         if (TouchInput.isCancelled()) this.onTouchCancel();
     }; // $.procOpenActiveTouch
+
+    /**
+     * The this pointer is Window_Selectable.prototype
+     * Hotspot
+     * @author DoubleX @since v0.00a @version v0.00a
+     * @param {number} index - The current selection index
+     * @param {number} maxItems - The maximum number of items in the selections
+     * @param {number} maxCols - The maximum number of columns in the selections
+     * @param {boolean} wrap - Whether the cursor can be wrapped
+     * @returns {boolean} Whether the cursor down's a smooth select downwards
+     */
+    NEW._isSmoothSelectDown = function(index, maxItems, maxCols, wrap) {
+        return index < maxItems - maxCols || (wrap && maxCols === 1);
+    }; // NEW._isSmoothSelectDown
+
+    /**
+     * The this pointer is Window_Selectable.prototype
+     * Hotspot
+     * @author DoubleX @since v0.00a @version v0.00a
+     * @param {number} index - The current selection index
+     * @param {number} maxItems - The maximum number of items in the selections
+     * @param {number} maxCols - The maximum number of columns in the selections
+     * @returns {number} The smooth select down index as the new selection index
+     */
+    NEW._smoothSelectDownIndex = function(index, maxItems, maxCols) {
+        return (index + maxCols) % maxItems;
+    }; // NEW._smoothSelectDownIndex
+
+    /**
+     * The this pointer is Window_Selectable.prototype
+     * Hotspot
+     * @author DoubleX @since v0.00a @version v0.00a
+     * @param {number} index - The current selection index
+     * @param {number} maxItems - The maximum number of items in the selections
+     * @param {number} maxCols - The maximum number of columns in the selections
+     * @param {boolean} wrap - Whether the cursor can be wrapped
+     * @returns {boolean} Whether the cursor up's a smooth select upwards
+     */
+    NEW._isSmoothSelectUp = function(index, maxItems, maxCols, wrap) {
+        return index >= maxCols || (wrap && maxCols === 1);
+    }; // NEW._isSmoothSelectUp
+
+    /**
+     * The this pointer is Window_Selectable.prototype
+     * Hotspot
+     * @author DoubleX @since v0.00a @version v0.00a
+     * @param {number} index - The current selection index
+     * @param {number} maxItems - The maximum number of items in the selections
+     * @param {number} maxCols - The maximum number of columns in the selections
+     * @returns {number} The smooth select up index as the new selection index
+     */
+    NEW._smoothSelectUpIndex = function(index, maxItems, maxCols) {
+        return (index - maxCols + maxItems) % maxItems;
+    }; // NEW._smoothSelectUpIndex
 
     /**
      * The this pointer is Window_Selectable.prototype
