@@ -731,7 +731,7 @@ var DoubleX_RMMZ = DoubleX_RMMZ || {}; // var must be used or game will crash
         if (battler.isEnemy()) return `{"i":${battler.index()}}`;
         return "";
     }; // CORE._BATTLER_CACHE_KEY
-    CORE._ARRAY_CACHE_KEY = JSON.stringify;
+    CORE._ARRAY_CACHE_KEY = JSON.stringify.bind(JSON);
     CORE._IS_VALID_CACHE = cache => cache !== null && cache !== undefined;
 
     CORE._ACTOR_NOTETAG_DATA = battler => {
@@ -948,7 +948,7 @@ var DoubleX_RMMZ = DoubleX_RMMZ || {}; // var must be used or game will crash
         }
         battlerNotetagTypeCache.get(notetagTypeKey).set(initVal, notetagVal);
     }; // CORE._CACHE_BATTLER_NOTETAG_VAL
-    CORE._NEW_NOTETAG_VAL = (battler, priorities, containerName, notetagTypes_, initVal) => {
+    CORE._NEW_COND_OP_NOTETAG_VAL = (battler, priorities, containerName, notetagTypes_, initVal) => {
         const notetags = MZ_EC.notetags(
                 battler, priorities, containerName, notetagTypes_);
         const notetagVal = notetags.reduce(
@@ -956,7 +956,7 @@ var DoubleX_RMMZ = DoubleX_RMMZ || {}; // var must be used or game will crash
         CORE._CACHE_BATTLER_NOTETAG_VAL(battler, priorities, containerName,
                 notetagTypes_, initVal, notetagVal);
         return notetagVal;
-    }; // CORE._NEW_NOTETAG_VAL
+    }; // CORE._NEW_COND_OP_NOTETAG_VAL
     CORE._BATTLER_NOTETAG_CACHE_VAL_CONTAINER = (battlerNotetagContainerCache, containerName, notetagTypes_, initVal) => {
         if (!battlerNotetagContainerCache.has(containerName)) return undefined;
         const container = battlerNotetagContainerCache.get(containerName);
@@ -983,7 +983,7 @@ var DoubleX_RMMZ = DoubleX_RMMZ || {}; // var must be used or game will crash
         const cachedNotetagVal_ = CORE._CACHED_BATTLER_NOTETAG_VAL(
                 battler, priorities, containerName, notetagTypes_, initVal);
         if (CORE._IS_VALID_CACHE(cachedNotetagVal_)) return cachedNotetagVal_;
-        return CORE._NEW_NOTETAG_VAL(
+        return CORE._NEW_COND_OP_NOTETAG_VAL(
                 battler, priorities, containerName, notetagTypes_, initVal);
     }; // MZ_EC.condOpValNotetagVal
 
@@ -1000,26 +1000,31 @@ var DoubleX_RMMZ = DoubleX_RMMZ || {}; // var must be used or game will crash
             //
         }
     }; // MZ_EC._IS_RUN_EVENTS
-    MZ_EC.condOpEventNotetags = (battler, priorities, containerName, notetagTypes_) => {
-        const events = [], notetags = MZ_EC.notetags(
+    MZ_EC.condOpNotetagVal = (battler, priorities, containerName, notetagTypes_) => {
+        // It's needless to cache cond op because events are much more expensive
+        const notetags = MZ_EC.notetags(
                 battler, priorities, containerName, notetagTypes_);
-        let isRunEvents = false;
-        for (const { pairs } of notetags) {
-            isRunEvents = MZ_EC._IS_RUN_EVENTS(battler, pairs, isRunEvents);
-            // If just the events are invalid then no need to skip whole notetag
-            if (pairs.has("func3")) events.push(pairs.get("func3"));
-            //
-        }
-        // Either all events are run or no events are run
-        return isRunEvents && events;
-        // Returning array means the conditions are met when combined
-    }; // MZ_EC.condOpEventNotetags
+        return notetags.reduce((isRunEvents, { pairs }) => {
+            return MZ_EC._IS_RUN_EVENTS(battler, pairs, isRunEvents);
+        }, false);
+        // It implies missing timings if it repeatedly return false in hotspots
+    }; // MZ_EC.condOpNotetagVal
+
+    MZ_EC.runCondOpEventNotetags = (battler, priorities, containerName, notetagTypes_) => {
+      const notetags = MZ_EC.notetags(
+              battler, priorities, containerName, notetagTypes_);
+      // All events are run if the chained conditions are met
+      notetags.forEach(({ pairs }) => {
+          if (pairs.has("func3")) pairs.get("func3").call(battler);
+      });
+      //
+    }; // MZ_EC.runCondOpEventNotetags
 
     MZ_EC.runCondEventNotetags = (battler, priorities, containerName, notetagTypes_) => {
         const notetags = MZ_EC.notetags(
                 battler, priorities, containerName, notetagTypes_);
         notetags.forEach(({ pairs }) => {
-            if (!pairs.has("func1")) return;
+            if (!pairs.has("func1") || !pairs.has("func2")) return;
             if (!pairs.get("func1").call(battler)) return;
             pairs.get("func2").call(battler);
         });
