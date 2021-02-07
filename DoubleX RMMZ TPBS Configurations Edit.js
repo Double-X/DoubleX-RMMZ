@@ -38,6 +38,7 @@
  *    # Links
  *      Video:
  *      1. https://www.youtube.com/watch?v=Pq0evMuFvpQ
+ *      2.(v1.01a+)https://www.youtube.com/watch?v=6aWvpmzNjbA
  *      This Plugin:
  *      1. https://github.com/Double-X/DoubleX-RMMZ/blob/master/DoubleX%20RMMZ%20TPBS%20Configurations%20Edit.js
  *      Posts:
