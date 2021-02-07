@@ -549,7 +549,7 @@
  * @value enemy
  * @option Data of effective states
  * @value states
- * @desc Sets data type priorities of the subjectSubstitute notetags
+ * @desc Sets data type priorities of subjectSubstitute notetags
  * You can use script calls/plugin commands to change this
  * @default ["actor", "class", "latestSkillItem", "weapons", "armors", "enemy", "states"]
  *
@@ -567,8 +567,8 @@
  *          effective
  *       2. Each line can only have at most 1 notetag
  *       3. The following is the structure of all notetags in this plugin:
- *          - <doublex rmmz skill item triggers>
- *          - <skill item triggers>
+ *          - <doublex rmmz skill item triggers contents>
+ *          - <skill item triggers contents>
  *          Where contents are in the form of type suffixes: entries
  *          Either of the above can be used, but the 1st one reduce the chance
  *          of causing other plugins to treat the notetags of this plugin as
