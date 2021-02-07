@@ -42,6 +42,7 @@
  *    # Links
  *      Video:
  *      1. https://www.youtube.com/watch?v=nisV-fdFLGA
+ *      2.(v1.01a+) https://www.youtube.com/watch?v=OErYnHkNuQ4
  *      This Plugin:
  *      1. https://github.com/Double-X/DoubleX-RMMZ/blob/master/DoubleX%20RMMZ%20Skill%20Item%20Triggers.js
  *      Posts:
