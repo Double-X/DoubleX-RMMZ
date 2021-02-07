@@ -64,6 +64,7 @@
  *    # Links
  *      Video:
  *      1. https://www.youtube.com/watch?v=jS--0ODtLAY
+ *      2.(v1.02a+) https://www.youtube.com/watch?v=TzXnjJAdr3o
  *      This Plugin:
  *      1. https://github.com/Double-X/DoubleX-RMMZ/blob/master/DoubleX%20RMMZ%20Skill%20Item%20Cooldown.js
  *      Posts:
