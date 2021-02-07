@@ -87,7 +87,7 @@
  *      - None So Far
  *----------------------------------------------------------------------------
  *    # Changelog
- *      { codebase: "1.1.1", plugin: "v1.02a" }(2021 Feb 7 GMT 0600):
+ *      { codebase: "1.1.1", plugin: "v1.02a" }(2021 Feb 7 GMT 1300):
  *      1. Added skillItemCooldownGaugeColor1 and skillItemCooldownGaugeColor2
  *         to let you show the TPB battler cooldown bar inside battles with
  *         configurable colors
