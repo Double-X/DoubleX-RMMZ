@@ -43,6 +43,7 @@
  *    # Links
  *      Video:
  *      1. https://www.youtube.com/watch?v=_6L8IJDiTcI
+ *      2.(v1.02a+) https://www.youtube.com/watch?v=_6L8IJDiTcI
  *      This Plugin:
  *      1. https://github.com/Double-X/DoubleX-RMMZ/blob/master/DoubleX%20RMMZ%20Unit%20Filters.js
  *      Posts:
