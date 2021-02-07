@@ -39,9 +39,13 @@
  *         https://github.com/Double-X/DoubleX-RMMZ/blob/master/DoubleX%20RMMZ%20Enhanced%20Codebase.js
  *      Abilities:
  *      1. Nothing special for most ordinary cases
- *      2. Little RMMZ plugin development proficiency to fully utilize this
+ *      2. Little RMMZ plugin development proficiency for more advanced usages
  *         (Elementary Javascript exposures being able to write beginner codes
  *         up to 300LoC scale)
+ *      3. Some RMMV plugin development proficiency to fully utilize this
+ *         (Basic knowledge on what RMMV plugin development does in general
+ *         with several easy, simple and small plugins written without
+ *         nontrivial bugs up to 1000 LoC scale but still being inexperienced)
  *----------------------------------------------------------------------------
  *    # Terms Of Use
  *      1. Commercial use's always allowed and crediting me's always optional.
