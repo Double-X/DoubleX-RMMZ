@@ -87,39 +87,6 @@
  *      - None So Far
  *----------------------------------------------------------------------------
  *    # Changelog
- *      { codebase: "1.1.1", plugin: "v1.02a" }(2021 Feb 7 GMT 1300):
- *      1. Added skillItemCooldownGaugeColor1 and skillItemCooldownGaugeColor2
- *         to let you show the TPB battler cooldown bar inside battles with
- *         configurable colors
- *      2. Added cancelBattlerCooldownHotkeys and
- *         cancelSkillItemCooldownHotkeys to let you set some hotkeys to
- *         cancel the battler/skill item cooldown of the corresponding actors
- *         respectively
- *      3. Added the following parameters:
- *         - canCancelBattlerCooldown
- *         - canCancelSkillItemCooldown
- *         - cancelBattlerCooldownFail
- *         - cancelSkillItemCooldownFail
- *         - cancelBattlerCooldownSuc
- *         - cancelSkillItemCooldownSuc
- *         - canCancelBattlerCooldownNotetagDataTypePriorities
- *         - canCancelSkillItemCooldownNotetagDataTypePriorities
- *         - cancelBattlerCooldownFailNotetagDataTypePriorities
- *         - cancelSkillItemCooldownFailNotetagDataTypePriorities
- *         - cancelBattlerCooldownSucNotetagDataTypePriorities
- *         - cancelSkillItemCooldownSucNotetagDataTypePriorities
- *      4. Added the following plugin commands:
- *         - canCancelBattlerCooldown
- *         - canCancelSkillItemCooldown
- *         - cancelBattlerCooldown
- *         - cancelSkillItemCooldown
- *      5. Added the following notetags:
- *         - canCancelBattler
- *         - canCancelSkillItem
- *         - cancelBattlerFail
- *         - cancelSkillItemFail
- *         - cancelBattlerSuc
- *         - cancelSkillItemSuc
  *      { codebase: "1.1.0", plugin: "v1.01b" }(2020 Nov 27 GMT 0500):
  *      1. You no longer have to edit the value of
  *         DoubleX_RMMZ.Skill_Item_Cooldown.PLUGIN_NAME when changing this
@@ -135,141 +102,37 @@
  *      1. 1st version of this plugin finished
  *----------------------------------------------------------------------------
  *    # Todo
- *      1. Shows the skill/item and battler cooldown values for each
+ *      1. Shows the TPB cooldown bar inside battles(with configurable colors)
+ *      2. Shows the skill/item and battler cooldown values for each
  *         skill/item both inside and outside battles
- *      2. Lets you bind some hotkeys to cancel some actor cooldowns under
+ *      3. Lets you bind some hotkeys to cancel some actor cooldowns under
  *         conditions set by you and the events set by you to be triggered
  *         upon successful cancels
  *============================================================================*/
-
-/*~struct~Hotkey:
- *
- * @param actorIndex
- * @type number
- * @desc The index of the actor selected by hotkey actorHotkey
- * @default
- *
- * @param actorHotkey
- * @desc The keymap of the hotkey selecting the actor with index actorIndex
- * @default
- */
-
 /*:
  * @url https://www.patreon.com/doublex
  * @target MZ
- * @plugindesc Versions: { codebase: "1.1.1", plugin: "v1.02a" }
+ * @plugindesc Versions: { codebase: "1.1.0", plugin: "v1.01b" }
  * Lets you set some skills/items to have battler and skill/item cooldowns
  * @orderAfter DoubleX_RMMZ_Enhanced_Codebase
  * @orderAfter DoubleX RMMZ Enhanced Codebase
  * @orderAfter DoubleX_RMMZ_Plugin_Query
- * @orderAfter DoubleX_RMMZ_TPBS_Configurations_Edit
- * @orderAfter DoubleX RMMZ TPBS Configurations Edit
  * @base DoubleX RMMZ Enhanced Codebase
  * @author DoubleX
  *
- * @param BattleManager
- *
  * @param clearBattlerSkillItemCooldownOnBattleStart
- * @parent BattleManager
  * @type note
  * @desc Let you clear battler/skill/item cooldowns on battle start
  * actor is the actor to have all those cooldowns cleared
  * @default "actor.clearBattlerSkillItemCooldowns();"
  *
  * @param clearBattlerSkillItemCooldownOnBattleEnd
- * @parent BattleManager
  * @type note
  * @desc Lets you clear battler/skill/item cooldowns on battle end
  * actor is the actor to have all those cooldowns cleared
  * @default "actor.clearBattlerSkillItemCooldowns();"
  *
- * @param Battler
- *
- * @param canCancelBattlerCooldown
- * @parent Battler
- * @type note
- * @desc Lets you set if a battler can cancel the battler cooldown
- * if no canCancelBattler notetags are present
- * @default "return true;"
- *
- * @param canCancelSkillItemCooldown
- * @parent Battler
- * @type note
- * @desc Lets you set if a battler can cancel the skill/item
- * cooldown if no canCancelSkillItem notetags are present
- * @default "return true;"
- *
- * @param cancelBattlerCooldownFail
- * @parent Battler
- * @type note
- * @desc Lets you set what happens when a battler failed to cancel
- * the battler cooldown
- * @default "SoundManager.playBuzzer();"
- *
- * @param cancelSkillItemCooldownFail
- * @parent Battler
- * @type note
- * @desc Lets you set what happens when a battler failed to cancel
- * the skill/item cooldown
- * @default "SoundManager.playBuzzer();"
- *
- * @param cancelBattlerCooldownSuc
- * @parent Battler
- * @type note
- * @desc Lets you set what happens when a battler successfully
- * cancel the battler cooldown
- * @default "SoundManager.playOk();"
- *
- * @param cancelSkillItemCooldownSuc
- * @parent Battler
- * @type note
- * @desc Lets you set what happens when a battler successfully
- * cancel the skill/item cooldown
- * @default "SoundManager.playOk();"
- *
- * @param onCancelCooldownClick
- * @parent Battler
- * @type note
- * @desc Lets you set what happens when the sprite of the actor
- * get clicked for triggering a cooldown cancel attempt
- * @default "this.cancelBattlerCooldown();\nthis.cancelSkillItemCooldown();"
- *
- * @param SpriteGauge
- *
- * @param skillItemCooldownGaugeColor1
- * @parent SpriteGauge
- * @type note
- * @desc Sets the 1st actor TPB battler cooldown gague sprite color
- * The gauge sprite involved can be referred by the this keyword
- * @default "return ColorManager.textColor(18);"
- *
- * @param skillItemCooldownGaugeColor2
- * @parent SpriteGauge
- * @type note
- * @desc Sets the 2nd actor TPB battler cooldown gague sprite color
- * The gauge sprite involved can be referred by the this keyword
- * @default "return ColorManager.textColor(10);"
- *
- * @param Hotkeys
- *
- * @param cancelBattlerCooldownHotkeys
- * @parent Hotkeys
- * @type struct<Hotkey>[]
- * @desc Sets the list of hotkeys cancelling the battler cooldown
- * of the actor with the corresponding hotkey indices
- * @default []
- *
- * @param cancelSkillItemCooldownHotkeys
- * @parent Hotkeys
- * @type struct<Hotkey>[]
- * @desc Sets the list of hotkeys cancelling the skill/item
- * cooldown of the actor with the corresponding hotkey indices
- * @default []
- *
- * @param NotetagDataTypePriorities
- *
  * @param battlerNotetagDataTypePriorities
- * @parent NotetagDataTypePriorities
  * @type select[]
  * @option Data of the actor
  * @value actor
@@ -298,7 +161,6 @@
  * @default ["latestSkillItem","states","enemy","armors","weapons","class","actor"]
  *
  * @param skillItemNotetagDataTypePriorities
- * @parent NotetagDataTypePriorities
  * @type select[]
  * @option Data of the actor
  * @value actor
@@ -323,180 +185,6 @@
  * @option Data of effective states
  * @value states
  * @desc Sets data type priorities of the skillItem notetags
- * You can use script calls/plugin commands to change this
- * @default ["latestSkillItem","states","enemy","armors","weapons","class","actor"]
- *
- * @param canCancelBattlerNotetagDataTypePriorities
- * @parent NotetagDataTypePriorities
- * @type select[]
- * @option Data of the actor
- * @value actor
- * @option Data of the current class
- * @value class
- * @option Data of learnt skills/action list(Shouldn't be used with Data of usable skills)
- * @value skills
- * @option Data of usable skills(Shouldn't be used with Data of learnt skills)
- * @value usableSkills
- * @option Data of possessed items(Shouldn't be used with Data of usable items)
- * @value items
- * @option Data of usable items(Shouldn't be used with Data of possessed items)
- * @value usableItems
- * @option Data of the latest skill/item being used(Can double-count with skills/items/usableSkills/usableItems)
- * @value latestSkillItem
- * @option Data of equipped weapons
- * @value weapons
- * @option Data of equipped armors
- * @value armors
- * @option Data of the enemy
- * @value enemy
- * @option Data of effective states
- * @value states
- * @desc Sets data type priorities of the canCancelBattler notetags
- * You can use script calls/plugin commands to change this
- * @default ["latestSkillItem","states","enemy","armors","weapons","class","actor"]
- *
- * @param canCancelSkillItemNotetagDataTypePriorities
- * @parent NotetagDataTypePriorities
- * @type select[]
- * @option Data of the actor
- * @value actor
- * @option Data of the current class
- * @value class
- * @option Data of learnt skills/action list(Shouldn't be used with Data of usable skills)
- * @value skills
- * @option Data of usable skills(Shouldn't be used with Data of learnt skills)
- * @value usableSkills
- * @option Data of possessed items(Shouldn't be used with Data of usable items)
- * @value items
- * @option Data of usable items(Shouldn't be used with Data of possessed items)
- * @value usableItems
- * @option Data of the latest skill/item being used(Can double-count with skills/items/usableSkills/usableItems)
- * @value latestSkillItem
- * @option Data of equipped weapons
- * @value weapons
- * @option Data of equipped armors
- * @value armors
- * @option Data of the enemy
- * @value enemy
- * @option Data of effective states
- * @value states
- * @desc Sets data type priorities of canCancelSkillItem notetags
- * You can use script calls/plugin commands to change this
- * @default ["latestSkillItem","states","enemy","armors","weapons","class","actor"]
- *
- * @param cancelBattlerSucNotetagDataTypePriorities
- * @parent NotetagDataTypePriorities
- * @type select[]
- * @option Data of the actor
- * @value actor
- * @option Data of the current class
- * @value class
- * @option Data of learnt skills/action list(Shouldn't be used with Data of usable skills)
- * @value skills
- * @option Data of usable skills(Shouldn't be used with Data of learnt skills)
- * @value usableSkills
- * @option Data of possessed items(Shouldn't be used with Data of usable items)
- * @value items
- * @option Data of usable items(Shouldn't be used with Data of possessed items)
- * @value usableItems
- * @option Data of the latest skill/item being used(Can double-count with skills/items/usableSkills/usableItems)
- * @value latestSkillItem
- * @option Data of equipped weapons
- * @value weapons
- * @option Data of equipped armors
- * @value armors
- * @option Data of the enemy
- * @value enemy
- * @option Data of effective states
- * @value states
- * @desc Sets data type priorities of the cancelBattlerSuc notetags
- * You can use script calls/plugin commands to change this
- * @default ["latestSkillItem","states","enemy","armors","weapons","class","actor"]
- *
- * @param cancelSkillItemSucNotetagDataTypePriorities
- * @parent NotetagDataTypePriorities
- * @type select[]
- * @option Data of the actor
- * @value actor
- * @option Data of the current class
- * @value class
- * @option Data of learnt skills/action list(Shouldn't be used with Data of usable skills)
- * @value skills
- * @option Data of usable skills(Shouldn't be used with Data of learnt skills)
- * @value usableSkills
- * @option Data of possessed items(Shouldn't be used with Data of usable items)
- * @value items
- * @option Data of usable items(Shouldn't be used with Data of possessed items)
- * @value usableItems
- * @option Data of the latest skill/item being used(Can double-count with skills/items/usableSkills/usableItems)
- * @value latestSkillItem
- * @option Data of equipped weapons
- * @value weapons
- * @option Data of equipped armors
- * @value armors
- * @option Data of the enemy
- * @value enemy
- * @option Data of effective states
- * @value states
- * @desc Sets data type priorities of cancelSkillItemSuc notetags
- * You can use script calls/plugin commands to change this
- * @default ["latestSkillItem","states","enemy","armors","weapons","class","actor"]
- *
- * @param cancelBattlerFailNotetagDataTypePriorities
- * @parent NotetagDataTypePriorities
- * @type select[]
- * @option Data of the actor
- * @value actor
- * @option Data of the current class
- * @value class
- * @option Data of learnt skills/action list(Shouldn't be used with Data of usable skills)
- * @value skills
- * @option Data of usable skills(Shouldn't be used with Data of learnt skills)
- * @value usableSkills
- * @option Data of possessed items(Shouldn't be used with Data of usable items)
- * @value items
- * @option Data of usable items(Shouldn't be used with Data of possessed items)
- * @value usableItems
- * @option Data of the latest skill/item being used(Can double-count with skills/items/usableSkills/usableItems)
- * @value latestSkillItem
- * @option Data of equipped weapons
- * @value weapons
- * @option Data of equipped armors
- * @value armors
- * @option Data of the enemy
- * @value enemy
- * @option Data of effective states
- * @value states
- * @desc Sets data type priorities of cancelBattlerFail notetags
- * You can use script calls/plugin commands to change this
- * @default ["latestSkillItem","states","enemy","armors","weapons","class","actor"]
- *
- * @param cancelSkillItemFailNotetagDataTypePriorities
- * @parent NotetagDataTypePriorities
- * @type select[]
- * @option Data of the actor
- * @value actor
- * @option Data of the current class
- * @value class
- * @option Data of learnt skills/action list(Shouldn't be used with Data of usable skills)
- * @value skills
- * @option Data of usable skills(Shouldn't be used with Data of learnt skills)
- * @value usableSkills
- * @option Data of possessed items(Shouldn't be used with Data of usable items)
- * @value items
- * @option Data of usable items(Shouldn't be used with Data of possessed items)
- * @value usableItems
- * @option Data of the latest skill/item being used(Can double-count with skills/items/usableSkills/usableItems)
- * @value latestSkillItem
- * @option Data of equipped weapons
- * @value weapons
- * @option Data of equipped armors
- * @value armors
- * @option Data of the enemy
- * @value enemy
- * @option Data of effective states
- * @value states
- * @desc Sets data type priorities of cancelSkillItemFail notetags
  * You can use script calls/plugin commands to change this
  * @default ["latestSkillItem","states","enemy","armors","weapons","class","actor"]
  *
@@ -577,10 +265,10 @@
  * @value actor
  * @option Enemy
  * @value enemy
- * @desc The side of the battler querying the battler cooldown
+ * @desc The side of the battler setting the battler cooldown
  * @arg label
  * @type number
- * @desc The actor id/enemy index of the battler querying the battler cooldown
+ * @desc The actor id/enemy index of the battler setting the battler cooldown
  * @arg varId
  * @type number
  * @desc The id of the game variable storing the script call result
@@ -594,10 +282,10 @@
  * @value actor
  * @option Enemy
  * @value enemy
- * @desc The side of the battler querying the battler cooldown
+ * @desc The side of the battler setting the battler cooldown
  * @arg label
  * @type number
- * @desc The actor id/enemy index of the battler querying the battler cooldown
+ * @desc The actor id/enemy index of the battler setting the battler cooldown
  * @arg switchId
  * @type number
  * @desc The id of the game switch storing the script call result
@@ -611,11 +299,11 @@
  * @value actor
  * @option Enemy
  * @value enemy
- * @desc The side of the battler querying the skill/item cooldown
+ * @desc The side of the battler setting the skill/item cooldown
  * with the skill/item involved
  * @arg label
  * @type number
- * @desc The actor id/enemy index of the battler querying the
+ * @desc The actor id/enemy index of the battler setting the
  * skill/item cooldown with the skill/item involved
  * @arg type
  * @type select
@@ -642,11 +330,11 @@
  * @value actor
  * @option Enemy
  * @value enemy
- * @desc The side of the battler querying the skill/item cooldown
+ * @desc The side of the battler setting the skill/item cooldown
  * with the skill/item involved
  * @arg label
  * @type number
- * @desc The actor id/enemy index of the battler querying the
+ * @desc The actor id/enemy index of the battler setting the
  * skill/item cooldown with the skill/item involved
  * @arg type
  * @type select
@@ -664,70 +352,6 @@
  * @type number
  * @desc The id of the game switch storing the script call result
  *
- * @command canCancelBattlerCooldown
- * @desc Stores the battler.canCancelBattlerCooldown() script call
- * results into the game switch with id switchId
- * @arg side
- * @type select
- * @option Actor
- * @value actor
- * @option Enemy
- * @value enemy
- * @desc The side of the battler querying the battler cooldown
- * @arg label
- * @type number
- * @desc The actor id/enemy index of the battler querying the
- * battler cooldown
- * @arg switchId
- * @type number
- * @desc The id of the game switch storing the script call result
- *
- * @command canCancelSkillItemCooldown
- * @desc Stores the battler.canCancelSkillItemCooldown() script
- * call results into the game switch with id switchId
- * @arg side
- * @type select
- * @option Actor
- * @value actor
- * @option Enemy
- * @value enemy
- * @desc The side of the battler querying the skill/item cooldown
- * @arg label
- * @type number
- * @desc The actor id/enemy index of the battler querying the
- * skill/item cooldown
- * @arg switchId
- * @type number
- * @desc The id of the game switch storing the script call result
- *
- * @command cancelBattlerCooldown
- * @desc Applies script call battler.cancelBattlerCooldown()
- * @arg side
- * @type select
- * @option Actor
- * @value actor
- * @option Enemy
- * @value enemy
- * @desc The side of the battler cancelling the battler cooldown
- * @arg label
- * @type number
- * @desc The actor id/enemy index of the battler cancelling the battler
- * cooldown
- *
- * @command cancelSkillItemCooldown
- * @desc Applies script call battler.cancelSkillItemCooldown()
- * @arg side
- * @type select
- * @option Actor
- * @value actor
- * @option Enemy
- * @value enemy
- * @desc The side of the battler cancelling the skill/item cooldown
- * @arg label
- * @type number
- * @desc The actor id/enemy index of the battler cancelling the skill/item
- * cooldown
- *
  * @help
  *============================================================================
  *    ## Notetag Info
@@ -735,8 +359,8 @@
  *          effective
  *       2. Each line can only have at most 1 notetag
  *       3. The following is the structure of all notetags in this plugin:
- *          - <doublex rmmz cooldown contents>
- *          - <cooldown contents>
+ *          - <doublex rmmz cooldown>
+ *          - <cooldown>
  *          Where contents are in the form of type suffixes: entries
  *          Either of the above can be used, but the 1st one reduce the chance
  *          of causing other plugins to treat the notetags of this plugin as
@@ -833,125 +457,6 @@
  *           if it's not cleared in
  *           clearBattlerSkillItemCooldownOnBattleStart, and vice verse if
  *           it's not cleared in clearBattlerSkillItemCooldownOnBattleEnd
- *      3.(v1.02a+) canCancelBattler condSuffix opSuffix: condEntry, opEntry
- *         - Applies the following formula on whether the battler involved can
- *           cancel the battler cooldown: current = current operator condition
- *           Where current is the current boolean value, operator is the
- *           operator specified by opEntry, and condition is the value
- *           specified by condEntry
- *         - If there are no notetags, the result returned by the default
- *           parameter function will be used
- *         - condSuffix can be val, switch or script
- *         - opSuffix can be val, var or script
- *         - The result of condEntry can be anything as only whether it's
- *           truthy matters
- *         - The result of opSuffix must be either of the following:
- *           and
- *           or
- *           nand
- *           nor
- *           xor
- *           xnor
- *           set
- *         - BATTLER COOLDOWNS CAN'T BE PARTIALLY CANCELLED
- *         - BATTLER COOLDOWNS CAN'T BE CANCELLED OUTSIDE BATTLES
- *         - E.g.:
- *           <cooldown canCancelBattler switch val: 1, set> will cause the
- *           battler to be able to cancel the battler cooldown if the game
- *           switch with id 1 is on, regardless of the result of the previous
- *           effective notetags, as long as this is the last effective notetag
- *      4.(v1.02a+) canCancelSkillItem condSuffix opSuffix: condEntry, opEntry
- *         - Applies the following formula on whether the battler involved can
- *           cancel the skill/item cooldown:
- *           current = current operator condition
- *           Where current is the current boolean value, operator is the
- *           operator specified by opEntry, and condition is the value
- *           specified by condEntry
- *         - If there are no notetags, the result returned by the default
- *           parameter function will be used
- *         - condSuffix can be val, switch or script
- *         - opSuffix can be val, var or script
- *         - The result of condEntry can be anything as only whether it's
- *           truthy matters
- *         - The result of opSuffix must be either of the following:
- *           and
- *           or
- *           nand
- *           nor
- *           xor
- *           xnor
- *           set
- *         - EITHER ALL OR NONE OF THE SKILL/ITEM COOLDOWNS WILL BE CANCELLED
- *         - SKILL/ITEM COOLDOWNS CAN'T BE CANCELLED OUTSIDE BATTLES
- *         - E.g.:
- *           <cooldown canCancelSkillItem script val: 1, and> will cause the
- *           battler to be unable to cancel the skill/item cooldown if the
- *           game variable with id 1 stores the string of a script returning a
- *           falsy value, as long as this is the last effective notetag
- *      5.(v1.02a+) cancelBattlerSuc condSuffix eventSuffix: condEntry, eventEntry
- *         - Triggers what specified in eventEntry when the battler involved
- *           successfully cancels the battler cooldown if condEntry returns a
- *           truthy result
- *         - condSuffix can be val, switch or script
- *         - eventEntry can be event or script
- *         - The result of condEntry can be anything as only whether it's
- *           truthy matters
- *         - If the result of condEntry is falsy, this notetag will be
- *           discarded upon such use cases
- *         - The result of eventEntry can be anything as it's supposed to run
- *           commands instead of returning results
- *         - E.g.:
- *           <cooldown cancelBattlerSuc switch event: 1, 2> will reserve the
- *           common event with id 2 when the battler involved successfully
- *           cancels the battler cooldown if the game switch with id 1 is on
- *      6.(v1.02a+) cancelSkillItemSuc condSuffix eventSuffix: condEntry, eventEntry
- *         - Triggers what specified in eventEntry when the battler involved
- *           successfully cancels the skill/item cooldown if condEntry returns
- *           a truthy result
- *         - condSuffix can be val, switch or script
- *         - eventEntry can be event or script
- *         - The result of condEntry can be anything as only whether it's
- *           truthy matters
- *         - If the result of condEntry is falsy, this notetag will be
- *           discarded upon such use cases
- *         - The result of eventEntry can be anything as it's supposed to run
- *           commands instead of returning results
- *         - E.g.:
- *           <cooldown cancelSkillItemSuc val event: true, 2> will always
- *           reserve the common event with id 2 when the battler involved
- *           successfully cancels the skill/item cooldown
- *      7.(v1.02a+) cancelBattlerFail condSuffix eventSuffix: condEntry, eventEntry
- *         - Triggers what specified in eventEntry when the battler involved
- *           fails to cancel the battler cooldown if condEntry returns a
- *           truthy result
- *         - condSuffix can be val, switch or script
- *         - eventEntry can be event or script
- *         - The result of condEntry can be anything as only whether it's
- *           truthy matters
- *         - If the result of condEntry is falsy, this notetag will be
- *           discarded upon such use cases
- *         - The result of eventEntry can be anything as it's supposed to run
- *           commands instead of returning results
- *         - E.g.:
- *           <cooldown cancelBattlerFail switch event: 1, 2> will reserve the
- *           common event with id 2 when the battler involved fails to cancel
- *           the battler cooldown if the game switch with id 1 is on
- *      8.(v1.02a+) cancelSkillItemFail condSuffix eventSuffix: condEntry, eventEntry
- *         - Triggers what specified in eventEntry when the battler involved
- *           fails to cancel the skill/item cooldown if condEntry returns a
- *           truthy result
- *         - condSuffix can be val, switch or script
- *         - eventEntry can be event or script
- *         - The result of condEntry can be anything as only whether it's
- *           truthy matters
- *         - If the result of condEntry is falsy, this notetag will be
- *           discarded upon such use cases
- *         - The result of eventEntry can be anything as it's supposed to run
- *           commands instead of returning results
- *         - E.g.:
- *           <cooldown cancelSkillItemFail val event: true, 2> will always
- *           reserve the common event with id 2 when the battler involved
- *           fails to cancel the skill/item cooldown
  *============================================================================
  *    ## Script Call Info
  *----------------------------------------------------------------------------
@@ -1034,32 +539,6 @@
  *           $gameParty.deadMembers(1).isSkillItemCooldown($dataItems[2]) will
  *           return if the 2nd dead game troop member is having skill/item
  *           cooldown with item with id 2
- *      8.(v1.02a+) canCancelBattlerCooldown()
- *         - Returns if the battler involved can cancel the battler cooldown
- *         - E.g.:
- *           $gameParty.aliveMembers(1).canCancelBattlerCooldown() will return
- *           if the 2nd alive game party member can canel the battler cooldown
- *      9.(v1.02a+) canCancelSkillItemCooldown()
- *         - Returns if the battler involved can cancel the skill/item
- *           cooldown
- *         - E.g.:
- *           $gameParty.deadMembers(1).canCancelSkillItemCooldown() will
- *           return if the 2nd dead game troop member can cancel the
- *           skill/item cooldown
- *      10.(v1.02a+) cancelBattlerCooldown()
- *         - Cancels the battler cooldown of the battler involved if that
- *           battler cooldown can be cancelled
- *         - E.g.:
- *           $gameParty.aliveMembers(1).cancelBattlerCooldown() will cancel
- *           the battler cooldown of the 2nd alive game party member if that
- *           battler cooldown can be cancelled
- *      11.(v1.02a+) cancelSkillItemCooldown()
- *         - Cancels the skill/item cooldown of the battler involved if that
- *           skill/item cooldown can be cancelled
- *         - E.g.:
- *           $gameParty.deadMembers(1).cancelSkillItemCooldown() will cancel
- *           the skill/item cooldown of the 2nd dead game troop member if that
- *           skill/item cooldown can be cancelled
  *============================================================================
  *    ## Plugin Command Info
  *----------------------------------------------------------------------------
@@ -1069,22 +548,13 @@
  *      2. clearBattlerSkillItemCooldowns side label
  *         - Applies the script call battler.clearBattlerSkillItemCooldowns()
  *         - battler is the battler identified by side and label
- *         - side is either actor or enemy
- *         - label is the actor id for side actor and troop member index for
- *           side enemy
  *      3. setBattlerCooldown side label turnCount
  *         - Applies the script call battler.setBattlerCooldown(turnCount)
  *         - battler is the battler identified by side and label
- *         - side is either actor or enemy
- *         - label is the actor id for side actor and troop member index for
- *           side enemy
  *      4. setSkillItemCooldown side label item turnCount
  *         - Applies the script call
  *           battler.setSkillItemCooldown(item, turnCount)
  *         - battler is the battler identified by side and label
- *         - side is either actor or enemy
- *         - label is the actor id for side actor and troop member index for
- *           side enemy
  *      5.(v1.01a+) battlerCooldown side label varId
  *         - Stores the returned result of the script call
  *           battler.battlerCooldown() in the game variable with id varId
@@ -1114,6 +584,7 @@
  *         - Stores the returned result of the script call
  *           battler.isSkillItemCooldown(item) in the game switch with id
  *           switchId
+ *         - Applies the script call battler.isSkillItemCooldown(item)
  *         - battler is the battler identified by side and label
  *         - side is either actor or enemy
  *         - label is the actor id for side actor and troop member index for
@@ -1121,34 +592,6 @@
  *         - item is the skill/item identified by type and id
  *         - type is either skill or item
  *         - id is the id of the skill/item
- *      9.(v1.02a+) canCancelBattlerCooldown side label switchId
- *         - Stores the returned result of the script call
- *           battler.canCancelBattlerCooldown() in the game switch with id
- *           switchId
- *         - battler is the battler identified by side and label
- *         - side is either actor or enemy
- *         - label is the actor id for side actor and troop member index for
- *           side enemy
- *      10.(v1.02a+) canCancelSkillItemCooldown side label switchId
- *          - Stores the returned result of the script call
- *            battler.canCancelSkillItemCooldown() in the game switch with id
- *            switchId
- *          - battler is the battler identified by side and label
- *          - side is either actor or enemy
- *          - label is the actor id for side actor and troop member index for
- *            side enemy
- *      11.(v1.02a+) cancelBattlerCooldown side label item
- *          - Applies the script call battler.cancelBattlerCooldown()
- *          - battler is the battler identified by side and label
- *          - side is either actor or enemy
- *          - label is the actor id for side actor and troop member index for
- *            side enemy
- *      12.(v1.02a+) cancelSkillItemCooldown side label item
- *          - Applies the script call battler.cancelSkillItemCooldown()
- *          - battler is the battler identified by side and label
- *          - side is either actor or enemy
- *          - label is the actor id for side actor and troop member index for
- *            side enemy
  *============================================================================
  *    ## (v1.01a+)Plugin Query Info
  *       1. You need to use DoubleX_RMMZ_Plugin_Query as well in order to use
@@ -1185,18 +628,6 @@
  *         - item is the skill/item identified by type and id
  *         - type is either skill or item
  *         - id is the id of the skill/item
- *      5.(v1.02a+) canCancelBattlerCooldown side label
- *         - Applies the script call battler.canCancelBattlerCooldown()
- *         - battler is the battler identified by side and label
- *         - side is either actor or enemy
- *         - label is the actor id for side actor and troop member index for
- *           side enemy
- *      6.(v1.02a+) canCancelSkillItemCooldown side label
- *         - Applies the script call battler.canCancelSkillItemCooldown()
- *         - battler is the battler identified by side and label
- *         - side is either actor or enemy
- *         - label is the actor id for side actor and troop member index for
- *           side enemy
  *============================================================================
  */
 
@@ -1215,7 +646,7 @@ var DoubleX_RMMZ = DoubleX_RMMZ || {}; // var must be used or game will crash
     // Separates the version numbers with the rest to make the former more clear
     DoubleX_RMMZ.Skill_Item_Cooldown = {
         PLUGIN_NAME: name,
-        VERSIONS: { codebase: "1.1.1", plugin: "v1.02a" }
+        VERSIONS: { codebase: "1.1.0", plugin: "v1.01b" }
     }; // DoubleX_RMMZ.Skill_Item_Cooldown
     //
 
@@ -1259,25 +690,28 @@ if (DoubleX_RMMZ.Enhanced_Codebase) {
 
 /*============================================================================*/
 
-((MZ_EC, SIC) => {
+(SIC => {
 
     "use strict";
 
-    MZ_EC.setupFuncParams(SIC, {
-        clearBattlerSkillItemCooldownOnBattleStart: ["actor"],
-        clearBattlerSkillItemCooldownOnBattleEnd: ["actor"],
-        canCancelBattlerCooldown: [],
-        canCancelSkillItemCooldown: [],
-        cancelBattlerCooldownFail: [],
-        cancelSkillItemCooldownFail: [],
-        cancelBattlerCooldownSuc: [],
-        cancelSkillItemCooldownSuc: [],
-        onCancelCooldownClick: [],
-        skillItemCooldownGaugeColor1: [],
-        skillItemCooldownGaugeColor2: []
-    });
+    const FP = SIC.FUNC_PARAMS = {};
 
-})(DoubleX_RMMZ.Enhanced_Codebase, DoubleX_RMMZ.Skill_Item_Cooldown);
+    FP.PARAM_FUNCS = new Map();
+
+    FP._PARAM_FUNC_ARGS = new Map(Object.entries({
+        clearBattlerSkillItemCooldownOnBattleStart: ["actor"],
+        clearBattlerSkillItemCooldownOnBattleEnd: ["actor"]
+    }));
+
+    FP.storeFuncParam = (param, val) => {
+        if (!FP._PARAM_FUNC_ARGS.has(param)) return;
+        const args = FP._PARAM_FUNC_ARGS.get(param);
+        // Using fastMerge would mutate the parameter function argument lists
+        FP.PARAM_FUNCS.set(param, new Function(...args.concat(val)));
+        //
+    }; // FP.storeFuncParam
+
+})(DoubleX_RMMZ.Skill_Item_Cooldown);
 
 /*----------------------------------------------------------------------------*/
 
@@ -1311,16 +745,12 @@ if (DoubleX_RMMZ.Enhanced_Codebase) {
             $gameVariables.setValue(+varId, val);
         }, _BATTLER_QUERY_FUNC.bind(undefined, name));
     })("battlerCooldown");
-    [
-        "isBattlerCooldown",
-        "canCancelBattlerCooldown",
-        "canCancelSkillItemCooldown"
-    ].forEach(name => {
+    (name => {
         PQ._SET_QUERY(name, ({ side, label, switchId }) => {
             const val = _BATTLER_QUERY_FUNC(name, side, label);
             $gameSwitches.setValue(+switchId, val);
         }, _BATTLER_QUERY_FUNC.bind(undefined, name));
-    });
+    })("isBattlerCooldown");
 
     PQ._ITEM_ = (type, id) => {
         switch (type) {
@@ -1359,12 +789,6 @@ if (DoubleX_RMMZ.Enhanced_Codebase) {
         const battler_ = PQ._BATTLER_(side, label), item_ = PQ._ITEM_(type, id);
         if (battler_ && item_) battler_.setSkillItemCooldown(item_, +turnCount);
     });
-    ["cancelBattlerCooldown", "cancelSkillItemCooldown"].forEach(cmd => {
-        PluginManager.registerCommand(SIC.PLUGIN_NAME, cmd, ({ side, label }) => {
-            const battler_ = PQ._BATTLER_(side, label);
-            if (battler_) battler_[cmd]();
-        });
-    });
 
 })(DoubleX_RMMZ.Skill_Item_Cooldown);
 
@@ -1400,43 +824,7 @@ if (DoubleX_RMMZ.Enhanced_Codebase) {
             entry1: MZ_EC.BOOL_ENTRY, // condEntry
             entry2: MZ_EC.STRING_ENTRY, // opEntry
             entry3: MZ_EC.NUM_ENTRY // valEntry
-        }, // skillItem
-        canCancelBattler: {
-            suffix1: MZ_EC.BOOL_SUFFIXES, // condSuffix
-            suffix2: MZ_EC.VAL_SUFFIXES, // opSuffix
-            entry1: MZ_EC.BOOL_ENTRY, // condEntry
-            entry2: MZ_EC.STRING_ENTRY // opEntry
-        }, // canCancelBattler
-        canCancelSkillItem: {
-            suffix1: MZ_EC.BOOL_SUFFIXES, // condSuffix
-            suffix2: MZ_EC.VAL_SUFFIXES, // opSuffix
-            entry1: MZ_EC.BOOL_ENTRY, // condEntry
-            entry2: MZ_EC.STRING_ENTRY // opEntry
-        }, // canCancelSkillItem
-        cancelBattlerSuc: {
-            suffix1: MZ_EC.BOOL_SUFFIXES, // condSuffix
-            suffix2: MZ_EC.EVENT_SUFFIXES, // eventSuffix
-            entry1: MZ_EC.BOOL_ENTRY, // condEntry
-            entry2: MZ_EC.NUM_ENTRY // eventEntry
-        }, // cancelBattlerSuc
-        cancelSkillItemSuc: {
-            suffix1: MZ_EC.BOOL_SUFFIXES, // condSuffix
-            suffix2: MZ_EC.EVENT_SUFFIXES, // eventSuffix
-            entry1: MZ_EC.BOOL_ENTRY, // condEntry
-            entry2: MZ_EC.NUM_ENTRY // eventEntry
-        }, // cancelSkillItemSuc
-        cancelBattlerFail: {
-            suffix1: MZ_EC.BOOL_SUFFIXES, // condSuffix
-            suffix2: MZ_EC.EVENT_SUFFIXES, // eventSuffix
-            entry1: MZ_EC.BOOL_ENTRY, // condEntry
-            entry2: MZ_EC.NUM_ENTRY // eventEntry
-        }, // cancelBattlerFail
-        cancelSkillItemFail: {
-            suffix1: MZ_EC.BOOL_SUFFIXES, // condSuffix
-            suffix2: MZ_EC.EVENT_SUFFIXES, // eventSuffix
-            entry1: MZ_EC.BOOL_ENTRY, // condEntry
-            entry2: MZ_EC.NUM_ENTRY // eventEntry
-        } // cancelSkillItemFail
+        } // skillItem
     }, {
         $dataActors: "actor",
         $dataClasses: "class",
@@ -1645,7 +1033,7 @@ if (DoubleX_RMMZ.Enhanced_Codebase) {
 
     "use strict";
 
-    const klassName = "Game_Battler", PF = SIC.FUNC_PARAMS.PARAM_FUNCS, {
+    const klassName = "Game_Battler", {
         NEW,
         ORIG,
         extendFunc
@@ -1657,9 +1045,6 @@ if (DoubleX_RMMZ.Enhanced_Codebase) {
      *------------------------------------------------------------------------*/
     // {{*}} _skillItemCooldown: The container of all other new variables
     //       {[DataSkill|DataItem]} usedSkillItems: list of used skills/items
-    //       (v1.02a+){[DataSkill|DataItem]} lastUsedSkillItems: list of last
-    //                                                           used
-    //                                                           skills/items
     //       {number} battlerTurnCount: The battler cooldown turn counter
     //       {{number}} skillItemTurnCounts: skill/item cooldown of skill/item
 
@@ -1713,18 +1098,19 @@ if (DoubleX_RMMZ.Enhanced_Codebase) {
     }); // v1.00a - v1.00a
 
     // This will break with dynmaic data but it's not actively supported anyway
-    NEW._SKILL_ITEM_COOLDOWN_KEY = JSON.stringify;
-    NEW._REVERSE_SKILL_ITEM_COOLDOWN_KEY = JSON.parse;
+    NEW._SKILL_ITEM_COOLDOWN_KEY = item => JSON.stringify(item);
     //
 
     /**
      * Script Call/Idempotent
-     * @author DoubleX @interface @since v1.00a @version v1.02a
+     * @author DoubleX @interface @since v1.00a @version v1.00a
      */
     $.clearBattlerSkillItemCooldowns = function() {
-        NEW._clearAllUsedSkillItems.call(this);
-        this.setBattlerCooldown(0);
-        NEW._clearSkillItemTurnCounts.call(this);
+        NEW._clearUsedSkillItems.call(this);
+        this._skillItemCooldown.battlerTurnCount = 0;
+        // Map can't be serialized so ordinary objects must be used
+        this._skillItemCooldown.skillItemTurnCounts = {};
+        //
     }; // $.clearBattlerSkillItemCooldowns
 
     /**
@@ -1786,16 +1172,6 @@ if (DoubleX_RMMZ.Enhanced_Codebase) {
     }; // $.isSkillItemCooldown
 
     /**
-     * Script Call/Nullipotent
-     * @author DoubleX @since v1.02a @version v1.02a
-     * @returns {boolean} Whether this battler has any skill/item cooldown
-     */
-    $.hasSkillItemCooldown = function() {
-        const { skillItemTurnCounts } = this._skillItemCooldown;
-        return !Object.keys(skillItemTurnCounts).isEmpty();
-    }; // $.hasSkillItemCooldown
-
-    /**
      * Idempotent
      * @author DoubleX @interface @since v1.00a @version v1.00a
      * @param {DataSkill?|DataItem?} item_ - The data of the item being cleared
@@ -1803,10 +1179,8 @@ if (DoubleX_RMMZ.Enhanced_Codebase) {
     $.clearSkillItemCooldown = function(item_) {
         if (!item_) return;
         const itemKey = NEW._SKILL_ITEM_COOLDOWN_KEY(item_);
-        const { _skillItemCooldown } = this;
-        delete _skillItemCooldown.skillItemTurnCounts[itemKey];
-        _skillItemCooldown.usedSkillItems.eraseElem(item_);
-        _skillItemCooldown.lastUsedSkillItems.eraseElem(item_);
+        delete this._skillItemCooldown.skillItemTurnCounts[itemKey];
+        this._skillItemCooldown.usedSkillItems.eraseElem(item_);
     }; // $.clearSkillItemCooldown
 
     /**
@@ -1824,7 +1198,7 @@ if (DoubleX_RMMZ.Enhanced_Codebase) {
      */
     $.clearInputtedSkillItems = function() {
         NEW._clearInputtedSkillItemCooldowns.call(this);
-        NEW._clearAllUsedSkillItems.call(this);
+        NEW._clearUsedSkillItems.call(this);
     }; // $.clearInputtedSkillItems
 
     /**
@@ -1833,54 +1207,8 @@ if (DoubleX_RMMZ.Enhanced_Codebase) {
      */
     $.startBattlerCooldown = function() {
         NEW._setBattlerCooldown.call(this);
-        // Otherwise cancel cooldown can't work with skill item notetags
-        const skillItems = this._skillItemCooldown;
-        skillItems.lastUsedSkillItems = skillItems.usedSkillItems.clone();
-        // It must be placed here or usedSkillItems would be already voided
         NEW._clearUsedSkillItems.call(this);
     }; // $.startBattlerCooldown
-
-    /**
-     * Potential Hotspot/Idempotent
-     * @author DoubleX @interface @since v1.02a @version v1.02a
-     */
-    $.cancelBattlerCooldown = function() {
-        if (!this.canCancelBattlerCooldown()) {
-            return NEW._onCancelBattlerCooldownFail.call(this);
-        }
-        NEW._onCancelBattlerCooldownSuc.call(this);
-    }; // $.cancelBattlerCooldown
-
-    /**
-     * Potential Hotspot/Nullipotent
-     * @author DoubleX @interface @since v1.02a @version v1.02a
-     * @returns {boolean} Whether this battler can cancel the battler cooldown
-     */
-    $.canCancelBattlerCooldown = function() {
-        if (!this.isBattlerCooldown()) return;
-        return NEW._canCancelCooldown.call(this, "canCancelBattler");
-    }; // $.canCancelBattlerCooldown
-
-    /**
-     * Potential Hotspot/Idempotent
-     * @author DoubleX @interface @since v1.02a @version v1.02a
-     */
-    $.cancelSkillItemCooldown = function() {
-        if (!this.canCancelSkillItemCooldown()) {
-            return NEW._onCancelSkillItemCooldownFail.call(this);
-        }
-        NEW._onCancelSkillItemCooldownSuc.call(this);
-    }; // $.cancelSkillItemCooldown
-
-    /**
-     * Potential Hotspot/Nullipotent
-     * @author DoubleX @interface @since v1.02a @version v1.02a
-     * @returns {boolean} Whether the battler can cancel the skill/item cooldown
-     */
-    $.canCancelSkillItemCooldown = function() {
-        if (!this.hasSkillItemCooldown()) return;
-        return NEW._canCancelCooldown.call(this, "canCancelSkillItem");
-    }; // $.canCancelSkillItemCooldown
 
     /**
      * The this pointer is Game_Battler.prototype
@@ -1891,7 +1219,6 @@ if (DoubleX_RMMZ.Enhanced_Codebase) {
         // Map can't be serialized so ordinary objects must be used
         this._skillItemCooldown = {
             usedSkillItems: [],
-            lastUsedSkillItems: [],
             battlerTurnCount: 0,
             skillItemTurnCounts: {}
         };
@@ -1927,9 +1254,7 @@ if (DoubleX_RMMZ.Enhanced_Codebase) {
      * @param {DataSkill|DataItem} item - Used item to be stored for cooldown
      */
     NEW._storeUsedSkillItem = function(item) {
-        // It's desirable for the same skill/item to be repeated multiple times
         this._skillItemCooldown.usedSkillItems.push(item);
-        //
     }; // NEW._storeUsedSkillItem
 
     /**
@@ -1956,7 +1281,7 @@ if (DoubleX_RMMZ.Enhanced_Codebase) {
      */
     NEW._skillItemCooldownTurnCount = function() {
         const priorities = $gameSystem.skillItemCooldownParam(
-                "skillItemNotetagDataTypePriorities");
+                "battlerNotetagDataTypePriorities");
         return MZ_EC.condOpValNotetagVal(
                 this, priorities, "cooldown", ["skillItem"], 0);
     }; // NEW._skillItemCooldownTurnCount
@@ -1994,8 +1319,16 @@ if (DoubleX_RMMZ.Enhanced_Codebase) {
 
     /**
      * The this pointer is Game_Battler.prototype
+     * Idempotent
      * @author DoubleX @since v1.00a @version v1.00a
-     * @param {DataSkill|DataItem} item - Used item to be stored for cooldown
+     */
+    NEW._clearUsedSkillItems = function() {
+        this._skillItemCooldown.usedSkillItems = [];
+    }; // NEW._clearUsedSkillItems
+
+    /**
+     * The this pointer is Game_Battler.prototype
+     * @author DoubleX @since v1.00a @version v1.00a
      */
     NEW._storeBattlerSkillItemCooldown = function(item) {
         this.storeSkillItemCooldown(item);
@@ -2047,31 +1380,15 @@ if (DoubleX_RMMZ.Enhanced_Codebase) {
     /**
      * The this pointer is Game_Battler.prototype
      * Idempotent
-     * @author DoubleX @since v1.00a @version v1.02a
+     * @author DoubleX @since v1.00a @version v1.00a
      * @param {string} itemKey - The key of the skill/item having cooldown
      * @param {number} turnCount - The skill/item cooldown turn count
      */
     NEW._storeSkillItemCooldown = function(itemKey, turnCount) {
-        if (turnCount <= 0) {
-            return NEW._eraseSkillItemCooldown.call(this, itemKey);
-        }
-        this._skillItemCooldown.skillItemTurnCounts[itemKey] = turnCount;
+        const { skillItemTurnCounts } = this._skillItemCooldown;
+        if (turnCount <= 0) return delete skillItemTurnCounts[itemKey];
+        skillItemTurnCounts[itemKey] = turnCount;
     }; // NEW._storeSkillItemCooldown
-
-    /**
-     * The this pointer is Game_Battler.prototype
-     * Idempotent
-     * @author DoubleX @since v1.02a @version v1.02a
-     * @param {string} itemKey - The key of the skill/item having cooldown
-     */
-    NEW._eraseSkillItemCooldown = function(itemKey) {
-        const { _skillItemCooldown } = this;
-        delete _skillItemCooldown.skillItemTurnCounts[itemKey];
-        // Otherwise cancel cooldown will have stale skill item notetags later
-        const item = NEW._REVERSE_SKILL_ITEM_COOLDOWN_KEY(itemKey);
-        _skillItemCooldown.lastUsedSkillItems.eraseElem(item);
-        //
-    }; // NEW._eraseSkillItemCooldown
 
     /**
      * The this pointer is Game_Battler.prototype
@@ -2107,110 +1424,6 @@ if (DoubleX_RMMZ.Enhanced_Codebase) {
         this._tpbChargeTime = -battlerTurnCount;
         // Otherwise the game will crash due to accessing the empty action slot
     }; // NEW._updateBattlerTpbCharge
-
-    /**
-     * Potential Hotspot/Nullipotent
-     * @author DoubleX @since v1.02a @version v1.02a
-     * @enum @param {string} notetagName - canCancelBattler/canCancelSkillItem
-     * @returns {boolean} Whether the battler can cancel the skill/item cooldown
-     */
-    NEW._canCancelCooldown = function(notetagName) {
-        MZ_EC.clearBattlerNotetagCache(this, "cooldown");
-        const priority = `${notetagName}NotetagDataTypePriorities`;
-        const priorities = $gameSystem.skillItemCooldownParam(priority);
-        const lastLatestSkillItems = this.latestSkillItems;
-        this.latestSkillItems = this._skillItemCooldown.lastUsedSkillItems;
-        const canCancel = MZ_EC.condOpNotetagVal(
-                this, priorities, "cooldown", [notetagName]);
-        this.latestSkillItems = lastLatestSkillItems;
-        MZ_EC.clearBattlerNotetagCache(this, "cooldown");
-        if (MZ_EC.IS_VALID_VAL(canCancel)) return canCancel;
-        return PF.get(`${notetagName}Cooldown`).call(this);
-    }; // $._canCancelCooldown
-
-    /**
-     * The this pointer is Game_Battler.prototype
-     * @author DoubleX @since v1.02a @version v1.02a
-     */
-    NEW._onCancelBattlerCooldownFail = function() {
-        PF.get("cancelBattlerCooldownFail").call(this);
-        NEW._runCancelCooldownEvents.call(this, "cancelBattlerFail");
-    }; // NEW._onCancelBattlerCooldownFail
-
-    /**
-     * The this pointer is Game_Battler.prototype
-     * @author DoubleX @since v1.02a @version v1.02a
-     */
-    NEW._onCancelSkillItemCooldownFail = function() {
-        PF.get("cancelSkillItemCooldownFail").call(this);
-        NEW._runCancelCooldownEvents.call(this, "cancelSkillItemFail");
-    }; // NEW._onCancelSkillItemCooldownFail
-
-    /**
-     * The this pointer is Game_Battler.prototype
-     * @author DoubleX @since v1.02a @version v1.02a
-     */
-    NEW._onCancelBattlerCooldownSuc = function() {
-        this.setBattlerCooldown(0);
-        PF.get("cancelBattlerCooldownSuc").call(this);
-        NEW._runCancelCooldownEvents.call(this, "cancelBattlerSuc");
-    }; // NEW._onCancelBattlerCooldownSuc
-
-    /**
-     * The this pointer is Game_Battler.prototype
-     * @author DoubleX @since v1.02a @version v1.02a
-     */
-    NEW._onCancelSkillItemCooldownSuc = function() {
-        NEW._clearSkillItemTurnCounts.call(this);
-        PF.get("cancelSkillItemCooldownSuc").call(this);
-        NEW._runCancelCooldownEvents.call(this, "cancelSkillItemSuc");
-    }; // NEW._onCancelSkillItemCooldownSuc
-
-    /**
-     * The this pointer is Game_Battler.prototype
-     * @author DoubleX @since v1.02a @version v1.02a
-     */
-    NEW._clearSkillItemTurnCounts = function() {
-        // Map can't be serialized so ordinary objects must be used
-        this._skillItemCooldown.skillItemTurnCounts = {};
-        //
-    }; // NEW._clearSkillItemTurnCounts
-
-    /**
-     * The this pointer is Game_Battler.prototype
-     * @author DoubleX @since v1.02a @version v1.02a
-     * @enum @param {string} notetagName - cancelBattlerFail/cancelSkillItemFail
-     *                                     /cancelBattlerSuc/cancelSkillItemSuc
-     */
-    NEW._runCancelCooldownEvents = function(notetagName) {
-        MZ_EC.clearBattlerNotetagCache(this, "cooldown");
-        const priority = `${notetagName}NotetagDataTypePriorities`;
-        const priorities = $gameSystem.skillItemCooldownParam(priority);
-        const lastLatestSkillItems = this.latestSkillItems;
-        this.latestSkillItems = this._skillItemCooldown.lastUsedSkillItems;
-        MZ_EC.runCondEventNotetags(this, priorities, "cooldown", [notetagName]);
-        this.latestSkillItems = lastLatestSkillItems;
-        MZ_EC.clearBattlerNotetagCache(this, "cooldown");
-    }; // NEW._runCancelCooldownEvents
-
-    /**
-     * The this pointer is Game_Battler.prototype
-     * Idempotent
-     * @author DoubleX @since v1.02a @version v1.02a
-     */
-    NEW._clearAllUsedSkillItems = function() {
-        NEW._clearUsedSkillItems.call(this);
-        this._skillItemCooldown.lastUsedSkillItems = [];
-    }; // NEW._clearAllUsedSkillItems
-
-    /**
-     * The this pointer is Game_Battler.prototype
-     * Idempotent
-     * @author DoubleX @since v1.00a @version v1.00a
-     */
-    NEW._clearUsedSkillItems = function() {
-        this._skillItemCooldown.usedSkillItems = [];
-    }; // NEW._clearUsedSkillItems
 
 })(Game_Battler.prototype, DoubleX_RMMZ.Enhanced_Codebase,
         DoubleX_RMMZ.Skill_Item_Cooldown);
@@ -2301,183 +1514,6 @@ if (DoubleX_RMMZ.Enhanced_Codebase) {
     }); // v1.00a - v1.00a
 
 })(Game_Enemy.prototype, DoubleX_RMMZ.Enhanced_Codebase,
-        DoubleX_RMMZ.Skill_Item_Cooldown);
-
-/*----------------------------------------------------------------------------
- *    # (v1.02a+)Edited class: Sprite_Gauge
- *      - Shows the TPBS battler cooldowns on the gauge sprites as well
- *----------------------------------------------------------------------------*/
-
-(($, MZ_EC, SIC) => {
-
-    "use strict";
-
-    const PF = SIC.FUNC_PARAMS.PARAM_FUNCS, klassName = "Sprite_Gauge";
-    const { ORIG } = MZ_EC.setKlassContainer(klassName, $, SIC);
-    const EC_SG = MZ_EC[klassName].new, SG = SIC[klassName];
-
-    MZ_EC.extendFunc(EC_SG, SG, "validCurTimeVal", function() {
-        // Edited to show the TPBS battler cooldowns as well
-        if (this._battler.isBattlerCooldown()) {
-            const validMaxTimeVal = EC_SG.validCurMaxTimeVal.call(this);
-            return Math.min(this._battler.battlerCooldown(), validMaxTimeVal);
-        } else return ORIG.validCurTimeVal.apply(this, arguments);
-        //
-    }); // v1.02a - v1.02a
-
-    ["1", "2"].forEach(num => {
-        MZ_EC.extendFunc(EC_SG, SG, `timeGaugeColor${num}`, function() {
-            // Edited to show the TPBS battler cooldowns as well
-            if (this._battler.isBattlerCooldown()) {
-                return PF.get(`skillItemCooldownGaugeColor${num}`).call(this);
-            } else return ORIG[`timeGaugeColor${num}`].apply(this, arguments);
-            //
-        }); // v1.02a - v1.02a
-    });
-
-})(Sprite_Gauge.prototype, DoubleX_RMMZ.Enhanced_Codebase,
-        DoubleX_RMMZ.Skill_Item_Cooldown);
-
-/*----------------------------------------------------------------------------
- *    # (v1.02a+)Edited class: Window_BattleStatus
- *      - Processes the battler cooldown cancel hotkeys as well
- *----------------------------------------------------------------------------*/
-
-(($, MZ_EC, SIC) => {
-
-    "use strict";
-
-    const $$ = Window_StatusBase.prototype, PF = SIC.FUNC_PARAMS.PARAM_FUNCS, {
-        NEW,
-        ORIG,
-        extendFunc
-    } = MZ_EC.setKlassContainer("Window_BattleStatus", $, SIC);
-
-    // It's to prevent unknowningly overriding that from other plugins
-    if ($.processHandling) {
-        extendFunc("processHandling", function() {
-            ORIG.processHandling.apply(this, arguments);
-            // Added to process cancel battler and skill/item cooldown hotkeys
-            NEW._procCancelCooldownHandling.call(this);
-            //
-        }); // v1.02a - v1.02a
-    } else {
-        /**
-         * Hotspot
-         * @author DoubleX @interface @since v1.02a @version v1.02a
-         */
-        $.processHandling = function() {
-            $$.processHandling.call(this);
-            NEW._procCancelCooldownHandling.call(this);
-        }; // $.processHandling
-    }
-    //
-
-    // It's to prevent unknowningly overriding that from other plugins
-    if ($.processTouch) {
-        extendFunc("processTouch", function() {
-            ORIG.processTouch.apply(this, arguments);
-            // Added to process cancel battler and skill/item cooldown touches
-            NEW._procTouch.call(this);
-            //
-        }); // v1.02a - v1.02a
-    } else {
-        /**
-         * Hotspot
-         * @author DoubleX @interface @since v1.02a @version v1.02a
-         */
-        $.processTouch = function() {
-            $$.processTouch.call(this);
-            NEW._procTouch.call(this);
-        }; // $.processTouch
-    }
-    //
-
-    /**
-     * The this pointer is Window_BattleStatus.prototype
-     * Hotspot/Idempotent
-     * @author DoubleX @since v1.02a @version v1.02a
-     */
-    NEW._procCancelCooldownHandling = function() {
-        if (!this.visible) return;
-        NEW._procCancelBattlerCooldownHandling.call(this);
-        NEW._procCancelSkillItemCooldownHandling.call(this);
-    }; // NEW._procCancelCooldownHandling
-
-    /**
-     * The this pointer is Window_BattleStatus.prototype
-     * Hotspot/Idempotent
-     * @author DoubleX @since v1.02a @version v1.02a
-     */
-    NEW._procCancelBattlerCooldownHandling = function() {
-        $gameSystem.skillItemCooldownParam("cancelBattlerCooldownHotkeys").
-                forEach(NEW._procCancelBattlerCooldownHotkey, this);
-    }; // NEW._procCancelBattlerCooldownHandling
-
-    /**
-     * The this pointer is Window_BattleStatus.prototype
-     * Hotspot/Idempotent
-     * @author DoubleX @since v1.02a @version v1.02a
-     * @param {Hotkey} hotkey - The cancel battler cooldown hotkey involved
-     * @param {number} i - The index of the corresponding actor in the party
-     */
-    NEW._procCancelBattlerCooldownHotkey = function(hotkey) {
-        NEW._procCancelCooldownHotkey.call(
-                this, hotkey, "cancelBattlerCooldown");
-    }; // NEW._procCancelBattlerCooldownHotkey
-
-    /**
-     * The this pointer is Window_BattleStatus.prototype
-     * Hotspot/Idempotent
-     * @author DoubleX @since v1.02a @version v1.02a
-     */
-    NEW._procCancelSkillItemCooldownHandling = function() {
-        $gameSystem.skillItemCooldownParam("cancelSkillItemCooldownHotkeys").
-                forEach(NEW._procCancelSkillItemCooldownHotkey, this);
-    }; // NEW._procCancelSkillItemCooldownHandling
-
-    /**
-     * The this pointer is Window_BattleStatus.prototype
-     * Hotspot/Idempotent
-     * @author DoubleX @since v1.02a @version v1.02a
-     * @param {Hotkey} hotkey - The cancel skill/item cooldown hotkey involved
-     */
-    NEW._procCancelSkillItemCooldownHotkey = function(hotkey) {
-        NEW._procCancelCooldownHotkey.call(
-                this, hotkey, "cancelSkillItemCooldown");
-    }; // NEW._procCancelSkillItemCooldownHotkey
-
-    /**
-     * The this pointer is Window_BattleStatus.prototype
-     * Hotspot/Idempotent
-     * @author DoubleX @since v1.02a @version v1.02a
-     * @param {Hotkey} hotkey - The cancel skill/item cooldown hotkey involved
-     * @enum @param {string} cmd - cancelBattlerCooldown/cancelSkillItemCooldown
-     */
-    NEW._procCancelCooldownHotkey = function(hotkey, cmd) {
-        const { actorIndex, actorHotkey } = hotkey;
-        if (!Input.isTriggered(actorHotkey)) return;
-        const actor_ = $gameParty.battleMembers()[actorIndex];
-        if (actor_) actor_[cmd]();
-    }; // NEW._procCancelCooldownHotkey
-
-    NEW._IS_VALID_TARGET = function(target_) {
-        return target_ && $gameParty.battleMembers().includes(target_);
-    }; // NEW._IS_VALID_TARGET
-    /**
-     * The this pointer is Window_BattleStatus.prototype
-     * Hotspot
-     * @author DoubleX @since v1.02a @version v1.02a
-     */
-    NEW._procTouch = function() {
-        if (!this.visible || $gameTemp.touchState() !== "click") return;
-        const target_ = $gameTemp.touchTarget();
-        $gameTemp.clearTouchState();
-        if (!NEW._IS_VALID_TARGET(target_)) return;
-        PF.get("onCancelCooldownClick").call(target_);
-    }; // NEW._procTouch
-
-})(Window_BattleStatus.prototype, DoubleX_RMMZ.Enhanced_Codebase,
         DoubleX_RMMZ.Skill_Item_Cooldown);
 
 /*============================================================================*/
