@@ -89,8 +89,8 @@
  *          one can be effective
  *       2. Each line can only have at most 1 notetag
  *       3. The following is the structure of all notetags in this plugin:
- *          - <doublex rmmz confusion edit>
- *          - <confusion edit>
+ *          - <doublex rmmz confusion edit contents>
+ *          - <confusion edit contents>
  *          Where contents are in the form of type suffixes: entries
  *          Either of the above can be used, but the 1st one reduce the chance
  *          of causing other plugins to treat the notetags of this plugin as
