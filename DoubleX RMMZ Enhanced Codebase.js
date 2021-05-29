@@ -18,7 +18,7 @@
  *       newer versions of this plugin
  *    3. This plugin also fixed some bugs and further improved performance in
  *       the default RMMZ codebase
- *    4. THIS PLUGIN'S INTENDED TO GIVES AN EXTRA OPTION TO PLUGIN DEVELOPERS
+ *    4. THIS PLUGIN'S INTENDED TO GIVE AN EXTRA OPTION TO PLUGIN DEVELOPERS
  *       RATHER THAN REPLACING THE DEFAULT RMMZ CODEBASE
  *----------------------------------------------------------------------------
  *    # Prerequisites
@@ -68,7 +68,7 @@
  *         must be outdated if those version numbers are indeed different
  *      3. (Plugin developers only)The version numbers of this plugin are
  *         stored in DoubleX_RMMZ.Enhanced_Codebase.VERSIONS, which should be
- *         { codebase: "1.1.1", plugin: "v0.00a" }
+ *         { codebase: "1.2.1", plugin: "v0.00a" }
  *         If it's falsy, it means this plugin's not loaded at the moment of
  *         querying its version numbers
  *      4. (Plugin developers only)Please use the following search tag to
@@ -126,7 +126,7 @@
 /*:
  * @url https://www.patreon.com/doublex
  * @target MZ
- * @plugindesc Versions: { codebase: "1.1.1", plugin: "v0.00a" }
+ * @plugindesc Versions: { codebase: "1.2.1", plugin: "v0.00a" }
  * Fixes bugs, improves codebase quality, boosts performance and gives new APIs
  * @author DoubleX
  *
@@ -413,7 +413,7 @@ var DoubleX_RMMZ = DoubleX_RMMZ || {}; // var must be used or game will crash
     // Separates the version numbers with the rest to make the former more clear
     DoubleX_RMMZ.Enhanced_Codebase = {
         PLUGIN_NAME: name,
-        VERSIONS: { codebase: "1.1.1", plugin: "v0.00a" }
+        VERSIONS: { codebase: "1.2.1", plugin: "v0.00a" }
     }; // DoubleX_RMMZ.Enhanced_Codebase
     //
 
@@ -1054,6 +1054,19 @@ var DoubleX_RMMZ = DoubleX_RMMZ || {}; // var must be used or game will crash
             container.delete(containerName_);
         });
     }; // MZ_EC.clearBattlerNotetagCache
+
+    // This unused function's here just to show that this idea doesn't work
+    MZ_EC.runSparseNotetagResults = function(notetagName, paramFunc, containerName, dataName, newData, notetagTypeFunc) {
+        const suffix = "NotetagDataTypePriorities";
+        const types = $gameSystem[paramFunc](`${notetagName}${suffix}`);
+        MZ_EC.clearBattlerNotetagCache(this, containerName);
+        const oldData = this[dataName];
+        this[dataName] = newData;
+        MZ_EC[notetagTypeFunc](this, types, containerName, [notetagName]);
+        this[dataName] = oldData;
+        MZ_EC.clearBattlerNotetagCache(this, containerName);
+    }; // MZ_EC.runNotetagResults
+    //
 
 })(DoubleX_RMMZ.Enhanced_Codebase);
 
@@ -2065,8 +2078,8 @@ var DoubleX_RMMZ = DoubleX_RMMZ || {}; // var must be used or game will crash
         //
         return new PIXI.Shader(PIXI.Program.from(vertexSrc, fragmentSrc), {
             uSampler0: 0,
-            uSampler1: 1,
-            uSampler2: 2,
+            uSampler1: 0,
+            uSampler2: 0,
             uProjectionMatrix: new PIXI.Matrix()
         });
     }); // v0.00a - v0.00a
