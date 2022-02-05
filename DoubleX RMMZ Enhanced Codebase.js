@@ -275,6 +275,22 @@
  *    ## Plugin Developers Info
  *----------------------------------------------------------------------------
  *   # New public APIs
+ *     Object
+ *     - Instance method
+ *       1. traceObjProp(cond, label)
+ *          - Traces all object properties satisfying function cond linked to
+ *            this object
+ *          - Labels all traced object properties with function label
+ *          - cond and label are functions written in
+ *            Object Property Trace Condition Function and
+ *            Object Property Trace Label Function
+ *            of plugin configurations respectively
+ *     - Instance variable
+ *       1. objPropLog[cond]
+ *          - Returns the log of all traced object properties satisfying
+ *            function cond linked to this object
+ *          - cond is a function written in
+ *            Object Property Trace Condition Function of plugin configurations
  *     Array
  *     - Instance methods
  *       1. fastMap(mapCallback, mapThis_)
@@ -412,6 +428,7 @@ var DoubleX_RMMZ = DoubleX_RMMZ || {}; // var must be used or game will crash
 
     // Separates the version numbers with the rest to make the former more clear
     DoubleX_RMMZ.Enhanced_Codebase = {
+        CFG: {},
         PLUGIN_NAME: name,
         VERSIONS: { codebase: "1.4.3", plugin: "v0.00a" }
     }; // DoubleX_RMMZ.Enhanced_Codebase
@@ -419,16 +436,102 @@ var DoubleX_RMMZ = DoubleX_RMMZ || {}; // var must be used or game will crash
 
 })();
 
-(EC => {
+(MZ_EC => {
 
     "use strict";
 
-    const pluginCodebaseVer = EC.VERSIONS.codebase;
+    const pluginCodebaseVer = MZ_EC.VERSIONS.codebase;
     if (Utils.checkRMVersion(pluginCodebaseVer)) return;
     console.warn(`Your codebase version is ${Utils.RPGMAKER_VERSION} but must be
-                 at least ${pluginCodebaseVer} to use ${EC.PLUGIN_NAME}`);
+                 at least ${pluginCodebaseVer} to use ${MZ_EC.PLUGIN_NAME}`);
 
 })(DoubleX_RMMZ.Enhanced_Codebase);
+
+/*============================================================================
+ *    ## Plugin Configurations
+ *       You only need to edit this part as it's about what this plugin does
+ *----------------------------------------------------------------------------*/
+
+(CFG => {
+
+    "use strict";
+
+    CFG.objPropTrace = {
+
+        /*--------------------------------------------------------------------
+         *    Object Property Trace Condition Function
+         *    - Setups cond used by traceObjProp(cond, label)
+         *--------------------------------------------------------------------*/
+        /* cond must be a function taking the object property as only argument
+           Below examples are added to help you setup your own cond functions */
+
+        /**
+         * Pure function
+         * @since v0.00a @version v0.00a
+         * @param {*} obj - The property of the object being traced
+         * @returns {boolean} Whether the property of the object's to be traced
+         */
+        condObj: function(obj) {
+            // Checks if the currently traced object's indeed a non-Array object
+            return !Array.isArray(obj) && typeof obj === "object";
+            //
+        }, // substitute cond with "condObj" to use this function
+
+        /**
+         * Pure function
+         * @since v0.00a @version v0.00a
+         * @param {*} obj - The property of the object being traced
+         * @returns {boolean} Whether the property of the object's to be traced
+         */
+        condArr: function(obj) {
+            // Checks if the currently traced object's an array
+            return Array.isArray(obj);
+            //
+        }, // substitute cond with "condArr" to use this function
+
+        // Add your own cond functions here
+
+
+        /*--------------------------------------------------------------------
+         *    Object Property Trace Label Function
+         *    - Setups label used by traceObjProp(cond, label)
+         *--------------------------------------------------------------------*/
+        /* label must be a function taking the object property as only argument
+           All label functions must return a string
+           No label will be applied to an object directly
+           Below examples are added to help you setup your label functions */
+
+        /**
+         * Pure function
+         * @since v0.00a @version v0.00a
+         * @param {*} obj - The property of the object being traced
+         * @returns {string} The label of the traced object property
+         */
+        labelObj: function(obj) {
+            // Always returns whole traced object property string representation
+            if (typeof obj === "object") return JSON.stringify(obj);
+            return obj.toString();
+            // This doesn't work if the property to be labelled is an object
+        }, // substitute label with "labelObj" to use this function
+
+        /**
+         * Pure function
+         * @since v0.00a @version v0.00a
+         * @param {*} obj - The property of the object being traced
+         * @returns {string} The label of the traced object property
+         */
+        labelType: function(obj) {
+            // Always returns type(including Array) of traced object property
+            return Array.isArray(obj) ? "array" : typeof obj;
+            // This doesn't work if the property to be labelled is an object
+        } // substitute label with "labelType" to use this function
+
+        // Add your own label functions here
+
+
+    }; // CFG.objPropTrace
+
+})(DoubleX_RMMZ.Enhanced_Codebase.CFG);
 
 /*============================================================================
  *    ## Plugin Implementations
@@ -1103,6 +1206,72 @@ var DoubleX_RMMZ = DoubleX_RMMZ || {}; // var must be used or game will crash
  *----------------------------------------------------------------------------*/
 
 /*----------------------------------------------------------------------------
+ *    # Edit class: Object
+ *      - Adds some new array APIs
+ *----------------------------------------------------------------------------*/
+
+(function($, OPT) {
+
+    "use strict";
+
+    /*------------------------------------------------------------------------
+     *    New public variable
+     *------------------------------------------------------------------------*/
+    // {{*}} objPropLog: The container as the object properties trace log
+
+    const _DEFINE_PROP = (obj, prop, val) => {
+        // Using Object.defineProperty is to make the property non-enumerable
+        if (!obj[prop]) Object.defineProperty(obj, prop, {
+            configurable: true,
+            value: val,
+            writable: true
+        });
+        //
+    }; // _DEFINE_PROP
+
+    /**
+     * Idempotent
+     * @author DoubleX @interface @since v0.00a @version v0.00a
+     * @memberof JsExtensions
+     * @enum @param {string} cond - The name of the trace condition function
+     * @enum @param {string} label - The name of the trace label function
+     */
+    _DEFINE_PROP($, "traceObjProp", function(cond, label) {
+        _DEFINE_PROP(this, "objPropLog", {});
+        _DEFINE_PROP(this, "_objPropTrace", {});
+        // Stop tracing the object property if the path would be cyclic
+        if (this._objPropTrace[cond]) return;
+        //
+        const traceCond = this._objPropTrace[cond] = {};
+        // Labels and uses all nonempty subtrees to form object property tree
+        Object.entries(this).forEach(([prop, obj]) => {
+            // Recursively traverse the property tree via Depth First Search
+            const isNonObj = Array.isArray(obj) || typeof obj !== "object";
+            if (OPT[cond](obj)) {
+                traceCond[obj] = [prop];
+                this.objPropLog[cond] = this.objPropLog[cond] || "{";
+                if (isNonObj) {
+                    this.objPropLog[cond] += ` ${prop}: ${OPT[label](obj)} `;
+                }
+            }
+            if (isNonObj || obj === null) return;
+            obj.traceObjProp(cond, label);
+            if (Object.keys(traceCond).isEmpty()) return;
+            traceCond[obj] = traceCond[obj] || [];
+            traceCond[obj].push(obj._objPropTrace[cond]);
+            if (!obj.objPropLog[cond]) return;
+            this.objPropLog[cond] = this.objPropLog[cond] || "{";
+            this.objPropLog[cond] += ` ${prop}: ${obj.objPropLog[cond]} `;
+            //
+        });
+        //
+        if (this.objPropLog[cond]) this.objPropLog[cond] += "}";
+    }); // traceObjProp
+    //
+
+})(Object.prototype, DoubleX_RMMZ.Enhanced_Codebase.CFG.objPropTrace);
+
+/*----------------------------------------------------------------------------
  *    # Edit class: Array
  *      - Adds some new array APIs
  *----------------------------------------------------------------------------*/
@@ -1699,7 +1868,10 @@ var DoubleX_RMMZ = DoubleX_RMMZ || {}; // var must be used or game will crash
      * @author DoubleX @since v0.00a @version v0.00a
      * @param {Error} e - The error occured when trying to create the pixi app
      */
-    NEW._onCreatePixiAppErr = function(e) { this._app = null; };
+    NEW._onCreatePixiAppErr = function(e) {
+        console.error(e.stack);
+        this._app = null;
+    }; // NEW._onCreatePixiAppErr
 
     /**
      * The this pointer is Graphics
@@ -1740,7 +1912,10 @@ var DoubleX_RMMZ = DoubleX_RMMZ || {}; // var must be used or game will crash
      * @author DoubleX @since v0.00a @version v0.00a
      * @param {Error} e - The error when failing to create the effekseer context
      */
-    NEW._onCreateEffekseerContextErr = function(e) { this._app = null; };
+    NEW._onCreateEffekseerContextErr = function(e) {
+        console.error(e.stack);
+        this._app = null;
+    }; // NEW._onCreateEffekseerContextErr
 
     /**
      * The this pointer is Graphics
@@ -1892,7 +2067,7 @@ var DoubleX_RMMZ = DoubleX_RMMZ || {}; // var must be used or game will crash
      * @author DoubleX @since v0.00a @version v0.00a
      * @param {Error} e - The error when failing to perform bit block transfer
      */
-    NEW._onBltError = function(e) {};
+    NEW._onBltError = function(e) { console.warn(e.stack); };
 
     /**
      * The this pointer is Bitmap.prototype
@@ -2009,6 +2184,7 @@ var DoubleX_RMMZ = DoubleX_RMMZ || {}; // var must be used or game will crash
      * @param {Error} e - The error when failing to refresh with base texture
      */
     NEW._onRefreshWithBaseTextureErr = function(e) {
+        console.warn(e.stack);
         this.texture.frame = new Rectangle();
     }; // NEW._onRefreshWithBaseTextureErr
 
@@ -2206,6 +2382,7 @@ var DoubleX_RMMZ = DoubleX_RMMZ || {}; // var must be used or game will crash
      * @param {Error} e - The error occured when failing to refresh base texture
      */
     NEW._onRefreshWithBaseTextureErr = function(e) {
+        console.warn(e.stack);
         this.texture.frame = new Rectangle();
     }; // NEW._onRefreshWithBaseTextureErr
 
@@ -2400,7 +2577,10 @@ var DoubleX_RMMZ = DoubleX_RMMZ || {}; // var must be used or game will crash
      * @author DoubleX @since v0.00a @version v0.00a
      * @param {Error} e - The error when failing to create the audio context
      */
-    NEW._onCreateContextErr = function(e) { this._context = null; };
+    NEW._onCreateContextErr = function(e) {
+        console.warn(e.stack);
+        this._context = null;
+    }; // NEW._onCreateContextErr
 
     /**
      * The this pointer is WebAudio.prototype
@@ -2423,7 +2603,7 @@ var DoubleX_RMMZ = DoubleX_RMMZ || {}; // var must be used or game will crash
      * @author DoubleX @since v0.00a @version v0.00a
      * @param {Error} e - The error when failing to stop the source node
      */
-    NEW_PROTO._onStopSourceNodeErr = function(e) {};
+    NEW_PROTO._onStopSourceNodeErr = function(e) { console.warn(e.stack); };
 
 })(WebAudio, DoubleX_RMMZ.Enhanced_Codebase);
 
@@ -2880,7 +3060,9 @@ var DoubleX_RMMZ = DoubleX_RMMZ || {}; // var must be used or game will crash
      * @author DoubleX @since v0.00a @version v0.00a
      * @param {Error} e - Error when failing to rollback failed local file save
      */
-    NEW._onRollbackFailedLocalFileSaveErr = function(e) {};
+    NEW._onRollbackFailedLocalFileSaveErr = function(e) {
+        console.warn(e.stack);
+    }; // NEW._onRollbackFailedLocalFileSaveErr
 
     /**
      * The this pointer is StorageManager
@@ -3254,7 +3436,7 @@ var DoubleX_RMMZ = DoubleX_RMMZ || {}; // var must be used or game will crash
     } = MZ_EC.setKlassContainer(klassName, $, MZ_EC);
 
     /*------------------------------------------------------------------------
-     *    New private variables
+     *    New private variable
      *------------------------------------------------------------------------*/
     // {{*}} _enhancedCodebase: The container of everything from other plugins
 
