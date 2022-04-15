@@ -52,7 +52,7 @@
  *      - None So Far
  *----------------------------------------------------------------------------
  *    # Changelog
- *      { codebase: "1.4.4", plugin: "v1.00a" }(2022 Apr 15 GMT 1200):
+ *      { codebase: "1.4.4", plugin: "v1.00a" }(2022 Apr 15 GMT 1300):
  *      1. 1st version of this plugin finished
  *============================================================================*/
 
@@ -83,21 +83,21 @@
  *  {
  *  	"Common Events": {
  *  		"Cri Hit Sound": {
- *  			"Text": [
- *  				"Cri Hit Sound"
- *  			]
+ *  			"Text": {
+ *  				"Contents Line 4": "Cri Hit Sound"
+ *  			}
  *  		},
  *  		"Norm Hit Sound": {
- *  			"Text": [
- *  				"Norm Hit Sound"
- *  			]
+ *  			"Text": {
+ *  				"Contents Line 4": "Norm Hit Sound"
+ *  			}
  *  		},
  *  		"Common Event Name Test Event Text Extractor": {
- *  			"Text": [
- *  				"Common Event Test Text"
- *  			],
- *  			"Choices": [
- *  				[
+ *  			"Text": {
+ *  				"Contents Line 2": "Common Event Test Text"
+ *  			},
+ *  			"Choices": {
+ *  				"Contents Line 3": [
  *  					"Choice I",
  *  					"B",
  *  					"3rd Selection",
@@ -105,46 +105,45 @@
  *  					"No",
  *  					"Cancel"
  *  				]
- *  			],
- *  			"Scroll Text": [
- *  				"Common Event Scroll Text Extractor Test"
- *  			]
+ *  			},
+ *  			"Scroll Text": {
+ *  				"Contents Line 18": "Common Event Scroll Text Extractor Test"
+ *  			}
  *  		}
  *  	},
  *  	"Troop Events": {
  *  		"Hi_monster*8": {
  *  			"Page 1": {
- *  				"Text": [
- *  					"New Turn"
- *  				]
- *  			},
- *  			"Page 2": {}
+ *  				"Text": {
+ *  					"Contents Line 3": "New Turn"
+ *  				}
+ *  			}
  *  		}
  *  	},
  *  	"First Map": {
  *  		"Event Name Summon Hi Monster X": {
  *  			"Page 1": {
- *  				"Text": [
- *  					"Do you want to fight Hi Monster X?"
- *  				],
- *  				"Choices": [
- *  					[
+ *  				"Text": {
+ *  					"Contents Line 16": "Do you want to fight Hi Monster X?"
+ *  				},
+ *  				"Choices": {
+ *  					"Contents Line 17": [
  *  						"Yes",
  *  						"No"
  *  					]
- *  				],
- *  				"Scroll Text": [
- *  					"Is Monsters X Working?"
- *  				]
+ *  				},
+ *  				"Scroll Text": {
+ *  					"Contents Line 48": "Is Monsters X Working?"
+ *  				}
  *  			}
  *  		},
  *  		"Event Name Summon Minions": {
  *  			"Page 1": {
- *  				"Choices": [
- *  					[
+ *  				"Choices": {
+ *  					"Contents Line 13": [
  *  						"Cnt Crow"
  *  					]
- *  				]
+ *  				}
  *  			}
  *  		}
  *  	}
@@ -227,7 +226,7 @@ var DoubleX_RMMV_RMMZ = DoubleX_RMMV_RMMZ || {};
         return _commonEvWithTxts(await _readJSON(_COMMON_EV_PATH));
     }; // _allCommonEvs
     const _commonEvWithTxts = commonEvs => commonEvs.filter(commonEv_ => {
-        return commonEv_ && commonEv_.list.some(_txtCmdCode_);
+        return commonEv_ && _hasListTxts(commonEv_);
     }); // _commonEvWithTxts
 
     const _allMaps = async () => {
@@ -242,14 +241,14 @@ var DoubleX_RMMV_RMMZ = DoubleX_RMMV_RMMZ || {};
         return `data/Map${"0".repeat(3 - id.toString().length)}${id}.json`;
     }; // _mapPath
     const _mapWithTxts = (infos, maps) => maps.filter(map => {
-        return map.events.some(ev_ => ev_ && _hasPageTxt(ev_.pages));
+        return map.events.some(ev_ => ev_ && _hasPageTxts(ev_.pages));
     }).map((map, i) => Object.assign({ name: infos[i].name }, map));
 
     const _allTroopEvs = async () => {
         return _troopWithTxts(await _readJSON(_TROOPS_PATH));
     }; // _allTroopEvs
     const _troopWithTxts = troops => troops.filter(troop_ => {
-        return troop_ && _hasPageTxt(troop_.pages);
+        return troop_ && _hasPageTxts(troop_.pages);
     }); // _troopWithTxts
 
     const _readJSON = path => new Promise((resolve, reject) => {
@@ -286,34 +285,37 @@ var DoubleX_RMMV_RMMZ = DoubleX_RMMV_RMMZ || {};
         const txts = {};
         commonEvs.forEach(commonEv => {
             const evNameTxts = txts[commonEv.name] = {};
-            commonEv.list.forEach(_extractTxt.bind(null, evNameTxts));
+            commonEv.list.forEach(_extractTxts.bind(null, evNameTxts));
         });
         return txts;
     }; // _commonEvTxts
 
-    const _evs = map => map.events.filter(ev_ => ev_ && _hasPageTxt(ev_.pages));
     const _evTxts = ev => {
         const txts = {};
         ev.forEach(ev => {
             const evNameTxts = txts[ev.name] = {};
-            ev.pages.forEach((page, i) => {
+            ev.pages.filter(_hasListTxts).forEach((page, i) => {
                 const evPageTxts = evNameTxts[`Page ${i + 1}`] = {};
-                page.list.forEach(_extractTxt.bind(null, evPageTxts));
+                page.list.forEach(_extractTxts.bind(null, evPageTxts));
             });
         });
         return txts;
     }; // _evTxts
 
-    const _extractTxt = (txts, cmd) => {
+    const _evs = map => {
+        return map.events.filter(ev_ => ev_ && _hasPageTxts(ev_.pages));
+    }; // _evs
+
+    const _extractTxts = (txts, cmd, i) => {
         const code = _txtCmdCode_(cmd);
         if (!code) return;
-        txts[code] = txts[code] || [];
-        txts[code].push(cmd.parameters[0]);
-    }, _txtCmdCode_ = cmd => _TEXT_CMD_CODES[cmd.code];
+        txts[code] = txts[code] || {};
+        txts[code][`Contents Line ${i + 1}`] = cmd.parameters[0];
+    }; // _extractTxts
 
-    const _hasPageTxt = pages => pages.some(page => {
-        return page.list.some(_txtCmdCode_);
-    }); // _hasPageTxt
+    const _hasPageTxts = pages => pages.some(_hasListTxts);
+    const _hasListTxts = page => page.list.some(_txtCmdCode_);
+    const _txtCmdCode_ = cmd => _TEXT_CMD_CODES[cmd.code];
 
     const {
         fileName,
