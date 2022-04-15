@@ -24,9 +24,9 @@
  *----------------------------------------------------------------------------
  *    # Links
  *      Video:
- *      1.
+ *      1. https://www.youtube.com/watch?v=xDjqmoJAZk4
  *      This Plugin:
- *      1.
+ *      1. https://github.com/Double-X/DoubleX-RMMZ/blob/master/DoubleX_RMMV_RMMZ_Event_Text_Extractor.js
  *      Posts:
  *      1.
  *      2.
@@ -52,7 +52,7 @@
  *      - None So Far
  *----------------------------------------------------------------------------
  *    # Changelog
- *      { codebase: "1.4.4", plugin: "v1.00a" }(2022 Apr 15 GMT 1100):
+ *      { codebase: "1.4.4", plugin: "v1.00a" }(2022 Apr 15 GMT 1200):
  *      1. 1st version of this plugin finished
  *============================================================================*/
 
@@ -77,9 +77,10 @@
  *
  * @help
  * This plugin works for both RMMV and RMMZ but only when running on NW.js
- *
+ * Only texts, choices and scroll texts in common events and events will be
+ * extracted by this plugin into the output txt file
  * The output txt file may contain something like this:
- * {
+ *  {
  *  	"Common Events": {
  *  		"Cri Hit Sound": {
  *  			"Text": [
@@ -110,6 +111,16 @@
  *  			]
  *  		}
  *  	},
+ *  	"Troop Events": {
+ *  		"Hi_monster*8": {
+ *  			"Page 1": {
+ *  				"Text": [
+ *  					"New Turn"
+ *  				]
+ *  			},
+ *  			"Page 2": {}
+ *  		}
+ *  	},
  *  	"First Map": {
  *  		"Event Name Summon Hi Monster X": {
  *  			"Page 1": {
@@ -136,8 +147,7 @@
  *  				]
  *  			}
  *  		}
- *  	},
- *  	"Second Map": {}
+ *  	}
  *  }
  */
 
@@ -204,11 +214,14 @@ var DoubleX_RMMV_RMMZ = DoubleX_RMMV_RMMZ || {};
 
     const _COMMON_EV_PATH = "data/CommonEvents.json";
     const _MAP_INFO_PATH = "data/MapInfos.json";
-    const TEXT_CMD_CODES = { 401: "Text", 102: "Choices", 405: "Scroll Text" };
+    const _TROOPS_PATH = "data/Troops.json";
+    const _TEXT_CMD_CODES = { 401: "Text", 102: "Choices", 405: "Scroll Text" };
 
-    const _allTxts = async () => {
-        return _combinedTxts(await Promise.all([_allCommonEvs(), _allMaps()]));
-    }; // _allTxts
+    const _allTxts = async () => _combinedTxts(await Promise.all([
+        _allCommonEvs(),
+        _allMaps(),
+        _allTroopEvs()
+    ])); // _allTxts
 
     const _allCommonEvs = async () => {
         return _commonEvWithTxts(await _readJSON(_COMMON_EV_PATH));
@@ -220,7 +233,7 @@ var DoubleX_RMMV_RMMZ = DoubleX_RMMV_RMMZ || {};
     const _allMaps = async () => {
         const infos = await _readJSON(_MAP_INFO_PATH);
         const validInfos = infos.filter(info_ => info_);
-        return _mapWithNames(validInfos, await _combinedMaps(validInfos));
+        return _mapWithTxts(validInfos, await _combinedMaps(validInfos));
     }; // _allMaps
     const _combinedMaps = infos => {
         return Promise.all(infos.map(map => _readJSON(_mapPath(map.id))));
@@ -228,9 +241,16 @@ var DoubleX_RMMV_RMMZ = DoubleX_RMMV_RMMZ || {};
     const _mapPath = id => {
         return `data/Map${"0".repeat(3 - id.toString().length)}${id}.json`;
     }; // _mapPath
-    const _mapWithNames = (infos, maps) => maps.map((map, i) => Object.assign({
-        name: infos[i].name
-    }, map)); // _mapWithNames
+    const _mapWithTxts = (infos, maps) => maps.filter(map => {
+        return map.events.some(ev_ => ev_ && _hasPageTxt(ev_.pages));
+    }).map((map, i) => Object.assign({ name: infos[i].name }, map));
+
+    const _allTroopEvs = async () => {
+        return _troopWithTxts(await _readJSON(_TROOPS_PATH));
+    }; // _allTroopEvs
+    const _troopWithTxts = troops => troops.filter(troop_ => {
+        return troop_ && _hasPageTxt(troop_.pages);
+    }); // _troopWithTxts
 
     const _readJSON = path => new Promise((resolve, reject) => {
         _readJSONXHR(path, resolve, reject).send();
@@ -253,8 +273,11 @@ var DoubleX_RMMV_RMMZ = DoubleX_RMMV_RMMZ || {};
         return xhr;
     }; // _readJSONXHR
 
-    const _combinedTxts = ([commonEvs, maps]) => {
-        const txts = { "Common Events": _commonEvTxts(commonEvs) };
+    const _combinedTxts = ([commonEvs, maps, troopEvs]) => {
+        const txts = {
+            "Common Events": _commonEvTxts(commonEvs),
+            "Troop Events": _evTxts(troopEvs)
+        };
         maps.forEach(map => { txts[map.name] = _evTxts(_evs(map)); });
         return JSON.stringify(txts, null, "\t");
     }; // _combinedTxts
@@ -268,9 +291,7 @@ var DoubleX_RMMV_RMMZ = DoubleX_RMMV_RMMZ || {};
         return txts;
     }; // _commonEvTxts
 
-    const _evs = map => map.events.filter(ev_ => {
-        return ev_ && ev_.pages.some(page => page.list.some(_txtCmdCode_));
-    }); // _evs
+    const _evs = map => map.events.filter(ev_ => ev_ && _hasPageTxt(ev_.pages));
     const _evTxts = ev => {
         const txts = {};
         ev.forEach(ev => {
@@ -288,7 +309,11 @@ var DoubleX_RMMV_RMMZ = DoubleX_RMMV_RMMZ || {};
         if (!code) return;
         txts[code] = txts[code] || [];
         txts[code].push(cmd.parameters[0]);
-    }, _txtCmdCode_ = cmd => TEXT_CMD_CODES[cmd.code];
+    }, _txtCmdCode_ = cmd => _TEXT_CMD_CODES[cmd.code];
+
+    const _hasPageTxt = pages => pages.some(page => {
+        return page.list.some(_txtCmdCode_);
+    }); // _hasPageTxt
 
     const {
         fileName,
