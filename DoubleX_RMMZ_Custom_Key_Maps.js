@@ -320,7 +320,6 @@
  * @plugindesc Versions: { codebase: "1.1.0", plugin: "v1.00b" }
  * Lets you use more keys in the keyboard for RMMZ by setting the key maps
  * @orderAfter DoubleX_RMMZ_Enhanced_Codebase
- * @orderAfter DoubleX RMMZ Enhanced Codebase
  * @author DoubleX
  *
  * @param keyMaps
