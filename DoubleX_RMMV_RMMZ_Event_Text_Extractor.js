@@ -60,7 +60,7 @@
  * @url https://www.patreon.com/doublex
  * @target MZ
  * @plugindesc Versions: { codebase: "1.4.4", plugin: "v1.00a" }
- * Lets you extract all texts in all events/common events into a txt file
+ * Lets you extract texts in events/common events/battle events to txt file
  * @orderAfter DoubleX_RMMZ_Enhanced_Codebase
  * @author DoubleX
  *
@@ -77,8 +77,11 @@
  *
  * @help
  * This plugin works for both RMMV and RMMZ but only when running on NW.js
- * Only texts, choices and scroll texts in common events and events will be
- * extracted by this plugin into the output txt file
+ * Only texts, choices and scroll texts in common events, events and troop
+ * battle events will be extracted by this plugin into the output txt file
+ * This plugin can lead to very long loading time upon game start when the
+ * project has hundreds of maps each having tons of texts, choices and
+ * scroll texts in common events, events and troop battle events
  * The output txt file may contain something like this:
  *  {
  *  	"Common Events": {
@@ -230,9 +233,8 @@ var DoubleX_RMMV_RMMZ = DoubleX_RMMV_RMMZ || {};
     }); // _commonEvWithTxts
 
     const _allMaps = async () => {
-        const infos = await _readJSON(_MAP_INFO_PATH);
-        const validInfos = infos.filter(info_ => info_);
-        return _mapWithTxts(validInfos, await _combinedMaps(validInfos));
+        const infos = (await _readJSON(_MAP_INFO_PATH)).filter(info_ => info_);
+        return _mapWithTxts(infos, await _combinedMaps(infos));
     }; // _allMaps
     const _combinedMaps = infos => {
         return Promise.all(infos.map(map => _readJSON(_mapPath(map.id))));
