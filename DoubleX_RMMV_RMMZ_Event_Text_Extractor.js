@@ -28,16 +28,16 @@
  *      This Plugin:
  *      1. https://github.com/Double-X/DoubleX-RMMZ/blob/master/DoubleX_RMMV_RMMZ_Event_Text_Extractor.js
  *      Posts:
- *      1.
- *      2.
- *      3.
- *      4.
- *      5.
- *      6.
- *      7.
- *      8.
- *      9.
- *      10.
+ *      1. https://forums.rpgmakerweb.com/index.php?threads/doublex_rmmv_rmmz_event_text_extractor.146836/
+ *      2. https://www.rpgmakercentral.com/topic/43111-doublex_rmmv_rmmz_event_text_extractor/
+ *      3. https://rpgmaker.net/engines/rmmz/utilities/345/
+ *      4. https://www.save-point.org/thread-8506.html
+ *      5. https://gdu.one/forums/topic/14133-doublex_rmmv_rmmz_event_text_extractor/
+ *      6. https://www.arpgmaker.com/threads/doublex_rmmv_rmmz_event_text_extractor.80837/
+ *      7. https://forum.chaos-project.com/index.php/topic,16229.msg197732.html
+ *      8. https://www.reddit.com/r/RPGMaker/comments/u5d37v/doublex_rmmv_rmmz_event_text_extractor/
+ *      9. https://doublexrpgmaker.wordpress.com/2022/04/17/doublex_rmmv_rmmz_event_text_extractor/
+ *      10. https://www.patreon.com/posts/65233133
  *----------------------------------------------------------------------------
  *    # Contributors
  *      Authors:
