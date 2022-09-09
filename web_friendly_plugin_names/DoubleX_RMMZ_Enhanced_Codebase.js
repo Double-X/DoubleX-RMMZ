@@ -253,7 +253,7 @@
  *                   case 2: return "damageFormulaWithoutSideEffects";
  *                   case 3: return formula.replace(regex1, "");
  *                   case 4: return formula.replace(regex2, "");
- *                   default 1: return formula.replace(Game_Action.NO_SIDE_EFFECT_DAMAGE_FORMULA_REGEX, "");
+ *                   default: return formula.replace(Game_Action.NO_SIDE_EFFECT_DAMAGE_FORMULA_REGEX, "");
  *               }
  *           };
  *           Do note that this plugin doesn't provide such notetags for you,
@@ -1763,18 +1763,20 @@ var DoubleX_RMMZ = DoubleX_RMMZ || {}; // var must be used or game will crash
     }); // v0.00a - v0.00a
 
     // Search tag: Graphics_Render_FPS
-    addAccessor("renderFps", function() {
+    addAccessor("renderFps", NEW._getRenderFps = function() { // v0.00a - v0.00a
         return this._app.ticker.FPS;
-    }, function(renderFps) {
+    }, NEW._setRenderFps = function(renderFps) {
         const { ticker } = this._app;
         ticker.maxFPS = ticker.minFPS = renderFps;
-    }); // v0.00a - v0.00a
+    });
     //
 
     // Search tag: Graphics_Game_FPS
-    addAccessor("gameFps", function() { // v0.00a - v0.00a
+    addAccessor("gameFps", NEW._getGameFps = function() { // v0.00a - v0.00a
         return PIXI.settings.TARGET_FPMS * 1000.0;
-    }, function(gameFps) { PIXI.settings.TARGET_FPMS = gameFps / 1000.0; });
+    }, NEW._setGameFps = function(gameFps) {
+        PIXI.settings.TARGET_FPMS = gameFps / 1000.0;
+    });
     //
 
     NEW._keyEvents = new Map();
@@ -1909,43 +1911,6 @@ var DoubleX_RMMZ = DoubleX_RMMZ || {}; // var must be used or game will crash
         console.error(e.stack);
         this._app = null;
     }; // NEW._onCreateEffekseerContextErr
-
-    /**
-     * The this pointer is Graphics
-     * Hotspot/Nullipotent
-     * @author DoubleX @since v0.00a @version v0.00a
-     * @returns {number} The current target rendering loop FPS
-     */
-    NEW._getRenderFps = function() { return this._app.ticker.FPS; };
-
-    /**
-     * The this pointer is Graphics
-     * Idempotent
-     * @author DoubleX @since v0.00a @version v0.00a
-     * @param {number} renderFps - The new target rendering loop FPS
-     */
-    NEW._setRenderFps = function(renderFps) {
-        const { ticker } = this._app;
-        ticker.maxFPS = ticker.minFPS = renderFps;
-    }; // NEW._setRenderFps
-
-    /**
-     * The this pointer is Graphics
-     * Hotspot/Nullipotent
-     * @author DoubleX @since v0.00a @version v0.00a
-     * @returns {number} The current target game loop FPS
-     */
-    NEW._getGameFps = function() { return PIXI.settings.TARGET_FPMS * 1000.0; };
-
-    /**
-     * The this pointer is Graphics
-     * Idempotent
-     * @author DoubleX @since v0.00a @version v0.00a
-     * @param {number} gameFps - The new target game loop FPS
-     */
-    NEW._setGameFps = function(gameFps) {
-        PIXI.settings.TARGET_FPMS = gameFps / 1000.0;
-    }; // NEW._setGameFps
 
 })(Graphics, DoubleX_RMMZ.Enhanced_Codebase);
 
@@ -2104,9 +2069,9 @@ var DoubleX_RMMZ = DoubleX_RMMZ || {}; // var must be used or game will crash
         rewriteFunc
     } = MZ_EC.setKlassContainer("Sprite", $, MZ_EC);
 
-    rewriteAccessor("width", function() {
+    rewriteAccessor("width", NEW._getWidth = function() {
         return this._frame.width;
-    }, function(val) {
+    }, NEW._setWidth = function(val) {
         // Added to stop refreshing the sprite when its width remain unchanged
         if (this._frame.width === val) return;
         //
@@ -2114,9 +2079,9 @@ var DoubleX_RMMZ = DoubleX_RMMZ || {}; // var must be used or game will crash
         this._refresh();
     }); // v0.00a - v0.00a
 
-    rewriteAccessor("height", function() {
+    rewriteAccessor("height", NEW._getHeight = function() {
         return this._frame.height;
-    }, function(val) {
+    }, NEW._setHeight = function(val) {
         // Added to stop refreshing the sprite when its height remain unchanged
         if (this._frame.height === val) return;
         //
@@ -2180,50 +2145,6 @@ var DoubleX_RMMZ = DoubleX_RMMZ || {}; // var must be used or game will crash
         console.warn(e.stack);
         this.texture.frame = new Rectangle();
     }; // NEW._onRefreshWithBaseTextureErr
-
-    /**
-     * The this pointer is Sprite.prototype
-     * Hotspot/Nullipotent
-     * @author DoubleX @since v0.00a @version v0.00a
-     * @returns {number} The current width of this sprite
-     */
-    NEW._getWidth = function() { return this._frame.width; };
-
-    /**
-     * The this pointer is Sprite.prototype
-     * Idempotent
-     * @author DoubleX @since v0.00a @version v0.00a
-     * @param {number} val - The new width of this sprite
-     */
-    NEW._setWidth = function(val) {
-        // Added to stop refreshing the sprite when its width remain unchanged
-        if (this._frame.width === val) return;
-        //
-        this._frame.width = val;
-        this._refresh();
-    }; // NEW._setWidth
-
-    /**
-     * The this pointer is Sprite.prototype
-     * Hotspot/Nullipotent
-     * @author DoubleX @since v0.00a @version v0.00a
-     * @returns {number} The current height of this sprite
-     */
-    NEW._getHeight = function() { return this._frame.height; };
-
-    /**
-     * The this pointer is Sprite.prototype
-     * Idempotent
-     * @author DoubleX @since v0.00a @version v0.00a
-     * @param {number} val - The new height of this sprite
-     */
-    NEW._setHeight = function(val) {
-        // Added to stop refreshing the sprite when its height remain unchanged
-        if (this._frame.height === val) return;
-        //
-        this._frame.height = val;
-        this._refresh();
-    }; // NEW._setHeight
 
 })(Sprite.prototype, DoubleX_RMMZ.Enhanced_Codebase);
 
@@ -2438,98 +2359,6 @@ var DoubleX_RMMZ = DoubleX_RMMZ || {}; // var must be used or game will crash
         this._refreshAllParts();
         //
     }); // v0.00a - v0.00a
-
-    /**
-     * The this pointer is Window.prototype
-     * Hotspot/Nullipotent
-     * @author DoubleX @since v0.00a @version v0.00a
-     * @returns {number} The current width of this window
-     */
-    NEW._getWidth = function() { return this._width; };
-
-    /**
-     * The this pointer is Window.prototype
-     * Idempotent
-     * @author DoubleX @since v0.00a @version v0.00a
-     * @param {number} val - The new width of this window
-     */
-    NEW._setWidth = function(val) {
-        // Added to fix redundant refresh with width unchanged
-        if (this._width === val) return;
-        //
-        this._width = val;
-        this._refreshAllParts();
-        //
-    }; // NEW._setWidth
-
-    /**
-     * The this pointer is Window.prototype
-     * Hotspot/Nullipotent
-     * @author DoubleX @since v0.00a @version v0.00a
-     * @returns {number} The current height of this window
-     */
-    NEW._getHeight = function() { return this._height; };
-
-    /**
-     * The this pointer is Window.prototype
-     * Idempotent
-     * @author DoubleX @since v0.00a @version v0.00a
-     * @param {number} val - The new height of this window
-     */
-    NEW._setHeight = function(val) {
-        // Added to fix redundant refresh with height unchanged
-        if (this._height === val) return;
-        //
-        this._height = val;
-        this._refreshAllParts();
-        //
-    }; // NEW._setHeight
-
-    /**
-     * The this pointer is Window.prototype
-     * Hotspot/Nullipotent
-     * @author DoubleX @since v0.00a @version v0.00a
-     * @returns {number} The current padding of this window
-     */
-    NEW._getPadding = function() { return this._padding; };
-
-    /**
-     * The this pointer is Window.prototype
-     * Idempotent
-     * @author DoubleX @since v0.00a @version v0.00a
-     * @param {number} val - The new padding of this window
-     */
-    NEW._setPadding = function(val) {
-        // Added to fix redundant refresh with padding unchanged
-        if (this._padding === val) return;
-        //
-        this._padding = val;
-        this._refreshAllParts();
-        //
-    }; // NEW._setPadding
-
-    /**
-     * The this pointer is Window.prototype
-     * Hotspot/Nullipotent
-     * @author DoubleX @since v0.00a @version v0.00a
-     * @returns {number} The current margin of this window
-     */
-    NEW._getMargin = function() { return this._margin; };
-
-    /**
-     * The this pointer is Window.prototype
-     * Idempotent
-     * @author DoubleX @since v0.00a @version v0.00a
-     * @param {number} val - The new margin of this window
-     */
-    NEW._setMargin = function(val) {
-        // Added to fix redundant refresh with margin unchanged
-        if (this._margin === val) return;
-        //
-        this._margin = val;
-        this._refreshAllParts();
-        //
-    }; // NEW._setMargin
 
 })(Window.prototype, DoubleX_RMMZ.Enhanced_Codebase);
 
@@ -3546,51 +3375,18 @@ var DoubleX_RMMZ = DoubleX_RMMZ || {}; // var must be used or game will crash
     }; // NEW.storedParamVal
 
     MZ_EC.setupGameSystemParamsIOs = (pluginName, containerName) => {
-
-        const { ORIG } = MZ_EC.setKlassContainer(klassName, $, pluginName);
-        const EC_GS = MZ_EC[klassName].new, GS = pluginName[klassName];
-
-        const PLUGIN_NAME = pluginName.PLUGIN_NAME;
-
-        MZ_EC.extendFunc(EC_GS, GS, "storeParams", function() {
-            ORIG.storeParams.apply(this, arguments);
-            // Added to store all parameters of this plugin
-            EC_GS.onStoreParams.call(this, PLUGIN_NAME, containerName);
-            //
-        }); // v0.00a - v0.00a
-
-        const UPPER_CASE_NAME = name => {
+        const upperCaseName = name => {
             return `${name[0].toUpperCase()}${name.slice(1)}`;
-        }; // UPPER_CASE_NAME
-        const CMD_NAME = `set${UPPER_CASE_NAME(containerName)}Param`;
-
-        /**
-         * Script Call/Idempotent
-         * @author DoubleX @interface @since v0.00a @version v0.00a
-         * @enum @param {string} param - Name of parameter to be stored in saves
-         * @param {*} val - The value of the parameter to be stored in saves
-         */
-        $[CMD_NAME] = function(param, val) {
-            EC_GS.storeParamVal.call(this, containerName, param, val);
-        }; // $$[CMD_NAME]
-
-        /**
-         * Script Call/Nullipotent
-         * @author DoubleX @interface @since v0.00a @version v0.00a
-         * @enum @param {string} param - Name of parameter to be stored in saves
-         * @returns {*} The value of the parameter to be stored in game saves
-         */
-        $[`${containerName}Param`] = function(param) {
-            return EC_GS.storedParamVal.call(this, containerName, param);
-        }; // $[`${containerName}Param`]
-
-        PluginManager.registerCommand(PLUGIN_NAME, CMD_NAME, ({ param, val }) => {
-            $gameSystem[CMD_NAME](param, JSON.parse(val));
-        });
-
+        }, cmdName = `set${upperCaseName(containerName)}Param`;
+        MZ_EC._SETUP_GAME_SYSTEM_PARAM_IOS(pluginName, containerName, cmdName);
     }; // MZ_EC.setupGameSystemParamsIOs
 
     MZ_EC.setupGameSystemTPBSParamsIOs = (pluginName, containerName) => {
+        const cmdName = `setTPBS${containerName.slice(4)}Param`;
+        MZ_EC._SETUP_GAME_SYSTEM_PARAM_IOS(pluginName, containerName, cmdName);
+    }; // MZ_EC.setupGameSystemTPBSParamsIOs
+
+    MZ_EC._SETUP_GAME_SYSTEM_PARAM_IOS = (pluginName, containerName, cmdName) => {
 
         const { ORIG } = MZ_EC.setKlassContainer(klassName, $, pluginName);
         const EC_GS = MZ_EC[klassName].new, GS = pluginName[klassName];
@@ -3604,17 +3400,15 @@ var DoubleX_RMMZ = DoubleX_RMMZ || {}; // var must be used or game will crash
             //
         }); // v0.00a - v0.00a
 
-        const CMD_NAME = `setTPBS${containerName.slice(4)}Param`;
-
         /**
          * Script Call/Idempotent
          * @author DoubleX @interface @since v0.00a @version v0.00a
          * @enum @param {string} param - Name of parameter to be stored in saves
          * @param {*} val - The value of the parameter to be stored in saves
          */
-        $[CMD_NAME] = function(param, val) {
+        $[cmdName] = function(param, val) {
             EC_GS.storeParamVal.call(this, containerName, param, val);
-        }; // $$[CMD_NAME]
+        }; // $$[cmdName]
 
         /**
          * Script Call/Nullipotent
@@ -3626,11 +3420,11 @@ var DoubleX_RMMZ = DoubleX_RMMZ || {}; // var must be used or game will crash
             return EC_GS.storedParamVal.call(this, containerName, param);
         }; // $[`${containerName}Param`]
 
-        PluginManager.registerCommand(PLUGIN_NAME, CMD_NAME, ({ param, val }) => {
-            $gameSystem[CMD_NAME](param, JSON.parse(val));
+        PluginManager.registerCommand(PLUGIN_NAME, cmdName, ({ param, val }) => {
+            $gameSystem[cmdName](param, JSON.parse(val));
         });
 
-    }; // MZ_EC.setupGameSystemParamsIOs
+    }; // MZ_EC._SETUP_GAME_SYSTEM_PARAM_IOS
 
 })(Game_System.prototype, DoubleX_RMMZ.Enhanced_Codebase);
 
@@ -6197,6 +5991,7 @@ var DoubleX_RMMZ = DoubleX_RMMZ || {}; // var must be used or game will crash
 
     "use strict";
 
+    const GCB = MZ_EC.Game_CharacterBase.new;
     const $$ = Game_Character.prototype, {
         rewriteFunc,
         NEW
@@ -6223,7 +6018,7 @@ var DoubleX_RMMZ = DoubleX_RMMZ || {}; // var must be used or game will crash
      * @enum @param {number} vert - 2 for down/8 for up
      */
     NEW._onMoveDiagonallySuc = function(horz, vert) {
-        NEW._updateDiagonalXY.call(this, horz, vert);
+        GCB._updateDiagonalXY.call(this, horz, vert);
         this.increaseSteps();
     }; // NEW._onMoveDiagonallySuc
 
