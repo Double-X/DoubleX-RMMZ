@@ -5991,7 +5991,6 @@ var DoubleX_RMMZ = DoubleX_RMMZ || {}; // var must be used or game will crash
 
     "use strict";
 
-    const GCB = MZ_EC.Game_CharacterBase.new;
     const $$ = Game_Character.prototype, {
         rewriteFunc,
         NEW
@@ -6009,18 +6008,6 @@ var DoubleX_RMMZ = DoubleX_RMMZ || {}; // var must be used or game will crash
         if (!this.isMoving()) this.updateNonmoving(wasMoving, sceneActive);
         this._followers.update();
     }); // v0.00a - v0.00a
-
-    /**
-     * The this pointer is Game_Interpreter.prototype
-     * Idempotent
-     * @author DoubleX @interface @since v0.00a @version v0.00a
-     * @enum @param {number} horz - 4 for left/6 for right
-     * @enum @param {number} vert - 2 for down/8 for up
-     */
-    NEW._onMoveDiagonallySuc = function(horz, vert) {
-        GCB._updateDiagonalXY.call(this, horz, vert);
-        this.increaseSteps();
-    }; // NEW._onMoveDiagonallySuc
 
 })(Game_Player.prototype, DoubleX_RMMZ.Enhanced_Codebase);
 
