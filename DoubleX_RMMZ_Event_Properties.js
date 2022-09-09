@@ -64,6 +64,8 @@
  *      8.
  *      9.
  *      10.
+ *      Mentioned Patreon Supporters:
+ *      https://www.patreon.com/posts/71738797
  *----------------------------------------------------------------------------
  *    # Contributors
  *      Authors:
