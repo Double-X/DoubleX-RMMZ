@@ -67,6 +67,8 @@
  *      8. https://doublexrpgmaker.wordpress.com/2020/08/25/doublex-rmmz-targeting-ai/
  *      9. https://www.patreon.com/posts/40832897
  *      10. https://www.makerdevs.com/plugin/doublex-rmmz-targeting-ai
+ *      Mentioned Patreon Supporters:
+ *      https://www.patreon.com/posts/71738797
  *----------------------------------------------------------------------------
  *    # Contributors
  *      Authors:
