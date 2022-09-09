@@ -52,6 +52,8 @@
  *      8. https://doublexrpgmaker.wordpress.com/2020/09/05/doublex-rmmz-tpbs-configurations-edit/
  *      9. https://www.patreon.com/posts/41270147
  *      10. https://www.makerdevs.com/plugin/doublex-rmmz-tpbs-configurations-edit
+ *      Mentioned Patreon Supporters:
+ *      https://www.patreon.com/posts/71738797
  *----------------------------------------------------------------------------
  *    # Contributors
  *      Authors:
