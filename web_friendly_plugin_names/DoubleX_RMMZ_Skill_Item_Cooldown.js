@@ -78,6 +78,8 @@
  *      8. https://doublexrpgmaker.wordpress.com/2020/08/27/doublex-rmmz-skill-item-cooldown/
  *      9. https://www.patreon.com/posts/40913611
  *      10. https://www.makerdevs.com/plugin/doublex-rmmz-skill-item-cooldown
+ *      Mentioned Patreon Supporters:
+ *      https://www.patreon.com/posts/71738797
  *----------------------------------------------------------------------------
  *    # Contributors
  *      Authors:
