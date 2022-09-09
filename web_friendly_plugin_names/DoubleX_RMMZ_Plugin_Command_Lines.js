@@ -81,6 +81,8 @@
  *      8. https://doublexrpgmaker.wordpress.com/2020/09/04/doublex-rmmz-plugin-command-lines/
  *      9. https://www.patreon.com/posts/41227340
  *      10. https://www.makerdevs.com/plugin/doublex-rmmz-plugin-command-lines
+ *      Mentioned Patreon Supporters:
+ *      https://www.patreon.com/posts/71738797
  *----------------------------------------------------------------------------
  *    # Contributors
  *      Authors:
