@@ -58,6 +58,8 @@
  *      8. https://doublexrpgmaker.wordpress.com/2020/09/21/doublex_rmmz_custom_script_calls/
  *      9. https://www.patreon.com/posts/41857800
  *      10. https://www.makerdevs.com/plugin/doublex-rmmz-custom-script-calls
+ *      Mentioned Patreon Supporters:
+ *      https://www.patreon.com/posts/71738797
  *----------------------------------------------------------------------------
  *    # Contributors
  *      Authors:

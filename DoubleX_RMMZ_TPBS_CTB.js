@@ -50,6 +50,8 @@
  *      8. https://doublexrpgmaker.wordpress.com/2020/09/27/doublex_rmmz_tpbs_ctb/
  *      9. https://www.patreon.com/posts/42067877
  *      10. https://www.makerdevs.com/plugin/doublex-rmmz-tpbs-ctb
+ *      Mentioned Patreon Supporters:
+ *      https://www.patreon.com/posts/71738797
  *----------------------------------------------------------------------------
  *    # Instructions
  *      1. The default plugin parameters file name is DoubleX_RMMZ_TPBS_CTB

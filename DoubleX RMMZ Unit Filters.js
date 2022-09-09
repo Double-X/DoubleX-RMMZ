@@ -57,6 +57,8 @@
  *      8. https://doublexrpgmaker.wordpress.com/2020/08/23/doublex-rmmz-unit-filters/
  *      9. https://www.patreon.com/posts/40758313
  *      10. https://www.makerdevs.com/plugin/doublex-rmmz-unit-filters
+ *      Mentioned Patreon Supporters:
+ *      https://www.patreon.com/posts/71738797
  *----------------------------------------------------------------------------
  *    # Contributors
  *      Authors:

@@ -51,6 +51,8 @@
  *      8. https://doublexrpgmaker.wordpress.com/2020/10/30/doublex_rmmz_tpbs_battle_turns/
  *      9. https://www.patreon.com/posts/43317432
  *      10. https://www.makerdevs.com/plugin/doublex-rmmz-tpbs-battle-turns
+ *      Mentioned Patreon Supporters:
+ *      https://www.patreon.com/posts/71738797
  *----------------------------------------------------------------------------
  *    # Contributors
  *      Authors:

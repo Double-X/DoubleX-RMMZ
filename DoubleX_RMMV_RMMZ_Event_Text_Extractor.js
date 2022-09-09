@@ -38,6 +38,8 @@
  *      8. https://www.reddit.com/r/RPGMaker/comments/u5d37v/doublex_rmmv_rmmz_event_text_extractor/
  *      9. https://doublexrpgmaker.wordpress.com/2022/04/17/doublex_rmmv_rmmz_event_text_extractor/
  *      10. https://www.patreon.com/posts/65233133
+ *      Mentioned Patreon Supporters:
+ *      https://www.patreon.com/posts/71738797
  *----------------------------------------------------------------------------
  *    # Contributors
  *      Authors:

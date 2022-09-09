@@ -54,6 +54,8 @@
  *      8. https://doublexrpgmaker.wordpress.com/2020/10/30/doublex_rmmz_tpbs_actor_hotkeys/
  *      9. https://www.patreon.com/posts/43321038
  *      10. https://www.makerdevs.com/plugin/doublex-rmmz-tpbs-actor-hotkeys
+ *      Mentioned Patreon Supporters:
+ *      https://www.patreon.com/posts/71738797
  *----------------------------------------------------------------------------
  *    # Contributors
  *      Authors:
@@ -377,7 +379,7 @@ if (DoubleX_RMMZ.Enhanced_Codebase) {
         });
     }; // NEW._procIndexHotkeys
 
-})(Window_ActorCommand.prototype, DoubleX_RMMZ.Enhanced_Codebase, 
+})(Window_ActorCommand.prototype, DoubleX_RMMZ.Enhanced_Codebase,
         DoubleX_RMMZ.TPBS_Actor_Hotkeys);
 
 /*----------------------------------------------------------------------------*/
@@ -547,7 +549,7 @@ if (DoubleX_RMMZ.Enhanced_Codebase) {
         this.startActorCommandSelection();
     }; // NEW._onSelectIndex
 
-})(Scene_Battle.prototype, DoubleX_RMMZ.Enhanced_Codebase, 
+})(Scene_Battle.prototype, DoubleX_RMMZ.Enhanced_Codebase,
         DoubleX_RMMZ.TPBS_Actor_Hotkeys);
 
 /*============================================================================*/

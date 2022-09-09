@@ -41,6 +41,8 @@
  *      8. https://doublexrpgmaker.wordpress.com/2020/09/14/doublex_rmmz_auto_battle_command/
  *      9. https://www.patreon.com/posts/41587930
  *      10. https://www.makerdevs.com/plugin/doublex-rmmz-auto-battle-command
+ *      Mentioned Patreon Supporters:
+ *      https://www.patreon.com/posts/71738797
  *----------------------------------------------------------------------------
  *    # Contributors
  *      Authors:

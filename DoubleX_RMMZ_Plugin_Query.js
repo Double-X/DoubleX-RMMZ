@@ -66,6 +66,8 @@
  *      8. https://doublexrpgmaker.wordpress.com/2020/10/07/doublex_rmmz_plugin_query/
  *      9. https://www.patreon.com/posts/42482628
  *      10. https://www.makerdevs.com/plugin/doublex-rmmz-plugin-query
+ *      Mentioned Patreon Supporters:
+ *      https://www.patreon.com/posts/71738797
  *----------------------------------------------------------------------------
  *    # Contributors
  *      Authors:

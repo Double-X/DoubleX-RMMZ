@@ -53,6 +53,8 @@
  *      8. https://doublexrpgmaker.wordpress.com/2020/08/29/doublex-rmmz-state-triggers/
  *      9. https://www.patreon.com/posts/doublex-rmmz-40988080
  *      10. https://www.makerdevs.com/plugin/doublex-rmmz-state-triggers
+ *      Mentioned Patreon Supporters:
+ *      https://www.patreon.com/posts/71738797
  *----------------------------------------------------------------------------
  *    # Contributors
  *      Authors:

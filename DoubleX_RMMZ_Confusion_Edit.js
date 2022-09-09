@@ -51,6 +51,8 @@
  *      8. https://doublexrpgmaker.wordpress.com/2020/09/28/doublex_rmmz_confusion_edit/
  *      9. https://www.patreon.com/posts/42077864
  *      10. https://www.makerdevs.com/plugin/doublex-rmmz-confusion-edit
+ *      Mentioned Patreon Supporters:
+ *      https://www.patreon.com/posts/71738797
  *----------------------------------------------------------------------------
  *    # Contributors
  *      Authors:

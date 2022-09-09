@@ -45,6 +45,8 @@
  *      8. https://doublexrpgmaker.wordpress.com/2020/10/14/doublex_rmmz_script_call_hotkeys/
  *      9. https://www.patreon.com/posts/42734896
  *      10. https://www.makerdevs.com/plugin/doublex-rmmz-script-call-hotkeys
+ *      Mentioned Patreon Supporters:
+ *      https://www.patreon.com/posts/71738797
  *----------------------------------------------------------------------------
  *    # Contributors
  *      Authors:
@@ -109,7 +111,7 @@
  * @param hotkeys
  * @type struct<ScriptCallHotkey>[]
  * @desc The list of hotkeys with their script calls on the specified scene
- * @default [] 
+ * @default []
  */
 /*~struct~ScriptCallHotkey:
  *

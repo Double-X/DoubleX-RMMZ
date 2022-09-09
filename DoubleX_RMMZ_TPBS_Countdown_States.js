@@ -51,6 +51,8 @@
  *      8. https://doublexrpgmaker.wordpress.com/2020/10/30/doublex_rmmz_tpbs_countdown_states/
  *      9. https://www.patreon.com/posts/43327703
  *      10. https://www.makerdevs.com/plugin/doublex-rmmz-tpbs-countdown-states
+ *      Mentioned Patreon Supporters:
+ *      https://www.patreon.com/posts/71738797
  *----------------------------------------------------------------------------
  *    # Contributors
  *      Authors:

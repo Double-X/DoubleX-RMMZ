@@ -42,7 +42,7 @@
  *----------------------------------------------------------------------------
  *    # Links
  *      This Plugin:
- *      1.
+ *      1. https://github.com/Double-X/DoubleX-RMMZ/blob/master/DoubleX_RMMZ_Test_Helper.js
  *      Posts:
  *      1.
  *      2.
@@ -54,6 +54,8 @@
  *      8.
  *      9.
  *      10.
+ *      Mentioned Patreon Supporters:
+ *      https://www.patreon.com/posts/71738797
  *----------------------------------------------------------------------------
  *    # Contributors
  *      Authors:

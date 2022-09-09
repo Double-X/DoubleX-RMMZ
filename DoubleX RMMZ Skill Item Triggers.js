@@ -56,6 +56,8 @@
  *      8. https://doublexrpgmaker.wordpress.com/2020/08/30/doublex-rmmz-skill-item-triggers/
  *      9. https://www.patreon.com/posts/41016175
  *      10. https://www.makerdevs.com/plugin/doublex-rmmz-skill-item-triggers
+ *      Mentioned Patreon Supporters:
+ *      https://www.patreon.com/posts/71738797
  *----------------------------------------------------------------------------
  *    # Contributors
  *      Authors:

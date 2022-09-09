@@ -55,6 +55,8 @@
  *      8. https://doublexrpgmaker.wordpress.com/2020/08/28/doublex-rmmz-dynamic-data/
  *      9. https://www.patreon.com/posts/40947317
  *      10. https://www.makerdevs.com/plugin/doublex-rmmz-dynamic-data
+ *      Mentioned Patreon Supporters:
+ *      https://www.patreon.com/posts/71738797
  *----------------------------------------------------------------------------
  *    # Contributors
  *      Authors:
@@ -220,7 +222,7 @@ if (DoubleX_RMMZ.Enhanced_Codebase) {
         //
         ORIG._onXhrLoadSuc.apply(this, arguments);
     }); // v1.00a - v1.00a
-    
+
     NEW.VOID_UNSERIALIZABLE_DATUM = datum_ => {
         if (!datum_) return;
         const { meta } = datum_;

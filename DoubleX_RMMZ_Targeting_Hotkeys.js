@@ -46,6 +46,8 @@
  *      8. https://doublexrpgmaker.wordpress.com/2020/09/30/doublex_rmmz_targeting_hotkeys/
  *      9. https://www.patreon.com/posts/42155629
  *      10. https://www.makerdevs.com/plugin/doublex-rmmz-targeting-hotkeys
+ *      Mentioned Patreon Supporters:
+ *      https://www.patreon.com/posts/71738797
  *----------------------------------------------------------------------------
  *    # Contributors
  *      Authors:

@@ -38,6 +38,8 @@
  *      8. https://doublexrpgmaker.wordpress.com/2020/09/30/doublex_rmmz_custom_key_maps/
  *      9. https://www.patreon.com/posts/42155627
  *      10. https://www.makerdevs.com/plugin/doublex-rmmz-custom-key-maps
+ *      Mentioned Patreon Supporters:
+ *      https://www.patreon.com/posts/71738797
  *----------------------------------------------------------------------------
  *    # Contributors
  *      Authors:
