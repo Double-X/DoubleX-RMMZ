@@ -5992,8 +5992,7 @@ var DoubleX_RMMZ = DoubleX_RMMZ || {}; // var must be used or game will crash
     "use strict";
 
     const $$ = Game_Character.prototype, {
-        rewriteFunc,
-        NEW
+        rewriteFunc
     } = MZ_EC.setKlassContainer("Game_Player", $, MZ_EC);
 
     rewriteFunc("update", function(sceneActive) {
