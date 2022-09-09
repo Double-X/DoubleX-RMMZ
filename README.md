@@ -1,4 +1,5 @@
 My patreon: https://www.patreon.com/doublex
+
 Mentioned patreon supporters: https://www.patreon.com/posts/71738797
 
 IMPORTANT: YOU MUST OWN A LEGEL COPY OF THE RMMZ SOFTWARE TO USE ANY OF MY RMMZ PLUGINS
