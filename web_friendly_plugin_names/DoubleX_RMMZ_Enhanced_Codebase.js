@@ -5919,7 +5919,7 @@ var DoubleX_RMMZ = DoubleX_RMMZ || {}; // var must be used or game will crash
     }); // v0.00a - v0.00a
 
     /**
-     * The this pointer is Game_Interpreter.prototype
+     * The this pointer is Game_CharacterBase.prototype
      * Idempotent
      * @author DoubleX @interface @since v0.00a @version v0.00a
      * @enum @param {number} d - 2 for down/4 for left/6 for right/8 for up
@@ -5931,7 +5931,7 @@ var DoubleX_RMMZ = DoubleX_RMMZ || {}; // var must be used or game will crash
     }; // NEW._onMoveStraightSuc
 
     /**
-     * The this pointer is Game_Interpreter.prototype
+     * The this pointer is Game_CharacterBase.prototype
      * Idempotent
      * @author DoubleX @interface @since v0.00a @version v0.00a
      * @enum @param {number} d - 2 for down/4 for left/6 for right/8 for up
@@ -5944,7 +5944,7 @@ var DoubleX_RMMZ = DoubleX_RMMZ || {}; // var must be used or game will crash
     }; // NEW._updateStraightXY
 
     /**
-     * The this pointer is Game_Interpreter.prototype
+     * The this pointer is Game_CharacterBase.prototype
      * Idempotent
      * @author DoubleX @interface @since v0.00a @version v0.00a
      * @enum @param {number} d - 2 for down/4 for left/6 for right/8 for up
@@ -5955,7 +5955,7 @@ var DoubleX_RMMZ = DoubleX_RMMZ || {}; // var must be used or game will crash
     }; // NEW._onMoveStraightFail
 
     /**
-     * The this pointer is Game_Interpreter.prototype
+     * The this pointer is Game_CharacterBase.prototype
      * Idempotent
      * @author DoubleX @interface @since v0.00a @version v0.00a
      * @enum @param {number} horz - 4 for left/6 for right
@@ -5967,7 +5967,7 @@ var DoubleX_RMMZ = DoubleX_RMMZ || {}; // var must be used or game will crash
     }; // NEW._onMoveDiagonallySuc
 
     /**
-     * The this pointer is Game_Interpreter.prototype
+     * The this pointer is Game_CharacterBase.prototype
      * Idempotent
      * @author DoubleX @interface @since v0.00a @version v0.00a
      * @enum @param {number} horz - 4 for left/6 for right
@@ -5991,22 +5991,40 @@ var DoubleX_RMMZ = DoubleX_RMMZ || {}; // var must be used or game will crash
 
     "use strict";
 
-    const $$ = Game_Character.prototype, {
-        rewriteFunc
+    const {
+        rewriteFunc,
+        NEW
     } = MZ_EC.setKlassContainer("Game_Player", $, MZ_EC);
 
-    rewriteFunc("update", function(sceneActive) {
-        const lastScrolledX = this.scrolledX();
-        const lastScrolledY = this.scrolledY();
-        const wasMoving = this.isMoving();
-        this.updateDashing();
-        if (sceneActive) this.moveByInput();
-        $$.update.call(this);
-        this.updateScroll(lastScrolledX, lastScrolledY);
-        this.updateVehicle();
-        if (!this.isMoving()) this.updateNonmoving(wasMoving, sceneActive);
-        this._followers.update();
+    rewriteFunc("makeEncounterCount", function() {
+        this._encounterCount = NEW._encounterCount.call(this);
     }); // v0.00a - v0.00a
+
+    rewriteFunc("updateEncounterCount", function() {
+        this._encounterCount = NEW._updatedEncounterCount.call(this);
+    }); // v0.00a - v0.00a
+
+    /**
+     * The this pointer is Game_Player.prototype
+     * Nullipotent
+     * @author DoubleX @interface @since v0.00a @version v0.00a
+     * @returns {number} The number of steps needed to trigger the next battle
+     */
+    NEW._encounterCount = function() {
+        const n = $gameMap.encounterStep();
+        return Math.randomInt(n) + Math.randomInt(n) + 1;
+    }; // NEW._encounterCount
+
+    /**
+     * The this pointer is Game_Player.prototype
+     * Nullipotent
+     * @author DoubleX @interface @since v0.00a @version v0.00a
+     * @returns {number} The updated number of steps to trigger the next battle
+     */
+    NEW._updatedEncounterCount = function() {
+        if (!this.canEncounter()) return this._encounterCount;
+        return this._encounterCount - this.encounterProgressValue();
+    }; // NEW._updatedEncounterCount
 
 })(Game_Player.prototype, DoubleX_RMMZ.Enhanced_Codebase);
 
@@ -6023,6 +6041,12 @@ var DoubleX_RMMZ = DoubleX_RMMZ || {}; // var must be used or game will crash
         NEW,
         rewriteFunc
     } = MZ_EC.setKlassContainer("Game_Interpreter", $.prototype, MZ_EC);
+
+    rewriteFunc("fadeSpeed", function() {
+        // Edited to help plugins alter the fps in better ways
+        return Graphics.gameFps * 0.4;
+        //
+    }); // v0.00a - v0.00a
 
     rewriteFunc("command111", function(params) {
         this._branch[this._indent] = NEW._condBranchResult.call(this, params);
@@ -6231,6 +6255,75 @@ var DoubleX_RMMZ = DoubleX_RMMZ || {}; // var must be used or game will crash
  *----------------------------------------------------------------------------*/
 
 /*----------------------------------------------------------------------------
+ *    # Edited class: Scene_Base
+ *      - Uses the configurable Graphics fps instead of the constant 60
+ *----------------------------------------------------------------------------*/
+
+(($, MZ_EC) => {
+
+    "use strict";
+
+    const { rewriteFunc } = MZ_EC.setKlassContainer("Scene_Base", $, MZ_EC);
+
+    rewriteFunc("startFadeIn", function(duration, white) {
+        this._fadeSign = 1;
+        // Edited to help plugins alter the fps in better ways
+        this._fadeDuration = duration || Graphics.gameFps / 2;
+        //
+        this._fadeWhite = white;
+        this._fadeOpacity = 255;
+        this.updateColorFilter();
+    }); // v0.00a - v0.00a
+
+    rewriteFunc("startFadeOut", function(duration, white) {
+        this._fadeSign = -1;
+        // Edited to help plugins alter the fps in better ways
+        this._fadeDuration = duration || Graphics.gameFps / 2;
+        //
+        this._fadeWhite = white;
+        this._fadeOpacity = 0;
+        this.updateColorFilter();
+    }); // v0.00a - v0.00a
+
+    rewriteFunc("fadeOutAll", function() {
+        const slowFadeSpeed = this.slowFadeSpeed();
+        // Edited to help plugins alter the fps in better ways
+        const time = slowFadeSpeed / Graphics.gameFps;
+        //
+        AudioManager.fadeOutBgm(time);
+        AudioManager.fadeOutBgs(time);
+        AudioManager.fadeOutMe(time);
+        this.startFadeOut(slowFadeSpeed);
+    }); // v0.00a - v0.00a
+
+    rewriteFunc("fadeSpeed", function() {
+        // Edited to help plugins alter the fps in better ways
+        return Graphics.gameFps * 0.4;
+        //
+    }); // v0.00a - v0.00a
+
+})(Scene_Base.prototype, DoubleX_RMMZ.Enhanced_Codebase);
+
+/*----------------------------------------------------------------------------
+ *    # Edited class: Scene_Map
+ *      - Uses the configurable Graphics fps instead of the constant 60
+ *----------------------------------------------------------------------------*/
+
+(($, MZ_EC) => {
+
+    "use strict";
+
+    const { rewriteFunc } = MZ_EC.setKlassContainer("Scene_Map", $, MZ_EC);
+
+    rewriteFunc("encounterEffectSpeed", function() {
+        // Edited to help plugins alter the fps in better ways
+        return Graphics.gameFps;
+        //
+    }); // v0.00a - v0.00a
+
+})(Scene_Map.prototype, DoubleX_RMMZ.Enhanced_Codebase);
+
+/*----------------------------------------------------------------------------
  *    # Edited class: Scene_Battle
  *      - Fixes some manifestations of the very rare but game-crashing bug
  *----------------------------------------------------------------------------*/
@@ -6307,6 +6400,26 @@ var DoubleX_RMMZ = DoubleX_RMMZ || {}; // var must be used or game will crash
 /*----------------------------------------------------------------------------
  *    ## Sprites
  *----------------------------------------------------------------------------*/
+
+/*----------------------------------------------------------------------------
+ *    # Edited class: Sprite_Damage
+ *      - Uses the configurable Graphics fps instead of the constant 60
+ *----------------------------------------------------------------------------*/
+
+(($, MZ_EC) => {
+
+    "use strict";
+
+    const { rewriteFunc } = MZ_EC.setKlassContainer("Sprite_Damage", $, MZ_EC);
+
+    rewriteFunc("setupCriticalEffect", function() {
+        this._flashColor = [255, 0, 0, 160];
+        // Edited to help plugins alter the fps in better ways
+        this._flashDuration = Graphics.gameFps;
+        //
+    }); // v0.00a - v0.00a
+
+})(Sprite_Damage.prototype, DoubleX_RMMZ.Enhanced_Codebase);
 
 /*----------------------------------------------------------------------------
  *    # Edited class: Sprite_Gauge
@@ -6405,7 +6518,7 @@ var DoubleX_RMMZ = DoubleX_RMMZ || {}; // var must be used or game will crash
     rewriteFunc("valueColor", function() {
         // Edited to break different bar type behaviors into separate methods
         const valueColor = NEW._VALUE_COLOR_FUNCS[this._statusType];
-        return NEW[valueColor || "defaultvalueColor"].call(this);
+        return NEW[valueColor || "defaultValueColor"].call(this);
         //
     }); // v0.00a - v0.00a
 
@@ -6786,10 +6899,97 @@ var DoubleX_RMMZ = DoubleX_RMMZ || {}; // var must be used or game will crash
 
 })(Sprite_Gauge.prototype, DoubleX_RMMZ.Enhanced_Codebase);
 
+/*----------------------------------------------------------------------------
+ *    # Edited class: Sprite_StateIcon
+ *      - Uses the configurable Graphics fps instead of the constant 60
+ *----------------------------------------------------------------------------*/
+
+(($, MZ_EC) => {
+
+    "use strict";
+
+    const {
+        rewriteFunc
+    } = MZ_EC.setKlassContainer("Sprite_StateIcon", $, MZ_EC);
+
+    rewriteFunc("animationWait", function() {
+        // Edited to help plugins alter the fps in better ways
+        return Graphics.gameFps * 2 / 3;
+        //
+    }); // v0.00a - v0.00a
+
+})(Sprite_StateIcon.prototype, DoubleX_RMMZ.Enhanced_Codebase);
+
+/*----------------------------------------------------------------------------
+ *    # Edited class: Sprite_StateOverlay
+ *      - Uses the configurable Graphics fps instead of the constant 60
+ *----------------------------------------------------------------------------*/
+
+(($, MZ_EC) => {
+
+    "use strict";
+
+    const {
+        rewriteFunc
+    } = MZ_EC.setKlassContainer("Sprite_StateOverlay", $, MZ_EC);
+
+    rewriteFunc("animationWait", function() {
+        // Edited to help plugins alter the fps in better ways
+        return Graphics.gameFps * 2 / 15;
+        //
+    }); // v0.00a - v0.00a
+
+})(Sprite_StateOverlay.prototype, DoubleX_RMMZ.Enhanced_Codebase);
+
+/*----------------------------------------------------------------------------
+ *    # Edited class: Sprite_Weapon
+ *      - Uses the configurable Graphics fps instead of the constant 60
+ *----------------------------------------------------------------------------*/
+
+(($, MZ_EC) => {
+
+    "use strict";
+
+    const { rewriteFunc } = MZ_EC.setKlassContainer("Sprite_Weapon", $, MZ_EC);
+
+    rewriteFunc("animationWait", function() {
+        // Edited to help plugins alter the fps in better ways
+        return Graphics.gameFps / 5;
+        //
+    }); // v0.00a - v0.00a
+
+})(Sprite_Weapon.prototype, DoubleX_RMMZ.Enhanced_Codebase);
+
+/*----------------------------------------------------------------------------
+ *    # Edited class: Sprite_Destination
+ *      - Uses the configurable Graphics fps instead of the constant 60
+ *----------------------------------------------------------------------------*/
+
+(($, MZ_EC) => {
+
+    "use strict";
+
+    const {
+        rewriteFunc
+    } = MZ_EC.setKlassContainer("Sprite_Destination", $, MZ_EC);
+
+    rewriteFunc("updateAnimation", function() {
+        // Edited to help plugins alter the fps in better ways
+        const maxFrameCount = Graphics.gameFps / 3;
+        //
+        this._frameCount++;
+        this._frameCount %= maxFrameCount;
+        this.opacity = (maxFrameCount - this._frameCount) * 6;
+        this.scale.x = 1 + this._frameCount / maxFrameCount;
+        this.scale.y = this.scale.x;
+    }); // v0.00a - v0.00a
+
+})(Sprite_Destination.prototype, DoubleX_RMMZ.Enhanced_Codebase);
+
 /*----------------------------------------------------------------------------*/
 
 /*----------------------------------------------------------------------------
- *    ## Sprites
+ *    ## Windows
  *----------------------------------------------------------------------------*/
 
 /*----------------------------------------------------------------------------
@@ -6955,5 +7155,84 @@ var DoubleX_RMMZ = DoubleX_RMMZ || {}; // var must be used or game will crash
     }; // NEW._procMovableCursor
 
 })(Window_Selectable.prototype, DoubleX_RMMZ.Enhanced_Codebase);
+
+/*----------------------------------------------------------------------------
+ *    # Edited class: Window_Message
+ *      - Uses the configurable Graphics fps instead of the constant 60
+ *----------------------------------------------------------------------------*/
+
+(($, MZ_EC) => {
+
+    "use strict";
+
+    const $$ = Window_Base.prototype, {
+        rewriteFunc
+    } = MZ_EC.setKlassContainer("Window_Message", $, MZ_EC);
+
+    rewriteFunc("processEscapeCharacter", function(code, textState) {
+        switch (code) {
+            case "$": return this._goldWindow.open();
+            // Edited to help plugins alter the fps in better ways
+            case ".": return this.startWait(Graphics.gameFps / 4);
+            case "|": return this.startWait(Graphics.gameFps);
+            //
+            case "!": return this.startPause();
+            case ">": return this._lineShowFast = true;
+            case "<": return this._lineShowFast = false;
+            case "^": return this._pauseSkip = true;
+            default:
+                return $$.processEscapeCharacter.call(this, code, textState);
+        }
+    }); // v0.00a - v0.00a
+
+    rewriteFunc("startPause", function() {
+        // Edited to help plugins alter the fps in better ways
+        this.startWait(Graphics.gameFps / 6);
+        //
+        this.pause = true;
+    }); // v0.00a - v0.00a
+
+})(Window_Message.prototype, DoubleX_RMMZ.Enhanced_Codebase);
+
+/*----------------------------------------------------------------------------
+ *    # Edited class: Window_MapName
+ *      - Uses the configurable Graphics fps instead of the constant 60
+ *----------------------------------------------------------------------------*/
+
+(($, MZ_EC) => {
+
+    "use strict";
+
+    const { rewriteFunc } = MZ_EC.setKlassContainer("Window_MapName", $, MZ_EC);
+
+    rewriteFunc("open", function() {
+        this.refresh();
+        // Edited to help plugins alter the fps in better ways
+        this._showCount = Graphics.gameFps * 5 / 2;
+        //
+    }); // v0.00a - v0.00a
+
+})(Window_MapName.prototype, DoubleX_RMMZ.Enhanced_Codebase);
+
+/*----------------------------------------------------------------------------
+ *    # Edited class: Window_BattleLog
+ *      - Uses the configurable Graphics fps instead of the constant 60
+ *----------------------------------------------------------------------------*/
+
+(($, MZ_EC) => {
+
+    "use strict";
+
+    const {
+        rewriteFunc
+    } = MZ_EC.setKlassContainer("Window_BattleLog", $, MZ_EC);
+
+    rewriteFunc("messageSpeed", function() {
+        // Edited to help plugins alter the fps in better ways
+        return Graphics.gameFps * 4 / 15;
+        //
+    }); // v0.00a - v0.00a
+
+})(Window_BattleLog.prototype, DoubleX_RMMZ.Enhanced_Codebase);
 
 /*============================================================================*/
