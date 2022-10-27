@@ -29,7 +29,7 @@
  *      Video:
  *      1.
  *      This Plugin:
- *      1.
+ *      1. https://github.com/Double-X/DoubleX-RMMZ/blob/master/DoubleX_RMMZ_Formulae_Edit.js
  *      Posts:
  *      1.
  *      2.
