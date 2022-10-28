@@ -86,6 +86,47 @@
  *      Feature Requesters:
  *      - None So Far
  *----------------------------------------------------------------------------
+ *    # Changelog
+ *      { codebase: "1.5.0", plugin: "v0.04b" }(2022 Oct 25 GMT 1400):
+ *      1. Fixes some visual effect duration not in sync with game loop FPS
+ *         changes bug
+ *      2. Fixes default sprite gauge value color crash bug
+ *      { codebase: "1.4.3", plugin: "v0.04a" }(2022 Feb 5 GMT 1400):
+ *      1. Added traceObjProp
+ *      2. Added objPropLog
+ *      { codebase: "1.1.1", plugin: "v0.03c" }(2020 Dec 26 GMT 1400):
+ *      1. Fixed the event suffix not working for all plugins with such
+ *         notetags bug
+ *      { codebase: "1.1.1", plugin: "v0.03b" }(2020 Dec 25 GMT 1400):
+ *      1. Makes Sprite_Gauge better at adding bar types/editing their
+ *         behaviors
+ *      { codebase: "1.1.0", plugin: "v0.03a" }(2020 Dec 13 GMT 1400):
+ *      1. Fixed some manifestations of the bug where the active TPBS will
+ *         have an extremely rare chance to crash the game when trying to
+ *         select the inputting actor, the inputting actions, or its targets
+ *      { codebase: "1.1.0", plugin: "v0.02c" }(2020 Dec 3 GMT 1400):
+ *      1. You no longer have to edit the value of
+ *         DoubleX_RMMZ.Enhanced_Codebase.PLUGIN_NAME when changing this
+ *         plugin file name
+ *      { codebase: "1.1.0", plugin: "v0.02b" }(2020 Oct 30 GMT 1400):
+ *      1. Fixed a game crashing bug when using the Control Variables event
+ *         command
+ *      { codebase: "1.0.2", plugin: "v0.02a" }(2020 Oct 11 GMT 1400):
+ *      1. Added rngPartNum
+ *      { codebase: "1.0.2", plugin: "v0.01c" }(2020 Sep 19 GMT 1400):
+ *      1. Fixed the game crashing bug when defeated enemies drop items
+ *      2. Fixed the character being stuck inside events bug when moving
+ *         straight
+ *      3. Fixed the game crashing bug when moving diagonally
+ *      { codebase: "1.0.2", plugin: "v0.01b" }(2020 Sep 14 GMT 1400):
+ *      1. Fixed the bug where the text alpha is wrong when drawing texts
+ *      { codebase: "1.0.0", plugin: "v0.01a" }(2020 Sep 4 GMT 1400):
+ *      1. Added IS_CACHE_DAMAGE_FORMULA
+ *      2. Added tpbCastTime
+ *      3. Added IS_CACHE_SCRIPT
+ *      { codebase: "1.0.0", plugin: "v0.00a" }(2020 Aug 31 GMT 1400):
+ *      1. 1st version of this plugin finished
+ *----------------------------------------------------------------------------
  *    # Todo
  *      1. Adds Array.prototype.filterFlat(with improved performance)
  *      2. Adds Array.prototype.filterFlatMap(with improved performance)
@@ -119,7 +160,7 @@
 /*:
  * @url https://www.patreon.com/doublex
  * @target MZ
- * @plugindesc Versions: { codebase: "1.4.3", plugin: "v0.00a" }
+ * @plugindesc Versions: { codebase: "1.5.0", plugin: "v0.04b" }
  * Fixes bugs, improves codebase quality, boosts performance and gives new APIs
  * @author DoubleX
  *
@@ -423,7 +464,7 @@ var DoubleX_RMMZ = DoubleX_RMMZ || {}; // var must be used or game will crash
     DoubleX_RMMZ.Enhanced_Codebase = {
         CFG: {},
         PLUGIN_NAME: name,
-        VERSIONS: { codebase: "1.4.3", plugin: "v0.00a" }
+        VERSIONS: { codebase: "1.5.0", plugin: "v0.04b" }
     }; // DoubleX_RMMZ.Enhanced_Codebase
     //
 
