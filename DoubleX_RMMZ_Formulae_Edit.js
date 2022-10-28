@@ -31,16 +31,15 @@
  *      This Plugin:
  *      1. https://github.com/Double-X/DoubleX-RMMZ/blob/master/DoubleX_RMMZ_Formulae_Edit.js
  *      Posts:
- *      1.
- *      2.
- *      3.
- *      4.
- *      5.
- *      6.
- *      7.
- *      8.
- *      9.
- *      10.
+ *      1. https://forums.rpgmakerweb.com/index.php?threads/doublex_rmmz_formulae_edit.152291/
+ *      2. https://www.rpgmakercentral.com/topic/43235-doublex_rmmz_formulae_edit/
+ *      3. https://rpgmaker.net/engines/rmmz/utilities/347/
+ *      4. https://www.save-point.org/thread-8586-post-55567.html
+ *      5. https://gdu.one/forums/topic/14958-doublex_rmmz_formulae_edit/
+ *      6. https://www.arpgmaker.com/threads/doublex_rmmz_formulae_edit.80847/
+ *      7. https://www.reddit.com/r/RPGMaker/comments/yfm474/doublex_rmmz_formulae_edit/
+ *      8. https://www.patreon.com/posts/73888965?pr=true
+ *      9. https://doublexrpgmaker.wordpress.com/2022/10/28/doublex_rmmz_formulae_edit/
  *      Mentioned Patreon Supporters:
  *      https://www.patreon.com/posts/71738797
  *----------------------------------------------------------------------------
