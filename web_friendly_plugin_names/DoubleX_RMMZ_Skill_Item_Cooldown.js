@@ -510,6 +510,49 @@
  * @command setSkillItemCooldownParam
  * @desc Applies script call $gameSystem.setSkillItemCooldownParam(param, val)
  * @arg param
+ * @type select
+ * @option clearBattlerSkillItemCooldownOnBattleStart
+ * @value clearBattlerSkillItemCooldownOnBattleStart
+ * @option clearBattlerSkillItemCooldownOnBattleEnd
+ * @value clearBattlerSkillItemCooldownOnBattleEnd
+ * @option canCancelBattlerCooldown
+ * @value canCancelBattlerCooldown
+ * @option canCancelSkillItemCooldown
+ * @value canCancelSkillItemCooldown
+ * @option cancelBattlerCooldownFail
+ * @value cancelBattlerCooldownFail
+ * @option cancelSkillItemCooldownFail
+ * @value cancelSkillItemCooldownFail
+ * @option cancelBattlerCooldownSuc
+ * @value cancelBattlerCooldownSuc
+ * @option cancelSkillItemCooldownSuc
+ * @value cancelSkillItemCooldownSuc
+ * @option onCancelCooldownClick
+ * @value onCancelCooldownClick
+ * @option skillItemCooldownGaugeColor1
+ * @value skillItemCooldownGaugeColor1
+ * @option skillItemCooldownGaugeColor2
+ * @value skillItemCooldownGaugeColor2
+ * @option cancelBattlerCooldownHotkeys
+ * @value cancelBattlerCooldownHotkeys
+ * @option cancelSkillItemCooldownHotkeys
+ * @value cancelSkillItemCooldownHotkeys
+ * @option battlerNotetagDataTypePriorities
+ * @value battlerNotetagDataTypePriorities
+ * @option skillItemNotetagDataTypePriorities
+ * @value skillItemNotetagDataTypePriorities
+ * @option canCancelBattlerNotetagDataTypePriorities
+ * @value canCancelBattlerNotetagDataTypePriorities
+ * @option canCancelSkillItemNotetagDataTypePriorities
+ * @value canCancelSkillItemNotetagDataTypePriorities
+ * @option cancelBattlerSucNotetagDataTypePriorities
+ * @value cancelBattlerSucNotetagDataTypePriorities
+ * @option cancelSkillItemSucNotetagDataTypePriorities
+ * @value cancelSkillItemSucNotetagDataTypePriorities
+ * @option cancelBattlerFailNotetagDataTypePriorities
+ * @value cancelBattlerFailNotetagDataTypePriorities
+ * @option cancelSkillItemFailNotetagDataTypePriorities
+ * @value cancelSkillItemFailNotetagDataTypePriorities
  * @desc The name of a valid parameter of this plugin
  * @arg val
  * @desc A valid new fully parsed value of the parameter param
@@ -2490,7 +2533,7 @@ if (DoubleX_RMMZ.Enhanced_Codebase) {
 /*============================================================================*/
 
     const curMZECVer = DoubleX_RMMZ.Enhanced_Codebase.VERSIONS.plugin;
-    const minMZECVer = "v0.00a";
+    const minMZECVer = "v0.03c";
     if (curMZECVer < minMZECVer) {
         console.warn(`The version of DoubleX RMMZ Enhanced Codebase is
                      ${curMZECVer} but should be at least ${minMZECVer}`);
