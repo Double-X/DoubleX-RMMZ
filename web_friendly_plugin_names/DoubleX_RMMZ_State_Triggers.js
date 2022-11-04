@@ -2,7 +2,7 @@
  *    ## Plugin Info
  *----------------------------------------------------------------------------
  *    # Plugin Name
- *      DoubleX RMMZ State Triggers
+ *      DoubleX_RMMZ_State_Triggers
  *----------------------------------------------------------------------------
  *    # Introduction
  *    1. This plugin lets you use notetags to set what happens when a state's
