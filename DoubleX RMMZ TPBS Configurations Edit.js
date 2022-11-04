@@ -667,6 +667,83 @@
  * @command setTPBSCfgEditParam
  * @desc Applies script call $gameSystem.setTPBSCfgEditParam(param, val)
  * @arg param
+ * @type select
+ * @option tpbAcceleration
+ * @value tpbAcceleration
+ * @option tpbRelativeSpeed
+ * @value tpbRelativeSpeed
+ * @option tpbSpeed
+ * @value tpbSpeed
+ * @option tpbBaseSpeed
+ * @value tpbBaseSpeed
+ * @option tpbRequiredCastTime
+ * @value tpbRequiredCastTime
+ * @option tpbChargeTimeWithPenalty
+ * @value tpbChargeTimeWithPenalty
+ * @option updatedTpbChargeTime
+ * @value updatedTpbChargeTime
+ * @option updatedTpbCastTime
+ * @value updatedTpbCastTime
+ * @option updatedTpbIdleTime
+ * @value updatedTpbIdleTime
+ * @option tpbCastDelay
+ * @value tpbCastDelay
+ * @option advantageousStartTpbChargeTime
+ * @value advantageousStartTpbChargeTime
+ * @option disadvantageousStartTpbChargeTime
+ * @value disadvantageousStartTpbChargeTime
+ * @option normStartTpbChargeTime
+ * @value normStartTpbChargeTime
+ * @option tpbAccelerationNotetagDataTypePriorities
+ * @value tpbAccelerationNotetagDataTypePriorities
+ * @option tpbRelativeSpeedNotetagDataTypePriorities
+ * @value tpbRelativeSpeedNotetagDataTypePriorities
+ * @option tpbSpeedNotetagDataTypePriorities
+ * @value tpbSpeedNotetagDataTypePriorities
+ * @option tpbBaseSpeedNotetagDataTypePriorities
+ * @value tpbBaseSpeedNotetagDataTypePriorities
+ * @option tpbRequiredCastTimeNotetagDataTypePriorities
+ * @value tpbRequiredCastTimeNotetagDataTypePriorities
+ * @option tpbChargeTimeWithPenaltyNotetagDataTypePriorities
+ * @value tpbChargeTimeWithPenaltyNotetagDataTypePriorities
+ * @option updatedTpbChargeTimeNotetagDataTypePriorities
+ * @value updatedTpbChargeTimeNotetagDataTypePriorities
+ * @option updatedTpbCastTimeNotetagDataTypePriorities
+ * @value updatedTpbCastTimeNotetagDataTypePriorities
+ * @option updatedTpbIdleTimeNotetagDataTypePriorities
+ * @value updatedTpbIdleTimeNotetagDataTypePriorities
+ * @option tpbCastDelayNotetagDataTypePriorities
+ * @value tpbCastDelayNotetagDataTypePriorities
+ * @option advantageousStartTpbChargeTimeNotetagDataTypePriorities
+ * @value advantageousStartTpbChargeTimeNotetagDataTypePriorities
+ * @option disadvantageousStartTpbChargeTimeNotetagDataTypePriorities
+ * @value disadvantageousStartTpbChargeTimeNotetagDataTypePriorities
+ * @option normStartTpbChargeTimeNotetagDataTypePriorities
+ * @value normStartTpbChargeTimeNotetagDataTypePriorities
+ * @option unitTPBBaseSpeed
+ * @value unitTPBBaseSpeed
+ * @option unitTPBReferenceTime
+ * @value unitTPBReferenceTime
+ * @option tpbChargeGaugeColor1
+ * @value tpbChargeGaugeColor1
+ * @option tpbChargeGaugeColor2
+ * @value tpbChargeGaugeColor2
+ * @option tpbIdleGaugeColor1
+ * @value tpbIdleGaugeColor1
+ * @option tpbIdleGaugeColor2
+ * @value tpbIdleGaugeColor2
+ * @option tpbCastGaugeColor1
+ * @value tpbCastGaugeColor1
+ * @option tpbCastGaugeColor2
+ * @value tpbCastGaugeColor2
+ * @option tpbReadyGaugeColor1
+ * @value tpbReadyGaugeColor1
+ * @option tpbReadyGaugeColor2
+ * @value tpbReadyGaugeColor2
+ * @option isTroopTpbTurnEnd
+ * @value isTroopTpbTurnEnd
+ * @option isTpbTimeActive
+ * @value isTpbTimeActive
  * @desc The name of a valid parameter of this plugin
  * @arg val
  * @desc A valid new fully parsed value of the parameter param
@@ -1781,7 +1858,7 @@ if (DoubleX_RMMZ.Enhanced_Codebase) {
 /*============================================================================*/
 
     const curMZECVer = DoubleX_RMMZ.Enhanced_Codebase.VERSIONS.plugin;
-    const minMZECVer = "v0.00a";
+    const minMZECVer = "v0.03b";
     if (curMZECVer < minMZECVer) {
         console.warn(`The version of DoubleX RMMZ Enhanced Codebase is
                      ${curMZECVer} but should be at least ${minMZECVer}`);
