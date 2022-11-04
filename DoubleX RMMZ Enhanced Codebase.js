@@ -125,7 +125,7 @@
  *      2. Added tpbCastTime
  *      3. Added IS_CACHE_SCRIPT
  *      { codebase: "1.0.0", plugin: "v0.00a" }(2020 Aug 31 GMT 1400):
- *      1. 1st version of this plugin finished
+ *      1. 1st testing version of this plugin finished
  *----------------------------------------------------------------------------
  *    # Todo
  *      1. Adds Array.prototype.filterFlat(with improved performance)
