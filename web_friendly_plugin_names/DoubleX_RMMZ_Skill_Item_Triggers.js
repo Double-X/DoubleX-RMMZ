@@ -559,6 +559,39 @@
  * @command setSkillItemTriggersParam
  * @desc Applies script call $gameSystem.setSkillItemTriggersParam(param, val)
  * @arg param
+ * @type select
+ * @option missNotetagDataTypePriorities
+ * @value missNotetagDataTypePriorities
+ * @option evaNotetagDataTypePriorities
+ * @value evaNotetagDataTypePriorities
+ * @option cntNotetagDataTypePriorities
+ * @value cntNotetagDataTypePriorities
+ * @option mrfNotetagDataTypePriorities
+ * @value mrfNotetagDataTypePriorities
+ * @option criNotetagDataTypePriorities
+ * @value criNotetagDataTypePriorities
+ * @option normNotetagDataTypePriorities
+ * @value normNotetagDataTypePriorities
+ * @option substituteNotetagDataTypePriorities
+ * @value substituteNotetagDataTypePriorities
+ * @option preNotetagDataTypePriorities
+ * @value preNotetagDataTypePriorities
+ * @option postNotetagDataTypePriorities
+ * @value postNotetagDataTypePriorities
+ * @option subjectMissNotetagDataTypePriorities
+ * @value subjectMissNotetagDataTypePriorities
+ * @option subjectEvaNotetagDataTypePriorities
+ * @value subjectEvaNotetagDataTypePriorities
+ * @option subjectCntNotetagDataTypePriorities
+ * @value subjectCntNotetagDataTypePriorities
+ * @option subjectMrfNotetagDataTypePriorities
+ * @value subjectMrfNotetagDataTypePriorities
+ * @option subjectCriNotetagDataTypePriorities
+ * @value subjectCriNotetagDataTypePriorities
+ * @option subjectNormNotetagDataTypePriorities
+ * @value subjectNormNotetagDataTypePriorities
+ * @option subjectSubstituteNotetagDataTypePriorities
+ * @value subjectSubstituteNotetagDataTypePriorities
  * @desc The name of a valid parameter of this plugin
  * @arg val
  * @desc A valid new fully parsed value of the parameter param
@@ -1347,7 +1380,7 @@ if (DoubleX_RMMZ.Enhanced_Codebase) {
 /*============================================================================*/
 
     const curMZECVer = DoubleX_RMMZ.Enhanced_Codebase.VERSIONS.plugin;
-    const minMZECVer = "v0.00a";
+    const minMZECVer = "v0.04a";
     if (curMZECVer < minMZECVer) {
         console.warn(`The version of DoubleX RMMZ Enhanced Codebase is
                      ${curMZECVer} but should be at least ${minMZECVer}`);
