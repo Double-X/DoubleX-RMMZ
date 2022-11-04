@@ -64,6 +64,7 @@
  * @plugindesc Versions: { codebase: "1.4.4", plugin: "v1.00a" }
  * Lets you extract texts in events/common events/battle events to txt file
  * @orderAfter DoubleX_RMMZ_Enhanced_Codebase
+ * @orderAfter DoubleX RMMZ Enhanced Codebase
  * @author DoubleX
  *
  * @param fileName

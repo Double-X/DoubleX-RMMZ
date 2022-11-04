@@ -306,7 +306,7 @@ if (DoubleX_RMMZ.Enhanced_Codebase) {
 /*============================================================================*/
 
     const curMZECVer = DoubleX_RMMZ.Enhanced_Codebase.VERSIONS.plugin;
-    const minMZECVer = "v0.00a";
+    const minMZECVer = "v0.02b";
     if (curMZECVer < minMZECVer) {
         console.warn(`The version of DoubleX RMMZ Enhanced Codebase is
                      ${curMZECVer} but should be at least ${minMZECVer}`);
