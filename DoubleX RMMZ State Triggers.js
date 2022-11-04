@@ -239,6 +239,17 @@
  * @command setStateTriggersParam
  * @desc Applies script call $gameSystem.setStateTriggersParam(param, val)
  * @arg param
+ * @type select
+ * @option addNotetagDataTypePriorities
+ * @value addNotetagDataTypePriorities
+ * @option removeNotetagDataTypePriorities
+ * @value removeNotetagDataTypePriorities
+ * @option resetNotetagDataTypePriorities
+ * @value resetNotetagDataTypePriorities
+ * @option expireNotetagDataTypePriorities
+ * @value expireNotetagDataTypePriorities
+ * @option turnNotetagDataTypePriorities
+ * @value turnNotetagDataTypePriorities
  * @desc The name of a valid parameter of this plugin
  * @arg val
  * @desc A valid new fully parsed value of the parameter param
@@ -674,7 +685,7 @@ if (DoubleX_RMMZ.Enhanced_Codebase) {
 /*============================================================================*/
 
     const curMZECVer = DoubleX_RMMZ.Enhanced_Codebase.VERSIONS.plugin;
-    const minMZECVer = "v0.00a";
+    const minMZECVer = "v0.02b";
     if (curMZECVer < minMZECVer) {
         console.warn(`The version of DoubleX RMMZ Enhanced Codebase is
                      ${curMZECVer} but should be at least ${minMZECVer}`);
